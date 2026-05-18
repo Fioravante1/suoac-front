@@ -1,0 +1,7 @@
+.card {
+  background-color: var(--suoac-color-surface);
+  border-radius: var(--suoac-radius-xl); /* 20px in our scale if lg is 16px */
+  padding: var(--suoac-card-padding);
+  box-shadow: var(--suoac-shadow-sm);
+  border: 1px solid var(--suoac-color-border);
+}
