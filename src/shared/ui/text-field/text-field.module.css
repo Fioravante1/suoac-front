@@ -1,0 +1,89 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  width: 100%;
+}
+
+.label {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  height: var(--suoac-input-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-sm);
+  background-color: var(--suoac-color-surface);
+  font-family: var(--suoac-font-family-sans);
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-primary);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--suoac-color-primary);
+  box-shadow: 0 0 0 2px var(--suoac-color-primary-light);
+}
+
+.input::placeholder {
+  color: var(--suoac-color-text-secondary);
+}
+
+.input:disabled {
+  background-color: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-secondary);
+  cursor: not-allowed;
+}
+
+.hasError {
+  border-color: var(--suoac-color-critical);
+}
+
+.hasError:focus {
+  border-color: var(--suoac-color-critical);
+  box-shadow: 0 0 0 2px var(--suoac-color-critical-soft);
+}
+
+.startIcon {
+  position: absolute;
+  left: var(--suoac-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--suoac-color-text-secondary);
+  pointer-events: none;
+}
+
+.endIcon {
+  position: absolute;
+  right: var(--suoac-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--suoac-color-text-secondary);
+}
+
+.hasStartIcon {
+  padding-left: calc(var(--suoac-space-3) * 2 + 20px); /* Adjust based on icon size */
+}
+
+.hasEndIcon {
+  padding-right: calc(var(--suoac-space-3) * 2 + 20px);
+}
+
+.errorMessage {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-critical);
+}
