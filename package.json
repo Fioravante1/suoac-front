@@ -6,19 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --cache --cache-location .next/cache/eslint/",
+    "lint:fix": "yarn lint --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:all": "yarn test:unit",
+    "architecture:check": "steiger ./src",
+    "typecheck": "tsc --noEmit",
+    "check": "yarn typecheck && yarn lint && yarn architecture:check && yarn test:unit && yarn format:check",
+    "validate": "yarn run check"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.100.10",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@feature-sliced/steiger-plugin": "0.5.8",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitest/coverage-v8": "4.1.6",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
-    "typescript": "^5"
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-boundaries": "6.0.2",
+    "jsdom": "29.1.1",
+    "prettier": "3.8.3",
+    "steiger": "0.5.12",
+    "typescript": "^5",
+    "vite": "8.0.13",
+    "vitest": "4.1.6"
   }
 }

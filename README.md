@@ -1,36 +1,178 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SUOAC Frontend
 
-## Getting Started
+Frontend do **SUOAC — Sistema Unificado de Ônibus para Assembleias e Congressos**.
 
-First, run the development server:
+O projeto implementa a interface web responsiva do sistema, com foco mobile-first, organização
+operacional, controle de eventos, passageiros, pagamentos e dashboards.
+
+---
+
+## Stack
+
+- Node.js `v24.x`
+- Yarn `v1.x`
+- Next.js `16.2.6` com App Router
+- React `19.2.4`
+- TypeScript com `strict: true`
+- TanStack Query para server state
+- Vitest + React Testing Library para testes unitários
+- ESLint Flat Config + Prettier
+- Feature-Sliced Design validado com Steiger
+- `eslint-plugin-boundaries` para feedback arquitetural no editor
+
+---
+
+## Documentação
+
+Leia estes arquivos antes de implementar funcionalidades:
+
+- [Requisitos](docs/SUOAC_REQUISITOS_v2.md)
+- [ERD](docs/SUOAC_ERD.md)
+- [Identidade Visual](docs/SUOAC%20%E2%80%94%20Identidade%20Visual%20Oficial.md)
+- [Arquitetura Frontend FSD](docs/SUOAC_ARQUITETURA_FRONTEND_FSD.md)
+
+Para alterações no Next.js, consulte também a documentação local instalada:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+node_modules/next/dist/docs/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Instalação
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+yarn install
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Desenvolvimento
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A aplicação roda em:
 
-## Deploy on Vercel
+```text
+http://localhost:3000
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Arquitetura
+
+O projeto segue **Feature-Sliced Design**.
+
+```text
+app/                  # Next.js App Router
+pages/                # placeholder para evitar uso do Pages Router legado
+src/
+  app/                # FSD App layer: providers, config, bootstrap, tokens
+  pages/              # FSD Pages layer: telas de produto
+  widgets/            # blocos grandes de interface
+  features/           # ações de usuário com valor de negócio
+  entities/           # conceitos de domínio
+  shared/             # base técnica e UI genérica
+```
+
+Regra de dependência:
+
+```text
+app -> pages -> widgets -> features -> entities -> shared
+```
+
+Arquivos em `/app` devem ser finos e apenas conectar rotas do Next às pages FSD.
+
+Exemplo:
+
+```tsx
+export { default } from "@/pages/home";
+```
+
+---
+
+## Validação Arquitetural
+
+O projeto usa duas camadas de validação:
+
+- `eslint-plugin-boundaries`: acusa violações no editor e em `yarn lint`
+- Steiger: valida FSD em `yarn architecture:check`
+
+Rodar validação arquitetural:
+
+```bash
+yarn architecture:check
+```
+
+---
+
+## Scripts
+
+```bash
+yarn dev                 # inicia o servidor de desenvolvimento
+yarn build               # build de produção
+yarn start               # inicia build de produção
+yarn lint                # ESLint
+yarn lint:fix            # ESLint com autofix
+yarn format              # formata com Prettier
+yarn format:check        # checa formatação
+yarn typecheck           # TypeScript sem emit
+yarn test                # Vitest em watch mode
+yarn test:unit           # testes unitários em modo run
+yarn test:coverage       # cobertura de testes
+yarn architecture:check  # valida FSD com Steiger
+yarn run check           # validação completa
+yarn validate            # alias seguro para yarn run check
+```
+
+Observação: em Yarn v1, `yarn check` pode chamar um comando interno do Yarn. Use `yarn run check`
+ou `yarn validate`.
+
+---
+
+## Testes
+
+Nesta fase inicial, o projeto usa apenas testes unitários.
+
+Regras:
+
+- Testes co-localizados com o arquivo testado
+- Padrão: `*.test.ts` ou `*.test.tsx`
+- Setup global em `tests/setup/vitest.setup.ts`
+
+Exemplo:
+
+```text
+src/pages/home/ui/home-page.tsx
+src/pages/home/ui/home-page.test.tsx
+```
+
+---
+
+## Qualidade
+
+Antes de concluir qualquer alteração de código, rode:
+
+```bash
+yarn run check
+```
+
+Esse comando executa:
+
+- TypeScript
+- ESLint
+- Steiger
+- Vitest
+- Prettier check
+
+---
+
+## Regras Para Assistentes
+
+As instruções de trabalho para agentes ficam em:
+
+- [AGENTS.md](AGENTS.md)
+- [CLAUDE.md](CLAUDE.md)
+- [GEMINI.md](GEMINI.md)
