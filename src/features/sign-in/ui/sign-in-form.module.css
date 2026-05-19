@@ -1,0 +1,37 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: calc(var(--suoac-space-2) * -1);
+}
+
+.forgotPassword {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-primary);
+  font-weight: var(--suoac-font-weight-medium);
+  transition: color 0.2s;
+}
+
+.forgotPassword:hover {
+  color: var(--suoac-color-primary-dark);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
