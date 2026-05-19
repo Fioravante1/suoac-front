@@ -15,6 +15,8 @@ operacional, controle de eventos, passageiros, pagamentos e dashboards.
 - React `19.2.4`
 - TypeScript com `strict: true`
 - TanStack Query para server state
+- React Hook Form + Zod para formulários
+- CSS Modules + CSS Custom Properties para estilos
 - Vitest + React Testing Library para testes unitários
 - ESLint Flat Config + Prettier
 - Feature-Sliced Design validado com Steiger

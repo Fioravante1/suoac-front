@@ -671,11 +671,16 @@ features/publish-event/model/...    # regra especifica para publicar evento
 
 ## 9. Formularios e validacao
 
-Quando React Hook Form + Zod forem adicionados:
+O projeto usa **React Hook Form + Zod + `@hookform/resolvers`** como padrao para formularios.
 
 - Schema especifico de uma feature fica em `features/{feature}/model`.
 - Schema de uma page simples fica em `pages/{page}/model`.
 - Schema de entidade, se representar invariantes estaveis do dominio, fica em `entities/{entity}/model`.
+- Formularios com React Hook Form devem ser Client Components e declarar `"use client"`.
+- Use `zodResolver` para conectar schemas Zod ao React Hook Form.
+- Nao criar pasta global `schemas`.
+- Nao colocar regras reutilizaveis diretamente dentro do componente.
+- Tipos do formulario devem ser derivados do schema com `z.infer` sempre que possivel.
 
 Exemplos:
 
@@ -689,9 +694,44 @@ entities/passenger/model/rg-schema.ts
 Regra: validacao de formulario nao deve ser confundida com regra de dominio. Se uma regra vale
 independentemente da tela, extraia para `entities` ou para a feature dona do caso de uso.
 
+Exemplo de padrao:
+
+```tsx
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { createEventSchema, type CreateEventFormValues } from "../model/create-event-schema";
+
+export function CreateEventForm() {
+  const form = useForm<CreateEventFormValues>({
+    resolver: zodResolver(createEventSchema),
+  });
+
+  // ...
+}
+```
+
 ---
 
 ## 10. Design system e UI
+
+### 10.0 Estrategia de estilo
+
+A estrategia padrao do projeto e **CSS Modules + CSS Custom Properties**.
+
+Decisao:
+
+- Nao usar `styled-components` como padrao inicial.
+- Tokens globais em CSS variables ficam em `app/globals.css`.
+- Tokens tipados para uso em TypeScript ficam em `src/app/styles/theme-tokens.ts`.
+- Componentes devem usar `.module.css` co-localizado sempre que possivel.
+- Estilos dinamicos devem priorizar data attributes, classes e CSS variables antes de introduzir
+  runtime CSS-in-JS.
+
+Motivo: essa abordagem reduz runtime no cliente, preserva Server Components do Next, funciona bem
+com FSD e atende melhor a natureza operacional/mobile-first do SUOAC.
 
 ### 10.1 `shared/ui`
 
@@ -1040,7 +1080,8 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 
 ### Fase 3 — Server state
 
-- Instalar TanStack Query.
+- Instalar TanStack Query. ✅
+- Instalar React Hook Form + Zod + resolvers. ✅
 - Criar `shared/api/client`.
 - Criar `shared/api/query-client`.
 - Criar query factories por entidade.

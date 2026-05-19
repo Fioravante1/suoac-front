@@ -1,12 +1,104 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* Brand */
+  --suoac-color-primary: #1f6e5a;
+  --suoac-color-primary-dark: #174e40;
+  --suoac-color-primary-light: #e6f4ef;
+
+  /* Secondary */
+  --suoac-color-info: #2f6fed;
+  --suoac-color-success: #2e9e5b;
+  --suoac-color-attention: #f5b700;
+  --suoac-color-critical: #d64545;
+
+  /* Neutrals */
+  --suoac-color-background: #f7f9f8;
+  --suoac-color-surface: #ffffff;
+  --suoac-color-surface-muted: #f1f5f3;
+  --suoac-color-border: #e3e8e6;
+  --suoac-color-border-strong: #cfd8d4;
+  --suoac-color-text-primary: #1e1f24;
+  --suoac-color-text-secondary: #667085;
+  --suoac-color-text-inverse: #ffffff;
+  --suoac-color-sidebar: #0d2b45;
+
+  /* Semantic backgrounds */
+  --suoac-color-info-soft: #e8f0ff;
+  --suoac-color-success-soft: #e7f6ee;
+  --suoac-color-attention-soft: #fff4cf;
+  --suoac-color-critical-soft: #fdecec;
+  --suoac-color-neutral-soft: #f1f3f3;
+
+  /* Event states */
+  --suoac-color-event-open: var(--suoac-color-primary);
+  --suoac-color-event-closed: var(--suoac-color-attention);
+  --suoac-color-event-finished: var(--suoac-color-sidebar);
+  --suoac-color-event-draft: var(--suoac-color-text-secondary);
+
+  /* Financial states */
+  --suoac-color-payment-paid: var(--suoac-color-success);
+  --suoac-color-payment-partial: var(--suoac-color-attention);
+  --suoac-color-payment-pending: var(--suoac-color-critical);
+  --suoac-color-payment-exempt: var(--suoac-color-info);
+
+  /* Typography */
+  --suoac-font-family-sans:
+    var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --suoac-font-size-label: 0.8125rem;
+  --suoac-font-size-small: 0.875rem;
+  --suoac-font-size-body: 1rem;
+  --suoac-font-size-h3: 1.25rem;
+  --suoac-font-size-h2: 1.5rem;
+  --suoac-font-size-h1: 2rem;
+  --suoac-line-height-tight: 1.2;
+  --suoac-line-height-heading: 1.25;
+  --suoac-line-height-body: 1.5;
+  --suoac-font-weight-regular: 400;
+  --suoac-font-weight-medium: 500;
+  --suoac-font-weight-semibold: 600;
+  --suoac-font-weight-bold: 700;
+
+  /* Spacing */
+  --suoac-space-1: 0.25rem;
+  --suoac-space-2: 0.5rem;
+  --suoac-space-3: 0.75rem;
+  --suoac-space-4: 1rem;
+  --suoac-space-5: 1.25rem;
+  --suoac-space-6: 1.5rem;
+  --suoac-space-8: 2rem;
+  --suoac-space-10: 2.5rem;
+  --suoac-space-12: 3rem;
+
+  /* Radius */
+  --suoac-radius-sm: 0.5rem;
+  --suoac-radius-md: 0.75rem;
+  --suoac-radius-lg: 1rem;
+  --suoac-radius-xl: 1.25rem;
+  --suoac-radius-pill: 999px;
+
+  /* Shadows */
+  --suoac-shadow-xs: 0 1px 2px rgb(16 24 40 / 0.06);
+  --suoac-shadow-sm: 0 8px 24px rgb(31 110 90 / 0.08);
+  --suoac-shadow-md: 0 16px 40px rgb(31 110 90 / 0.12);
+
+  /* Layout */
+  --suoac-layout-mobile-nav-height: 4.5rem;
+  --suoac-layout-sidebar-width: 17rem;
+  --suoac-layout-content-max-width: 75rem;
+
+  /* Component defaults */
+  --suoac-button-height: 2.75rem;
+  --suoac-input-height: 3rem;
+  --suoac-card-padding: var(--suoac-space-6);
+
+  --background: var(--suoac-color-background);
+  --foreground: var(--suoac-color-text-primary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: light;
   }
 }
 
@@ -26,7 +118,9 @@ body {
   flex-direction: column;
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--suoac-font-family-sans);
+  font-size: var(--suoac-font-size-body);
+  line-height: var(--suoac-line-height-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -44,6 +138,6 @@ a {
 
 @media (prefers-color-scheme: dark) {
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 }

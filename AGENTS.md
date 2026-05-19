@@ -20,6 +20,7 @@ Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio 
 - **React**: `19.2.4`
 - **Linguagem**: TypeScript com `strict: true`
 - **Server state**: TanStack Query `@tanstack/react-query`
+- **Formularios**: React Hook Form + Zod + `@hookform/resolvers`
 - **Testes unitarios**: Vitest + React Testing Library + jsdom
 - **Arquitetura**: Feature-Sliced Design (FSD)
 - **Validador FSD**: Steiger + `@feature-sliced/steiger-plugin`
@@ -201,6 +202,26 @@ shared/api/query-client.ts
 - Nao espalhe tipos de backend por componentes.
 - Nao crie `shared/types`.
 
+### Formularios
+
+- Use React Hook Form + Zod + `zodResolver`.
+- Formularios com React Hook Form devem ser Client Components e declarar `"use client"`.
+- Schema especifico de uma feature fica em `features/{feature}/model`.
+- Schema de uma page simples fica em `pages/{page}/model`.
+- Schema de entidade reutilizavel fica em `entities/{entity}/model`.
+- Nao crie pasta global `schemas`.
+- Nao coloque regras reutilizaveis diretamente no componente.
+- Derive tipos com `z.infer` sempre que possivel.
+
+Exemplo de organizacao:
+
+```text
+src/features/register-payment/
+  ui/register-payment-form.tsx
+  model/register-payment-schema.ts
+  api/register-payment.mutation.ts
+```
+
 ---
 
 ## 6. UI, Design System e UX
@@ -219,10 +240,21 @@ Diretrizes:
 - Componentes genericos ficam em `shared/ui`.
 - Componentes com regra/semantica de dominio ficam em `entities`, `features` ou `widgets`.
 - Nao use `components/`, `hooks/`, `utils/`, `services/` como pastas genericas na raiz.
+- A estrategia de estilo padrao e CSS Modules + CSS Custom Properties.
+- Nao adicione `styled-components` sem nova decisao arquitetural explicita.
+- Estilos de componente devem ficar co-localizados em `*.module.css`.
+- Nao espalhe valores visuais soltos em componentes ou CSS Modules (`#1f6e5a`, `24px`, sombras,
+  radius, z-index, alturas de controles, etc.) quando eles representarem uma decisao de design.
+- Se um valor visual for reutilizavel, semantico ou parte do design system, crie/atualize o token
+  correspondente em `app/globals.css` e em `src/app/styles/theme-tokens.ts`.
+- CSS Modules devem consumir tokens via `var(--suoac-...)` sempre que possivel.
+- Valores locais so sao aceitaveis quando forem especificos de layout daquele componente e nao
+  tiverem significado reutilizavel no design system.
 
 Tokens atuais ficam em:
 
 ```text
+app/globals.css
 src/app/styles/theme-tokens.ts
 ```
 
