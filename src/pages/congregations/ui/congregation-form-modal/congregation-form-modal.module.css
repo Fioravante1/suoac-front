@@ -1,0 +1,13 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  background-color: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-sm);
+  font-size: var(--suoac-font-size-small);
+}

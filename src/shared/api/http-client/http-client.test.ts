@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+vi.mock("@/shared/auth/session", () => ({
+  getAccessToken: vi.fn().mockResolvedValue("test-token"),
+}));
+
 import { httpClient, HttpError } from "./http-client";
 
 const fetchMock = vi.fn();
@@ -24,7 +28,7 @@ describe("httpClient", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("https://api.test.com/users/1", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization: "Bearer test-token" },
     });
     expect(result).toEqual(data);
   });
@@ -41,7 +45,7 @@ describe("httpClient", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("https://api.test.com/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test-token" },
       body: JSON.stringify(body),
     });
     expect(result).toEqual(responseData);

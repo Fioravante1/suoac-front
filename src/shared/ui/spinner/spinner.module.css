@@ -1,0 +1,30 @@
+.spinner {
+  display: inline-block;
+  border: 3px solid var(--suoac-color-border);
+  border-top-color: var(--suoac-color-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.sizeSmall {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.sizeMedium {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.sizeLarge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

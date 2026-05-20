@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getAccessToken } from "@/shared/auth/session";
+
 export class HttpError extends Error {
   constructor(
     public readonly status: number,
@@ -27,10 +29,13 @@ export async function httpClient<T>(path: string, options: HttpClientOptions = {
     throw new Error("API_BASE_URL is not configured");
   }
 
+  const token = await getAccessToken();
+
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
-      "Content-Type": "application/json",
+      ...(body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -49,6 +54,10 @@ export async function httpClient<T>(path: string, options: HttpClientOptions = {
     }
 
     throw new HttpError(response.status, message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return response.json() as Promise<T>;

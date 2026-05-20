@@ -98,6 +98,7 @@ Criacao dos componentes base reutilizaveis na camada `shared`, todos acompanhado
 ---
 
 ## Proximos Passos
+
 - [ ] Implementar filtragem de navegacao por role (RBAC).
 - [ ] Criar entities com model e queries reais (event, passenger, payment, congregation).
 - [ ] Criar features do MVP (create-event, enroll-passenger, register-payment).

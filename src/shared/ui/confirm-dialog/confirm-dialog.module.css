@@ -1,0 +1,5 @@
+.message {
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-secondary);
+  line-height: var(--suoac-line-height-body);
+}

@@ -1,0 +1,134 @@
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-secondary);
+  border-bottom: 1px solid var(--suoac-color-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-primary);
+  border-bottom: 1px solid var(--suoac-color-border);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: var(--suoac-color-surface-muted);
+}
+
+.name {
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.code {
+  color: var(--suoac-color-text-secondary);
+  font-family: monospace;
+  font-size: var(--suoac-font-size-label);
+}
+
+.city {
+  color: var(--suoac-color-text-secondary);
+}
+
+.email {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-label);
+}
+
+.actions {
+  display: flex;
+  gap: var(--suoac-space-2);
+  justify-content: flex-end;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--suoac-space-1) var(--suoac-space-2);
+  border: none;
+  background: transparent;
+  border-radius: var(--suoac-radius-sm);
+  color: var(--suoac-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--suoac-font-size-small);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.actionButton:hover {
+  background-color: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-primary);
+}
+
+.actionButtonDanger:hover {
+  background-color: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+}
+
+/* Mobile card layout */
+.mobileCards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.mobileCard {
+  background: var(--suoac-color-surface);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  padding: var(--suoac-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.mobileCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.mobileCardName {
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.mobileCardDetail {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}
+
+.mobileCardActions {
+  display: flex;
+  gap: var(--suoac-space-2);
+  padding-top: var(--suoac-space-2);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+/* Responsive breakpoint */
+@media (min-width: 768px) {
+  .mobileCards {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .tableWrapper {
+    display: none;
+  }
+}
