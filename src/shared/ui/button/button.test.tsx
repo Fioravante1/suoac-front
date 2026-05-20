@@ -12,7 +12,7 @@ describe("Button", () => {
     render(
       <Button disabled type="submit" data-testid="test-btn">
         Enviar
-      </Button>
+      </Button>,
     );
     const button = screen.getByTestId("test-btn");
     expect(button).toBeDisabled();

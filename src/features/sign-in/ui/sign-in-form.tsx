@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Loader2 } from "lucide-react";
@@ -8,9 +9,12 @@ import { Button } from "@/shared/ui/button";
 import { TextField } from "@/shared/ui/text-field";
 
 import { signInSchema, type SignInFormValues } from "../model/sign-in-schema";
+import { signInAction } from "../api/sign-in-action";
 import styles from "./sign-in-form.module.css";
 
 export function SignInForm() {
+  const [serverError, setServerError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -20,14 +24,27 @@ export function SignInForm() {
   });
 
   const onSubmit = async (data: SignInFormValues) => {
-    // TODO: Replace with real API call
-    console.log("Form data:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    alert("Login simulado com sucesso!");
+    setServerError(null);
+
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    const result = await signInAction(undefined, formData);
+
+    if (result?.error) {
+      setServerError(result.error);
+    }
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+      {serverError && (
+        <div className={styles.errorBanner} role="alert">
+          {serverError}
+        </div>
+      )}
+
       <TextField
         label="E-mail"
         type="email"

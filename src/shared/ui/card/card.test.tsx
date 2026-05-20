@@ -7,7 +7,7 @@ describe("Card", () => {
     render(
       <Card>
         <p>Conteúdo do card</p>
-      </Card>
+      </Card>,
     );
     expect(screen.getByText("Conteúdo do card")).toBeInTheDocument();
   });
@@ -16,9 +16,9 @@ describe("Card", () => {
     const { container } = render(
       <Card className="minha-classe-customizada">
         <p>Conteúdo</p>
-      </Card>
+      </Card>,
     );
-    
+
     // O container.firstChild deve ser a div do Card
     expect(container.firstChild).toHaveClass("minha-classe-customizada");
   });

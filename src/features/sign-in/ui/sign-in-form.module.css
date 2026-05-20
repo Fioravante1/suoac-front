@@ -5,6 +5,15 @@
   width: 100%;
 }
 
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  background-color: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  border-radius: var(--suoac-radius-sm);
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

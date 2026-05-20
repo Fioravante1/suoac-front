@@ -25,7 +25,7 @@ describe("TextField", () => {
       <TextField
         startIcon={<span data-testid="start-icon">Icone Inicio</span>}
         endIcon={<span data-testid="end-icon">Icone Fim</span>}
-      />
+      />,
     );
     expect(screen.getByTestId("start-icon")).toBeInTheDocument();
     expect(screen.getByTestId("end-icon")).toBeInTheDocument();

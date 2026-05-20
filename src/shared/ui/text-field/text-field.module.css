@@ -28,7 +28,9 @@
   font-family: var(--suoac-font-family-sans);
   font-size: var(--suoac-font-size-body);
   color: var(--suoac-color-text-primary);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   outline: none;
 }
 

@@ -9,4 +9,12 @@ export default defineConfig([
       "fsd/insignificant-slice": "off",
     },
   },
+  {
+    // Next.js server/client boundary prevents barrel-exporting server-only
+    // modules alongside client code. These files import server modules directly.
+    files: ["src/**/api/*-action.ts", "src/app/providers/**", "src/pages/**/ui/**"],
+    rules: {
+      "fsd/no-public-api-sidestep": "off",
+    },
+  },
 ]);

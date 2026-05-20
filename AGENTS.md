@@ -131,6 +131,59 @@ import { createQueryClient } from "@/shared/api/query-client";
 
 Codigo interno do proprio slice deve usar import relativo.
 
+### Organizacao interna de segmentos
+
+Dentro de qualquer segmento (`api`, `auth`, `ui`, `lib`, `model`, `config`), em qualquer camada
+(`shared`, `entities`, `features`, `widgets`, `pages`, `app`), cada modulo deve ter seu proprio
+subdiretorio com arquivos co-localizados e um `index.ts` como public API do modulo.
+
+Nao deixe arquivos soltos na raiz de um segmento. Agrupe por responsabilidade.
+
+Estrutura correta:
+
+```text
+shared/api/
+  http-client/
+    http-client.ts
+    http-client.test.ts
+    index.ts
+  query-client/
+    query-client.ts
+    query-keys.ts
+    index.ts
+  index.ts
+
+features/sign-in/api/
+  sign-in-action/
+    sign-in-action.ts
+    sign-in.dto.ts
+    index.ts
+  sign-out-action/
+    sign-out-action.ts
+    index.ts
+  index.ts
+```
+
+Errado:
+
+```text
+shared/api/
+  http-client.ts
+  http-client.test.ts
+  query-client.ts
+  query-keys.ts
+  types.ts
+  index.ts
+```
+
+Excecoes:
+
+- Quando um segmento possui apenas um arquivo alem do `index.ts`, o subdiretorio e desnecessario.
+  O arquivo pode ficar direto no segmento.
+- `shared/ui` nao deve ter `index.ts` na raiz. Como tende a crescer com muitos componentes, um
+  barrel re-exportando todos prejudica tree-shaking. Imports devem apontar para o subdiretorio do
+  componente: `import { Button } from "@/shared/ui/button"`.
+
 ### Cross-imports
 
 Slices da mesma camada nao devem importar uns aos outros.
@@ -192,6 +245,33 @@ Exemplos:
 entities/event/api/event.queries.ts
 features/register-payment/api/register-payment.mutation.ts
 shared/api/query-client.ts
+```
+
+### HTTP Client
+
+- O cliente HTTP fica em `src/shared/api/http-client/`.
+- Paths de API sao valores de dominio e devem ser centralizados em `endpoints.ts`, nunca usados
+  como strings soltas no codigo. Novos endpoints devem ser adicionados ao objeto `endpoints`.
+
+```ts
+// Correto
+import { httpClient, endpoints } from "@/shared/api/http-client";
+await httpClient(endpoints.auth.login, { method: "POST", body });
+
+// Errado
+await httpClient("/auth/login", { method: "POST", body });
+```
+
+- Metodos HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) sao um conjunto fixo e padrao do
+  protocolo. Devem ser usados como string literal diretamente, sem constantes ou enums. O tipo
+  `HttpMethod` no client ja restringe os valores aceitos em compilacao.
+
+```ts
+// Correto — string literal restrita pelo tipo HttpMethod
+await httpClient(endpoints.auth.login, { method: "POST", body });
+
+// Errado — nao criar objetos/enums para metodos HTTP
+HttpMethod.POST; // desnecessario
 ```
 
 ### DTOs e Mappers
