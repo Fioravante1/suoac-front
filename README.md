@@ -90,7 +90,8 @@ Arquivos em `/app` devem ser finos e apenas conectar rotas do Next às pages FSD
 Exemplo:
 
 ```tsx
-export { default } from "@/pages/home";
+// app/(private)/dashboard/page.tsx
+export { default } from "@/pages/dashboard";
 ```
 
 ---

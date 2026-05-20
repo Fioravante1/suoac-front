@@ -97,12 +97,13 @@ navegador e a API real. No SUOAC, o servidor Node.js do Next.js desempenha esse 
    b. Chama httpClient<SignInResponseDto>("/auth/login", { method: "POST", body })
    c. Backend retorna { accessToken, refreshToken, user }
    d. createSession() seta 3 cookies no navegador
-   e. redirect("/") com HTTP 303
-5. Proxy ve o cookie → permite acesso a "/"
+   e. redirect("/dashboard") com HTTP 303
+5. Proxy ve o cookie → permite acesso a "/dashboard"
 6. RootLayout renderiza AppProviders:
    a. getSession() le o cookie suoac-user
    b. AuthProvider recebe os dados do usuario
-7. HomePage usa useAuth() e exibe "Bem-vindo, {nome}!"
+7. PrivateLayout renderiza AppShell (sidebar + bottom nav)
+8. DashboardPage usa useAuth() e exibe "Bem-vindo, {nome}!"
 ```
 
 ### 3.2 Server Action: `signInAction`
@@ -334,11 +335,12 @@ Rotas excluidas:
 
 ### 6.3 Rotas publicas vs protegidas
 
-| Rota     | Tipo      | Comportamento                                                  |
-| -------- | --------- | -------------------------------------------------------------- |
-| `/login` | Publica   | Acessivel sem autenticacao. Redireciona para `/` se ja logado. |
-| `/`      | Protegida | Requer cookie. Redireciona para `/login` se nao autenticado.   |
-| `/*`     | Protegida | Qualquer outra rota segue a mesma regra.                       |
+| Rota         | Tipo      | Comportamento                                                           |
+| ------------ | --------- | ----------------------------------------------------------------------- |
+| `/login`     | Publica   | Acessivel sem autenticacao. Redireciona para `/dashboard` se ja logado. |
+| `/`          | Protegida | Redireciona para `/dashboard`.                                          |
+| `/dashboard` | Protegida | Requer cookie. Redireciona para `/login` se nao autenticado.            |
+| `/*`         | Protegida | Qualquer outra rota segue a mesma regra.                                |
 
 ### 6.4 Limitacao de seguranca do proxy
 
@@ -596,7 +598,7 @@ src/shared/auth/
   index.ts                Barrel publico
 
 src/shared/config/
-  routes.ts               Mapa de rotas { home: "/", login: "/login" }
+  routes.ts               Mapa de rotas { home, login, dashboard, events, ... }
   index.ts                Barrel publico
 ```
 
@@ -622,7 +624,7 @@ src/features/sign-in/
     sign-in-form.tsx      Formulario de login ("use client")
     sign-in-form.module.css
     sign-in-form.test.tsx
-  index.ts                Barrel — exporta APENAS SignInForm (client-safe)
+  index.ts                Barrel — exporta SignInForm e signOutAction
 ```
 
 ### 11.4 Providers (app)
@@ -638,11 +640,22 @@ src/app/providers/
 ```txt
 app/
   layout.tsx              RootLayout — <AppProviders>
-  page.tsx                Exporta HomePage de @/pages/home
+  page.tsx                Redireciona "/" para "/dashboard"
   (auth)/
     layout.tsx            Layout visual para rotas de autenticacao
     login/
       page.tsx            Exporta LoginPage de @/pages/login
+  (private)/
+    layout.tsx            Layout autenticado — <AppShell>
+    dashboard/
+      page.tsx            Exporta DashboardPage de @/pages/dashboard
+
+src/widgets/app-shell/
+  ui/
+    app-shell/            Server Component — sidebar + main + bottom nav
+    desktop-sidebar/      Client Component — navegacao desktop + logout
+    mobile-bottom-nav/    Client Component — navegacao mobile + logout
+  index.ts                Barrel — exporta AppShell
 
 proxy.ts                  Protecao de rotas (edge)
 ```

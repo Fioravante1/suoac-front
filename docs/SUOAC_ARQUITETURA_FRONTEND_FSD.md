@@ -216,9 +216,20 @@ src/
     app-shell/
       index.ts
       ui/
-        app-shell.tsx
-        desktop-sidebar.tsx
-        mobile-bottom-nav.tsx
+        app-shell/
+          app-shell.tsx
+          app-shell.module.css
+          index.ts
+        desktop-sidebar/
+          desktop-sidebar.tsx
+          desktop-sidebar.module.css
+          desktop-sidebar.test.tsx
+          index.ts
+        mobile-bottom-nav/
+          mobile-bottom-nav.tsx
+          mobile-bottom-nav.module.css
+          mobile-bottom-nav.test.tsx
+          index.ts
 
     event-overview/
       index.ts
@@ -1061,38 +1072,41 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 
 ## 16. Roadmap arquitetural inicial
 
-### Fase 1 — Fundacao
+### Fase 1 — Fundacao (concluida)
 
-- Criar estrutura FSD vazia.
-- Manter o App Router do Next em `/app`.
-- Manter a camada App do FSD em `src/app`.
-- Mover tela inicial para `src/pages/home` ou `src/pages/dashboard` quando a primeira UI real entrar.
-- Criar `src/app/providers`.
-- Criar `shared/config/routes`.
-- Criar `shared/ui` minimo alinhado ao design system.
-- Configurar Steiger como validador arquitetural.
+- Criar estrutura FSD vazia. (concluido)
+- Manter o App Router do Next em `/app`. (concluido)
+- Manter a camada App do FSD em `src/app`. (concluido)
+- Mover tela inicial para `src/pages/dashboard`. (concluido)
+- Criar `src/app/providers`. (concluido)
+- Criar `shared/config/routes`. (concluido)
+- Criar `shared/ui` minimo alinhado ao design system. (concluido)
+- Configurar Steiger como validador arquitetural. (concluido)
 
 ### Fase 2 — Dominio MVP
 
 - Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`.
 - Criar features `create-event`, `enroll-passenger`, `register-payment`.
-- Criar widgets `app-shell`, `event-overview`, `financial-summary`.
+- Criar widgets `event-overview`, `financial-summary`.
 
 ### Fase 3 — Server state
 
-- Instalar TanStack Query. ✅
-- Instalar React Hook Form + Zod + resolvers. ✅
-- Criar `shared/api/client`.
-- Criar `shared/api/query-client`.
+- Instalar TanStack Query. (concluido)
+- Instalar React Hook Form + Zod + resolvers. (concluido)
+- Criar `shared/api/client`. (concluido — `shared/api/http-client`)
+- Criar `shared/api/query-client`. (concluido)
 - Criar query factories por entidade.
 - Criar mutations por feature.
 
-### Fase 4 — Permissoes e fluxo autenticado
+### Fase 4 — Permissoes e fluxo autenticado (parcialmente concluida)
 
-- Criar `features/sign-in`.
-- Criar `entities/user`.
-- Criar `shared/auth`.
-- Criar protecao de rotas por papel.
+- Criar `features/sign-in`. (concluido)
+- Criar `entities/user`. (concluido — model basico)
+- Criar `shared/auth`. (concluido — session, auth-context, AuthProvider)
+- Criar protecao de rotas via proxy. (concluido)
+- Criar widget `app-shell` com sidebar e bottom nav. (concluido)
+- Criar route group `(private)` com layout autenticado. (concluido)
+- Criar filtragem de navegacao por papel (RBAC).
 
 ### Fase 5 — Relatorios e pos-MVP
 
