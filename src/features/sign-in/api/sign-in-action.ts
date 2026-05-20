@@ -51,5 +51,5 @@ export async function signInAction(_prevState: SignInState | undefined, formData
     return { error: "Ocorreu um erro inesperado. Tente novamente." };
   }
 
-  redirect(routes.home);
+  redirect(routes.dashboard);
 }

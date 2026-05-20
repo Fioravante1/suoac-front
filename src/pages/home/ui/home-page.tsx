@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/shared/auth";
-import { signOutAction } from "@/features/sign-in/api/sign-out-action";
+import { signOutAction } from "@/features/sign-in";
 
 import styles from "./home-page.module.css";
 

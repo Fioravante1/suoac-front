@@ -1,0 +1,120 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--suoac-layout-sidebar-width);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--suoac-color-sidebar);
+  color: var(--suoac-color-text-inverse);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: var(--suoac-space-6);
+}
+
+.logoIcon {
+  flex-shrink: 0;
+  border-radius: var(--suoac-radius-sm);
+}
+
+.logoTextGroup {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: -0.25rem;
+}
+
+.logoTitle {
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-bold);
+  letter-spacing: 0.05em;
+  line-height: var(--suoac-line-height-tight);
+}
+
+.logoSubtitle {
+  font-size: 0.625rem;
+  font-weight: var(--suoac-font-weight-regular);
+  line-height: var(--suoac-line-height-tight);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  padding: 0 var(--suoac-space-3);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border-radius: var(--suoac-radius-sm);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--suoac-color-text-inverse);
+}
+
+.navItemActive {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--suoac-color-text-inverse);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.footer {
+  padding: var(--suoac-space-4) var(--suoac-space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--suoac-space-3);
+}
+
+.userName {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+  color: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--suoac-radius-sm);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.logoutButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--suoac-color-critical);
+}
