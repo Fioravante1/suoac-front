@@ -4,7 +4,7 @@ Este documento mantém o registro da evolução do projeto frontend, separando p
 
 ## Status Atual
 
-**Fase:** Protecao de rotas e App Shell
+**Fase:** Pages placeholder e navegacao interna
 
 ---
 
@@ -83,11 +83,21 @@ Criacao dos componentes base reutilizaveis na camada `shared`, todos acompanhado
 
 - `shared/config/routes.ts` com: `home`, `login`, `dashboard`, `events`, `congregations`, `passengers`, `financial`, `settings`.
 
+### 8. Pages Placeholder (Rotas Internas)
+
+- **Pages FSD criadas** para todas as rotas internas do app-shell:
+  - `events` — Eventos (assembleias e congressos).
+  - `congregations` — Congregacoes do circuito.
+  - `passengers` — Passageiros e inscricoes.
+  - `financial` — Pagamentos e resumos financeiros.
+  - `settings` — Configuracoes do sistema.
+- Cada page segue o padrao: Server Component com heading + descricao, CSS Modules com design tokens, teste unitario co-localizado e public API via `index.ts`.
+- Rotas conectadas ao App Router via `app/(private)/{rota}/page.tsx`.
+- Navegacao pelo sidebar e bottom nav funciona sem 404.
+
 ---
 
 ## Proximos Passos
-
-- [ ] Criar pages placeholder para as rotas internas (events, congregations, passengers, financial, settings).
 - [ ] Implementar filtragem de navegacao por role (RBAC).
 - [ ] Criar entities com model e queries reais (event, passenger, payment, congregation).
 - [ ] Criar features do MVP (create-event, enroll-passenger, register-payment).
