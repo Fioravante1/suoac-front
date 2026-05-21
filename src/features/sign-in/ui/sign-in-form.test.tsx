@@ -6,6 +6,12 @@ vi.mock("../api/sign-in-action", () => ({
   signInAction: vi.fn(),
 }));
 
+const mockSearchParams = new URLSearchParams();
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
 import { signInAction } from "../api/sign-in-action";
 
 const signInActionMock = vi.mocked(signInAction);
@@ -13,6 +19,8 @@ const signInActionMock = vi.mocked(signInAction);
 describe("SignInForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearchParams.delete("sessionExpired");
+    mockSearchParams.delete("returnUrl");
   });
 
   it("renderiza os campos e o botao corretamente", () => {
@@ -91,5 +99,66 @@ describe("SignInForm", () => {
       const alert = screen.getByRole("alert");
       expect(alert).toHaveTextContent("E-mail ou senha incorretos.");
     });
+  });
+
+  it("exibe banner informativo quando sessionExpired=true", () => {
+    mockSearchParams.set("sessionExpired", "true");
+
+    render(<SignInForm />);
+
+    const banner = screen.getByRole("status");
+    expect(banner).toHaveTextContent("Sua sessão expirou. Faça login novamente para continuar.");
+  });
+
+  it("nao exibe banner informativo sem sessionExpired", () => {
+    render(<SignInForm />);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("inclui returnUrl no FormData quando presente nos search params", async () => {
+    mockSearchParams.set("sessionExpired", "true");
+    mockSearchParams.set("returnUrl", "/congregations?page=2");
+    signInActionMock.mockResolvedValue({});
+
+    render(<SignInForm />);
+
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Senha/i), {
+      target: { value: "Senha@123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Entrar/i }));
+
+    await waitFor(() => {
+      expect(signInActionMock).toHaveBeenCalledOnce();
+    });
+
+    const [, formData] = signInActionMock.mock.calls[0];
+    expect(formData.get("returnUrl")).toBe("/congregations?page=2");
+  });
+
+  it("nao inclui returnUrl no FormData quando ausente dos search params", async () => {
+    signInActionMock.mockResolvedValue({});
+
+    render(<SignInForm />);
+
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Senha/i), {
+      target: { value: "Senha@123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Entrar/i }));
+
+    await waitFor(() => {
+      expect(signInActionMock).toHaveBeenCalledOnce();
+    });
+
+    const [, formData] = signInActionMock.mock.calls[0];
+    expect(formData.get("returnUrl")).toBeNull();
   });
 });

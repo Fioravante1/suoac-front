@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSearchParams } from "next/navigation";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
@@ -13,6 +14,10 @@ import { signInAction } from "../api/sign-in-action";
 import styles from "./sign-in-form.module.css";
 
 export function SignInForm() {
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams?.get("sessionExpired") === "true";
+  const returnUrl = searchParams?.get("returnUrl") ?? null;
+
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -30,6 +35,10 @@ export function SignInForm() {
     formData.append("email", data.email);
     formData.append("password", data.password);
 
+    if (returnUrl) {
+      formData.append("returnUrl", returnUrl);
+    }
+
     const result = await signInAction(undefined, formData);
 
     if (result?.error) {
@@ -39,6 +48,12 @@ export function SignInForm() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+      {sessionExpired && (
+        <div className={styles.infoBanner} role="status">
+          Sua sessão expirou. Faça login novamente para continuar.
+        </div>
+      )}
+
       {serverError && (
         <div className={styles.errorBanner} role="alert">
           {serverError}

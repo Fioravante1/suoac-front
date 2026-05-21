@@ -5,6 +5,15 @@
   width: 100%;
 }
 
+.infoBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  background-color: var(--suoac-color-info-soft);
+  color: var(--suoac-color-info);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  border-radius: var(--suoac-radius-sm);
+}
+
 .errorBanner {
   padding: var(--suoac-space-3) var(--suoac-space-4);
   background-color: var(--suoac-color-critical-soft);
