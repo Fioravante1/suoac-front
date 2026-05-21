@@ -522,6 +522,16 @@ podem ficar dentro da propria page. Nao criar feature prematuramente para codigo
 - Route handlers.
 - Loading/error/not-found.
 
+#### Error boundaries
+
+Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client Components.
+
+- Usam `shared/ui/error-state` para o layout visual (ilustracao, titulo, descricao, acoes).
+- Navegacao de saida usa `window.location.href` em vez de `useRouter().push()` porque a arvore
+  de componentes esta em estado de erro e o router client-side nao funciona confiavelmente.
+- `global-error.tsx` replica o visual com inline styles porque renderiza fora da arvore do app,
+  sem acesso a CSS Modules, providers ou tokens globais.
+
 `src/app` pertence ao FSD:
 
 - Providers globais.
@@ -748,14 +758,17 @@ com FSD e atende melhor a natureza operacional/mobile-first do SUOAC.
 
 Componentes genericos:
 
+- Badge.
 - Button.
-- TextField.
-- Select.
-- Dialog.
 - Card.
-- StatusChip.
-- DataTable.
+- ConfirmDialog.
 - EmptyState.
+- ErrorState.
+- Modal.
+- PageHeader.
+- Pagination.
+- Spinner.
+- TextField.
 
 Cada componente deve ter seu proprio diretorio e `index.ts`:
 
@@ -1059,11 +1072,15 @@ Regras importantes cobertas pelo Steiger:
 - Detectar nomes de camadas incorretos.
 - Detectar estrutura de segmentos fora do padrao FSD.
 
-Excecao atual:
+Excecoes atuais:
 
 - `fsd/insignificant-slice` fica desligada enquanto a arquitetura esta scaffoldada antes da
   implementacao real dos slices. Quando os principais slices do MVP estiverem em uso, essa regra
   deve ser reavaliada.
+- `@next/next/no-img-element` esta desligada para error boundaries (`app/**/error.tsx` e
+  `app/global-error.tsx`). Error boundaries renderizam quando a arvore do app esta quebrada, entao
+  depender do pipeline de otimizacao de imagem do Next.js seria arriscado. `global-error.tsx` monta
+  seu proprio `<html>` e nao tem acesso aos providers do Next, tornando `<Image />` inviavel.
 
 O script `yarn check` deve executar a validacao arquitetural junto com typecheck, lint, teste e
 formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara no pipeline de CI.
@@ -1081,6 +1098,8 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 - Criar `src/app/providers`. (concluido)
 - Criar `shared/config/routes`. (concluido)
 - Criar `shared/ui` minimo alinhado ao design system. (concluido)
+- Criar `shared/ui/error-state` com layout horizontal, animacoes e suporte a acao secundaria. (concluido)
+- Criar error boundaries em `/app` (`(auth)/error.tsx`, `(private)/error.tsx`, `global-error.tsx`). (concluido)
 - Configurar Steiger como validador arquitetural. (concluido)
 
 ### Fase 2 — Dominio MVP
