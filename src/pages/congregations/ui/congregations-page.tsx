@@ -1,5 +1,7 @@
 "use client";
 
+import { Building2 } from "lucide-react";
+
 import { useAuth } from "@/shared/auth";
 import { useQuery, useMutation, useQueryClient, queryKeys } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
@@ -90,7 +92,7 @@ export function CongregationsPage() {
 
         {data && data.data.length === 0 && (
           <EmptyState
-            icon="🏛️"
+            icon={<Building2 size={48} strokeWidth={1.5} />}
             title="Nenhuma congregação cadastrada"
             description="Adicione a primeira congregação do circuito para começar."
             action={<Button onClick={() => formModal.open()}>+ Nova Congregação</Button>}
