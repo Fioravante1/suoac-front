@@ -1,6 +1,8 @@
 import "server-only";
 
-import { getAccessToken } from "@/shared/auth/session";
+import { getAccessToken, deleteSession } from "@/shared/auth/session";
+import { refreshSession } from "@/shared/auth/refresh-session";
+import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
 
 export class HttpError extends Error {
   constructor(
@@ -20,7 +22,7 @@ interface HttpClientOptions {
   headers?: Record<string, string>;
 }
 
-export async function httpClient<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
+async function performRequest(path: string, options: HttpClientOptions, token: string | null): Promise<Response> {
   const { method = "GET", body, headers = {} } = options;
 
   const baseUrl = process.env.API_BASE_URL;
@@ -29,9 +31,7 @@ export async function httpClient<T>(path: string, options: HttpClientOptions = {
     throw new Error("API_BASE_URL is not configured");
   }
 
-  const token = await getAccessToken();
-
-  const response = await fetch(`${baseUrl}${path}`, {
+  return fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       ...(body ? { "Content-Type": "application/json" } : {}),
@@ -40,25 +40,56 @@ export async function httpClient<T>(path: string, options: HttpClientOptions = {
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+}
 
-  if (!response.ok) {
-    let message = `Request failed with status ${response.status}`;
+async function parseErrorMessage(response: Response): Promise<string> {
+  let message = `Request failed with status ${response.status}`;
 
-    try {
-      const errorBody = (await response.json()) as { message?: string };
-      if (errorBody.message) {
-        message = errorBody.message;
+  try {
+    const errorBody = (await response.json()) as { message?: string };
+    if (errorBody.message) {
+      message = errorBody.message;
+    }
+  } catch {
+    // Use default message if body parsing fails
+  }
+
+  return message;
+}
+
+export async function httpClient<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
+  const token = await getAccessToken();
+
+  const response = await performRequest(path, options, token);
+
+  if (response.ok) {
+    if (response.status === 204) {
+      return undefined as T;
+    }
+    return response.json() as Promise<T>;
+  }
+
+  if (response.status === 401 && token) {
+    const newToken = await refreshSession();
+
+    if (newToken) {
+      const retryResponse = await performRequest(path, options, newToken);
+
+      if (retryResponse.ok) {
+        if (retryResponse.status === 204) {
+          return undefined as T;
+        }
+        return retryResponse.json() as Promise<T>;
       }
-    } catch {
-      // Use default message if body parsing fails
+
+      const retryMessage = await parseErrorMessage(retryResponse);
+      throw new HttpError(retryResponse.status, retryMessage);
     }
 
-    throw new HttpError(response.status, message);
+    await deleteSession();
+    throw new HttpError(401, SESSION_EXPIRED_MESSAGE);
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
+  const message = await parseErrorMessage(response);
+  throw new HttpError(response.status, message);
 }
