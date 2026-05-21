@@ -32,7 +32,9 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
     formState: { errors, isSubmitting },
   } = useForm<CongregationFormValues>({
     resolver: zodResolver(congregationFormSchema),
-    values: congregation ? { name: congregation.name, city: congregation.city ?? "" } : { name: "", city: "" },
+    values: congregation
+      ? { code: congregation.code, name: congregation.name, email: congregation.email, city: congregation.city ?? "" }
+      : { code: "", name: "", email: "", city: "" },
   });
 
   async function handleFormSubmit(values: CongregationFormValues) {
@@ -77,8 +79,16 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
             {serverError}
           </div>
         )}
+        <TextField label="Código" placeholder="Ex: 105478" error={errors.code?.message} {...register("code")} />
         <TextField label="Nome" placeholder="Nome da congregação" error={errors.name?.message} {...register("name")} />
-        <TextField label="Cidade" placeholder="Cidade (opcional)" error={errors.city?.message} {...register("city")} />
+        <TextField
+          label="E-mail"
+          type="email"
+          placeholder="congregacao@exemplo.com"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <TextField label="Cidade" placeholder="Nome da cidade" error={errors.city?.message} {...register("city")} />
       </form>
     </Modal>
   );
