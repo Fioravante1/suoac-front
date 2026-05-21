@@ -57,6 +57,12 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    files: ["app/**/error.tsx", "app/global-error.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
