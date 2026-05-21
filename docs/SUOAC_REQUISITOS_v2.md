@@ -545,6 +545,13 @@ O sistema é composto por dois backends e um frontend:
 
 O MVP deve cobrir o fluxo essencial: criar evento (com suporte a multi-dia), cadastrar passageiros (com seleção de dias), registrar pagamentos, e visualizar dashboards. Funcionalidades como check-in, importação em lote, modo offline, gestão de ônibus e tracking em tempo real (Go) serão adicionadas em fases posteriores.
 
+Status no frontend em 21/05/2026:
+
+- Criação de evento: parcialmente implementada no frontend com `features/create-event`, incluindo assembleia de um dia e congresso regional multi-dia conforme contrato do backend.
+- Listagem de eventos: implementada em `pages/events` com paginação, cards responsivos, empty state, skeleton e retry em erro.
+- Publicação/abertura de inscrições: pendente. Deve usar a transição de status `DRAFT` -> `OPEN`.
+- Cadastro de passageiros, seleção de dias, pagamentos e dashboards reais: pendentes para as próximas fatias do MVP.
+
 ### 8.3 Observações
 
 - O sistema deve ser desenvolvido com foco na simplicidade de uso, considerando que os usuários podem ter diferentes níveis de familiaridade com tecnologia

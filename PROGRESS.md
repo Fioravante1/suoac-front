@@ -1,105 +1,123 @@
-# Histórico de Progresso - SUOAC Frontend
+# Progresso do Projeto - SUOAC Frontend
 
-Este documento mantém o registro da evolução do projeto frontend, separando por conquistas e etapas concluídas para facilitar o rastreamento do que já foi implementado.
+**Atualizado em:** 21/05/2026  
+**Fase atual:** Domínio MVP - eventos
 
-## Status Atual
+Este arquivo acompanha o estado do frontend, o que já foi entregue e quais frentes ainda precisam avançar.
 
-**Fase:** Pages placeholder e navegacao interna
+## Estado Geral
 
----
+| Frente                 | Estado      | Observação                                                                          |
+| ---------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| Fundação Next.js + FSD | Concluído   | Estrutura base, App Router em `/app`, FSD em `src/`, Steiger e ESLint configurados. |
+| Design system base     | Concluído   | Tokens globais, componentes compartilhados e padrões visuais iniciais.              |
+| Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.  |
+| App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                |
+| Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                      |
+| Eventos                | Parcial     | Modelos, queries, listagem paginada e criação de evento implementados.              |
+| Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
+| Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
+| Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                    |
 
-## Entregas Concluidas
+## Entregas Concluídas
 
-### 1. Setup Base e Infraestrutura
+### 1. Fundação e Arquitetura
 
-- Configuracao do projeto com **Next.js 16** (App Router) e **React 19**.
-- Setup rigoroso do **TypeScript** (`strict: true`).
-- Configuracao da **Feature-Sliced Design (FSD)** como arquitetura oficial.
-- Implantacao das validacoes de arquitetura via **Steiger** e **ESLint** (`eslint-plugin-boundaries`).
-- Setup da suite de testes com **Vitest** e **React Testing Library**, incluindo o `cleanup` automatico pos-testes.
+- Projeto configurado com Next.js 16, React 19, TypeScript strict e Yarn v1.
+- App Router físico mantido em `/app`.
+- Camadas FSD organizadas em `src/app`, `src/pages`, `src/widgets`, `src/features`, `src/entities` e `src/shared`.
+- Validação arquitetural com Steiger e `eslint-plugin-boundaries`.
+- Scripts de validação centralizados em `yarn run check`.
 
-### 2. Design System e Estilizacao
+### 2. Shared UI e Design System
 
-- Definicao do Design System ("Verde Organizacao") com tokens CSS globais.
-- Tipografia oficializada (Inter).
-- Substituicao do favicon padrao do Next.js pelo logotipo vetorial do SUOAC (`app/icon.png`).
+- Tokens globais em `app/globals.css`.
+- Componentes compartilhados com testes co-localizados:
+  - `Button`
+  - `TextField`
+  - `Card`
+  - `Badge`
+  - `Table`
+  - `Skeleton`
+  - `Spinner`
+  - `Modal`
+  - `ConfirmDialog`
+  - `EmptyState`
+  - `ErrorState`
+  - `Pagination`
+  - `PageHeader`
 
-### 3. Componentes Compartilhados (Shared UI)
+### 3. Autenticação, Sessão e Permissões
 
-Criacao dos componentes base reutilizaveis na camada `shared`, todos acompanhados de testes unitarios:
+- `features/sign-in` com formulário, schema Zod e Server Actions.
+- `shared/auth` com sessão por cookies HttpOnly, refresh de sessão, `AuthProvider` e `useAuth`.
+- `proxy.ts` protegendo rotas privadas.
+- `app-shell` autenticado com navegação filtrada por papel.
 
-- **Button:** Variantes `primary`, `secondary` e `ghost`, `fullWidth`, animacoes de hover/disabled.
-- **TextField:** Inputs com suporte a icones, labels vinculadas, estados de erro e IDs autogerados.
-- **Card:** Container com fundo e bordas arredondadas padronizadas (`radius-xl`).
+### 4. API e Server State
 
-### 4. Autenticacao
+- `shared/api/http-client` com `Authorization: Bearer`, refresh automático em 401 e tratamento de erros.
+- Endpoints centralizados em `shared/api/http-client/endpoints.ts`.
+- Query client e query keys em `shared/api/query-client`.
+- TanStack Query integrado às páginas que já consomem backend.
 
-- **Feature `sign-in`:**
-  - `SignInForm` com React Hook Form + Zod + `zodResolver`.
-  - `signInAction` (Server Action) conectando ao backend via `httpClient`.
-  - `signOutAction` para logout com limpeza de sessao.
-  - Testes unitarios para validacao e submissao.
+### 5. Congregações
 
-- **Sessao e Auth Context:**
-  - `shared/auth/session` com cookies HttpOnly (`suoac-access-token`, `suoac-refresh-token`, `suoac-session`).
-  - `shared/auth/auth-context` com `AuthProvider` e `useAuth`.
-  - `AppProviders` compondo `AuthProvider` + `QueryProvider`.
+- `entities/congregation` com model e queries.
+- Página `congregations` com listagem paginada, empty state, criação, edição, exclusão e confirmação destrutiva.
 
-- **Cliente HTTP:**
-  - `shared/api/http-client` com tipagem, tratamento de erros (`HttpError`), endpoints centralizados.
+### 6. Eventos - Primeira Fatia MVP
 
-- **Proxy (protecao de rotas):**
-  - `proxy.ts` na raiz, auto-detectado pelo Next.js 16.
-  - Redireciona usuarios nao autenticados para `/login`.
-  - Redireciona usuarios autenticados tentando acessar `/login` para `/dashboard`.
+- `entities/event` criado com tipos de domínio, queries e query options.
+- `entities/event-day` criado com tipos de domínio e queries.
+- Endpoints adicionados para:
+  - listar/criar/detalhar/atualizar/deletar eventos;
+  - alterar status de evento;
+  - listar/detalhar/atualizar/cancelar dias de evento.
+- Query keys adicionadas para `events` e `eventDays`.
+- `features/create-event` implementada com:
+  - schema Zod com validação de assembleia e congresso regional;
+  - DTO mapper para o contrato do backend em `EVENTS.txt`;
+  - Server Action `createEventAction`;
+  - modal com React Hook Form, validação inline e feedback de erro.
+- Página `events` deixou de ser placeholder e agora possui:
+  - listagem paginada por circuito;
+  - cards responsivos, dois por linha em telas maiores e um por linha em telas menores;
+  - empty state;
+  - estado de erro com retry;
+  - skeleton de carregamento;
+  - modal de criação de evento.
 
-### 5. Camada de Paginas
+## Validação Mais Recente
 
-- **Page `login`:**
-  - Pagina visual na camada FSD (`src/pages/login`).
-  - Conectada ao roteamento via `app/(auth)/login/page.tsx`.
+Última validação completa executada após a implementação de eventos:
 
-- **Page `dashboard`:**
-  - Pagina placeholder na camada FSD (`src/pages/dashboard`).
-  - Exibe heading "Dashboard" e saudacao com nome do usuario via `useAuth`.
-  - Conectada ao roteamento via `app/(private)/dashboard/page.tsx`.
+```bash
+yarn run check
+```
 
-- **Redirect na raiz:**
-  - `app/page.tsx` redireciona `/` para `/dashboard`.
+Resultado: passou com typecheck, lint, architecture check, testes unitários e Prettier.
 
-### 6. App Shell (Widget)
+Após ajuste visual da grade de eventos, também foi executado:
 
-- **Widget `app-shell`** (`src/widgets/app-shell`):
-  - `app-shell` — Server Component que compoe sidebar + main content + bottom nav.
-  - `desktop-sidebar` — Client Component com logo, 6 itens de navegacao, highlight ativo, nome do usuario e logout.
-  - `mobile-bottom-nav` — Client Component com 4 itens de navegacao + botao de sair.
-  - Responsivo: sidebar visivel em desktop (>=768px), bottom nav fixa em mobile.
-  - Testes unitarios para sidebar, bottom nav e dashboard page.
+```bash
+yarn test:unit src/pages/events/ui/events-page.test.tsx
+```
 
-- **Route group `(private)`:**
-  - `app/(private)/layout.tsx` usa `AppShell` como layout autenticado.
+Resultado: passou.
 
-### 7. Rotas
+## Próximos Passos Recomendados
 
-- `shared/config/routes.ts` com: `home`, `login`, `dashboard`, `events`, `congregations`, `passengers`, `financial`, `settings`.
+1. Implementar `features/publish-event` para transicionar evento de `DRAFT` para `OPEN` via `PATCH /events/:id/status`.
+2. Adicionar ações de edição e exclusão de evento respeitando as restrições por status do backend.
+3. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
+4. Implementar `entities/passenger` e `features/enroll-passenger`.
+5. Implementar `entities/payment` e `features/register-payment`.
+6. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
 
-### 8. Pages Placeholder (Rotas Internas)
+## Pendências Conhecidas
 
-- **Pages FSD criadas** para todas as rotas internas do app-shell:
-  - `events` — Eventos (assembleias e congressos).
-  - `congregations` — Congregacoes do circuito.
-  - `passengers` — Passageiros e inscricoes.
-  - `financial` — Pagamentos e resumos financeiros.
-  - `settings` — Configuracoes do sistema.
-- Cada page segue o padrao: Server Component com heading + descricao, CSS Modules com design tokens, teste unitario co-localizado e public API via `index.ts`.
-- Rotas conectadas ao App Router via `app/(private)/{rota}/page.tsx`.
-- Navegacao pelo sidebar e bottom nav funciona sem 404.
-
----
-
-## Proximos Passos
-
-- [ ] Implementar filtragem de navegacao por role (RBAC).
-- [ ] Criar entities com model e queries reais (event, passenger, payment, congregation).
-- [ ] Criar features do MVP (create-event, enroll-passenger, register-payment).
-- [ ] Integracao real das requisicoes assincronas com TanStack Query.
+- Ainda não há ação de publicar evento na UI.
+- Ainda não há edição, exclusão ou detalhe de evento na UI.
+- Ainda não há manipulação de horários/cancelamento de `event-day` na UI.
+- O arquivo `EVENTS.txt` contém o contrato usado para esta fase e está fora da documentação oficial versionada em `docs/`.
