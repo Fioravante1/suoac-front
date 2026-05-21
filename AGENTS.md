@@ -350,6 +350,7 @@ src/app/styles/theme-tokens.ts
 - Nao deixe imports, variaveis ou parametros sem uso.
 - Nao crie barrel exports globais que exportam tudo sem criterio.
 - Nao use `console.log` em codigo de producao frontend.
+- Evite blocos `if` aninhados ("nested ifs"). Prefira sempre o uso de "early returns" (retorno antecipado) para manter o codigo limpo, legivel e reduzir a complexidade ciclomatica.
 - Use nomes em kebab-case para arquivos e pastas.
 - Componentes e tipos usam PascalCase.
 - Hooks usam camelCase com prefixo `use`.
