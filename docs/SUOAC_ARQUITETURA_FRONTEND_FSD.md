@@ -1119,7 +1119,7 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 - Criar query factories por entidade.
 - Criar mutations por feature.
 
-### Fase 4 — Permissoes e fluxo autenticado (parcialmente concluida)
+### Fase 4 — Permissoes e fluxo autenticado (concluida)
 
 - Criar `features/sign-in`. (concluido)
 - Criar `entities/user`. (concluido — model basico)
