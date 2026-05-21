@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 
 import { Card } from "@/shared/ui/card";
@@ -17,7 +18,9 @@ export function LoginPage() {
           <p className={styles.tagline}>Coordenação inteligente para o arranjo de ônibus.</p>
         </div>
 
-        <SignInForm />
+        <Suspense>
+          <SignInForm />
+        </Suspense>
       </Card>
     </div>
   );
