@@ -403,7 +403,10 @@ src/pages/home/ui/home-page.test.tsx
 
 Regras:
 
-- Toda logica de negocio implementada deve ter teste unitario correspondente.
+- **Todo artefato novo deve ter teste unitario co-localizado**, sem excecao:
+  - **Componentes** (`*.tsx`): renderizacao, props, estados visuais e interacoes.
+  - **Hooks** (`use*.ts`): comportamento do estado inicial, transicoes e valores retornados.
+  - **Funcoes utilitarias e servicos** (`*.ts`): casos normais, bordas e erros esperados.
 - Testes devem descrever comportamento esperado em portugues quando forem de negocio.
 - Nao use `.skip` para esconder teste quebrado.
 - Nao adicione testes de integracao ou E2E sem decisao explicita. Eles foram deixados fora por
@@ -416,6 +419,26 @@ yarn test          # watch mode do Vitest
 yarn test:unit     # vitest run
 yarn test:coverage # coverage com V8
 ```
+
+### Simulacao de eventos de usuario
+
+O projeto **nao possui** `@testing-library/user-event` instalado. Use as alternativas abaixo:
+
+- **`fireEvent`** (importado de `@testing-library/react`): suficiente para cliques, submits e
+  eventos DOM simples. Preferir em testes de componentes genericos.
+- **`userEvent`**: instalar apenas se houver necessidade real de simular digitacao realista,
+  tabulacao ou sequencias complexas de teclado. Nao instalar por padrao.
+
+```ts
+// Correto — fireEvent para cliques simples
+import { render, screen, fireEvent } from "@testing-library/react";
+
+fireEvent.click(screen.getByRole("button", { name: "Salvar" }));
+
+// Errado — nao importar user-event sem o pacote instalado
+import userEvent from "@testing-library/user-event";
+```
+
 
 ---
 
