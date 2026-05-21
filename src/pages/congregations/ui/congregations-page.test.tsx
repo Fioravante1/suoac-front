@@ -62,7 +62,7 @@ describe("CongregationsPage", () => {
     expect(screen.getByText("+ Nova Congregação")).toBeInTheDocument();
   });
 
-  it("exibe o loading spinner enquanto carrega dados", () => {
+  it("exibe o skeleton enquanto carrega dados", () => {
     render(<CongregationsPage />, { wrapper: createWrapper() });
 
     expect(screen.getByRole("status")).toBeInTheDocument();

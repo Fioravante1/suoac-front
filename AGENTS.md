@@ -338,6 +338,27 @@ app/globals.css
 src/app/styles/theme-tokens.ts
 ```
 
+### Padrao de feedback de carregamento
+
+- **Skeleton** (`shared/ui/skeleton`): usar para carregamento de paginas, listas, tabelas e blocos
+  de conteudo. O Skeleton mostra placeholders animados no formato aproximado do conteudo que sera
+  exibido, transmitindo progresso sem layout shift.
+- **Spinner** (`shared/ui/spinner`): usar apenas em acoes pontuais e inline, como botoes de salvar,
+  enviar formulario ou confirmar exclusao. Nao usar Spinner como indicador de carregamento de
+  pagina inteira.
+
+Exemplos corretos:
+
+```tsx
+// Carregamento de lista — Skeleton
+{isLoading && <SkeletonTableRows rows={5} />}
+
+// Botao de salvar — Spinner
+<Button disabled={isPending}>
+  {isPending ? <Spinner size="small" /> : "Salvar"}
+</Button>
+```
+
 ---
 
 ## 7. Estilo de Codigo, Tipagem e Lint

@@ -767,6 +767,7 @@ Componentes genericos:
 - Modal.
 - PageHeader.
 - Pagination.
+- Skeleton.
 - Spinner.
 - TextField.
 
