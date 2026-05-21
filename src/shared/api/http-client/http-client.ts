@@ -59,37 +59,30 @@ async function parseErrorMessage(response: Response): Promise<string> {
 
 export async function httpClient<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
   const token = await getAccessToken();
-
   const response = await performRequest(path, options, token);
 
   if (response.ok) {
-    if (response.status === 204) {
-      return undefined as T;
-    }
-    return response.json() as Promise<T>;
+    return response.status === 204 ? (undefined as T) : (response.json() as Promise<T>);
   }
 
-  if (response.status === 401 && token) {
-    const newToken = await refreshSession();
+  if (response.status !== 401 || !token) {
+    const message = await parseErrorMessage(response);
+    throw new HttpError(response.status, message);
+  }
 
-    if (newToken) {
-      const retryResponse = await performRequest(path, options, newToken);
+  const newToken = await refreshSession();
 
-      if (retryResponse.ok) {
-        if (retryResponse.status === 204) {
-          return undefined as T;
-        }
-        return retryResponse.json() as Promise<T>;
-      }
-
-      const retryMessage = await parseErrorMessage(retryResponse);
-      throw new HttpError(retryResponse.status, retryMessage);
-    }
-
+  if (!newToken) {
     await deleteSession();
     throw new HttpError(401, SESSION_EXPIRED_MESSAGE);
   }
 
-  const message = await parseErrorMessage(response);
-  throw new HttpError(response.status, message);
+  const retryResponse = await performRequest(path, options, newToken);
+
+  if (!retryResponse.ok) {
+    const retryMessage = await parseErrorMessage(retryResponse);
+    throw new HttpError(retryResponse.status, retryMessage);
+  }
+
+  return retryResponse.status === 204 ? (undefined as T) : (retryResponse.json() as Promise<T>);
 }
