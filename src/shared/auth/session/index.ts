@@ -1,2 +1,2 @@
-export { createSession, getSession, getAccessToken, deleteSession, hasSession } from "./session";
+export { createSession, getSession, getAccessToken, getRefreshToken, deleteSession, hasSession } from "./session";
 export type { SessionUser, UserRole } from "./session";
