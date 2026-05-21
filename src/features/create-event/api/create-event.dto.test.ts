@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import { EVENT_TYPES } from "@/entities/event";
+
 import { mapCreateEventFormToDto } from "./create-event.dto";
 
 describe("mapCreateEventFormToDto", () => {
   it("normaliza os dados do formulário para o contrato do backend", () => {
     const dto = mapCreateEventFormToDto({
       title: " Assembleia SP 2026 ",
-      type: "ASSEMBLY",
+      type: EVENT_TYPES.ASSEMBLY,
       ticketPrice: "25,50",
       registrationDeadline: "2026-06-01",
       paymentDeadline: "2026-06-15",
@@ -23,7 +25,7 @@ describe("mapCreateEventFormToDto", () => {
 
     expect(dto).toEqual({
       title: "Assembleia SP 2026",
-      type: "ASSEMBLY",
+      type: EVENT_TYPES.ASSEMBLY,
       ticketPrice: 25.5,
       registrationDeadline: "2026-06-01",
       paymentDeadline: "2026-06-15",
@@ -41,7 +43,7 @@ describe("mapCreateEventFormToDto", () => {
   it("inclui endDate para congresso regional", () => {
     const dto = mapCreateEventFormToDto({
       title: "Congresso 2026",
-      type: "REGIONAL_CONVENTION",
+      type: EVENT_TYPES.REGIONAL_CONVENTION,
       ticketPrice: "30.00",
       registrationDeadline: "2026-06-01",
       paymentDeadline: "2026-06-15",

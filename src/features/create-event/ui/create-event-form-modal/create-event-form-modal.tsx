@@ -4,6 +4,7 @@ import { type ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { EVENT_TYPE_LABELS, EVENT_TYPES } from "@/entities/event";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
 import { TextField } from "@/shared/ui/text-field";
@@ -106,8 +107,10 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
                 className={`${styles.select} ${errors.type ? styles.hasError : ""}`.trim()}
                 {...eventTypeField}
               >
-                <option value="ASSEMBLY">Assembleia</option>
-                <option value="REGIONAL_CONVENTION">Congresso regional</option>
+                <option value={EVENT_TYPES.ASSEMBLY}>{EVENT_TYPE_LABELS[EVENT_TYPES.ASSEMBLY]}</option>
+                <option value={EVENT_TYPES.REGIONAL_CONVENTION}>
+                  {EVENT_TYPE_LABELS[EVENT_TYPES.REGIONAL_CONVENTION]}
+                </option>
               </select>
               {errors.type?.message && <span className={styles.errorMessage}>{errors.type.message}</span>}
             </div>
@@ -157,7 +160,7 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
           </h3>
           <div className={styles.grid}>
             <TextField label="Data inicial" type="date" error={errors.date?.message} {...register("date")} />
-            {eventType === "REGIONAL_CONVENTION" && (
+            {eventType === EVENT_TYPES.REGIONAL_CONVENTION && (
               <TextField label="Data final" type="date" error={errors.endDate?.message} {...register("endDate")} />
             )}
             <TextField

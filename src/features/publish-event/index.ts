@@ -1,1 +1,1 @@
-export {};
+export { publishEventAction } from "./api";

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { EVENT_TYPES, EVENT_TYPE_VALUES } from "@/entities/event";
+
 const dateMessage = "Informe uma data válida.";
 const timeMessage = "Informe um horário no formato HH:mm.";
 const currencyRegex = /^\d+(?:[,.]\d{1,2})?$/;
@@ -16,7 +18,7 @@ function isValidDate(value: string): boolean {
 export const createEventSchema = z
   .object({
     title: z.string().trim().min(2, "Informe pelo menos 2 caracteres.").max(200, "Use no máximo 200 caracteres."),
-    type: z.enum(["ASSEMBLY", "REGIONAL_CONVENTION"], { error: "Selecione o tipo de evento." }),
+    type: z.enum(EVENT_TYPE_VALUES, { error: "Selecione o tipo de evento." }),
     ticketPrice: z
       .string()
       .trim()
@@ -39,7 +41,7 @@ export const createEventSchema = z
     observations: z.string().trim().optional(),
   })
   .superRefine((values, context) => {
-    if (values.type !== "REGIONAL_CONVENTION") return;
+    if (values.type !== EVENT_TYPES.REGIONAL_CONVENTION) return;
 
     if (!values.endDate || !isValidDate(values.endDate)) {
       context.addIssue({
@@ -63,7 +65,7 @@ export type CreateEventFormValues = z.infer<typeof createEventSchema>;
 
 export const createEventDefaultValues: CreateEventFormValues = {
   title: "",
-  type: "ASSEMBLY",
+  type: EVENT_TYPES.ASSEMBLY,
   ticketPrice: "",
   registrationDeadline: "",
   paymentDeadline: "",

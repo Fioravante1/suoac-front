@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
+import { EVENT_TYPES } from "@/entities/event";
+
 import { createEventSchema } from "./create-event-schema";
 
 const baseValues = {
   title: "Assembleia SP 2026",
-  type: "ASSEMBLY",
+  type: EVENT_TYPES.ASSEMBLY,
   ticketPrice: "25.00",
   registrationDeadline: "2026-06-01",
   paymentDeadline: "2026-06-15",
@@ -27,7 +29,7 @@ describe("createEventSchema", () => {
   });
 
   it("exige data final para congresso regional", () => {
-    const result = createEventSchema.safeParse({ ...baseValues, type: "REGIONAL_CONVENTION" });
+    const result = createEventSchema.safeParse({ ...baseValues, type: EVENT_TYPES.REGIONAL_CONVENTION });
 
     expect(result.success).toBe(false);
   });
@@ -35,7 +37,7 @@ describe("createEventSchema", () => {
   it("rejeita data final anterior à data inicial", () => {
     const result = createEventSchema.safeParse({
       ...baseValues,
-      type: "REGIONAL_CONVENTION",
+      type: EVENT_TYPES.REGIONAL_CONVENTION,
       endDate: "2026-07-09",
     });
 

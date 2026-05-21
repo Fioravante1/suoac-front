@@ -274,13 +274,23 @@ await httpClient(endpoints.auth.login, { method: "POST", body });
 HttpMethod.POST; // desnecessario
 ```
 
-### DTOs e Mappers
+### DTOs, Models e Valores de Dominio
 
 - DTO e a forma do backend.
 - Model e a forma usada no frontend.
 - DTOs e mappers devem ficar perto do request que os consome.
 - Nao espalhe tipos de backend por componentes.
 - Nao crie `shared/types`.
+- Valores de dominio fechados devem ter uma unica fonte de verdade na entidade dona do conceito,
+  normalmente em `entities/{entity}/model`, e devem ser expostos pela Public API da entidade.
+- Status, tipos, estados, papeis especificos de dominio, labels e variantes visuais derivadas desses
+  valores nao devem ficar como strings soltas em pages, features, widgets ou testes. Crie constantes
+  tipadas como `EVENT_STATUSES`, `EVENT_TYPES`, `EVENT_STATUS_LABELS` e `EVENT_STATUS_BADGE_VARIANTS`
+  no model da entidade correspondente.
+- Use essas constantes em schemas Zod, DTO mappers, Server Actions, componentes e testes. Assim, o
+  contrato do dominio fica centralizado e mudancas futuras nao exigem procurar literais espalhados.
+- Excecao: metodos HTTP continuam sendo string literals diretamente, conforme regra da secao HTTP
+  Client. Eles pertencem ao protocolo, nao ao dominio SUOAC.
 
 ### Formularios
 

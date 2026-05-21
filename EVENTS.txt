@@ -1,0 +1,328 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                 
+  ---                                                                                                                                                                                                                                 
+  Autenticacao                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                      
+  Todas as rotas exigem Authorization: Bearer <accessToken>.                                                                                                                                                                          
+  Rotas de escrita (POST, PATCH, DELETE) exigem role CIRCUIT_COORDINATOR ou CIRCUIT_ASSISTANT. Rotas de leitura (GET) aceitam qualquer usuario autenticado.
+
+  ---
+  Tipos TypeScript para o Front
+
+  // ── Enums ────────────────────────────────────────────
+  type EventType = 'ASSEMBLY' | 'REGIONAL_CONVENTION';
+  type EventStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'FINISHED';
+  type EventDayStatus = 'ACTIVE' | 'CANCELLED';
+
+  // ── EventDay ─────────────────────────────────────────
+  interface EventDayResponse {
+    id: string;
+    dayNumber: number;
+    date: string;           // ISO 8601 — "2026-07-10T00:00:00.000Z"
+    label: string;          // "Dia 1 - Sexta-feira"
+    departureTime: string;  // "06:00"
+    returnTime: string;     // "18:00"
+    status: EventDayStatus;
+    eventId: string;
+  }
+
+  // ── Event ────────────────────────────────────────────
+  interface EventResponse {
+    id: string;
+    title: string;
+    type: EventType;
+    ticketPrice: string;    // "25.00" (string, nunca number)
+    status: EventStatus;
+    registrationDeadline: string;  // ISO 8601
+    paymentDeadline: string;       // ISO 8601
+    venue: string;
+    address: string;
+    city: string;
+    state: string;          // "SP" (2 chars, uppercase)
+    observations: string | null;
+    circuitId: string;
+    createdById: string;
+    createdAt: string;      // ISO 8601
+    updatedAt: string;      // ISO 8601
+    days?: EventDayResponse[];  // presente apenas no GET /events/:id
+  }
+
+  // ── Paginacao ────────────────────────────────────────
+  interface PaginatedResponse<T> {
+    data: T[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }
+
+  ---
+  Endpoints — Events
+
+  1. Criar evento
+
+  POST /circuits/:circuitId/events
+
+  Roles: CC, CA
+
+  Request body:
+  {
+    "title": "Assembleia SP 2026",
+    "type": "ASSEMBLY",
+    "ticketPrice": 25.00,
+    "registrationDeadline": "2026-06-01",
+    "paymentDeadline": "2026-06-15",
+    "venue": "Salao Central",
+    "address": "Rua das Flores, 100",
+    "city": "Sao Paulo",
+    "state": "SP",
+    "date": "2026-07-10",
+    "departureTime": "06:00",
+    "returnTime": "18:00",
+    "observations": "Opcional"
+  }
+  ┌──────────────────────┬────────┬─────────────┬─────────────────────────────────────────────────────────────┐
+  │        Campo         │  Tipo  │ Obrigatorio │                          Validacao                          │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ title                │ string │ sim         │ 2-200 chars                                                 │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ type                 │ string │ sim         │ ASSEMBLY ou REGIONAL_CONVENTION                             │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ ticketPrice          │ number │ sim         │ >= 0, max 2 casas decimais                                  │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ registrationDeadline │ string │ sim         │ data ISO                                                    │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ paymentDeadline      │ string │ sim         │ data ISO                                                    │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ venue                │ string │ sim         │ 2-200 chars                                                 │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ address              │ string │ sim         │ 2-300 chars                                                 │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ city                 │ string │ sim         │ 2-100 chars                                                 │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ state                │ string │ sim         │ exato 2 chars                                               │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ date                 │ string │ sim         │ data ISO (dia unico para ASSEMBLY, inicio para congresso)   │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ endDate              │ string │ condicional │ obrigatorio se type = REGIONAL_CONVENTION, deve ser >= date │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ departureTime        │ string │ sim         │ formato HH:mm                                               │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ returnTime           │ string │ sim         │ formato HH:mm                                               │
+  ├──────────────────────┼────────┼─────────────┼─────────────────────────────────────────────────────────────┤
+  │ observations         │ string │ nao         │ texto livre                                                 │
+  └──────────────────────┴────────┴─────────────┴─────────────────────────────────────────────────────────────┘
+  Resposta: 201 — EventResponse com days incluso.
+
+  Os dias sao gerados automaticamente:
+  - ASSEMBLY → 1 dia
+  - REGIONAL_CONVENTION → N dias (de date ate endDate inclusive)
+
+  Cada dia recebe label em portugues: "Dia 1 - Sexta-feira", "Dia 2 - Sabado", etc.
+
+  Erros:
+  - 404 — circuito nao encontrado
+  - 422 — endDate ausente para congresso, ou endDate < date
+
+  ---
+  2. Listar eventos do circuito
+
+  GET /circuits/:circuitId/events?page=1&limit=20
+
+  Roles: qualquer autenticado
+
+  Query params:
+  ┌───────┬─────────┬─────┬─────┐
+  │ Param │ Default │ Min │ Max │
+  ├───────┼─────────┼─────┼─────┤
+  │ page  │ 1       │ 1   │ —   │
+  ├───────┼─────────┼─────┼─────┤
+  │ limit │ 20      │ 1   │ 100 │
+  └───────┴─────────┴─────┴─────┘
+  Resposta: 200 — PaginatedResponse<EventResponse> (sem days).
+
+  Erros:
+  - 404 — circuito nao encontrado
+
+  ---
+  3. Detalhe do evento
+
+  GET /events/:id
+
+  Roles: qualquer autenticado
+
+  Resposta: 200 — EventResponse com days incluso (array de EventDayResponse ordenado por dayNumber).
+
+  Erros:
+  - 404 — evento nao encontrado
+
+  ---
+  4. Atualizar evento
+
+  PATCH /events/:id
+
+  Roles: CC, CA
+
+  Request body (todos opcionais):
+  {
+    "title": "Novo titulo",
+    "ticketPrice": 30.00,
+    "registrationDeadline": "2026-06-10",
+    "paymentDeadline": "2026-06-20",
+    "venue": "Novo local",
+    "address": "Nova rua",
+    "city": "Nova cidade",
+    "state": "RJ",
+    "observations": "Nota"
+  }
+
+  Restricao por status — o front deve respeitar isso na UI:
+  ┌──────────┬────────────────────────────────────────────────────────────────────────────────┐
+  │  Status  │                                Campos editaveis                                │
+  ├──────────┼────────────────────────────────────────────────────────────────────────────────┤
+  │ DRAFT    │ todos acima                                                                    │
+  ├──────────┼────────────────────────────────────────────────────────────────────────────────┤
+  │ OPEN     │ title, ticketPrice, paymentDeadline, venue, address, city, state, observations │
+  ├──────────┼────────────────────────────────────────────────────────────────────────────────┤
+  │ CLOSED   │ apenas observations                                                            │
+  ├──────────┼────────────────────────────────────────────────────────────────────────────────┤
+  │ FINISHED │ nenhum (422 se tentar)                                                         │
+  └──────────┴────────────────────────────────────────────────────────────────────────────────┘
+  Resposta: 200 — EventResponse (sem days).
+
+  Erros:
+  - 404 — evento nao encontrado
+  - 422 — campo proibido para o status atual (mensagem: "Campos nao editaveis no status X: campo1, campo2")
+
+  ---
+  5. Transicao de status
+
+  PATCH /events/:id/status
+
+  Roles: CC, CA
+
+  Request body:
+  {
+    "status": "OPEN"
+  }
+
+  Valores aceitos: OPEN, CLOSED, FINISHED
+
+  Transicoes validas (somente para frente):
+  DRAFT → OPEN → CLOSED → FINISHED
+
+  - DRAFT → OPEN exige pelo menos 1 dia com status ACTIVE
+  - Nao e possivel voltar atras (ex: OPEN → DRAFT retorna 422)
+
+  Resposta: 200 — EventResponse (sem days).
+
+  Erros:
+  - 404 — evento nao encontrado
+  - 422 — transicao invalida ou sem dias ativos
+
+  ---
+  6. Deletar evento
+
+  DELETE /events/:id
+
+  Roles: CC, CA
+
+  Somente eventos em DRAFT podem ser deletados (hard delete, apaga dias junto).
+
+  Resposta: 204 — sem body.
+
+  Erros:
+  - 404 — evento nao encontrado
+  - 422 — evento nao esta em DRAFT
+
+  ---
+  Endpoints — EventDays
+
+  7. Listar dias do evento
+
+  GET /events/:eventId/days
+
+  Roles: qualquer autenticado
+
+  Resposta: 200 — EventDayResponse[] (array simples, sem paginacao, ordenado por dayNumber).
+
+  Erros:
+  - 404 — evento nao encontrado
+
+  ---
+  8. Detalhe de um dia
+
+  GET /event-days/:id
+
+  Roles: qualquer autenticado
+
+  Resposta: 200 — EventDayResponse.
+
+  Erros:
+  - 404 — dia nao encontrado
+
+  ---
+  9. Atualizar horarios de um dia
+
+  PATCH /event-days/:id
+
+  Roles: CC, CA
+
+  Request body (ambos opcionais):
+  {
+    "departureTime": "07:00",
+    "returnTime": "19:00"
+  }
+
+  Formato: HH:mm (regex ^\d{2}:\d{2}$).
+
+  Restricoes:
+  - Evento deve estar em DRAFT ou OPEN
+  - Dia deve estar ACTIVE (nao pode editar dia cancelado)
+
+  Resposta: 200 — EventDayResponse.
+
+  Erros:
+  - 404 — dia nao encontrado
+  - 422 — evento em CLOSED/FINISHED, ou dia cancelado
+
+  ---
+  10. Cancelar um dia
+
+  PATCH /event-days/:id/cancel
+
+  Roles: CC, CA
+
+  Request body: nenhum (body vazio).
+
+  Comportamento:
+  - Dia ACTIVE → muda para CANCELLED
+  - Dia ja CANCELLED → retorna o mesmo objeto (idempotente, sem erro)
+
+  Restricoes:
+  - Evento deve estar em DRAFT ou OPEN
+
+  Resposta: 200 — EventDayResponse com status: "CANCELLED".
+
+  Erros:
+  - 404 — dia nao encontrado
+  - 422 — evento em CLOSED/FINISHED
+
+  ---
+  Formato de erro padrao
+
+  Todas as respostas de erro seguem:
+
+  {
+    "statusCode": 422,
+    "message": "Campos nao editaveis no status OPEN: registrationDeadline",
+    "error": "Unprocessable Entity"
+  }
+
+  Para erros de validacao (400):
+  {
+    "statusCode": 400,
+    "message": ["title must be longer than or equal to 2 characters", "type must be a valid enum value"],
+    "error": "Bad Request"
+  }

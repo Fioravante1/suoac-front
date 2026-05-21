@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { EVENT_TYPES } from "@/entities/event";
+
 import { CreateEventFormModal } from "./create-event-form-modal";
 
 describe("CreateEventFormModal", () => {
@@ -16,7 +18,7 @@ describe("CreateEventFormModal", () => {
   it("exibe data final ao selecionar congresso regional", () => {
     render(<CreateEventFormModal open onClose={vi.fn()} onSubmit={vi.fn()} />);
 
-    fireEvent.change(screen.getByLabelText("Tipo"), { target: { value: "REGIONAL_CONVENTION" } });
+    fireEvent.change(screen.getByLabelText("Tipo"), { target: { value: EVENT_TYPES.REGIONAL_CONVENTION } });
 
     expect(screen.getByLabelText("Data final")).toBeInTheDocument();
   });
@@ -43,7 +45,7 @@ describe("CreateEventFormModal", () => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           title: "Assembleia SP 2026",
-          type: "ASSEMBLY",
+          type: EVENT_TYPES.ASSEMBLY,
           ticketPrice: "25.00",
         }),
       );

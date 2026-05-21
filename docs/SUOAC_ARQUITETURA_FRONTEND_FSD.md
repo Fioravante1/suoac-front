@@ -1107,17 +1107,17 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 ### Fase 2 — Dominio MVP
 
 - Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`. (parcial — `event` e `event-day` implementadas; `congregation` e `user` ja possuem base funcional)
-- Criar features `create-event`, `enroll-passenger`, `register-payment`. (parcial — `create-event` implementada)
+- Criar features `create-event`, `publish-event`, `enroll-passenger`, `register-payment`. (parcial — `create-event` e `publish-event` implementadas)
 - Criar widgets `event-overview`, `financial-summary`.
 
 Status atual da fatia de eventos:
 
-- `entities/event` contem model, queries e query options para listagem e detalhe.
+- `entities/event` contem model, constantes de status/tipo, labels, variants, queries e query options para listagem e detalhe.
 - `entities/event-day` contem model, queries e query options para listagem e detalhe de dias.
 - `features/create-event` contem schema Zod, mapper de DTO, Server Action e modal de criacao.
 - `pages/events` consome eventos por circuito via TanStack Query, exibe cards paginados e abre o modal de criacao.
 - A grade de eventos usa dois cards por linha em telas maiores e um card por linha em telas menores.
-- A publicacao do evento (`DRAFT` -> `OPEN`) ainda deve ser implementada em `features/publish-event`.
+- A publicacao do evento (`DRAFT` -> `OPEN`) foi implementada em `features/publish-event`.
 
 ### Fase 3 — Server state
 

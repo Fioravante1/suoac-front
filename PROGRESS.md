@@ -14,7 +14,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 | Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.  |
 | App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                |
 | Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                      |
-| Eventos                | Parcial     | Modelos, queries, listagem paginada e criação de evento implementados.              |
+| Eventos                | Parcial     | Modelos, queries, listagem paginada, criação de evento e abertura de inscrições.    |
 | Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
 | Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
 | Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                    |
@@ -68,7 +68,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 
 ### 6. Eventos - Primeira Fatia MVP
 
-- `entities/event` criado com tipos de domínio, queries e query options.
+- `entities/event` criado com tipos de domínio, constantes de status/tipo, labels, variants, queries e query options.
 - `entities/event-day` criado com tipos de domínio e queries.
 - Endpoints adicionados para:
   - listar/criar/detalhar/atualizar/deletar eventos;
@@ -86,7 +86,16 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
   - empty state;
   - estado de erro com retry;
   - skeleton de carregamento;
-  - modal de criação de evento.
+  - modal de criação de evento;
+  - ação para publicar eventos em rascunho, disponível apenas para papéis de circuito.
+
+### 7. Publicação de Eventos
+
+- `features/publish-event` implementada com Server Action `publishEventAction`.
+- A ação chama `PATCH /events/:id/status` com `{ status: "OPEN" }`.
+- A página de eventos exibe o botão "Publicar evento" apenas para eventos em `DRAFT` e para papéis de circuito.
+- Em sucesso, as queries de eventos são invalidadas para atualizar a listagem.
+- Em erro, a página mostra mensagem recuperável no topo da listagem.
 
 ## Validação Mais Recente
 
@@ -108,16 +117,14 @@ Resultado: passou.
 
 ## Próximos Passos Recomendados
 
-1. Implementar `features/publish-event` para transicionar evento de `DRAFT` para `OPEN` via `PATCH /events/:id/status`.
-2. Adicionar ações de edição e exclusão de evento respeitando as restrições por status do backend.
-3. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
-4. Implementar `entities/passenger` e `features/enroll-passenger`.
-5. Implementar `entities/payment` e `features/register-payment`.
-6. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
+1. Adicionar ações de edição e exclusão de evento respeitando as restrições por status do backend.
+2. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
+3. Implementar `entities/passenger` e `features/enroll-passenger`.
+4. Implementar `entities/payment` e `features/register-payment`.
+5. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
 
 ## Pendências Conhecidas
 
-- Ainda não há ação de publicar evento na UI.
 - Ainda não há edição, exclusão ou detalhe de evento na UI.
 - Ainda não há manipulação de horários/cancelamento de `event-day` na UI.
 - O arquivo `EVENTS.txt` contém o contrato usado para esta fase e está fora da documentação oficial versionada em `docs/`.

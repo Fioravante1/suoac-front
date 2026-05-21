@@ -549,7 +549,7 @@ Status no frontend em 21/05/2026:
 
 - Criação de evento: parcialmente implementada no frontend com `features/create-event`, incluindo assembleia de um dia e congresso regional multi-dia conforme contrato do backend.
 - Listagem de eventos: implementada em `pages/events` com paginação, cards responsivos, empty state, skeleton e retry em erro.
-- Publicação/abertura de inscrições: pendente. Deve usar a transição de status `DRAFT` -> `OPEN`.
+- Publicação/abertura de inscrições: implementada na listagem de eventos para registros em `DRAFT`, usando a transição de status `DRAFT` -> `OPEN`.
 - Cadastro de passageiros, seleção de dias, pagamentos e dashboards reais: pendentes para as próximas fatias do MVP.
 
 ### 8.3 Observações

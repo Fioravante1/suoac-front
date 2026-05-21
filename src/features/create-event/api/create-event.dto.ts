@@ -1,4 +1,4 @@
-import type { EventType } from "@/entities/event";
+import { EVENT_TYPES, type EventType } from "@/entities/event";
 
 import type { CreateEventFormValues } from "../model";
 
@@ -21,7 +21,7 @@ export interface CreateEventDto {
 
 export function mapCreateEventFormToDto(values: CreateEventFormValues): CreateEventDto {
   const observations = values.observations?.trim();
-  const endDate = values.type === "REGIONAL_CONVENTION" ? values.endDate : undefined;
+  const endDate = values.type === EVENT_TYPES.REGIONAL_CONVENTION ? values.endDate : undefined;
 
   return {
     title: values.title.trim(),
