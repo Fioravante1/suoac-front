@@ -34,7 +34,7 @@ export function CongregationsPage() {
   const [editingCongregation, setEditingCongregation] = useState<Congregation | null>(null);
   const [deletingCongregation, setDeletingCongregation] = useState<Congregation | null>(null);
 
-  const { data, isLoading, isError, error } = useQuery(congregationListOptions(circuitId, page));
+  const { data, isLoading } = useQuery(congregationListOptions(circuitId, page));
 
   const createMutation = useMutation({
     mutationFn: (dto: CongregationFormValues) => createCongregationAction(circuitId, dto),
@@ -108,20 +108,6 @@ export function CongregationsPage() {
         {isLoading && (
           <div className={styles.loadingContainer}>
             <Spinner size="large" />
-          </div>
-        )}
-
-        {isError && (
-          <div className={styles.errorContainer}>
-            <p className={styles.errorMessage}>
-              {error instanceof Error ? error.message : "Erro ao carregar congregações."}
-            </p>
-            <Button
-              variant="secondary"
-              onClick={() => queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all })}
-            >
-              Tentar novamente
-            </Button>
           </div>
         )}
 
