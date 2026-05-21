@@ -31,13 +31,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--suoac-space-1) var(--suoac-space-2);
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-2) var(--suoac-space-3);
   border: none;
   background: transparent;
   border-radius: var(--suoac-radius-sm);
   color: var(--suoac-color-text-secondary);
   cursor: pointer;
   font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
   transition:
     background-color 0.15s ease,
     color 0.15s ease;

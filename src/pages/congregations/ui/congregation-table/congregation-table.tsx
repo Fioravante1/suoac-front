@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from "lucide-react";
 import type { Congregation } from "@/entities/congregation";
 
 import { TableWrapper, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/shared/ui/table";
@@ -45,7 +46,8 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
                         onClick={() => onEdit(congregation)}
                         aria-label={`Editar ${congregation.name}`}
                       >
-                        ✏️ Editar
+                        <Pencil size={16} />
+                        <span>Editar</span>
                       </button>
                       <button
                         type="button"
@@ -53,7 +55,8 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
                         onClick={() => onDelete(congregation)}
                         aria-label={`Excluir ${congregation.name}`}
                       >
-                        🗑️ Excluir
+                        <Trash2 size={16} />
+                        <span>Excluir</span>
                       </button>
                     </div>
                   </TableCell>
@@ -81,7 +84,8 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
                 onClick={() => onEdit(congregation)}
                 aria-label={`Editar ${congregation.name}`}
               >
-                ✏️ Editar
+                <Pencil size={16} />
+                <span>Editar</span>
               </button>
               <button
                 type="button"
@@ -89,7 +93,8 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
                 onClick={() => onDelete(congregation)}
                 aria-label={`Excluir ${congregation.name}`}
               >
-                🗑️ Excluir
+                <Trash2 size={16} />
+                <span>Excluir</span>
               </button>
             </div>
           </div>
