@@ -769,6 +769,7 @@ Componentes genericos:
 - Pagination.
 - Skeleton.
 - Spinner.
+- Table.
 - TextField.
 
 Cada componente deve ter seu proprio diretorio e `index.ts`:

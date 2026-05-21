@@ -351,12 +351,12 @@ Exemplos corretos:
 
 ```tsx
 // Carregamento de lista — Skeleton
-{isLoading && <SkeletonTableRows rows={5} />}
+{
+  isLoading && <SkeletonTableRows rows={5} />;
+}
 
 // Botao de salvar — Spinner
-<Button disabled={isPending}>
-  {isPending ? <Spinner size="small" /> : "Salvar"}
-</Button>
+<Button disabled={isPending}>{isPending ? <Spinner size="small" /> : "Salvar"}</Button>;
 ```
 
 ---
@@ -438,7 +438,6 @@ fireEvent.click(screen.getByRole("button", { name: "Salvar" }));
 // Errado — nao importar user-event sem o pacote instalado
 import userEvent from "@testing-library/user-event";
 ```
-
 
 ---
 

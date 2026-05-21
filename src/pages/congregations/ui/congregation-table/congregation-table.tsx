@@ -1,5 +1,7 @@
 import type { Congregation } from "@/entities/congregation";
 
+import { TableWrapper, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/shared/ui/table";
+
 import styles from "./congregation-table.module.css";
 
 interface CongregationTableProps {
@@ -16,48 +18,50 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
   return (
     <>
       {/* Desktop: table */}
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Código</th>
-              <th>E-mail</th>
-              <th>Cidade</th>
-              <th style={{ textAlign: "right" }}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {congregations.map((congregation) => (
-              <tr key={congregation.id}>
-                <td className={styles.name}>{congregation.name}</td>
-                <td className={styles.code}>{congregation.code}</td>
-                <td className={styles.email}>{normalizeEmail(congregation.email)}</td>
-                <td className={styles.city}>{congregation.city ?? "—"}</td>
-                <td>
-                  <div className={styles.actions}>
-                    <button
-                      type="button"
-                      className={styles.actionButton}
-                      onClick={() => onEdit(congregation)}
-                      aria-label={`Editar ${congregation.name}`}
-                    >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.actionButton} ${styles.actionButtonDanger}`}
-                      onClick={() => onDelete(congregation)}
-                      aria-label={`Excluir ${congregation.name}`}
-                    >
-                      🗑️ Excluir
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className={styles.desktopOnly}>
+        <TableWrapper>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Código</TableHead>
+                <TableHead>E-mail</TableHead>
+                <TableHead>Cidade</TableHead>
+                <TableHead style={{ textAlign: "right" }}>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {congregations.map((congregation) => (
+                <TableRow key={congregation.id}>
+                  <TableCell className={styles.name}>{congregation.name}</TableCell>
+                  <TableCell className={styles.code}>{congregation.code}</TableCell>
+                  <TableCell className={styles.email}>{normalizeEmail(congregation.email)}</TableCell>
+                  <TableCell className={styles.city}>{congregation.city ?? "—"}</TableCell>
+                  <TableCell>
+                    <div className={styles.actions}>
+                      <button
+                        type="button"
+                        className={styles.actionButton}
+                        onClick={() => onEdit(congregation)}
+                        aria-label={`Editar ${congregation.name}`}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.actionButton} ${styles.actionButtonDanger}`}
+                        onClick={() => onDelete(congregation)}
+                        aria-label={`Excluir ${congregation.name}`}
+                      >
+                        🗑️ Excluir
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableWrapper>
       </div>
 
       {/* Mobile: cards */}
