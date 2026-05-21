@@ -14,6 +14,8 @@ export interface SignInState {
 }
 
 export async function signInAction(_prevState: SignInState | undefined, formData: FormData): Promise<SignInState> {
+  const returnUrl = formData.get("returnUrl") as string | null;
+
   const raw = {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -51,5 +53,7 @@ export async function signInAction(_prevState: SignInState | undefined, formData
     return { error: "Ocorreu um erro inesperado. Tente novamente." };
   }
 
-  redirect(routes.dashboard);
+  const safeReturnUrl = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//") ? returnUrl : null;
+
+  redirect(safeReturnUrl ?? routes.dashboard);
 }
