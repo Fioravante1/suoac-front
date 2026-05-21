@@ -18,7 +18,7 @@ vi.mock("next/headers", () => ({
   ),
 }));
 
-import { createSession, getSession, getAccessToken, deleteSession, hasSession } from "./session";
+import { createSession, getSession, getAccessToken, getRefreshToken, deleteSession, hasSession } from "./session";
 import type { SessionUser } from "./session";
 
 const testUser: SessionUser = {
@@ -114,6 +114,25 @@ describe("getAccessToken", () => {
     mockGet.mockReturnValue(undefined);
 
     const token = await getAccessToken();
+
+    expect(token).toBeNull();
+  });
+});
+
+describe("getRefreshToken", () => {
+  it("retorna token quando cookie existe", async () => {
+    mockGet.mockReturnValue({ value: "refresh-token-456" });
+
+    const token = await getRefreshToken();
+
+    expect(mockGet).toHaveBeenCalledWith("suoac-refresh-token");
+    expect(token).toBe("refresh-token-456");
+  });
+
+  it("retorna null quando cookie nao existe", async () => {
+    mockGet.mockReturnValue(undefined);
+
+    const token = await getRefreshToken();
 
     expect(token).toBeNull();
   });
