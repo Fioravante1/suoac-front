@@ -665,26 +665,26 @@ O SUOAC tera JWT com refresh token em cookie HttpOnly no backend. No frontend, a
 
 ### 8.2 RBAC
 
-Papeis previstos:
+Papeis definidos em `shared/auth/session/user-role.ts` via const `USER_ROLES`:
 
-- Coordenador do circuito.
-- Assistente do circuito.
-- Coordenador da congregacao.
-- Assistente da congregacao.
+- `CIRCUIT_COORDINATOR` — Coordenador do circuito.
+- `CIRCUIT_ASSISTANT` — Assistente do circuito.
+- `CONGREGATION_COORDINATOR` — Coordenador da congregacao.
+- `CONGREGATION_ASSISTANT` — Assistente da congregacao.
 
-Regras de permissao puras podem ficar em:
+O tipo `UserRole` e derivado da const via `typeof`, garantindo ponto unico de definicao.
+
+Helpers de permissao e filtragem de navegacao ficam em `shared/auth/rbac/`:
 
 ```txt
-src/shared/auth/permissions.ts
+shared/auth/session/user-role.ts    # const USER_ROLES e tipo UserRole
+shared/auth/rbac/rbac.ts            # isCircuitRole, filterNavItems, NavItem
 ```
 
 Se a regra depender fortemente de `User`, mover ou expor composicoes via `entities/user/model`.
-
-Exemplo de responsabilidade:
+Regras especificas de features ficam na propria feature:
 
 ```txt
-shared/auth/permissions.ts          # helpers genericos: hasRole, hasAnyRole
-entities/user/model/role.ts         # enum e regras do papel
 features/publish-event/model/...    # regra especifica para publicar evento
 ```
 
@@ -1127,7 +1127,7 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 - Criar protecao de rotas via proxy. (concluido)
 - Criar widget `app-shell` com sidebar e bottom nav. (concluido)
 - Criar route group `(private)` com layout autenticado. (concluido)
-- Criar filtragem de navegacao por papel (RBAC).
+- Criar filtragem de navegacao por papel (RBAC). (concluido)
 
 ### Fase 5 — Relatorios e pos-MVP
 

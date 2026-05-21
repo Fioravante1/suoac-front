@@ -2,11 +2,9 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-export type UserRole =
-  | "CIRCUIT_COORDINATOR"
-  | "CIRCUIT_ASSISTANT"
-  | "CONGREGATION_COORDINATOR"
-  | "CONGREGATION_ASSISTANT";
+import type { UserRole } from "./user-role";
+
+export type { UserRole };
 
 export interface SessionUser {
   id: string;

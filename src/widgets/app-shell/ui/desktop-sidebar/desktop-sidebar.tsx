@@ -5,24 +5,36 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarDays, Building2, Users, Wallet, Settings, LogOut } from "lucide-react";
 
-import { useAuth } from "@/shared/auth";
+import { useAuth, filterNavItems, USER_ROLES, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
 import styles from "./desktop-sidebar.module.css";
 
-const navItems = [
+const navItems: NavItem[] = [
   { label: "Dashboard", href: routes.dashboard, icon: LayoutDashboard },
   { label: "Eventos", href: routes.events, icon: CalendarDays },
-  { label: "Congregações", href: routes.congregations, icon: Building2 },
+  {
+    label: "Congregações",
+    href: routes.congregations,
+    icon: Building2,
+    roles: [USER_ROLES.CIRCUIT_COORDINATOR, USER_ROLES.CIRCUIT_ASSISTANT],
+  },
   { label: "Passageiros", href: routes.passengers, icon: Users },
   { label: "Financeiro", href: routes.financial, icon: Wallet },
-  { label: "Configurações", href: routes.settings, icon: Settings },
-] as const;
+  {
+    label: "Configurações",
+    href: routes.settings,
+    icon: Settings,
+    roles: [USER_ROLES.CIRCUIT_COORDINATOR, USER_ROLES.CIRCUIT_ASSISTANT],
+  },
+];
 
 export function DesktopSidebar() {
   const pathname = usePathname() ?? "";
   const { user } = useAuth();
+
+  const visibleItems = user ? filterNavItems(navItems, user.role) : [];
 
   return (
     <aside className={styles.sidebar}>
@@ -43,7 +55,7 @@ export function DesktopSidebar() {
       </div>
 
       <nav className={styles.nav}>
-        {navItems.map(({ label, href, icon: Icon }) => {
+        {visibleItems.map(({ label, href, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(`${href}/`);
 
           return (

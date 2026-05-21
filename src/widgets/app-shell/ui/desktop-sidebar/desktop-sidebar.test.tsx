@@ -5,9 +5,15 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/dashboard"),
 }));
 
-vi.mock("@/shared/auth", () => ({
-  useAuth: vi.fn(() => ({ user: { name: "João Silva" }, isAuthenticated: true })),
-}));
+const mockUseAuth = vi.fn();
+
+vi.mock("@/shared/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/shared/auth")>();
+  return {
+    ...actual,
+    useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  };
+});
 
 vi.mock("@/features/sign-in", () => ({
   signOutAction: vi.fn(),
@@ -16,7 +22,12 @@ vi.mock("@/features/sign-in", () => ({
 import { DesktopSidebar } from "./desktop-sidebar";
 
 describe("DesktopSidebar", () => {
-  it("renderiza todos os itens de navegacao", () => {
+  it("renderiza todos os 6 itens para CIRCUIT_COORDINATOR", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<DesktopSidebar />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
@@ -27,21 +38,64 @@ describe("DesktopSidebar", () => {
     expect(screen.getByText("Configurações")).toBeInTheDocument();
   });
 
+  it("oculta Congregacoes e Configuracoes para CONGREGATION_COORDINATOR", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
+    render(<DesktopSidebar />);
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.queryByText("Congregações")).not.toBeInTheDocument();
+    expect(screen.getByText("Passageiros")).toBeInTheDocument();
+    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+    expect(screen.queryByText("Configurações")).not.toBeInTheDocument();
+  });
+
   it("renderiza o logo SUOAC", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<DesktopSidebar />);
 
     expect(screen.getByText("SUOAC")).toBeInTheDocument();
   });
 
   it("renderiza o nome do usuario", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<DesktopSidebar />);
 
     expect(screen.getByText("João Silva")).toBeInTheDocument();
   });
 
   it("renderiza o botao de logout", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<DesktopSidebar />);
 
     expect(screen.getByRole("button", { name: /Sair/i })).toBeInTheDocument();
+  });
+
+  it("nao renderiza itens de navegacao quando nao ha usuario", () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+    });
+
+    render(<DesktopSidebar />);
+
+    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+    expect(screen.queryByText("Eventos")).not.toBeInTheDocument();
   });
 });

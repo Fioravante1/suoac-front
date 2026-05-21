@@ -5,6 +5,16 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/dashboard"),
 }));
 
+const mockUseAuth = vi.fn();
+
+vi.mock("@/shared/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/shared/auth")>();
+  return {
+    ...actual,
+    useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  };
+});
+
 vi.mock("@/features/sign-in", () => ({
   signOutAction: vi.fn(),
 }));
@@ -12,7 +22,26 @@ vi.mock("@/features/sign-in", () => ({
 import { MobileBottomNav } from "./mobile-bottom-nav";
 
 describe("MobileBottomNav", () => {
-  it("renderiza os itens de navegacao mobile", () => {
+  it("renderiza todos os 4 itens para CIRCUIT_COORDINATOR", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
+    render(<MobileBottomNav />);
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.getByText("Passageiros")).toBeInTheDocument();
+    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+  });
+
+  it("renderiza todos os 4 itens para CONGREGATION_COORDINATOR", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<MobileBottomNav />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
@@ -22,6 +51,11 @@ describe("MobileBottomNav", () => {
   });
 
   it("nao renderiza itens exclusivos do desktop", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<MobileBottomNav />);
 
     expect(screen.queryByText("Congregações")).not.toBeInTheDocument();
@@ -29,8 +63,25 @@ describe("MobileBottomNav", () => {
   });
 
   it("renderiza o botao de sair", () => {
+    mockUseAuth.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
     render(<MobileBottomNav />);
 
     expect(screen.getByRole("button", { name: /Sair/i })).toBeInTheDocument();
+  });
+
+  it("nao renderiza itens de navegacao quando nao ha usuario", () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+    });
+
+    render(<MobileBottomNav />);
+
+    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+    expect(screen.queryByText("Eventos")).not.toBeInTheDocument();
   });
 });

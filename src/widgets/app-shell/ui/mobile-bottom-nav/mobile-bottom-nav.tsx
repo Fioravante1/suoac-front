@@ -4,24 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarDays, Users, Wallet, LogOut } from "lucide-react";
 
+import { useAuth, filterNavItems, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
 import styles from "./mobile-bottom-nav.module.css";
 
-const mobileNavItems = [
+const mobileNavItems: NavItem[] = [
   { label: "Dashboard", href: routes.dashboard, icon: LayoutDashboard },
   { label: "Eventos", href: routes.events, icon: CalendarDays },
   { label: "Passageiros", href: routes.passengers, icon: Users },
   { label: "Financeiro", href: routes.financial, icon: Wallet },
-] as const;
+];
 
 export function MobileBottomNav() {
   const pathname = usePathname() ?? "";
+  const { user } = useAuth();
+
+  const visibleItems = user ? filterNavItems(mobileNavItems, user.role) : [];
 
   return (
     <nav className={styles.nav}>
-      {mobileNavItems.map(({ label, href, icon: Icon }) => {
+      {visibleItems.map(({ label, href, icon: Icon }) => {
         const isActive = pathname === href || pathname.startsWith(`${href}/`);
 
         return (
