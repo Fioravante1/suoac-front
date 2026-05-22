@@ -44,6 +44,48 @@ export const EVENT_STATUS_BADGE_VARIANTS: Record<EventStatus, EventStatusVariant
   [EVENT_STATUSES.FINISHED]: "info",
 };
 
+export const EVENT_UPDATE_FIELDS = {
+  TITLE: "title",
+  TICKET_PRICE: "ticketPrice",
+  REGISTRATION_DEADLINE: "registrationDeadline",
+  PAYMENT_DEADLINE: "paymentDeadline",
+  VENUE: "venue",
+  ADDRESS: "address",
+  CITY: "city",
+  STATE: "state",
+  OBSERVATIONS: "observations",
+} as const;
+
+export type EventUpdateField = (typeof EVENT_UPDATE_FIELDS)[keyof typeof EVENT_UPDATE_FIELDS];
+
+export const EVENT_EDITABLE_FIELDS_BY_STATUS: Record<EventStatus, readonly EventUpdateField[]> = {
+  [EVENT_STATUSES.DRAFT]: Object.values(EVENT_UPDATE_FIELDS),
+  [EVENT_STATUSES.OPEN]: [
+    EVENT_UPDATE_FIELDS.TITLE,
+    EVENT_UPDATE_FIELDS.TICKET_PRICE,
+    EVENT_UPDATE_FIELDS.PAYMENT_DEADLINE,
+    EVENT_UPDATE_FIELDS.VENUE,
+    EVENT_UPDATE_FIELDS.ADDRESS,
+    EVENT_UPDATE_FIELDS.CITY,
+    EVENT_UPDATE_FIELDS.STATE,
+    EVENT_UPDATE_FIELDS.OBSERVATIONS,
+  ],
+  [EVENT_STATUSES.CLOSED]: [EVENT_UPDATE_FIELDS.OBSERVATIONS],
+  [EVENT_STATUSES.FINISHED]: [],
+};
+
+export function canUpdateEventStatus(status: EventStatus): boolean {
+  return EVENT_EDITABLE_FIELDS_BY_STATUS[status].length > 0;
+}
+
+export function canDeleteEventStatus(status: EventStatus): boolean {
+  return status === EVENT_STATUSES.DRAFT;
+}
+
+export function isEventFieldEditable(status: EventStatus, field: EventUpdateField): boolean {
+  return EVENT_EDITABLE_FIELDS_BY_STATUS[status].includes(field);
+}
+
 export const EVENT_DAY_STATUSES = {
   ACTIVE: "ACTIVE",
   CANCELLED: "CANCELLED",

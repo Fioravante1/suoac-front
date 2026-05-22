@@ -4,7 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvents } from "@/entities/event/api";
+import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
+import { updateEventAction } from "@/features/update-event/api";
 
 import { EventsPage } from "./events-page";
 
@@ -44,6 +46,14 @@ vi.mock("@/features/publish-event", () => ({
   publishEventAction: vi.fn(),
 }));
 
+vi.mock("@/features/update-event/api", () => ({
+  updateEventAction: vi.fn(),
+}));
+
+vi.mock("@/features/delete-event", () => ({
+  deleteEventAction: vi.fn(),
+}));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -60,6 +70,8 @@ function createWrapper() {
 
 const fetchEventsMock = vi.mocked(fetchEvents);
 const publishEventActionMock = vi.mocked(publishEventAction);
+const updateEventActionMock = vi.mocked(updateEventAction);
+const deleteEventActionMock = vi.mocked(deleteEventAction);
 
 const draftEvent = {
   id: "event-1",
@@ -91,6 +103,8 @@ describe("EventsPage", () => {
       success: true,
       data: { ...draftEvent, status: EVENT_STATUSES.OPEN },
     });
+    updateEventActionMock.mockResolvedValue({ success: true, data: draftEvent });
+    deleteEventActionMock.mockResolvedValue({ success: true, data: undefined });
   });
 
   it("renderiza o heading Eventos", () => {
@@ -113,7 +127,7 @@ describe("EventsPage", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it("exibe ação para publicar evento em evento rascunho para papel de circuito", async () => {
+  it("confirma publicação de evento em rascunho para papel de circuito", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -123,6 +137,11 @@ describe("EventsPage", () => {
 
     const publishButton = await screen.findByRole("button", { name: /publicar evento/i });
     fireEvent.click(publishButton);
+
+    expect(screen.getByRole("dialog", { name: "Publicar Evento" })).toBeInTheDocument();
+    expect(publishEventActionMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Publicar" }));
 
     await waitFor(() => {
       expect(publishEventActionMock).toHaveBeenCalledWith("event-1");
@@ -141,5 +160,44 @@ describe("EventsPage", () => {
     expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /novo evento/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /publicar evento/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /editar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /excluir/i })).not.toBeInTheDocument();
+  });
+
+  it("abre modal de edição e envia alterações", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [draftEvent],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /editar/i }));
+    fireEvent.change(screen.getByLabelText("Título"), { target: { value: "Novo título" } });
+    fireEvent.click(screen.getByRole("button", { name: "Salvar alterações" }));
+
+    await waitFor(() => {
+      expect(updateEventActionMock).toHaveBeenCalledWith(
+        "event-1",
+        EVENT_STATUSES.DRAFT,
+        expect.objectContaining({ title: "Novo título" }),
+      );
+    });
+  });
+
+  it("confirma exclusão de evento em rascunho", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [draftEvent],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /excluir/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Excluir" }).at(-1)!);
+
+    await waitFor(() => {
+      expect(deleteEventActionMock).toHaveBeenCalledWith("event-1");
+    });
   });
 });

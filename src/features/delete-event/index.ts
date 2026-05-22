@@ -1,0 +1,1 @@
+export { deleteEventAction } from "./api";

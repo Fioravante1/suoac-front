@@ -89,6 +89,27 @@
   gap: var(--suoac-space-1);
 }
 
+.cardActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--suoac-space-2);
+  justify-content: stretch;
+  width: 100%;
+  padding-top: var(--suoac-space-4);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+.cardActions > button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--suoac-space-3);
+  white-space: nowrap;
+}
+
+.cardActions > button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .ticketPrice {
   font-size: var(--suoac-font-size-h3);
   font-weight: var(--suoac-font-weight-bold);
@@ -118,8 +139,25 @@
   }
 
   .cardFooter {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    align-items: stretch;
+  }
+
+  .priceGroup {
+    max-width: 100%;
+  }
+
+  .cardActions {
+    grid-template-columns: repeat(3, max-content);
+    justify-content: end;
+    align-self: stretch;
+    max-width: 100%;
+  }
+
+  .cardActions > button {
+    width: auto;
+  }
+
+  .cardActions > button:last-child:nth-child(odd) {
+    grid-column: auto;
   }
 }

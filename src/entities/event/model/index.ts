@@ -1,5 +1,7 @@
 export {
   EVENT_DAY_STATUSES,
+  EVENT_EDITABLE_FIELDS_BY_STATUS,
+  EVENT_UPDATE_FIELDS,
   EVENT_STATUS_BADGE_VARIANTS,
   EVENT_STATUS_LABELS,
   EVENT_STATUS_VALUES,
@@ -7,5 +9,16 @@ export {
   EVENT_TYPE_LABELS,
   EVENT_TYPE_VALUES,
   EVENT_TYPES,
+  canDeleteEventStatus,
+  canUpdateEventStatus,
+  isEventFieldEditable,
 } from "./event";
-export type { Event, EventDayInEvent, EventDayStatus, EventStatus, EventStatusVariant, EventType } from "./event";
+export type {
+  Event,
+  EventDayInEvent,
+  EventDayStatus,
+  EventStatus,
+  EventStatusVariant,
+  EventType,
+  EventUpdateField,
+} from "./event";

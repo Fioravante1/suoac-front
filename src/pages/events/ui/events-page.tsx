@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Clock, MapPin, Plus, RefreshCw, Send } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { isCircuitRole, useAuth } from "@/shared/auth";
@@ -9,6 +9,7 @@ import { useModal, usePagination } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { ErrorState } from "@/shared/ui/error-state";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -20,12 +21,17 @@ import {
   EVENT_STATUS_LABELS,
   EVENT_STATUSES,
   EVENT_TYPE_LABELS,
+  canDeleteEventStatus,
+  canUpdateEventStatus,
   type Event,
 } from "@/entities/event";
 import { eventListOptions } from "@/entities/event/api/event.options";
 import { createEventAction } from "@/features/create-event/api";
+import { deleteEventAction } from "@/features/delete-event";
 import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
 import { publishEventAction } from "@/features/publish-event";
+import { updateEventAction } from "@/features/update-event/api";
+import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
 
 import styles from "./events-page.module.css";
 
@@ -39,12 +45,14 @@ function formatCurrency(value: string): string {
 
 interface EventCardProps {
   event: Event;
-  canPublish: boolean;
+  canManage: boolean;
   publishing: boolean;
+  onEdit: (event: Event) => void;
+  onDelete: (event: Event) => void;
   onPublish: (event: Event) => void;
 }
 
-function EventCard({ event, canPublish, publishing, onPublish }: EventCardProps) {
+function EventCard({ event, canManage, publishing, onEdit, onDelete, onPublish }: EventCardProps) {
   return (
     <Card className={styles.eventCard}>
       <div className={styles.cardHeader}>
@@ -75,11 +83,27 @@ function EventCard({ event, canPublish, publishing, onPublish }: EventCardProps)
           <span className={styles.ticketPrice}>{formatCurrency(event.ticketPrice)}</span>
           <span className={styles.venue}>{event.venue}</span>
         </div>
-        {canPublish && event.status === EVENT_STATUSES.DRAFT && (
-          <Button variant="secondary" onClick={() => onPublish(event)} disabled={publishing}>
-            <Send size={18} aria-hidden="true" />
-            {publishing ? "Publicando…" : "Publicar evento"}
-          </Button>
+        {canManage && (
+          <div className={styles.cardActions}>
+            {canUpdateEventStatus(event.status) && (
+              <Button variant="ghost" onClick={() => onEdit(event)}>
+                <Pencil size={18} aria-hidden="true" />
+                Editar
+              </Button>
+            )}
+            {canDeleteEventStatus(event.status) && (
+              <Button variant="ghost" onClick={() => onDelete(event)}>
+                <Trash2 size={18} aria-hidden="true" />
+                Excluir
+              </Button>
+            )}
+            {event.status === EVENT_STATUSES.DRAFT && (
+              <Button variant="secondary" onClick={() => onPublish(event)} disabled={publishing}>
+                <Send size={18} aria-hidden="true" />
+                {publishing ? "Publicando…" : "Publicar evento"}
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </Card>
@@ -92,11 +116,14 @@ export function EventsPage() {
   const circuitId = user?.circuitId ?? "";
   const { page, setPage } = usePagination();
   const createModal = useModal();
+  const updateModal = useModal<Event>();
+  const publishModal = useModal<Event>();
+  const deleteModal = useModal<Event>();
   const canManageEvents = user ? isCircuitRole(user.role) : false;
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
-  const [publishError, setPublishError] = useState<string | null>(null);
+  const [operationError, setOperationError] = useState<string | null>(null);
 
   const createMutation = useMutation({
     mutationFn: (values: CreateEventFormValues) => createEventAction(circuitId, values),
@@ -112,12 +139,42 @@ export function EventsPage() {
     mutationFn: (eventId: string) => publishEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        setPublishError(result.error);
+        setOperationError(result.error);
         return;
       }
 
-      setPublishError(null);
+      setOperationError(null);
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      publishModal.close();
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ event, values }: { event: Event; values: UpdateEventFormValues }) =>
+      updateEventAction(event.id, event.status, values),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setOperationError(result.error);
+        return;
+      }
+
+      setOperationError(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      updateModal.close();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (eventId: string) => deleteEventAction(eventId),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setOperationError(result.error);
+        return;
+      }
+
+      setOperationError(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      deleteModal.close();
     },
   });
 
@@ -125,9 +182,22 @@ export function EventsPage() {
     return createMutation.mutateAsync(values);
   }
 
-  function handlePublishEvent(event: Event) {
-    setPublishError(null);
-    publishMutation.mutate(event.id);
+  async function handleUpdateEvent(event: Event, values: UpdateEventFormValues) {
+    return updateMutation.mutateAsync({ event, values });
+  }
+
+  function handleConfirmPublish() {
+    if (!publishModal.item) return;
+
+    setOperationError(null);
+    publishMutation.mutate(publishModal.item.id);
+  }
+
+  function handleConfirmDelete() {
+    if (!deleteModal.item) return;
+
+    setOperationError(null);
+    deleteMutation.mutate(deleteModal.item.id);
   }
 
   return (
@@ -146,9 +216,9 @@ export function EventsPage() {
       />
 
       <div className={styles.content}>
-        {publishError && (
+        {operationError && (
           <div className={styles.errorBanner} role="alert">
-            {publishError}
+            {operationError}
           </div>
         )}
 
@@ -190,9 +260,11 @@ export function EventsPage() {
                 <EventCard
                   key={event.id}
                   event={event}
-                  canPublish={canManageEvents}
+                  canManage={canManageEvents}
                   publishing={publishMutation.isPending && publishMutation.variables === event.id}
-                  onPublish={handlePublishEvent}
+                  onEdit={updateModal.open}
+                  onDelete={deleteModal.open}
+                  onPublish={publishModal.open}
                 />
               ))}
             </div>
@@ -202,6 +274,30 @@ export function EventsPage() {
       </div>
 
       <CreateEventFormModal open={createModal.isOpen} onClose={createModal.close} onSubmit={handleCreateEvent} />
+      <UpdateEventFormModal
+        open={updateModal.isOpen}
+        onClose={updateModal.close}
+        onSubmit={handleUpdateEvent}
+        event={updateModal.item}
+      />
+      <ConfirmDialog
+        open={publishModal.isOpen}
+        onClose={publishModal.close}
+        onConfirm={handleConfirmPublish}
+        title="Publicar Evento"
+        message={`Tem certeza que deseja publicar o evento "${publishModal.item?.title}"? Depois disso, as congregações poderão visualizar o evento e iniciar as inscrições.`}
+        confirmLabel="Publicar"
+        loading={publishMutation.isPending}
+      />
+      <ConfirmDialog
+        open={deleteModal.isOpen}
+        onClose={deleteModal.close}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Evento"
+        message={`Tem certeza que deseja excluir o evento "${deleteModal.item?.title}"? Essa ação apaga o evento e seus dias e não pode ser desfeita.`}
+        confirmLabel="Excluir"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }
