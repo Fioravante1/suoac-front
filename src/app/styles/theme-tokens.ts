@@ -7,6 +7,7 @@ export const themeTokens = {
     success: "#2E9E5B",
     attention: "#F5B700",
     critical: "#D64545",
+    criticalDark: "#B53232",
     background: "#F7F9F8",
     surface: "#FFFFFF",
     surfaceMuted: "#F1F5F3",
