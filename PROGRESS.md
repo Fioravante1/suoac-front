@@ -14,7 +14,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 | Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.  |
 | App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                |
 | Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                      |
-| Eventos                | Parcial     | Modelos, queries, listagem paginada, criação de evento e abertura de inscrições.    |
+| Eventos                | Parcial     | Listagem, criação, publicação, edição e exclusão já integradas ao backend.          |
 | Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
 | Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
 | Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                    |
@@ -97,6 +97,18 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - Em sucesso, as queries de eventos são invalidadas para atualizar a listagem.
 - Em erro, a página mostra mensagem recuperável no topo da listagem.
 
+### 8. Edição e Exclusão de Eventos
+
+- `features/update-event` implementada com schema Zod, mapper por status, Server Action e modal de edição.
+- A edição respeita os campos permitidos por status conforme contrato do backend:
+  - `DRAFT`: todos os campos editáveis pelo endpoint;
+  - `OPEN`: sem alteração de prazo de inscrição;
+  - `CLOSED`: apenas observações;
+  - `FINISHED`: sem edição.
+- `features/delete-event` implementada com Server Action.
+- A exclusão aparece apenas para eventos em `DRAFT` e exige confirmação via dialog.
+- Regras de campos editáveis e exclusão por status ficam centralizadas em `entities/event/model`.
+
 ## Validação Mais Recente
 
 Última validação completa executada após a implementação de eventos:
@@ -117,14 +129,13 @@ Resultado: passou.
 
 ## Próximos Passos Recomendados
 
-1. Adicionar ações de edição e exclusão de evento respeitando as restrições por status do backend.
-2. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
-3. Implementar `entities/passenger` e `features/enroll-passenger`.
-4. Implementar `entities/payment` e `features/register-payment`.
-5. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
+1. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
+2. Implementar `entities/passenger` e `features/enroll-passenger`.
+3. Implementar `entities/payment` e `features/register-payment`.
+4. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
 
 ## Pendências Conhecidas
 
-- Ainda não há edição, exclusão ou detalhe de evento na UI.
+- Ainda não há detalhe de evento na UI.
 - Ainda não há manipulação de horários/cancelamento de `event-day` na UI.
 - O arquivo `EVENTS.txt` contém o contrato usado para esta fase e está fora da documentação oficial versionada em `docs/`.

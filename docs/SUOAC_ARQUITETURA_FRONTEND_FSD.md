@@ -1107,7 +1107,7 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 ### Fase 2 — Dominio MVP
 
 - Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`. (parcial — `event` e `event-day` implementadas; `congregation` e `user` ja possuem base funcional)
-- Criar features `create-event`, `publish-event`, `enroll-passenger`, `register-payment`. (parcial — `create-event` e `publish-event` implementadas)
+- Criar features `create-event`, `publish-event`, `update-event`, `delete-event`, `enroll-passenger`, `register-payment`. (parcial — eventos implementados; passageiros e pagamentos pendentes)
 - Criar widgets `event-overview`, `financial-summary`.
 
 Status atual da fatia de eventos:
@@ -1118,6 +1118,8 @@ Status atual da fatia de eventos:
 - `pages/events` consome eventos por circuito via TanStack Query, exibe cards paginados e abre o modal de criacao.
 - A grade de eventos usa dois cards por linha em telas maiores e um card por linha em telas menores.
 - A publicacao do evento (`DRAFT` -> `OPEN`) foi implementada em `features/publish-event`.
+- A edicao por campos permitidos em cada status foi implementada em `features/update-event`.
+- A exclusao de eventos em rascunho foi implementada em `features/delete-event`.
 
 ### Fase 3 — Server state
 
