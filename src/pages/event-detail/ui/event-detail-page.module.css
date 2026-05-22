@@ -1,0 +1,198 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-6);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.backLink:hover {
+  color: var(--suoac-color-primary);
+}
+
+.backLink:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--suoac-radius-sm);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.eventType {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-primary);
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: var(--suoac-font-size-h1);
+  line-height: var(--suoac-line-height-heading);
+  font-weight: var(--suoac-font-weight-bold);
+  color: var(--suoac-color-text-primary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-2);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+}
+
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+}
+
+.cardTitle {
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+  margin-bottom: var(--suoac-space-4);
+}
+
+.infoGrid {
+  display: grid;
+  gap: var(--suoac-space-4);
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--suoac-space-3);
+}
+
+.infoIcon {
+  flex: 0 0 auto;
+  color: var(--suoac-color-primary);
+  margin-top: 2px;
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.infoLabel {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.infoValue {
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-primary);
+}
+
+.observations {
+  white-space: pre-line;
+}
+
+.daysList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.dayCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface);
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--suoac-space-2);
+}
+
+.dayLabel {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.dayMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.dayMetaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}
+
+.dayMetaItem svg {
+  flex: 0 0 auto;
+  color: var(--suoac-color-primary);
+}
+
+.emptyDays {
+  padding: var(--suoac-space-5);
+  text-align: center;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}
+
+@media (min-width: 48rem) {
+  .headerTop {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .infoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dayMeta {
+    flex-direction: row;
+    gap: var(--suoac-space-5);
+  }
+}

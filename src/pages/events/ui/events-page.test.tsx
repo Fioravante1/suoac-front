@@ -2,6 +2,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("next/link", () => ({
+  default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 import { EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvents } from "@/entities/event/api/event.queries";
 import { createEventAction } from "@/features/create-event/api";

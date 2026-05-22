@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { CalendarDays, ChevronRight, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { isCircuitRole, useAuth } from "@/shared/auth";
+import { routes } from "@/shared/config";
 import { useModal, usePagination } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -58,7 +60,11 @@ function EventCard({ event, canManage, publishing, onEdit, onDelete, onPublish }
       <div className={styles.cardHeader}>
         <div className={styles.cardTitleGroup}>
           <span className={styles.eventType}>{EVENT_TYPE_LABELS[event.type]}</span>
-          <h2 className={styles.eventTitle}>{event.title}</h2>
+          <h2 className={styles.eventTitle}>
+            <Link href={routes.eventDetail(event.id)} className={styles.eventTitleLink}>
+              {event.title}
+            </Link>
+          </h2>
         </div>
         <Badge variant={EVENT_STATUS_BADGE_VARIANTS[event.status]}>{EVENT_STATUS_LABELS[event.status]}</Badge>
       </div>
@@ -79,9 +85,15 @@ function EventCard({ event, canManage, publishing, onEdit, onDelete, onPublish }
       </div>
 
       <div className={styles.cardFooter}>
-        <div className={styles.priceGroup}>
-          <span className={styles.ticketPrice}>{formatCurrency(event.ticketPrice)}</span>
-          <span className={styles.venue}>{event.venue}</span>
+        <div className={styles.footerTop}>
+          <div className={styles.priceGroup}>
+            <span className={styles.ticketPrice}>{formatCurrency(event.ticketPrice)}</span>
+            <span className={styles.venue}>{event.venue}</span>
+          </div>
+          <Link href={routes.eventDetail(event.id)} className={styles.detailLink}>
+            Ver detalhes
+            <ChevronRight size={18} aria-hidden="true" />
+          </Link>
         </div>
         {canManage && (
           <div className={styles.cardActions}>

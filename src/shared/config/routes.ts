@@ -3,6 +3,7 @@ export const routes = {
   login: "/login",
   dashboard: "/dashboard",
   events: "/events",
+  eventDetail: (id: string) => `/events/${id}`,
   congregations: "/congregations",
   passengers: "/passengers",
   financial: "/financial",
