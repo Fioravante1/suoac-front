@@ -79,10 +79,7 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole 
       return "Apenas o campo de observações pode ser editado em eventos com inscrições encerradas.";
     }
 
-    if (
-      event.status === EVENT_STATUSES.OPEN &&
-      userRole !== USER_ROLES.CIRCUIT_COORDINATOR
-    ) {
+    if (event.status === EVENT_STATUSES.OPEN && userRole !== USER_ROLES.CIRCUIT_COORDINATOR) {
       return "Os prazos de inscrição e pagamento só podem ser alterados pelo coordenador do arranjo de ônibus.";
     }
 
