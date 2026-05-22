@@ -25,13 +25,13 @@ import {
   canUpdateEventStatus,
   type Event,
 } from "@/entities/event";
-import { eventListOptions } from "@/entities/event/api/event.options";
+import { eventListOptions } from "@/entities/event/api";
+import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
 import { createEventAction } from "@/features/create-event/api";
 import { deleteEventAction } from "@/features/delete-event";
-import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
 import { publishEventAction } from "@/features/publish-event";
-import { updateEventAction } from "@/features/update-event/api";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
+import { updateEventAction } from "@/features/update-event/api";
 
 import styles from "./events-page.module.css";
 
@@ -279,6 +279,7 @@ export function EventsPage() {
         onClose={updateModal.close}
         onSubmit={handleUpdateEvent}
         event={updateModal.item}
+        userRole={user?.role ?? null}
       />
       <ConfirmDialog
         open={publishModal.isOpen}
@@ -297,6 +298,7 @@ export function EventsPage() {
         message={`Tem certeza que deseja excluir o evento "${deleteModal.item?.title}"? Essa ação apaga o evento e seus dias e não pode ser desfeita.`}
         confirmLabel="Excluir"
         loading={deleteMutation.isPending}
+        variant="destructive"
       />
     </div>
   );

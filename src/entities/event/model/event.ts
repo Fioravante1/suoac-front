@@ -63,6 +63,7 @@ export const EVENT_EDITABLE_FIELDS_BY_STATUS: Record<EventStatus, readonly Event
   [EVENT_STATUSES.OPEN]: [
     EVENT_UPDATE_FIELDS.TITLE,
     EVENT_UPDATE_FIELDS.TICKET_PRICE,
+    EVENT_UPDATE_FIELDS.REGISTRATION_DEADLINE,
     EVENT_UPDATE_FIELDS.PAYMENT_DEADLINE,
     EVENT_UPDATE_FIELDS.VENUE,
     EVENT_UPDATE_FIELDS.ADDRESS,
@@ -72,6 +73,14 @@ export const EVENT_EDITABLE_FIELDS_BY_STATUS: Record<EventStatus, readonly Event
   ],
   [EVENT_STATUSES.CLOSED]: [EVENT_UPDATE_FIELDS.OBSERVATIONS],
   [EVENT_STATUSES.FINISHED]: [],
+};
+
+/**
+ * Campos que, em determinado status, só podem ser editados por CIRCUIT_COORDINATOR.
+ * Para CIRCUIT_ASSISTANT, esses campos devem ficar desabilitados no formulário.
+ */
+export const EVENT_COORDINATOR_ONLY_FIELDS_BY_STATUS: Partial<Record<EventStatus, readonly EventUpdateField[]>> = {
+  [EVENT_STATUSES.OPEN]: [EVENT_UPDATE_FIELDS.REGISTRATION_DEADLINE, EVENT_UPDATE_FIELDS.PAYMENT_DEADLINE],
 };
 
 export function canUpdateEventStatus(status: EventStatus): boolean {
@@ -84,6 +93,12 @@ export function canDeleteEventStatus(status: EventStatus): boolean {
 
 export function isEventFieldEditable(status: EventStatus, field: EventUpdateField): boolean {
   return EVENT_EDITABLE_FIELDS_BY_STATUS[status].includes(field);
+}
+
+export function isEventFieldCoordinatorOnly(status: EventStatus, field: EventUpdateField): boolean {
+  const restricted = EVENT_COORDINATOR_ONLY_FIELDS_BY_STATUS[status];
+
+  return restricted ? restricted.includes(field) : false;
 }
 
 export const EVENT_DAY_STATUSES = {

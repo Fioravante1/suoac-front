@@ -31,8 +31,10 @@ describe("mapUpdateEventFormToDto", () => {
     });
   });
 
-  it("nao envia prazo de inscrição para evento aberto", () => {
-    expect(mapUpdateEventFormToDto(values, EVENT_STATUSES.OPEN)).not.toHaveProperty("registrationDeadline");
+  it("envia prazo de inscrição para evento aberto", () => {
+    const dto = mapUpdateEventFormToDto(values, EVENT_STATUSES.OPEN);
+
+    expect(dto).toHaveProperty("registrationDeadline", "2026-06-01");
   });
 
   it("envia apenas observações para evento encerrado", () => {

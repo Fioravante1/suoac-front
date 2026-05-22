@@ -20,7 +20,7 @@ describe("CreateEventFormModal", () => {
 
     fireEvent.change(screen.getByLabelText("Tipo"), { target: { value: EVENT_TYPES.REGIONAL_CONVENTION } });
 
-    expect(screen.getByLabelText("Data final")).toBeInTheDocument();
+    expect(screen.getByLabelText("Data final do evento")).toBeInTheDocument();
   });
 
   it("envia valores válidos", async () => {
@@ -35,7 +35,7 @@ describe("CreateEventFormModal", () => {
     fireEvent.change(screen.getByLabelText("Cidade"), { target: { value: "São Paulo" } });
     fireEvent.change(screen.getByLabelText("Endereço"), { target: { value: "Rua das Flores, 100" } });
     fireEvent.change(screen.getByLabelText("Estado"), { target: { value: "SP" } });
-    fireEvent.change(screen.getByLabelText("Data inicial"), { target: { value: "2026-07-10" } });
+    fireEvent.change(screen.getByLabelText("Data do evento"), { target: { value: "2026-07-10" } });
     fireEvent.change(screen.getByLabelText("Prazo de inscrição"), { target: { value: "2026-06-01" } });
     fireEvent.change(screen.getByLabelText("Prazo de pagamento"), { target: { value: "2026-06-15" } });
 

@@ -1,4 +1,5 @@
 export {
+  EVENT_COORDINATOR_ONLY_FIELDS_BY_STATUS,
   EVENT_DAY_STATUSES,
   EVENT_EDITABLE_FIELDS_BY_STATUS,
   EVENT_UPDATE_FIELDS,
@@ -11,6 +12,7 @@ export {
   EVENT_TYPES,
   canDeleteEventStatus,
   canUpdateEventStatus,
+  isEventFieldCoordinatorOnly,
   isEventFieldEditable,
 } from "./model";
 export type {

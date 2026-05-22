@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { EVENT_STATUSES, EVENT_TYPES, type Event } from "@/entities/event";
+import { USER_ROLES } from "@/shared/auth";
 
 import { UpdateEventFormModal } from "./update-event-form-modal";
 
@@ -26,17 +27,26 @@ const baseEvent: Event = {
 
 describe("UpdateEventFormModal", () => {
   it("renderiza valores do evento", () => {
-    render(<UpdateEventFormModal open event={baseEvent} onClose={vi.fn()} onSubmit={vi.fn()} />);
+    render(
+      <UpdateEventFormModal
+        open
+        event={baseEvent}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+      />,
+    );
 
     expect(screen.getByDisplayValue("Assembleia SP 2026")).toBeInTheDocument();
     expect(screen.getByDisplayValue("25.00")).toBeInTheDocument();
   });
 
-  it("mantem campos liberados visualmente para evento aberto", () => {
+  it("libera todos os campos para coordenador em evento aberto sem mensagem de restrição", () => {
     render(
       <UpdateEventFormModal
         open
         event={{ ...baseEvent, status: EVENT_STATUSES.OPEN }}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
         onClose={vi.fn()}
         onSubmit={vi.fn()}
       />,
@@ -47,11 +57,35 @@ describe("UpdateEventFormModal", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
+  it("desabilita prazos e exibe aviso para assistente em evento aberto", () => {
+    render(
+      <UpdateEventFormModal
+        open
+        event={{ ...baseEvent, status: EVENT_STATUSES.OPEN }}
+        userRole={USER_ROLES.CIRCUIT_ASSISTANT}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Prazo de inscrição")).toBeDisabled();
+    expect(screen.getByLabelText("Prazo de pagamento")).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent(/coordenador do arranjo de ônibus/i);
+  });
+
   it("envia valores válidos", async () => {
     const onSubmit = vi.fn().mockResolvedValue({ success: true, data: baseEvent });
     const onClose = vi.fn();
 
-    render(<UpdateEventFormModal open event={baseEvent} onClose={onClose} onSubmit={onSubmit} />);
+    render(
+      <UpdateEventFormModal
+        open
+        event={baseEvent}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        onClose={onClose}
+        onSubmit={onSubmit}
+      />,
+    );
 
     fireEvent.change(screen.getByLabelText("Título"), { target: { value: "Novo título" } });
     fireEvent.click(screen.getByRole("button", { name: "Salvar alterações" }));

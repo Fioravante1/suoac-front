@@ -159,9 +159,19 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
             Datas e horários
           </h3>
           <div className={styles.grid}>
-            <TextField label="Data inicial" type="date" error={errors.date?.message} {...register("date")} />
+            <TextField
+              label={eventType === EVENT_TYPES.REGIONAL_CONVENTION ? "Data inicial do evento" : "Data do evento"}
+              type="date"
+              error={errors.date?.message}
+              {...register("date")}
+            />
             {eventType === EVENT_TYPES.REGIONAL_CONVENTION && (
-              <TextField label="Data final" type="date" error={errors.endDate?.message} {...register("endDate")} />
+              <TextField
+                label="Data final do evento"
+                type="date"
+                error={errors.endDate?.message}
+                {...register("endDate")}
+              />
             )}
             <TextField
               label="Prazo de inscrição"

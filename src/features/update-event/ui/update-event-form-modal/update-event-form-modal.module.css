@@ -13,6 +13,15 @@
   font-size: var(--suoac-font-size-small);
 }
 
+.infoBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-info);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-info-soft);
+  color: var(--suoac-color-info);
+  font-size: var(--suoac-font-size-small);
+}
+
 .section {
   display: flex;
   flex-direction: column;

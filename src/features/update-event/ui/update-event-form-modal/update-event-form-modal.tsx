@@ -6,12 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   EVENT_STATUSES,
-  EVENT_STATUS_LABELS,
   EVENT_UPDATE_FIELDS,
+  isEventFieldCoordinatorOnly,
   isEventFieldEditable,
   type Event,
   type EventUpdateField,
 } from "@/entities/event";
+import { USER_ROLES, type UserRole } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
 import { TextField } from "@/shared/ui/text-field";
@@ -28,6 +29,7 @@ interface UpdateEventFormModalProps {
     values: UpdateEventFormValues,
   ) => Promise<{ success: boolean; error?: string; data?: Event }>;
   event: Event | null;
+  userRole: UserRole | null;
 }
 
 function toDateInputValue(value: string): string {
@@ -48,7 +50,7 @@ function toFormValues(event: Event | null): UpdateEventFormValues {
   };
 }
 
-export function UpdateEventFormModal({ open, onClose, onSubmit, event }: UpdateEventFormModalProps) {
+export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole }: UpdateEventFormModalProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -64,12 +66,30 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event }: UpdateE
 
   function isEditable(field: EventUpdateField): boolean {
     if (!event) return false;
-    if (event.status === EVENT_STATUSES.OPEN) return true;
+    if (!isEventFieldEditable(event.status, field)) return false;
+    if (isEventFieldCoordinatorOnly(event.status, field) && userRole !== USER_ROLES.CIRCUIT_COORDINATOR) return false;
 
-    return isEventFieldEditable(event.status, field);
+    return true;
   }
 
-  const shouldShowRestrictionMessage = event ? event.status === EVENT_STATUSES.CLOSED : false;
+  function getRestrictionMessage(): string | null {
+    if (!event) return null;
+
+    if (event.status === EVENT_STATUSES.CLOSED) {
+      return "Apenas o campo de observações pode ser editado em eventos com inscrições encerradas.";
+    }
+
+    if (
+      event.status === EVENT_STATUSES.OPEN &&
+      userRole !== USER_ROLES.CIRCUIT_COORDINATOR
+    ) {
+      return "Os prazos de inscrição e pagamento só podem ser alterados pelo coordenador do arranjo de ônibus.";
+    }
+
+    return null;
+  }
+
+  const restrictionMessage = getRestrictionMessage();
 
   async function handleFormSubmit(values: UpdateEventFormValues) {
     if (!event) return;
@@ -116,9 +136,9 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event }: UpdateE
           </div>
         )}
 
-        {shouldShowRestrictionMessage && event && (
-          <div className={styles.errorBanner} role="status">
-            Campos disponíveis para o status {EVENT_STATUS_LABELS[event.status]}.
+        {restrictionMessage && (
+          <div className={styles.infoBanner} role="status">
+            {restrictionMessage}
           </div>
         )}
 

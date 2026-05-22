@@ -52,3 +52,12 @@
 .variant-ghost:hover:not(:disabled) {
   background-color: var(--suoac-color-surface-muted);
 }
+
+.variant-destructive {
+  background-color: var(--suoac-color-critical);
+  color: var(--suoac-color-text-inverse);
+}
+
+.variant-destructive:hover:not(:disabled) {
+  background-color: var(--suoac-color-critical-dark);
+}

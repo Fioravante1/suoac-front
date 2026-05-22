@@ -14,6 +14,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   loading?: boolean;
+  variant?: "primary" | "destructive";
 }
 
 export function ConfirmDialog({
@@ -25,6 +26,7 @@ export function ConfirmDialog({
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
   loading = false,
+  variant = "primary",
 }: ConfirmDialogProps) {
   return (
     <Modal
@@ -36,7 +38,7 @@ export function ConfirmDialog({
           <Button variant="ghost" onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>
-          <Button variant="primary" onClick={onConfirm} disabled={loading}>
+          <Button variant={variant} onClick={onConfirm} disabled={loading}>
             {loading ? "Aguarde…" : confirmLabel}
           </Button>
         </>

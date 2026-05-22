@@ -3,7 +3,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
-import { fetchEvents } from "@/entities/event/api";
+import { fetchEvents } from "@/entities/event/api/event.queries";
+import { createEventAction } from "@/features/create-event/api";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { updateEventAction } from "@/features/update-event/api";
@@ -69,6 +70,7 @@ function createWrapper() {
 }
 
 const fetchEventsMock = vi.mocked(fetchEvents);
+const createEventActionMock = vi.mocked(createEventAction);
 const publishEventActionMock = vi.mocked(publishEventAction);
 const updateEventActionMock = vi.mocked(updateEventAction);
 const deleteEventActionMock = vi.mocked(deleteEventAction);
@@ -99,6 +101,7 @@ describe("EventsPage", () => {
       data: [],
       meta: { total: 0, page: 1, limit: 10, totalPages: 1 },
     });
+    createEventActionMock.mockResolvedValue({ success: true, data: draftEvent });
     publishEventActionMock.mockResolvedValue({
       success: true,
       data: { ...draftEvent, status: EVENT_STATUSES.OPEN },
