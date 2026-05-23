@@ -1,5 +1,7 @@
 export {
   EVENT_COORDINATOR_ONLY_FIELDS_BY_STATUS,
+  EVENT_DAY_STATUS_BADGE_VARIANTS,
+  EVENT_DAY_STATUS_LABELS,
   EVENT_DAY_STATUSES,
   EVENT_EDITABLE_FIELDS_BY_STATUS,
   EVENT_UPDATE_FIELDS,
@@ -10,7 +12,9 @@ export {
   EVENT_TYPE_LABELS,
   EVENT_TYPE_VALUES,
   EVENT_TYPES,
+  canCancelEventDay,
   canDeleteEventStatus,
+  canUpdateEventDayTimes,
   canUpdateEventStatus,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,

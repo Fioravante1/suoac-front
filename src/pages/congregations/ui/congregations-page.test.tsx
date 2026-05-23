@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { CongregationsPage } from "./congregations-page";
+import { fetchCongregations } from "@/entities/congregation/api/congregation.queries";
 
 vi.mock("@/shared/auth", () => ({
   useAuth: () => ({
@@ -49,7 +50,12 @@ function createWrapper() {
   };
 }
 
+const fetchCongregationsMock = vi.mocked(fetchCongregations);
+
 describe("CongregationsPage", () => {
+  beforeEach(() => {
+    fetchCongregationsMock.mockReturnValue(new Promise(() => {})); // returns a pending promise to keep it in loading state
+  });
   it("renderiza o heading Congregações", () => {
     render(<CongregationsPage />, { wrapper: createWrapper() });
 

@@ -173,6 +173,14 @@
   color: var(--suoac-color-primary);
 }
 
+.dayActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-2);
+  padding-top: var(--suoac-space-2);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
 .emptyDays {
   padding: var(--suoac-space-5);
   text-align: center;

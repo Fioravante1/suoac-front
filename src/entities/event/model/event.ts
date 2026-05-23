@@ -17,6 +17,7 @@ export const EVENT_STATUSES = {
   OPEN: "OPEN",
   CLOSED: "CLOSED",
   FINISHED: "FINISHED",
+  CANCELLED: "CANCELLED",
 } as const;
 
 export type EventStatus = (typeof EVENT_STATUSES)[keyof typeof EVENT_STATUSES];
@@ -26,6 +27,7 @@ export const EVENT_STATUS_VALUES = [
   EVENT_STATUSES.OPEN,
   EVENT_STATUSES.CLOSED,
   EVENT_STATUSES.FINISHED,
+  EVENT_STATUSES.CANCELLED,
 ] as const;
 
 export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
@@ -33,6 +35,7 @@ export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
   [EVENT_STATUSES.OPEN]: "Inscrições abertas",
   [EVENT_STATUSES.CLOSED]: "Inscrições encerradas",
   [EVENT_STATUSES.FINISHED]: "Finalizado",
+  [EVENT_STATUSES.CANCELLED]: "Cancelado",
 };
 
 export type EventStatusVariant = "success" | "critical" | "attention" | "info" | "neutral";
@@ -42,6 +45,7 @@ export const EVENT_STATUS_BADGE_VARIANTS: Record<EventStatus, EventStatusVariant
   [EVENT_STATUSES.OPEN]: "success",
   [EVENT_STATUSES.CLOSED]: "attention",
   [EVENT_STATUSES.FINISHED]: "info",
+  [EVENT_STATUSES.CANCELLED]: "critical",
 };
 
 export const EVENT_UPDATE_FIELDS = {
@@ -73,6 +77,7 @@ export const EVENT_EDITABLE_FIELDS_BY_STATUS: Record<EventStatus, readonly Event
   ],
   [EVENT_STATUSES.CLOSED]: [EVENT_UPDATE_FIELDS.OBSERVATIONS],
   [EVENT_STATUSES.FINISHED]: [],
+  [EVENT_STATUSES.CANCELLED]: [],
 };
 
 /**
@@ -107,6 +112,30 @@ export const EVENT_DAY_STATUSES = {
 } as const;
 
 export type EventDayStatus = (typeof EVENT_DAY_STATUSES)[keyof typeof EVENT_DAY_STATUSES];
+
+export const EVENT_DAY_STATUS_LABELS: Record<EventDayStatus, string> = {
+  [EVENT_DAY_STATUSES.ACTIVE]: "Ativo",
+  [EVENT_DAY_STATUSES.CANCELLED]: "Cancelado",
+};
+
+export const EVENT_DAY_STATUS_BADGE_VARIANTS: Record<EventDayStatus, "success" | "critical"> = {
+  [EVENT_DAY_STATUSES.ACTIVE]: "success",
+  [EVENT_DAY_STATUSES.CANCELLED]: "critical",
+};
+
+export function canUpdateEventDayTimes(eventStatus: EventStatus, dayStatus: EventDayStatus): boolean {
+  return (
+    (eventStatus === EVENT_STATUSES.DRAFT || eventStatus === EVENT_STATUSES.OPEN) &&
+    dayStatus === EVENT_DAY_STATUSES.ACTIVE
+  );
+}
+
+export function canCancelEventDay(eventStatus: EventStatus, dayStatus: EventDayStatus): boolean {
+  return (
+    (eventStatus === EVENT_STATUSES.DRAFT || eventStatus === EVENT_STATUSES.OPEN) &&
+    dayStatus === EVENT_DAY_STATUSES.ACTIVE
+  );
+}
 
 export interface EventDayInEvent {
   id: string;

@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvent } from "@/entities/event/api/event.queries";
+import { cancelEventDayAction } from "@/features/cancel-event-day";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { updateEventAction } from "@/features/update-event/api";
+import { updateEventDayAction } from "@/features/update-event-day/api";
 
 import { EventDetailPage } from "./event-detail-page";
 
@@ -71,6 +73,14 @@ vi.mock("@/features/delete-event", () => ({
   deleteEventAction: vi.fn(),
 }));
 
+vi.mock("@/features/update-event-day/api", () => ({
+  updateEventDayAction: vi.fn(),
+}));
+
+vi.mock("@/features/cancel-event-day", () => ({
+  cancelEventDayAction: vi.fn(),
+}));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -89,6 +99,8 @@ const fetchEventMock = vi.mocked(fetchEvent);
 const publishEventActionMock = vi.mocked(publishEventAction);
 const updateEventActionMock = vi.mocked(updateEventAction);
 const deleteEventActionMock = vi.mocked(deleteEventAction);
+const updateEventDayActionMock = vi.mocked(updateEventDayAction);
+const cancelEventDayActionMock = vi.mocked(cancelEventDayAction);
 
 const eventWithDays = {
   id: "event-1",
@@ -141,6 +153,14 @@ describe("EventDetailPage", () => {
     });
     updateEventActionMock.mockResolvedValue({ success: true, data: eventWithDays });
     deleteEventActionMock.mockResolvedValue({ success: true, data: undefined });
+    updateEventDayActionMock.mockResolvedValue({
+      success: true,
+      data: { ...eventWithDays.days[0], departureTime: "07:00" },
+    });
+    cancelEventDayActionMock.mockResolvedValue({
+      success: true,
+      data: { ...eventWithDays.days[0], status: EVENT_DAY_STATUSES.CANCELLED },
+    });
     pushMock.mockClear();
   });
 
@@ -191,7 +211,7 @@ describe("EventDetailPage", () => {
   it("mostra ações de editar, excluir e publicar para papel de circuito", async () => {
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
-    expect(await screen.findByRole("button", { name: /editar/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /^editar$/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /excluir/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /publicar evento/i })).toBeInTheDocument();
   });
@@ -239,5 +259,102 @@ describe("EventDetailPage", () => {
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     expect(await screen.findByText("Levar documento com foto")).toBeInTheDocument();
+  });
+
+  it("exibe botões de editar horários e cancelar dia para circuito em DRAFT", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+
+    const editButtons = screen.getAllByRole("button", { name: /editar horários/i });
+    const cancelButtons = screen.getAllByRole("button", { name: /cancelar dia/i });
+
+    expect(editButtons).toHaveLength(1);
+    expect(cancelButtons).toHaveLength(1);
+  });
+
+  it("oculta botões de editar horários e cancelar dia para congregação", async () => {
+    authMock.role = "CONGREGATION_COORDINATOR";
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /editar horários/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar dia/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta apenas botão de cancelar dia para assistente de circuito", async () => {
+    authMock.role = "CIRCUIT_ASSISTANT";
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /editar horários/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar dia/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta editar horários para dia cancelado", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 2 - Sábado")).toBeInTheDocument();
+
+    const editButtons = screen.getAllByRole("button", { name: /editar horários/i });
+
+    expect(editButtons).toHaveLength(1);
+  });
+
+  it("oculta botões de dia para evento CLOSED", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.CLOSED });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /editar horários/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar dia/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botões de dia para evento FINISHED", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.FINISHED });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /editar horários/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar dia/i })).not.toBeInTheDocument();
+  });
+
+  it("abre modal de editar horários ao clicar no botão", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /editar horários/i }));
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByText(/Editar horários — Dia 1 - Sexta-feira/)).toBeInTheDocument();
+  });
+
+  it("abre ConfirmDialog de cancelar dia ao clicar no botão", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
+
+    expect(screen.getByRole("dialog", { name: "Cancelar Dia" })).toBeInTheDocument();
+    expect(screen.getByText(/Tem certeza que deseja cancelar/)).toBeInTheDocument();
+  });
+
+  it("confirma cancelamento de dia e chama cancelEventDayAction", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
+
+    const dialog = screen.getByRole("dialog", { name: "Cancelar Dia" });
+    expect(dialog).toBeInTheDocument();
+
+    const confirmButtons = screen.getAllByRole("button", { name: /cancelar dia/i });
+    fireEvent.click(confirmButtons.at(-1)!);
+
+    await waitFor(() => {
+      expect(cancelEventDayActionMock).toHaveBeenCalledWith("day-1");
+    });
   });
 });

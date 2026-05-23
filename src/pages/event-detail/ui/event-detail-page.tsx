@@ -14,10 +14,11 @@ import {
   RefreshCw,
   Send,
   Trash2,
+  XCircle,
 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { isCircuitRole, useAuth } from "@/shared/auth";
+import { USER_ROLES, isCircuitRole, useAuth } from "@/shared/auth";
 import { routes } from "@/shared/config";
 import { useModal } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
@@ -28,21 +29,27 @@ import { ErrorState } from "@/shared/ui/error-state";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
 
 import {
-  EVENT_DAY_STATUSES,
+  EVENT_DAY_STATUS_BADGE_VARIANTS,
+  EVENT_DAY_STATUS_LABELS,
   EVENT_STATUS_BADGE_VARIANTS,
   EVENT_STATUS_LABELS,
   EVENT_STATUSES,
   EVENT_TYPE_LABELS,
+  canCancelEventDay,
   canDeleteEventStatus,
+  canUpdateEventDayTimes,
   canUpdateEventStatus,
   type Event,
-  type EventDayStatus,
+  type EventDayInEvent,
 } from "@/entities/event";
 import { eventDetailOptions } from "@/entities/event/api";
+import { cancelEventDayAction } from "@/features/cancel-event-day";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
 import { updateEventAction } from "@/features/update-event/api";
+import { UpdateEventDayFormModal, type UpdateEventDayFormValues } from "@/features/update-event-day";
+import { updateEventDayAction } from "@/features/update-event-day/api";
 
 import styles from "./event-detail-page.module.css";
 
@@ -58,16 +65,6 @@ function formatWeekday(value: string): string {
   return new Intl.DateTimeFormat("pt-BR", { weekday: "long", timeZone: "UTC" }).format(new Date(value));
 }
 
-const DAY_STATUS_BADGE_VARIANTS: Record<EventDayStatus, "success" | "critical"> = {
-  [EVENT_DAY_STATUSES.ACTIVE]: "success",
-  [EVENT_DAY_STATUSES.CANCELLED]: "critical",
-};
-
-const DAY_STATUS_LABELS: Record<EventDayStatus, string> = {
-  [EVENT_DAY_STATUSES.ACTIVE]: "Ativo",
-  [EVENT_DAY_STATUSES.CANCELLED]: "Cancelado",
-};
-
 interface EventDetailPageProps {
   eventId: string;
 }
@@ -79,6 +76,8 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   const updateModal = useModal<Event>();
   const publishModal = useModal<Event>();
   const deleteModal = useModal<Event>();
+  const updateDayModal = useModal<EventDayInEvent>();
+  const cancelDayModal = useModal<EventDayInEvent>();
   const canManage = user ? isCircuitRole(user.role) : false;
   const [operationError, setOperationError] = useState<string | null>(null);
 
@@ -129,8 +128,43 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     },
   });
 
+  const updateDayMutation = useMutation({
+    mutationFn: ({ day, values }: { day: EventDayInEvent; values: UpdateEventDayFormValues }) =>
+      updateEventDayAction(day.id, event!.status, day.status, values, {
+        departureTime: day.departureTime,
+        returnTime: day.returnTime,
+      }),
+  });
+
+  const cancelDayMutation = useMutation({
+    mutationFn: (dayId: string) => cancelEventDayAction(dayId),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setOperationError(result.error);
+        return;
+      }
+
+      setOperationError(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.eventDays.all });
+      cancelDayModal.close();
+    },
+  });
+
   async function handleUpdateEvent(ev: Event, values: UpdateEventFormValues) {
     return updateMutation.mutateAsync({ ev, values });
+  }
+
+  async function handleUpdateDay(day: EventDayInEvent, values: UpdateEventDayFormValues) {
+    const result = await updateDayMutation.mutateAsync({ day, values });
+
+    if (result.success) {
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.eventDays.all });
+    }
+
+    return result;
   }
 
   function handleConfirmPublish() {
@@ -145,6 +179,13 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
     setOperationError(null);
     deleteMutation.mutate(deleteModal.item.id);
+  }
+
+  function handleConfirmCancelDay() {
+    if (!cancelDayModal.item) return;
+
+    setOperationError(null);
+    cancelDayMutation.mutate(cancelDayModal.item.id);
   }
 
   return (
@@ -287,7 +328,9 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                   <div key={day.id} className={styles.dayCard}>
                     <div className={styles.dayHeader}>
                       <span className={styles.dayLabel}>{day.label}</span>
-                      <Badge variant={DAY_STATUS_BADGE_VARIANTS[day.status]}>{DAY_STATUS_LABELS[day.status]}</Badge>
+                      <Badge variant={EVENT_DAY_STATUS_BADGE_VARIANTS[day.status]}>
+                        {EVENT_DAY_STATUS_LABELS[day.status]}
+                      </Badge>
                     </div>
                     <div className={styles.dayMeta}>
                       <span className={styles.dayMetaItem}>
@@ -303,6 +346,23 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                         Retorno: {day.returnTime}
                       </span>
                     </div>
+                    {canManage && (
+                      <div className={styles.dayActions}>
+                        {canUpdateEventDayTimes(event.status, day.status) && (
+                          <Button variant="ghost" onClick={() => updateDayModal.open(day)}>
+                            <Pencil size={16} aria-hidden="true" />
+                            Editar horários
+                          </Button>
+                        )}
+                        {canCancelEventDay(event.status, day.status) &&
+                          user?.role === USER_ROLES.CIRCUIT_COORDINATOR && (
+                            <Button variant="ghost" onClick={() => cancelDayModal.open(day)}>
+                              <XCircle size={16} aria-hidden="true" />
+                              Cancelar dia
+                            </Button>
+                          )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -319,6 +379,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
         onSubmit={handleUpdateEvent}
         event={updateModal.item}
         userRole={user?.role ?? null}
+      />
+      <UpdateEventDayFormModal
+        open={updateDayModal.isOpen}
+        onClose={updateDayModal.close}
+        onSubmit={handleUpdateDay}
+        day={updateDayModal.item}
       />
       <ConfirmDialog
         open={publishModal.isOpen}
@@ -337,6 +403,17 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
         message={`Tem certeza que deseja excluir o evento "${deleteModal.item?.title}"? Essa ação apaga o evento e seus dias e não pode ser desfeita.`}
         confirmLabel="Excluir"
         loading={deleteMutation.isPending}
+        variant="destructive"
+      />
+      <ConfirmDialog
+        open={cancelDayModal.isOpen}
+        onClose={cancelDayModal.close}
+        onConfirm={handleConfirmCancelDay}
+        title="Cancelar Dia"
+        message={`Tem certeza que deseja cancelar "${cancelDayModal.item?.label}"? Essa ação não pode ser desfeita.`}
+        confirmLabel="Cancelar dia"
+        cancelLabel="Voltar"
+        loading={cancelDayMutation.isPending}
         variant="destructive"
       />
     </div>
