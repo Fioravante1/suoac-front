@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, ChevronRight, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
+import { Ban, CalendarDays, ChevronRight, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { isCircuitRole, useAuth } from "@/shared/auth";
+import { USER_ROLES, isCircuitRole, useAuth } from "@/shared/auth";
 import { routes } from "@/shared/config";
 import { useModal, usePagination } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
@@ -23,6 +23,7 @@ import {
   EVENT_STATUS_LABELS,
   EVENT_STATUSES,
   EVENT_TYPE_LABELS,
+  canCancelEventStatus,
   canDeleteEventStatus,
   canUpdateEventStatus,
   type Event,
@@ -30,6 +31,7 @@ import {
 import { eventListOptions } from "@/entities/event/api";
 import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
 import { createEventAction } from "@/features/create-event/api";
+import { cancelEventAction } from "@/features/cancel-event";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
@@ -48,13 +50,26 @@ function formatCurrency(value: string): string {
 interface EventCardProps {
   event: Event;
   canManage: boolean;
+  isCoordinator: boolean;
   publishing: boolean;
+  cancelling: boolean;
   onEdit: (event: Event) => void;
   onDelete: (event: Event) => void;
   onPublish: (event: Event) => void;
+  onCancel: (event: Event) => void;
 }
 
-function EventCard({ event, canManage, publishing, onEdit, onDelete, onPublish }: EventCardProps) {
+function EventCard({
+  event,
+  canManage,
+  isCoordinator,
+  publishing,
+  cancelling,
+  onEdit,
+  onDelete,
+  onPublish,
+  onCancel,
+}: EventCardProps) {
   return (
     <Card className={styles.eventCard}>
       <div className={styles.cardHeader}>
@@ -115,6 +130,12 @@ function EventCard({ event, canManage, publishing, onEdit, onDelete, onPublish }
                 {publishing ? "Publicando…" : "Publicar evento"}
               </Button>
             )}
+            {canCancelEventStatus(event.status) && isCoordinator && (
+              <Button variant="destructive" onClick={() => onCancel(event)} disabled={cancelling}>
+                <Ban size={18} aria-hidden="true" />
+                Cancelar evento
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -131,7 +152,9 @@ export function EventsPage() {
   const updateModal = useModal<Event>();
   const publishModal = useModal<Event>();
   const deleteModal = useModal<Event>();
+  const cancelEventModal = useModal<Event>();
   const canManageEvents = user ? isCircuitRole(user.role) : false;
+  const isCoordinator = user?.role === USER_ROLES.CIRCUIT_COORDINATOR;
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
@@ -190,6 +213,20 @@ export function EventsPage() {
     },
   });
 
+  const cancelEventMutation = useMutation({
+    mutationFn: (eventId: string) => cancelEventAction(eventId),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setOperationError(result.error);
+        return;
+      }
+
+      setOperationError(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      cancelEventModal.close();
+    },
+  });
+
   async function handleCreateEvent(values: CreateEventFormValues) {
     return createMutation.mutateAsync(values);
   }
@@ -210,6 +247,13 @@ export function EventsPage() {
 
     setOperationError(null);
     deleteMutation.mutate(deleteModal.item.id);
+  }
+
+  function handleConfirmCancelEvent() {
+    if (!cancelEventModal.item) return;
+
+    setOperationError(null);
+    cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
   return (
@@ -273,10 +317,13 @@ export function EventsPage() {
                   key={event.id}
                   event={event}
                   canManage={canManageEvents}
+                  isCoordinator={isCoordinator}
                   publishing={publishMutation.isPending && publishMutation.variables === event.id}
+                  cancelling={cancelEventMutation.isPending && cancelEventMutation.variables === event.id}
                   onEdit={updateModal.open}
                   onDelete={deleteModal.open}
                   onPublish={publishModal.open}
+                  onCancel={cancelEventModal.open}
                 />
               ))}
             </div>
@@ -310,6 +357,17 @@ export function EventsPage() {
         message={`Tem certeza que deseja excluir o evento "${deleteModal.item?.title}"? Essa ação apaga o evento e seus dias e não pode ser desfeita.`}
         confirmLabel="Excluir"
         loading={deleteMutation.isPending}
+        variant="destructive"
+      />
+      <ConfirmDialog
+        open={cancelEventModal.isOpen}
+        onClose={cancelEventModal.close}
+        onConfirm={handleConfirmCancelEvent}
+        title="Cancelar Evento"
+        message={`Tem certeza que deseja cancelar o evento "${cancelEventModal.item?.title}"? Todos os dias serão cancelados e as inscrições encerradas. Essa ação não pode ser desfeita.`}
+        confirmLabel="Cancelar evento"
+        cancelLabel="Voltar"
+        loading={cancelEventMutation.isPending}
         variant="destructive"
       />
     </div>

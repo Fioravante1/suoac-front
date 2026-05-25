@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvent } from "@/entities/event/api/event.queries";
+import { cancelEventAction } from "@/features/cancel-event";
 import { cancelEventDayAction } from "@/features/cancel-event-day";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
@@ -77,6 +78,10 @@ vi.mock("@/features/update-event-day/api", () => ({
   updateEventDayAction: vi.fn(),
 }));
 
+vi.mock("@/features/cancel-event", () => ({
+  cancelEventAction: vi.fn(),
+}));
+
 vi.mock("@/features/cancel-event-day", () => ({
   cancelEventDayAction: vi.fn(),
 }));
@@ -99,6 +104,7 @@ const fetchEventMock = vi.mocked(fetchEvent);
 const publishEventActionMock = vi.mocked(publishEventAction);
 const updateEventActionMock = vi.mocked(updateEventAction);
 const deleteEventActionMock = vi.mocked(deleteEventAction);
+const cancelEventActionMock = vi.mocked(cancelEventAction);
 const updateEventDayActionMock = vi.mocked(updateEventDayAction);
 const cancelEventDayActionMock = vi.mocked(cancelEventDayAction);
 
@@ -153,6 +159,10 @@ describe("EventDetailPage", () => {
     });
     updateEventActionMock.mockResolvedValue({ success: true, data: eventWithDays });
     deleteEventActionMock.mockResolvedValue({ success: true, data: undefined });
+    cancelEventActionMock.mockResolvedValue({
+      success: true,
+      data: { ...eventWithDays, status: EVENT_STATUSES.CANCELLED },
+    });
     updateEventDayActionMock.mockResolvedValue({
       success: true,
       data: { ...eventWithDays.days[0], departureTime: "07:00" },
@@ -356,5 +366,100 @@ describe("EventDetailPage", () => {
     await waitFor(() => {
       expect(cancelEventDayActionMock).toHaveBeenCalledWith("day-1");
     });
+  });
+
+  it("exibe botão cancelar evento para coordenador em DRAFT", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByRole("button", { name: /cancelar evento/i })).toBeInTheDocument();
+  });
+
+  it("exibe botão cancelar evento para coordenador em OPEN", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByRole("button", { name: /cancelar evento/i })).toBeInTheDocument();
+  });
+
+  it("oculta botão cancelar evento para assistente de circuito", async () => {
+    authMock.role = "CIRCUIT_ASSISTANT";
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão cancelar evento para congregação", async () => {
+    authMock.role = "CONGREGATION_COORDINATOR";
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão cancelar evento para CLOSED", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.CLOSED });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão cancelar evento para FINISHED", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.FINISHED });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão cancelar evento para CANCELLED", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.CANCELLED });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("abre dialog de cancelar evento e chama cancelEventAction", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /cancelar evento/i }));
+
+    expect(screen.getByRole("dialog", { name: "Cancelar Evento" })).toBeInTheDocument();
+
+    const confirmButtons = screen.getAllByRole("button", { name: /cancelar evento/i });
+    fireEvent.click(confirmButtons.at(-1)!);
+
+    await waitFor(() => {
+      expect(cancelEventActionMock).toHaveBeenCalledWith("event-1");
+    });
+  });
+
+  it("mostra aviso de último dia ativo no dialog de cancelar dia", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
+
+    expect(screen.getByText(/Este é o último dia ativo/)).toBeInTheDocument();
+  });
+
+  it("não mostra aviso de último dia ativo quando há mais de um dia ativo", async () => {
+    fetchEventMock.mockResolvedValue({
+      ...eventWithDays,
+      days: [{ ...eventWithDays.days[0] }, { ...eventWithDays.days[1], status: EVENT_DAY_STATUSES.ACTIVE }],
+    });
+
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    fireEvent.click((await screen.findAllByRole("button", { name: /cancelar dia/i }))[0]);
+
+    expect(screen.queryByText(/Este é o último dia ativo/)).not.toBeInTheDocument();
   });
 });

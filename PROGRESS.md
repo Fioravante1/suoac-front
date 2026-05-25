@@ -1,23 +1,23 @@
 # Progresso do Projeto - SUOAC Frontend
 
-**Atualizado em:** 21/05/2026  
+**Atualizado em:** 22/05/2026
 **Fase atual:** Domínio MVP - eventos
 
 Este arquivo acompanha o estado do frontend, o que já foi entregue e quais frentes ainda precisam avançar.
 
 ## Estado Geral
 
-| Frente                 | Estado      | Observação                                                                          |
-| ---------------------- | ----------- | ----------------------------------------------------------------------------------- |
-| Fundação Next.js + FSD | Concluído   | Estrutura base, App Router em `/app`, FSD em `src/`, Steiger e ESLint configurados. |
-| Design system base     | Concluído   | Tokens globais, componentes compartilhados e padrões visuais iniciais.              |
-| Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.  |
-| App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                |
-| Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                      |
-| Eventos                | Parcial     | Listagem, criação, publicação, edição e exclusão já integradas ao backend.          |
-| Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
-| Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                               |
-| Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                    |
+| Frente                 | Estado      | Observação                                                                               |
+| ---------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| Fundação Next.js + FSD | Concluído   | Estrutura base, App Router em `/app`, FSD em `src/`, Steiger e ESLint configurados.      |
+| Design system base     | Concluído   | Tokens globais, componentes compartilhados e padrões visuais iniciais.                   |
+| Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.       |
+| App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                     |
+| Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                           |
+| Eventos                | Parcial     | Listagem, criação, publicação, edição, exclusão e cancelamento já integrados ao backend. |
+| Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                                    |
+| Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                                    |
+| Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                         |
 
 ## Entregas Concluídas
 
@@ -109,33 +109,35 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - A exclusão aparece apenas para eventos em `DRAFT` e exige confirmação via dialog.
 - Regras de campos editáveis e exclusão por status ficam centralizadas em `entities/event/model`.
 
+### 9. Cancelamento de Eventos
+
+- `features/cancel-event` implementada com Server Action `cancelEventAction`.
+- A ação chama `PATCH /events/:id/status` com `{ status: "CANCELLED" }`, reutilizando o endpoint de transição de status.
+- Helpers de domínio adicionados em `entities/event/model`:
+  - `canCancelEventStatus(status)` — retorna `true` para `DRAFT` e `OPEN`.
+  - `isLastActiveDayInEvent(days)` — retorna `true` quando há exatamente 1 dia ativo.
+- A página de detalhe exibe o botão "Cancelar evento" apenas para `CIRCUIT_COORDINATOR` em eventos `DRAFT` ou `OPEN`.
+- A página de listagem exibe o botão "Cancelar evento" no card, com as mesmas regras de visibilidade.
+- Ao cancelar o último dia ativo de um evento, o dialog de cancelamento do dia avisa que o evento também será cancelado.
+- Cancelamento exige confirmação via dialog destrutivo em ambas as páginas.
+- Após cancelar, o evento continua visível com status atualizado (sem redirecionamento).
+
 ## Validação Mais Recente
 
-Última validação completa executada após a implementação de eventos:
+Última validação completa executada após a implementação do cancelamento de eventos:
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, testes unitários e Prettier.
-
-Após ajuste visual da grade de eventos, também foi executado:
-
-```bash
-yarn test:unit src/pages/events/ui/events-page.test.tsx
-```
-
-Resultado: passou.
+Resultado: passou com typecheck, lint, architecture check, 226 testes unitários e Prettier.
 
 ## Próximos Passos Recomendados
 
-1. Criar página ou fluxo de detalhe do evento com `days` e preparação para inscrição de passageiros.
-2. Implementar `entities/passenger` e `features/enroll-passenger`.
-3. Implementar `entities/payment` e `features/register-payment`.
-4. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
+1. Implementar `entities/passenger` e `features/enroll-passenger`.
+2. Implementar `entities/payment` e `features/register-payment`.
+3. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
 
 ## Pendências Conhecidas
 
-- Ainda não há detalhe de evento na UI.
-- Ainda não há manipulação de horários/cancelamento de `event-day` na UI.
 - O arquivo `EVENTS.txt` contém o contrato usado para esta fase e está fora da documentação oficial versionada em `docs/`.

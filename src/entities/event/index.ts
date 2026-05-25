@@ -13,9 +13,11 @@ export {
   EVENT_TYPE_VALUES,
   EVENT_TYPES,
   canCancelEventDay,
+  canCancelEventStatus,
   canDeleteEventStatus,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
+  isLastActiveDayInEvent,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
 } from "./model";

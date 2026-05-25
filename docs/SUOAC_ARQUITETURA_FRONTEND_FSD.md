@@ -568,6 +568,7 @@ Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client
 | `publish-event`               | feature | Mudanca de status para inscricoes abertas |
 | `update-event-day`            | feature | Edicao de horarios de saida/retorno       |
 | `cancel-event-day`            | feature | Cancelamento de dia individual do evento  |
+| `cancel-event`                | feature | Cancelamento do evento inteiro            |
 | `enroll-passenger`            | feature | Inscricao em evento                       |
 | `select-event-days`           | feature | Escolha de dias e calculo de valor        |
 | `register-payment`            | feature | Pagamento total/parcial/isento            |
@@ -1109,18 +1110,19 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 ### Fase 2 — Dominio MVP
 
 - Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`. (parcial — `event` e `event-day` implementadas; `congregation` e `user` ja possuem base funcional)
-- Criar features `create-event`, `publish-event`, `update-event`, `delete-event`, `update-event-day`, `cancel-event-day`, `enroll-passenger`, `register-payment`. (parcial — eventos e dias implementados; passageiros e pagamentos pendentes)
+- Criar features `create-event`, `publish-event`, `update-event`, `delete-event`, `cancel-event`, `update-event-day`, `cancel-event-day`, `enroll-passenger`, `register-payment`. (parcial — eventos e dias implementados; passageiros e pagamentos pendentes)
 - Criar widgets `event-overview`, `financial-summary`.
 
 Status atual da fatia de eventos:
 
-- `entities/event` contem model, constantes de status/tipo, labels, variants, helpers de regra de negocio para dias (`canUpdateEventDayTimes`, `canCancelEventDay`), queries e query options para listagem e detalhe.
+- `entities/event` contem model, constantes de status/tipo, labels, variants, helpers de regra de negocio para dias (`canUpdateEventDayTimes`, `canCancelEventDay`) e para o evento (`canCancelEventStatus`, `isLastActiveDayInEvent`), queries e query options para listagem e detalhe.
 - `entities/event-day` contem model, queries e query options para listagem e detalhe de dias.
 - `features/create-event` contem schema Zod, mapper de DTO, Server Action e modal de criacao.
 - `features/update-event-day` contem schema Zod (horarios HH:mm), DTO com deteccao de alteracoes, Server Action (PATCH) e modal de edicao de horarios.
 - `features/cancel-event-day` contem Server Action para cancelamento de dia (PATCH /event-days/:id/cancel).
+- `features/cancel-event` contem Server Action para cancelamento do evento inteiro (PATCH /events/:id/status com CANCELLED).
 - `pages/events` consome eventos por circuito via TanStack Query, exibe cards paginados e abre o modal de criacao.
-- `pages/event-detail` exibe detalhe do evento com acoes de editar, excluir, publicar, editar horarios de dia e cancelar dia.
+- `pages/event-detail` exibe detalhe do evento com acoes de editar, excluir, publicar, cancelar evento, editar horarios de dia e cancelar dia. Ao cancelar o ultimo dia ativo, o dialog avisa que o evento tambem sera cancelado.
 - A grade de eventos usa dois cards por linha em telas maiores e um card por linha em telas menores.
 - A publicacao do evento (`DRAFT` -> `OPEN`) foi implementada em `features/publish-event`.
 - A edicao por campos permitidos em cada status foi implementada em `features/update-event`.

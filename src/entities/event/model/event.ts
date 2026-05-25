@@ -137,6 +137,14 @@ export function canCancelEventDay(eventStatus: EventStatus, dayStatus: EventDayS
   );
 }
 
+export function canCancelEventStatus(status: EventStatus): boolean {
+  return status === EVENT_STATUSES.DRAFT || status === EVENT_STATUSES.OPEN;
+}
+
+export function isLastActiveDayInEvent(days: readonly EventDayInEvent[]): boolean {
+  return days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE).length === 1;
+}
+
 export interface EventDayInEvent {
   id: string;
   dayNumber: number;

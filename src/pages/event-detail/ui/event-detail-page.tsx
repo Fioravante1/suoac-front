@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  Ban,
   CalendarDays,
   Clock,
   DollarSign,
@@ -36,13 +37,16 @@ import {
   EVENT_STATUSES,
   EVENT_TYPE_LABELS,
   canCancelEventDay,
+  canCancelEventStatus,
   canDeleteEventStatus,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
+  isLastActiveDayInEvent,
   type Event,
   type EventDayInEvent,
 } from "@/entities/event";
 import { eventDetailOptions } from "@/entities/event/api";
+import { cancelEventAction } from "@/features/cancel-event";
 import { cancelEventDayAction } from "@/features/cancel-event-day";
 import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
@@ -78,6 +82,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   const deleteModal = useModal<Event>();
   const updateDayModal = useModal<EventDayInEvent>();
   const cancelDayModal = useModal<EventDayInEvent>();
+  const cancelEventModal = useModal<Event>();
   const canManage = user ? isCircuitRole(user.role) : false;
   const [operationError, setOperationError] = useState<string | null>(null);
 
@@ -152,6 +157,21 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     },
   });
 
+  const cancelEventMutation = useMutation({
+    mutationFn: (id: string) => cancelEventAction(id),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setOperationError(result.error);
+        return;
+      }
+
+      setOperationError(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      cancelEventModal.close();
+    },
+  });
+
   async function handleUpdateEvent(ev: Event, values: UpdateEventFormValues) {
     return updateMutation.mutateAsync({ ev, values });
   }
@@ -186,6 +206,13 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
     setOperationError(null);
     cancelDayMutation.mutate(cancelDayModal.item.id);
+  }
+
+  function handleConfirmCancelEvent() {
+    if (!cancelEventModal.item) return;
+
+    setOperationError(null);
+    cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
   return (
@@ -249,6 +276,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                   >
                     <Send size={18} aria-hidden="true" />
                     {publishMutation.isPending ? "Publicando..." : "Publicar evento"}
+                  </Button>
+                )}
+                {canCancelEventStatus(event.status) && user?.role === USER_ROLES.CIRCUIT_COORDINATOR && (
+                  <Button variant="destructive" onClick={() => cancelEventModal.open(event)}>
+                    <Ban size={18} aria-hidden="true" />
+                    Cancelar evento
                   </Button>
                 )}
               </div>
@@ -410,10 +443,25 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
         onClose={cancelDayModal.close}
         onConfirm={handleConfirmCancelDay}
         title="Cancelar Dia"
-        message={`Tem certeza que deseja cancelar "${cancelDayModal.item?.label}"? Essa ação não pode ser desfeita.`}
+        message={
+          event && event.days && isLastActiveDayInEvent(event.days)
+            ? `Tem certeza que deseja cancelar "${cancelDayModal.item?.label}"? Este é o último dia ativo — o evento também será cancelado. Essa ação não pode ser desfeita.`
+            : `Tem certeza que deseja cancelar "${cancelDayModal.item?.label}"? Essa ação não pode ser desfeita.`
+        }
         confirmLabel="Cancelar dia"
         cancelLabel="Voltar"
         loading={cancelDayMutation.isPending}
+        variant="destructive"
+      />
+      <ConfirmDialog
+        open={cancelEventModal.isOpen}
+        onClose={cancelEventModal.close}
+        onConfirm={handleConfirmCancelEvent}
+        title="Cancelar Evento"
+        message={`Tem certeza que deseja cancelar o evento "${cancelEventModal.item?.title}"? Todos os dias serão cancelados e as inscrições encerradas. Essa ação não pode ser desfeita.`}
+        confirmLabel="Cancelar evento"
+        cancelLabel="Voltar"
+        loading={cancelEventMutation.isPending}
         variant="destructive"
       />
     </div>
