@@ -88,6 +88,7 @@ export const themeTokens = {
   },
   component: {
     buttonHeight: "2.75rem",
+    buttonHeightSm: "2.25rem",
     inputHeight: "3rem",
     cardPadding: "1.5rem",
   },

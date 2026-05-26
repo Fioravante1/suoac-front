@@ -3,7 +3,7 @@
 import { endpoints, httpClient } from "@/shared/api/http-client";
 import type { ActionResult } from "@/shared/api";
 
-import { EVENT_STATUSES, type Event } from "@/entities/event";
+import type { Event } from "@/entities/event";
 
 export async function cancelEventAction(eventId: string): Promise<ActionResult<Event>> {
   if (!eventId) {
@@ -11,9 +11,8 @@ export async function cancelEventAction(eventId: string): Promise<ActionResult<E
   }
 
   try {
-    const data = await httpClient<Event>(endpoints.events.updateStatus(eventId), {
+    const data = await httpClient<Event>(endpoints.events.cancel(eventId), {
       method: "PATCH",
-      body: { status: EVENT_STATUSES.CANCELLED },
     });
 
     return { success: true, data };

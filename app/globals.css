@@ -90,6 +90,7 @@
 
   /* Component defaults */
   --suoac-button-height: 2.75rem;
+  --suoac-button-height-sm: 2.25rem;
   --suoac-input-height: 3rem;
   --suoac-card-padding: var(--suoac-space-6);
 

@@ -41,8 +41,8 @@ describe("canUpdateEventDayTimes", () => {
 });
 
 describe("canCancelEventDay", () => {
-  it("retorna true para evento DRAFT com dia ACTIVE", () => {
-    expect(canCancelEventDay(EVENT_STATUSES.DRAFT, EVENT_DAY_STATUSES.ACTIVE)).toBe(true);
+  it("retorna false para evento DRAFT com dia ACTIVE", () => {
+    expect(canCancelEventDay(EVENT_STATUSES.DRAFT, EVENT_DAY_STATUSES.ACTIVE)).toBe(false);
   });
 
   it("retorna true para evento OPEN com dia ACTIVE", () => {
@@ -71,8 +71,8 @@ describe("canCancelEventDay", () => {
 });
 
 describe("canCancelEventStatus", () => {
-  it("retorna true para DRAFT", () => {
-    expect(canCancelEventStatus(EVENT_STATUSES.DRAFT)).toBe(true);
+  it("retorna false para DRAFT", () => {
+    expect(canCancelEventStatus(EVENT_STATUSES.DRAFT)).toBe(false);
   });
 
   it("retorna true para OPEN", () => {

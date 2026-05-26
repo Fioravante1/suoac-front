@@ -73,67 +73,69 @@ function EventCard({
   return (
     <Card className={styles.eventCard}>
       <div className={styles.cardHeader}>
-        <div className={styles.cardTitleGroup}>
-          <span className={styles.eventType}>{EVENT_TYPE_LABELS[event.type]}</span>
-          <h2 className={styles.eventTitle}>
-            <Link href={routes.eventDetail(event.id)} className={styles.eventTitleLink}>
-              {event.title}
-            </Link>
-          </h2>
-        </div>
+        <span className={styles.eventType}>{EVENT_TYPE_LABELS[event.type]}</span>
         <Badge variant={EVENT_STATUS_BADGE_VARIANTS[event.status]}>{EVENT_STATUS_LABELS[event.status]}</Badge>
       </div>
 
+      <h2 className={styles.eventTitle}>
+        <Link href={routes.eventDetail(event.id)} className={styles.eventTitleLink}>
+          {event.title}
+        </Link>
+      </h2>
+
       <div className={styles.eventMeta}>
         <span className={styles.metaItem}>
-          <CalendarDays size={18} aria-hidden="true" />
+          <CalendarDays size={16} aria-hidden="true" />
           Inscrições até {formatDate(event.registrationDeadline)}
         </span>
         <span className={styles.metaItem}>
-          <Clock size={18} aria-hidden="true" />
+          <Clock size={16} aria-hidden="true" />
           Pagamento até {formatDate(event.paymentDeadline)}
         </span>
         <span className={styles.metaItem}>
-          <MapPin size={18} aria-hidden="true" />
+          <MapPin size={16} aria-hidden="true" />
           {event.city}, {event.state}
         </span>
       </div>
 
       <div className={styles.cardFooter}>
-        <div className={styles.footerTop}>
-          <div className={styles.priceGroup}>
+        <div className={styles.footerRow}>
+          <div className={styles.footerInfo}>
             <span className={styles.ticketPrice}>{formatCurrency(event.ticketPrice)}</span>
+            <span className={styles.footerSeparator} aria-hidden="true">
+              ·
+            </span>
             <span className={styles.venue}>{event.venue}</span>
           </div>
           <Link href={routes.eventDetail(event.id)} className={styles.detailLink}>
             Ver detalhes
-            <ChevronRight size={18} aria-hidden="true" />
+            <ChevronRight size={16} aria-hidden="true" />
           </Link>
         </div>
         {canManage && (
           <div className={styles.cardActions}>
             {canUpdateEventStatus(event.status) && (
-              <Button variant="ghost" onClick={() => onEdit(event)}>
-                <Pencil size={18} aria-hidden="true" />
+              <Button variant="ghost" size="small" onClick={() => onEdit(event)}>
+                <Pencil size={16} aria-hidden="true" />
                 Editar
               </Button>
             )}
             {canDeleteEventStatus(event.status) && (
-              <Button variant="ghost" onClick={() => onDelete(event)}>
-                <Trash2 size={18} aria-hidden="true" />
+              <Button variant="ghost" size="small" onClick={() => onDelete(event)}>
+                <Trash2 size={16} aria-hidden="true" />
                 Excluir
               </Button>
             )}
-            {event.status === EVENT_STATUSES.DRAFT && (
-              <Button variant="secondary" onClick={() => onPublish(event)} disabled={publishing}>
-                <Send size={18} aria-hidden="true" />
-                {publishing ? "Publicando…" : "Publicar evento"}
+            {canCancelEventStatus(event.status) && isCoordinator && (
+              <Button variant="destructive" size="small" onClick={() => onCancel(event)} disabled={cancelling}>
+                <Ban size={16} aria-hidden="true" />
+                Cancelar evento
               </Button>
             )}
-            {canCancelEventStatus(event.status) && isCoordinator && (
-              <Button variant="destructive" onClick={() => onCancel(event)} disabled={cancelling}>
-                <Ban size={18} aria-hidden="true" />
-                Cancelar evento
+            {event.status === EVENT_STATUSES.DRAFT && (
+              <Button variant="secondary" size="small" onClick={() => onPublish(event)} disabled={publishing}>
+                <Send size={16} aria-hidden="true" />
+                {publishing ? "Publicando…" : "Publicar evento"}
               </Button>
             )}
           </div>

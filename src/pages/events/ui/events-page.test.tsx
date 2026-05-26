@@ -222,7 +222,7 @@ describe("EventsPage", () => {
     });
   });
 
-  it("exibe botão cancelar evento para coordenador em DRAFT", async () => {
+  it("oculta botão cancelar evento para coordenador em DRAFT", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -230,7 +230,8 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    expect(await screen.findByRole("button", { name: /cancelar evento/i })).toBeInTheDocument();
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
   });
 
   it("exibe botão cancelar evento para coordenador em OPEN", async () => {
@@ -296,7 +297,7 @@ describe("EventsPage", () => {
 
   it("confirma cancelamento de evento e chama cancelEventAction", async () => {
     fetchEventsMock.mockResolvedValue({
-      data: [draftEvent],
+      data: [{ ...draftEvent, status: EVENT_STATUSES.OPEN }],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
     });
 

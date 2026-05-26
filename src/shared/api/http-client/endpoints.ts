@@ -17,6 +17,7 @@ export const endpoints = {
     create: (circuitId: string) => `/circuits/${circuitId}/events` as const,
     update: (id: string) => `/events/${id}` as const,
     updateStatus: (id: string) => `/events/${id}/status` as const,
+    cancel: (id: string) => `/events/${id}/cancel` as const,
     delete: (id: string) => `/events/${id}` as const,
   },
   eventDays: {

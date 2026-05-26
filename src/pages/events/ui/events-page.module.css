@@ -18,7 +18,7 @@
 .eventCard {
   display: flex;
   flex-direction: column;
-  gap: var(--suoac-space-5);
+  gap: var(--suoac-space-3);
 }
 
 .errorBanner {
@@ -30,16 +30,13 @@
   font-size: var(--suoac-font-size-small);
 }
 
+/* ── Card header ── */
+
 .cardHeader {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--suoac-space-3);
-}
-
-.cardTitleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-1);
 }
 
 .eventType {
@@ -47,7 +44,10 @@
   font-weight: var(--suoac-font-weight-semibold);
   color: var(--suoac-color-primary);
   text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
+
+/* ── Card title ── */
 
 .eventTitle {
   font-size: var(--suoac-font-size-h3);
@@ -72,16 +72,18 @@
   border-radius: var(--suoac-radius-sm);
 }
 
+/* ── Metadata ── */
+
 .eventMeta {
-  display: grid;
-  gap: var(--suoac-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
 }
 
 .metaItem {
   display: flex;
   align-items: center;
   gap: var(--suoac-space-2);
-  min-height: 2rem;
   color: var(--suoac-color-text-secondary);
   font-size: var(--suoac-font-size-small);
 }
@@ -91,24 +93,42 @@
   color: var(--suoac-color-primary);
 }
 
+/* ── Card footer ── */
+
 .cardFooter {
   display: flex;
   flex-direction: column;
-  gap: var(--suoac-space-4);
-  padding-top: var(--suoac-space-4);
+  gap: var(--suoac-space-3);
+  padding-top: var(--suoac-space-3);
   border-top: 1px solid var(--suoac-color-border);
 }
 
-.footerTop {
+.footerRow {
   display: flex;
   flex-direction: column;
-  gap: var(--suoac-space-3);
+  gap: var(--suoac-space-2);
 }
 
-.priceGroup {
+.footerInfo {
   display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-1);
+  align-items: baseline;
+  gap: var(--suoac-space-2);
+  flex-wrap: wrap;
+}
+
+.ticketPrice {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-bold);
+  color: var(--suoac-color-text-primary);
+}
+
+.footerSeparator {
+  color: var(--suoac-color-border-strong);
+}
+
+.venue {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
 }
 
 .detailLink {
@@ -132,81 +152,33 @@
   border-radius: var(--suoac-radius-sm);
 }
 
+/* ── Card actions ── */
+
 .cardActions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(7rem, max-content));
+  justify-content: end;
   gap: var(--suoac-space-2);
-  justify-content: stretch;
-  width: 100%;
-  padding-top: var(--suoac-space-4);
-  border-top: 1px solid var(--suoac-color-border);
 }
 
-.cardActions > button {
-  width: 100%;
-  min-width: 0;
-  padding-inline: var(--suoac-space-3);
-  white-space: nowrap;
-}
+/* ── Responsive ── */
 
-.cardActions > button:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
+@media (min-width: 48rem) {
+  .eventMeta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--suoac-space-4) var(--suoac-space-5);
+  }
 
-.ticketPrice {
-  font-size: var(--suoac-font-size-h3);
-  font-weight: var(--suoac-font-weight-bold);
-  color: var(--suoac-color-text-primary);
-}
-
-.venue {
-  color: var(--suoac-color-text-secondary);
-  font-size: var(--suoac-font-size-small);
+  .footerRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 @media (min-width: 56rem) {
   .eventList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 48rem) {
-  .cardHeader {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .eventMeta {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .cardFooter {
-    align-items: stretch;
-  }
-
-  .footerTop {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .priceGroup {
-    max-width: 100%;
-  }
-
-  .cardActions {
-    grid-template-columns: repeat(3, max-content);
-    justify-content: end;
-    align-self: stretch;
-    max-width: 100%;
-  }
-
-  .cardActions > button {
-    width: auto;
-  }
-
-  .cardActions > button:last-child:nth-child(odd) {
-    grid-column: auto;
   }
 }

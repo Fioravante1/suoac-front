@@ -131,14 +131,11 @@ export function canUpdateEventDayTimes(eventStatus: EventStatus, dayStatus: Even
 }
 
 export function canCancelEventDay(eventStatus: EventStatus, dayStatus: EventDayStatus): boolean {
-  return (
-    (eventStatus === EVENT_STATUSES.DRAFT || eventStatus === EVENT_STATUSES.OPEN) &&
-    dayStatus === EVENT_DAY_STATUSES.ACTIVE
-  );
+  return eventStatus === EVENT_STATUSES.OPEN && dayStatus === EVENT_DAY_STATUSES.ACTIVE;
 }
 
 export function canCancelEventStatus(status: EventStatus): boolean {
-  return status === EVENT_STATUSES.DRAFT || status === EVENT_STATUSES.OPEN;
+  return status === EVENT_STATUSES.OPEN;
 }
 
 export function isLastActiveDayInEvent(days: readonly EventDayInEvent[]): boolean {

@@ -61,3 +61,11 @@
 .variant-destructive:hover:not(:disabled) {
   background-color: var(--suoac-color-critical-dark);
 }
+
+/* Sizes */
+.size-small {
+  height: var(--suoac-button-height-sm);
+  font-size: var(--suoac-font-size-small);
+  padding: 0 var(--suoac-space-4);
+  gap: var(--suoac-space-1);
+}

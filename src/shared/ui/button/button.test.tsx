@@ -18,4 +18,16 @@ describe("Button", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("type", "submit");
   });
+
+  it("deve aplicar classe de tamanho small quando size='small'", () => {
+    render(<Button size="small">Compacto</Button>);
+    const button = screen.getByRole("button", { name: "Compacto" });
+    expect(button.className).toMatch(/size-small/);
+  });
+
+  it("nao deve aplicar classe de tamanho quando size='default'", () => {
+    render(<Button size="default">Normal</Button>);
+    const button = screen.getByRole("button", { name: "Normal" });
+    expect(button.className).not.toMatch(/size-/);
+  });
 });

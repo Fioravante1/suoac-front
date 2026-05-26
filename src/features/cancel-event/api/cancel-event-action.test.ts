@@ -9,7 +9,7 @@ const httpClientMock = vi.hoisted(() => vi.fn());
 vi.mock("@/shared/api/http-client", () => ({
   endpoints: {
     events: {
-      updateStatus: (id: string) => `/events/${id}/status`,
+      cancel: (id: string) => `/events/${id}/cancel`,
     },
   },
   httpClient: httpClientMock,
@@ -40,13 +40,12 @@ describe("cancelEventAction", () => {
     httpClientMock.mockResolvedValue(cancelledEvent);
   });
 
-  it("chama o endpoint de atualização de status com CANCELLED", async () => {
+  it("chama o endpoint de cancelamento sem body", async () => {
     const result = await cancelEventAction("event-1");
 
     expect(result).toEqual({ success: true, data: cancelledEvent });
-    expect(httpClientMock).toHaveBeenCalledWith("/events/event-1/status", {
+    expect(httpClientMock).toHaveBeenCalledWith("/events/event-1/cancel", {
       method: "PATCH",
-      body: { status: "CANCELLED" },
     });
   });
 

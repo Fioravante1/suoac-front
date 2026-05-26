@@ -271,7 +271,9 @@ describe("EventDetailPage", () => {
     expect(await screen.findByText("Levar documento com foto")).toBeInTheDocument();
   });
 
-  it("exibe botões de editar horários e cancelar dia para circuito em DRAFT", async () => {
+  it("exibe botões de editar horários e cancelar dia para circuito em OPEN", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
@@ -281,6 +283,15 @@ describe("EventDetailPage", () => {
 
     expect(editButtons).toHaveLength(1);
     expect(cancelButtons).toHaveLength(1);
+  });
+
+  it("exibe editar horários mas oculta cancelar dia para circuito em DRAFT", async () => {
+    render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Dia 1 - Sexta-feira")).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: /editar horários/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar dia/i })).not.toBeInTheDocument();
   });
 
   it("oculta botões de editar horários e cancelar dia para congregação", async () => {
@@ -344,6 +355,8 @@ describe("EventDetailPage", () => {
   });
 
   it("abre ConfirmDialog de cancelar dia ao clicar no botão", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
@@ -353,6 +366,8 @@ describe("EventDetailPage", () => {
   });
 
   it("confirma cancelamento de dia e chama cancelEventDayAction", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
@@ -368,10 +383,11 @@ describe("EventDetailPage", () => {
     });
   });
 
-  it("exibe botão cancelar evento para coordenador em DRAFT", async () => {
+  it("oculta botão cancelar evento para coordenador em DRAFT", async () => {
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
-    expect(await screen.findByRole("button", { name: /cancelar evento/i })).toBeInTheDocument();
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
   });
 
   it("exibe botão cancelar evento para coordenador em OPEN", async () => {
@@ -428,6 +444,8 @@ describe("EventDetailPage", () => {
   });
 
   it("abre dialog de cancelar evento e chama cancelEventAction", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     fireEvent.click(await screen.findByRole("button", { name: /cancelar evento/i }));
@@ -443,6 +461,8 @@ describe("EventDetailPage", () => {
   });
 
   it("mostra aviso de último dia ativo no dialog de cancelar dia", async () => {
+    fetchEventMock.mockResolvedValue({ ...eventWithDays, status: EVENT_STATUSES.OPEN });
+
     render(<EventDetailPage eventId="event-1" />, { wrapper: createWrapper() });
 
     fireEvent.click(await screen.findByRole("button", { name: /cancelar dia/i }));
@@ -453,6 +473,7 @@ describe("EventDetailPage", () => {
   it("não mostra aviso de último dia ativo quando há mais de um dia ativo", async () => {
     fetchEventMock.mockResolvedValue({
       ...eventWithDays,
+      status: EVENT_STATUSES.OPEN,
       days: [{ ...eventWithDays.days[0] }, { ...eventWithDays.days[1], status: EVENT_DAY_STATUSES.ACTIVE }],
     });
 
