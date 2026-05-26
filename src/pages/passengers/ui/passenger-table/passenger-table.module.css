@@ -1,0 +1,130 @@
+.desktopOnly {
+  display: block;
+}
+
+.name {
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.rg {
+  color: var(--suoac-color-text-secondary);
+  font-family: monospace;
+  font-size: var(--suoac-font-size-label);
+}
+
+.muted,
+.observations {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}
+
+.observations {
+  max-width: 18rem;
+}
+
+.actionsHead {
+  text-align: right;
+}
+
+.actions {
+  display: flex;
+  gap: var(--suoac-space-2);
+  justify-content: flex-end;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--suoac-space-2);
+  min-height: var(--suoac-button-height-sm);
+  padding: var(--suoac-space-2) var(--suoac-space-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--suoac-radius-sm);
+  color: var(--suoac-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.actionButton:hover,
+.actionButton:focus-visible {
+  background-color: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-primary);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid var(--suoac-color-info);
+  outline-offset: 2px;
+}
+
+.actionButtonDanger:hover,
+.actionButtonDanger:focus-visible {
+  background-color: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+}
+
+.mobileCards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3);
+}
+
+.mobileCard {
+  background: var(--suoac-color-surface);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  padding: var(--suoac-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.mobileCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.mobileCardName {
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.mobileCardRg,
+.mobileCardDetail {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}
+
+.mobileCardRg {
+  font-family: monospace;
+}
+
+.mobileCardActions {
+  display: flex;
+  gap: var(--suoac-space-2);
+  padding-top: var(--suoac-space-2);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+@media (min-width: 768px) {
+  .mobileCards {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktopOnly {
+    display: none;
+  }
+
+  .actionButton {
+    min-height: 2.75rem;
+  }
+}

@@ -26,4 +26,12 @@ export const endpoints = {
     update: (id: string) => `/event-days/${id}` as const,
     cancel: (id: string) => `/event-days/${id}/cancel` as const,
   },
+  passengers: {
+    list: (congregationId: string) => `/congregations/${congregationId}/passengers` as const,
+    search: (congregationId: string) => `/congregations/${congregationId}/passengers/search` as const,
+    detail: (id: string) => `/passengers/${id}` as const,
+    create: (congregationId: string) => `/congregations/${congregationId}/passengers` as const,
+    update: (id: string) => `/passengers/${id}` as const,
+    delete: (id: string) => `/passengers/${id}` as const,
+  },
 } as const;

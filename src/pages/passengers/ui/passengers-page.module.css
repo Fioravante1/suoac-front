@@ -1,16 +1,83 @@
 .page {
   display: flex;
   flex-direction: column;
+  gap: var(--suoac-space-6);
+}
+
+.toolbar {
+  display: grid;
   gap: var(--suoac-space-4);
+  padding: var(--suoac-space-4);
+  background: var(--suoac-color-surface);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-lg);
 }
 
-.heading {
-  font-size: var(--suoac-font-size-h1);
-  font-weight: var(--suoac-font-weight-bold);
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.selectLabel {
   color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
 }
 
-.description {
-  font-size: var(--suoac-font-size-body);
-  color: var(--suoac-color-text-secondary);
+.select {
+  width: 100%;
+  min-height: var(--suoac-input-height);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  font: inherit;
+  padding: 0 var(--suoac-space-4);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--suoac-color-primary);
+  box-shadow: 0 0 0 3px var(--suoac-color-primary-light);
+}
+
+.searchForm {
+  display: grid;
+  gap: var(--suoac-space-3);
+}
+
+.content {
+  background: var(--suoac-color-surface);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-lg);
+  overflow: hidden;
+}
+
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+}
+
+@media (min-width: 768px) {
+  .toolbar {
+    grid-template-columns: minmax(14rem, 18rem) 1fr;
+    align-items: end;
+  }
+
+  .searchForm {
+    grid-template-columns: 1fr auto auto;
+    align-items: end;
+  }
+
+  .searchForm:only-child {
+    grid-column: 1 / -1;
+  }
 }
