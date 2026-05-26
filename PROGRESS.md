@@ -1,6 +1,6 @@
 # Progresso do Projeto - SUOAC Frontend
 
-**Atualizado em:** 22/05/2026
+**Atualizado em:** 25/05/2026
 **Fase atual:** Domínio MVP - eventos
 
 Este arquivo acompanha o estado do frontend, o que já foi entregue e quais frentes ainda precisam avançar.
@@ -73,6 +73,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - Endpoints adicionados para:
   - listar/criar/detalhar/atualizar/deletar eventos;
   - alterar status de evento;
+  - cancelar evento (endpoint dedicado `PATCH /events/:id/cancel`);
   - listar/detalhar/atualizar/cancelar dias de evento.
 - Query keys adicionadas para `events` e `eventDays`.
 - `features/create-event` implementada com:
@@ -112,25 +113,39 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 ### 9. Cancelamento de Eventos
 
 - `features/cancel-event` implementada com Server Action `cancelEventAction`.
-- A ação chama `PATCH /events/:id/status` com `{ status: "CANCELLED" }`, reutilizando o endpoint de transição de status.
-- Helpers de domínio adicionados em `entities/event/model`:
-  - `canCancelEventStatus(status)` — retorna `true` para `DRAFT` e `OPEN`.
+- A ação chama o endpoint dedicado `PATCH /events/:id/cancel` (sem body). Anteriormente usava o endpoint genérico de transição de status; agora usa endpoint específico conforme contrato do backend.
+- Helpers de domínio em `entities/event/model`:
+  - `canCancelEventStatus(status)` — retorna `true` apenas para `OPEN`. Eventos em `DRAFT` devem ser excluídos via DELETE.
+  - `canCancelEventDay(eventStatus, dayStatus)` — retorna `true` apenas quando evento está `OPEN` e dia está `ACTIVE`. Dias de eventos em `DRAFT` não podem ser cancelados individualmente.
   - `isLastActiveDayInEvent(days)` — retorna `true` quando há exatamente 1 dia ativo.
-- A página de detalhe exibe o botão "Cancelar evento" apenas para `CIRCUIT_COORDINATOR` em eventos `DRAFT` ou `OPEN`.
+- A página de detalhe exibe o botão "Cancelar evento" apenas para `CIRCUIT_COORDINATOR` em eventos `OPEN`.
+- A página de detalhe exibe o botão "Cancelar dia" apenas quando o evento está `OPEN` (coordenador).
 - A página de listagem exibe o botão "Cancelar evento" no card, com as mesmas regras de visibilidade.
 - Ao cancelar o último dia ativo de um evento, o dialog de cancelamento do dia avisa que o evento também será cancelado.
 - Cancelamento exige confirmação via dialog destrutivo em ambas as páginas.
 - Após cancelar, o evento continua visível com status atualizado (sem redirecionamento).
 
+### 10. Redesign dos Cards de Eventos
+
+- Componente `Button` (`shared/ui/button`) agora suporta prop `size` com valores `"default"` (44px) e `"small"` (36px, fonte menor, padding reduzido).
+- Token `--suoac-button-height-sm` adicionado ao design system (`globals.css` e `theme-tokens.ts`).
+- Cards de evento na página de listagem redesenhados:
+  - Header: tipo do evento + badge de status sempre na mesma linha.
+  - Título: elemento standalone abaixo do header, linkável para a página de detalhe.
+  - Metadata: ícones 16px, gap mais apertado, layout em linha no tablet+.
+  - Footer unificado: preço e local na mesma linha com separador "·", link "Ver detalhes" ao lado.
+  - Ações com `size="small"` e grid `auto-fit` com `minmax(7rem, max-content)` que distribui botões em 2 colunas no mobile e linha única no tablet, alinhados à direita.
+  - Ordem dos botões: Editar → Excluir → Cancelar evento → Publicar evento (CTA principal sempre por último à direita).
+
 ## Validação Mais Recente
 
-Última validação completa executada após a implementação do cancelamento de eventos:
+Última validação completa executada após o redesign dos cards e ajuste das regras de cancelamento:
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, 226 testes unitários e Prettier.
+Resultado: passou com typecheck, lint, architecture check, 229 testes unitários e Prettier.
 
 ## Próximos Passos Recomendados
 
