@@ -1,0 +1,106 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--suoac-space-5);
+}
+
+.title {
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-bold);
+  color: var(--suoac-color-text-primary);
+}
+
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+  margin-bottom: var(--suoac-space-4);
+}
+
+.errorMessage {
+  text-align: center;
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+  padding: var(--suoac-space-4);
+}
+
+.dayBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-1);
+}
+
+.actions {
+  display: flex;
+  gap: var(--suoac-space-1);
+  align-items: center;
+}
+
+/* Mobile cards — visible on small screens */
+.mobileCards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.mobileCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+}
+
+.mobileCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobileCardName {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.mobileCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-3);
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.mobileCardFinancial {
+  display: flex;
+  gap: var(--suoac-space-4);
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.mobileCardActions {
+  display: flex;
+  gap: var(--suoac-space-2);
+  padding-top: var(--suoac-space-2);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+/* Desktop table — hidden on small screens */
+.desktopTable {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .mobileCards {
+    display: none;
+  }
+
+  .desktopTable {
+    display: block;
+  }
+}

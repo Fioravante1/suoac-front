@@ -5,13 +5,13 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/dashboard"),
 }));
 
-const mockUseAuth = vi.fn();
+const mockUseAuthPermissions = vi.fn();
 
 vi.mock("@/shared/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/shared/auth")>();
   return {
     ...actual,
-    useAuth: (...args: unknown[]) => mockUseAuth(...args),
+    useAuthPermissions: (...args: unknown[]) => mockUseAuthPermissions(...args),
   };
 });
 
@@ -23,7 +23,7 @@ import { MobileBottomNav } from "./mobile-bottom-nav";
 
 describe("MobileBottomNav", () => {
   it("renderiza todos os 4 itens para CIRCUIT_COORDINATOR", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -37,7 +37,7 @@ describe("MobileBottomNav", () => {
   });
 
   it("renderiza todos os 4 itens para CONGREGATION_COORDINATOR", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -51,7 +51,7 @@ describe("MobileBottomNav", () => {
   });
 
   it("nao renderiza itens exclusivos do desktop", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -63,7 +63,7 @@ describe("MobileBottomNav", () => {
   });
 
   it("renderiza o botao de sair", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -74,7 +74,7 @@ describe("MobileBottomNav", () => {
   });
 
   it("nao renderiza itens de navegacao quando nao ha usuario", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: null,
       isAuthenticated: false,
     });

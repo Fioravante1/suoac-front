@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { passengerFormSchema, type Passenger, type PassengerFormValues } from "@/entities/passenger";
+import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 
 import styles from "./passenger-form-modal.module.css";
@@ -19,8 +20,8 @@ interface PassengerFormModalProps {
 }
 
 export function PassengerFormModal({ open, onClose, onSubmit, passenger }: PassengerFormModalProps) {
+  const { serverError, clearServerError, showServerError } = useServerError();
   const isEditing = Boolean(passenger);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
@@ -41,17 +42,17 @@ export function PassengerFormModal({ open, onClose, onSubmit, passenger }: Passe
   });
 
   async function handleFormSubmit(values: PassengerFormValues) {
-    setServerError(null);
+    clearServerError();
 
     const result = await onSubmit(values);
 
     if (!result.success) {
-      setServerError(result.error ?? "Ocorreu um erro inesperado.");
+      showServerError(result.error);
     }
   }
 
   function handleClose() {
-    setServerError(null);
+    clearServerError();
     reset();
     onClose();
   }
@@ -67,6 +68,7 @@ export function PassengerFormModal({ open, onClose, onSubmit, passenger }: Passe
             Cancelar
           </Button>
           <Button type="submit" form="passenger-form" disabled={isSubmitting}>
+            {isSubmitting && <Spinner size="small" />}
             {isSubmitting ? "Salvando..." : "Salvar"}
           </Button>
         </>

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { EventDayInEvent } from "@/entities/event";
+import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
 import { TextField } from "@/shared/ui/text-field";
@@ -28,7 +28,7 @@ function toFormValues(day: EventDayInEvent | null): UpdateEventDayFormValues {
 }
 
 export function UpdateEventDayFormModal({ open, onClose, onSubmit, day }: UpdateEventDayFormModalProps) {
-  const [serverError, setServerError] = useState<string | null>(null);
+  const { serverError, clearServerError, showServerError } = useServerError();
 
   const {
     register,
@@ -44,12 +44,12 @@ export function UpdateEventDayFormModal({ open, onClose, onSubmit, day }: Update
   async function handleFormSubmit(values: UpdateEventDayFormValues) {
     if (!day) return;
 
-    setServerError(null);
+    clearServerError();
 
     const result = await onSubmit(day, values);
 
     if (!result.success) {
-      setServerError(result.error ?? "Não foi possível atualizar os horários.");
+      showServerError(result.error, "Não foi possível atualizar os horários.");
       return;
     }
 
@@ -58,7 +58,7 @@ export function UpdateEventDayFormModal({ open, onClose, onSubmit, day }: Update
   }
 
   function handleClose() {
-    setServerError(null);
+    clearServerError();
     reset(toFormValues(day));
     onClose();
   }

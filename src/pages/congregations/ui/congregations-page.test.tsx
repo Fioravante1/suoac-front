@@ -6,7 +6,7 @@ import { CongregationsPage } from "./congregations-page";
 import { fetchCongregations } from "@/entities/congregation/api/congregation.queries";
 
 vi.mock("@/shared/auth", () => ({
-  useAuth: () => ({
+  useAuthPermissions: () => ({
     user: {
       id: "user-1",
       name: "Coordenador",
@@ -16,7 +16,15 @@ vi.mock("@/shared/auth", () => ({
       circuitId: "circuit-1",
       congregationId: null,
     },
+    userRole: "CIRCUIT_COORDINATOR",
+    userCircuitId: "circuit-1",
+    userCongregationId: null,
     isAuthenticated: true,
+    isCircuitUser: true,
+    isCircuitCoordinator: true,
+    isCircuitAssistant: false,
+    isCongregationCoordinator: false,
+    isCongregationAssistant: false,
   }),
 }));
 

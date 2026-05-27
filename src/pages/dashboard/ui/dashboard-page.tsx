@@ -1,11 +1,11 @@
 "use client";
 
-import { useAuth } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 
 import styles from "./dashboard-page.module.css";
 
 export function DashboardPage() {
-  const { user } = useAuth();
+  const { user } = useAuthPermissions();
 
   return (
     <div className={styles.page}>

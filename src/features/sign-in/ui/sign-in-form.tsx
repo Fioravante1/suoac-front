@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
+import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { TextField } from "@/shared/ui/text-field";
 
@@ -18,7 +18,7 @@ export function SignInForm() {
   const sessionExpired = searchParams?.get("sessionExpired") === "true";
   const returnUrl = searchParams?.get("returnUrl") ?? null;
 
-  const [serverError, setServerError] = useState<string | null>(null);
+  const { serverError, clearServerError, showServerError } = useServerError();
 
   const {
     register,
@@ -29,7 +29,7 @@ export function SignInForm() {
   });
 
   const onSubmit = async (data: SignInFormValues) => {
-    setServerError(null);
+    clearServerError();
 
     const formData = new FormData();
     formData.append("email", data.email);
@@ -42,7 +42,7 @@ export function SignInForm() {
     const result = await signInAction(undefined, formData);
 
     if (result?.error) {
-      setServerError(result.error);
+      showServerError(result.error);
     }
   };
 

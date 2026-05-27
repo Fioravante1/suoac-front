@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useServerError } from "@/shared/lib";
 
 import {
   EVENT_STATUSES,
@@ -51,7 +52,7 @@ function toFormValues(event: Event | null): UpdateEventFormValues {
 }
 
 export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole }: UpdateEventFormModalProps) {
-  const [serverError, setServerError] = useState<string | null>(null);
+  const { serverError, clearServerError, showServerError } = useServerError();
 
   const {
     register,
@@ -91,12 +92,12 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole 
   async function handleFormSubmit(values: UpdateEventFormValues) {
     if (!event) return;
 
-    setServerError(null);
+    clearServerError();
 
     const result = await onSubmit(event, values);
 
     if (!result.success) {
-      setServerError(result.error ?? "Não foi possível atualizar o evento.");
+      showServerError(result.error, "Não foi possível atualizar o evento.");
       return;
     }
 
@@ -105,7 +106,7 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole 
   }
 
   function handleClose() {
-    setServerError(null);
+    clearServerError();
     reset(toFormValues(event));
     onClose();
   }

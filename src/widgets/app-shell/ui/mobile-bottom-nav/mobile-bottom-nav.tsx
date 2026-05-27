@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarDays, Users, Wallet, LogOut } from "lucide-react";
 
-import { useAuth, filterNavItems, type NavItem } from "@/shared/auth";
+import { useAuthPermissions, filterNavItems, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
@@ -19,7 +19,7 @@ const mobileNavItems: NavItem[] = [
 
 export function MobileBottomNav() {
   const pathname = usePathname() ?? "";
-  const { user } = useAuth();
+  const { user } = useAuthPermissions();
 
   const visibleItems = user ? filterNavItems(mobileNavItems, user.role) : [];
 

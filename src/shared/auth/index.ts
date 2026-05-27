@@ -1,4 +1,5 @@
 export { AuthProvider, useAuth } from "./auth-context";
+export { useAuthPermissions } from "./use-auth-permissions";
 export type { SessionUser, UserRole } from "./session";
 export { SESSION_EXPIRED_MESSAGE } from "./constants";
 export { USER_ROLES } from "./session/user-role";

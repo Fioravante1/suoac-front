@@ -1,0 +1,1 @@
+export { removeEventPassengerAction } from "./api";

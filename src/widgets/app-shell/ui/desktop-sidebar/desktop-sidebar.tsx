@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarDays, Building2, Users, Wallet, Settings, LogOut } from "lucide-react";
 
-import { useAuth, filterNavItems, USER_ROLES, type NavItem } from "@/shared/auth";
+import { useAuthPermissions, filterNavItems, USER_ROLES, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
 
 export function DesktopSidebar() {
   const pathname = usePathname() ?? "";
-  const { user } = useAuth();
+  const { user } = useAuthPermissions();
 
   const visibleItems = user ? filterNavItems(navItems, user.role) : [];
 

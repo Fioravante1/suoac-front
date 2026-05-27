@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -19,9 +18,9 @@ import {
 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { USER_ROLES, isCircuitRole, useAuth } from "@/shared/auth";
+import { USER_ROLES, useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { useModal } from "@/shared/lib";
+import { formatCurrency, formatDate, formatWeekday, useModal, useServerError } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -54,28 +53,19 @@ import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/upd
 import { updateEventAction } from "@/features/update-event/api";
 import { UpdateEventDayFormModal, type UpdateEventDayFormValues } from "@/features/update-event-day";
 import { updateEventDayAction } from "@/features/update-event-day/api";
+import { EventEnrollmentsSection } from "@/widgets/event-enrollments";
 
 import styles from "./event-detail-page.module.css";
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(value));
-}
-
-function formatCurrency(value: string): string {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value));
-}
-
-function formatWeekday(value: string): string {
-  return new Intl.DateTimeFormat("pt-BR", { weekday: "long", timeZone: "UTC" }).format(new Date(value));
-}
 
 interface EventDetailPageProps {
   eventId: string;
 }
 
 export function EventDetailPage({ eventId }: EventDetailPageProps) {
+  const { serverError, clearServerError, showServerError } = useServerError();
+  const { userRole, userCongregationId, isCircuitUser, isCircuitCoordinator } = useAuthPermissions();
+
   const router = useRouter();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const updateModal = useModal<Event>();
   const publishModal = useModal<Event>();
@@ -83,8 +73,8 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   const updateDayModal = useModal<EventDayInEvent>();
   const cancelDayModal = useModal<EventDayInEvent>();
   const cancelEventModal = useModal<Event>();
-  const canManage = user ? isCircuitRole(user.role) : false;
-  const [operationError, setOperationError] = useState<string | null>(null);
+
+  const canManage = isCircuitUser;
 
   const { data: event, isError, isLoading, refetch } = useQuery(eventDetailOptions(eventId));
 
@@ -92,11 +82,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => publishEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       publishModal.close();
@@ -108,11 +98,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
       updateEventAction(ev.id, ev.status, values),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       updateModal.close();
@@ -123,11 +113,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => deleteEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       router.push(routes.events);
     },
@@ -145,11 +135,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (dayId: string) => cancelEventDayAction(dayId),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.eventDays.all });
@@ -161,11 +151,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => cancelEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       cancelEventModal.close();
@@ -190,28 +180,28 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   function handleConfirmPublish() {
     if (!publishModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     publishMutation.mutate(publishModal.item.id);
   }
 
   function handleConfirmDelete() {
     if (!deleteModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     deleteMutation.mutate(deleteModal.item.id);
   }
 
   function handleConfirmCancelDay() {
     if (!cancelDayModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     cancelDayMutation.mutate(cancelDayModal.item.id);
   }
 
   function handleConfirmCancelEvent() {
     if (!cancelEventModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
@@ -239,9 +229,9 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
       {event && (
         <div className={styles.content}>
-          {operationError && (
+          {serverError && (
             <div className={styles.errorBanner} role="alert">
-              {operationError}
+              {serverError}
             </div>
           )}
 
@@ -278,7 +268,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                     {publishMutation.isPending ? "Publicando..." : "Publicar evento"}
                   </Button>
                 )}
-                {canCancelEventStatus(event.status) && user?.role === USER_ROLES.CIRCUIT_COORDINATOR && (
+                {canCancelEventStatus(event.status) && isCircuitCoordinator && (
                   <Button variant="destructive" onClick={() => cancelEventModal.open(event)}>
                     <Ban size={18} aria-hidden="true" />
                     Cancelar evento
@@ -387,13 +377,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                             Editar horários
                           </Button>
                         )}
-                        {canCancelEventDay(event.status, day.status) &&
-                          user?.role === USER_ROLES.CIRCUIT_COORDINATOR && (
-                            <Button variant="ghost" onClick={() => cancelDayModal.open(day)}>
-                              <XCircle size={16} aria-hidden="true" />
-                              Cancelar dia
-                            </Button>
-                          )}
+                        {canCancelEventDay(event.status, day.status) && isCircuitCoordinator && (
+                          <Button variant="ghost" onClick={() => cancelDayModal.open(day)}>
+                            <XCircle size={16} aria-hidden="true" />
+                            Cancelar dia
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -403,6 +392,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
               <p className={styles.emptyDays}>Nenhum dia cadastrado para este evento.</p>
             )}
           </Card>
+
+          <EventEnrollmentsSection
+            event={event}
+            userRole={userRole ?? USER_ROLES.CONGREGATION_ASSISTANT}
+            userCongregationId={userCongregationId}
+          />
         </div>
       )}
 
@@ -411,7 +406,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
         onClose={updateModal.close}
         onSubmit={handleUpdateEvent}
         event={updateModal.item}
-        userRole={user?.role ?? null}
+        userRole={userRole}
       />
       <UpdateEventDayFormModal
         open={updateDayModal.isOpen}

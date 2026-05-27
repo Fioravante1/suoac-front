@@ -29,8 +29,8 @@ vi.mock("@/shared/auth", async () => {
 
   return {
     ...actual,
-    useAuth: () => ({
-      user: {
+    useAuthPermissions: () => {
+      const user = {
         id: "user-1",
         name: "Coordenador",
         email: "coord@test.com",
@@ -38,9 +38,21 @@ vi.mock("@/shared/auth", async () => {
         isActive: true,
         circuitId: "circuit-1",
         congregationId: null,
-      },
-      isAuthenticated: true,
-    }),
+      };
+
+      return {
+        user,
+        userRole: authMock.role,
+        userCircuitId: user.circuitId,
+        userCongregationId: user.congregationId,
+        isAuthenticated: true,
+        isCircuitUser: authMock.role === "CIRCUIT_COORDINATOR" || authMock.role === "CIRCUIT_ASSISTANT",
+        isCircuitCoordinator: authMock.role === "CIRCUIT_COORDINATOR",
+        isCircuitAssistant: authMock.role === "CIRCUIT_ASSISTANT",
+        isCongregationCoordinator: authMock.role === "CONGREGATION_COORDINATOR",
+        isCongregationAssistant: authMock.role === "CONGREGATION_ASSISTANT",
+      };
+    },
   };
 });
 

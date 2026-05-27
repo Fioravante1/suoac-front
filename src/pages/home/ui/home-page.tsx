@@ -1,12 +1,12 @@
 "use client";
 
-import { useAuth } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 
 import styles from "./home-page.module.css";
 
 export function HomePage() {
-  const { user } = useAuth();
+  const { user } = useAuthPermissions();
 
   return (
     <div className={styles.page}>

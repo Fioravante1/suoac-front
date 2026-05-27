@@ -21,4 +21,9 @@ export const queryKeys = {
       ["suoac", "passengers", "list", congregationId, page, search] as const,
     detail: (id: string) => ["suoac", "passengers", "detail", id] as const,
   },
+  eventPassengers: {
+    all: ["suoac", "event-passengers"] as const,
+    list: (eventId: string, page: number) => ["suoac", "event-passengers", "list", eventId, page] as const,
+    detail: (id: string) => ["suoac", "event-passengers", "detail", id] as const,
+  },
 };

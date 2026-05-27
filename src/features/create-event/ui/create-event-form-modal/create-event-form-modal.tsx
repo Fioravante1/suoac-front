@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { EVENT_TYPE_LABELS, EVENT_TYPES } from "@/entities/event";
+import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
 import { TextField } from "@/shared/ui/text-field";
@@ -20,7 +21,9 @@ interface CreateEventFormModalProps {
 }
 
 export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFormModalProps) {
-  const [serverError, setServerError] = useState<string | null>(null);
+  const { serverError, clearServerError, showServerError } = useServerError();
+
+  const [eventType, setEventType] = useState<CreateEventFormValues["type"]>(createEventDefaultValues.type);
 
   const {
     register,
@@ -33,7 +36,6 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
     defaultValues: createEventDefaultValues,
   });
 
-  const [eventType, setEventType] = useState<CreateEventFormValues["type"]>(createEventDefaultValues.type);
   const eventTypeField = register("type", {
     onChange: (event: ChangeEvent<HTMLSelectElement>) => {
       setEventType(event.target.value as CreateEventFormValues["type"]);
@@ -41,12 +43,12 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
   });
 
   async function handleFormSubmit(values: CreateEventFormValues) {
-    setServerError(null);
+    clearServerError();
 
     const result = await onSubmit(values);
 
     if (!result.success) {
-      setServerError(result.error ?? "Não foi possível criar o evento.");
+      showServerError(result.error, "Não foi possível criar o evento.");
       return;
     }
 
@@ -56,7 +58,7 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
   }
 
   function handleClose() {
-    setServerError(null);
+    clearServerError();
     reset(createEventDefaultValues);
     setEventType(createEventDefaultValues.type);
     onClose();

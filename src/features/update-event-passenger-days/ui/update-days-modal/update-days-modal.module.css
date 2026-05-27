@@ -1,0 +1,56 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.errorBanner {
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+}
+
+.description {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.daysGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-3);
+}
+
+.dayCheckbox {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-2) var(--suoac-space-3);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-sm);
+  font-size: var(--suoac-font-size-small);
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.dayCheckbox:hover {
+  border-color: var(--suoac-color-primary);
+  background: var(--suoac-color-primary-light);
+}
+
+.dayCheckbox input:checked + span {
+  color: var(--suoac-color-primary);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+  padding: var(--suoac-space-4);
+}

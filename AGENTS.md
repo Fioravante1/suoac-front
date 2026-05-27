@@ -247,6 +247,14 @@ features/register-payment/api/register-payment.mutation.ts
 shared/api/query-client.ts
 ```
 
+### Paginacao
+
+- Listas paginadas devem usar `usePagination` de `@/shared/lib` em vez de `useState(1)` local para controlar pagina. Use `setPage` como handler de `Pagination` e `reset()` quando filtros, busca ou contexto da lista precisarem voltar para a primeira pagina.
+
+### Formatadores reutilizaveis
+
+- Formatadores genericos e reutilizaveis devem ficar em bibliotecas focadas dentro de `shared/lib`, como `shared/lib/date` e `shared/lib/currency`, e ser consumidos via `@/shared/lib`. Nao duplique `Intl.DateTimeFormat` ou `Intl.NumberFormat` em pages, widgets, features ou entities quando o formato for compartilhado.
+
 ### HTTP Client
 
 - O cliente HTTP fica em `src/shared/api/http-client/`.
@@ -295,6 +303,7 @@ HttpMethod.POST; // desnecessario
 ### Formularios
 
 - Use React Hook Form + Zod + `zodResolver`.
+- Qualquer UI que colete e submeta dados do usuario deve ser modelada como formulario com React Hook Form, mesmo quando for simples (ex.: selecao de checkboxes em modal). Evite `useState` para armazenar valores de campos submetidos; reserve `useState` para estado visual ou de controle que nao faz parte do payload.
 - Formularios com React Hook Form devem ser Client Components e declarar `"use client"`.
 - Schema especifico de uma feature fica em `features/{feature}/model`.
 - Schema de uma page simples fica em `pages/{page}/model`.
@@ -302,6 +311,7 @@ HttpMethod.POST; // desnecessario
 - Nao crie pasta global `schemas`.
 - Nao coloque regras reutilizaveis diretamente no componente.
 - Derive tipos com `z.infer` sempre que possivel.
+- Erros de servidor em formularios, modais e fluxos de submissao devem usar `useServerError` de `@/shared/lib` em vez de `useState<string | null>(null)` local para `serverError`. Use `clearServerError()` antes de reenviar ou fechar e `showServerError(error, fallbackMessage?)` para exibir a falha com fallback humano.
 
 Exemplo de organizacao:
 

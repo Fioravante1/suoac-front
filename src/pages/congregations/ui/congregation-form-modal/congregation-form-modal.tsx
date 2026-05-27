@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 
 import type { Congregation } from "@/entities/congregation";
@@ -23,7 +24,7 @@ interface CongregationFormModalProps {
 
 export function CongregationFormModal({ open, onClose, onSubmit, congregation }: CongregationFormModalProps) {
   const isEditing = Boolean(congregation);
-  const [serverError, setServerError] = useState<string | null>(null);
+  const { serverError, clearServerError, showServerError } = useServerError();
 
   const {
     register,
@@ -38,12 +39,12 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
   });
 
   async function handleFormSubmit(values: CongregationFormValues) {
-    setServerError(null);
+    clearServerError();
 
     const result = await onSubmit(values);
 
     if (!result.success) {
-      setServerError(result.error ?? "Ocorreu um erro inesperado.");
+      showServerError(result.error);
       return;
     }
 
@@ -52,7 +53,7 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
   }
 
   function handleClose() {
-    setServerError(null);
+    clearServerError();
     reset();
     onClose();
   }
@@ -68,6 +69,7 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
             Cancelar
           </Button>
           <Button type="submit" form="congregation-form" disabled={isSubmitting}>
+            {isSubmitting && <Spinner size="small" />}
             {isSubmitting ? "Salvando…" : "Salvar"}
           </Button>
         </>

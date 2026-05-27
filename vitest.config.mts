@@ -9,6 +9,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: false,
+    clearMocks: true,
     setupFiles: ["./tests/setup/vitest.setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     exclude: ["node_modules/**", ".next/**"],

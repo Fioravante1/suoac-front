@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Ban, CalendarDays, ChevronRight, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { USER_ROLES, isCircuitRole, useAuth } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { useModal, usePagination } from "@/shared/lib";
+import { formatCurrency, formatDate, useModal, usePagination, useServerError } from "@/shared/lib";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -38,14 +37,6 @@ import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/upd
 import { updateEventAction } from "@/features/update-event/api";
 
 import styles from "./events-page.module.css";
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(value));
-}
-
-function formatCurrency(value: string): string {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value));
-}
 
 interface EventCardProps {
   event: Event;
@@ -146,21 +137,23 @@ function EventCard({
 }
 
 export function EventsPage() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const circuitId = user?.circuitId ?? "";
+  const { userCircuitId, userRole, isCircuitUser, isCircuitCoordinator } = useAuthPermissions();
   const { page, setPage } = usePagination();
+
+  const queryClient = useQueryClient();
   const createModal = useModal();
   const updateModal = useModal<Event>();
   const publishModal = useModal<Event>();
   const deleteModal = useModal<Event>();
   const cancelEventModal = useModal<Event>();
-  const canManageEvents = user ? isCircuitRole(user.role) : false;
-  const isCoordinator = user?.role === USER_ROLES.CIRCUIT_COORDINATOR;
+
+  const { serverError, clearServerError, showServerError } = useServerError();
+
+  const circuitId = userCircuitId;
+  const canManageEvents = isCircuitUser;
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
-  const [operationError, setOperationError] = useState<string | null>(null);
 
   const createMutation = useMutation({
     mutationFn: (values: CreateEventFormValues) => createEventAction(circuitId, values),
@@ -176,11 +169,11 @@ export function EventsPage() {
     mutationFn: (eventId: string) => publishEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       publishModal.close();
     },
@@ -191,11 +184,11 @@ export function EventsPage() {
       updateEventAction(event.id, event.status, values),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       updateModal.close();
     },
@@ -205,11 +198,11 @@ export function EventsPage() {
     mutationFn: (eventId: string) => deleteEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       deleteModal.close();
     },
@@ -219,11 +212,11 @@ export function EventsPage() {
     mutationFn: (eventId: string) => cancelEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        setOperationError(result.error);
+        showServerError(result.error);
         return;
       }
 
-      setOperationError(null);
+      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       cancelEventModal.close();
     },
@@ -240,21 +233,21 @@ export function EventsPage() {
   function handleConfirmPublish() {
     if (!publishModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     publishMutation.mutate(publishModal.item.id);
   }
 
   function handleConfirmDelete() {
     if (!deleteModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     deleteMutation.mutate(deleteModal.item.id);
   }
 
   function handleConfirmCancelEvent() {
     if (!cancelEventModal.item) return;
 
-    setOperationError(null);
+    clearServerError();
     cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
@@ -274,9 +267,9 @@ export function EventsPage() {
       />
 
       <div className={styles.content}>
-        {operationError && (
+        {serverError && (
           <div className={styles.errorBanner} role="alert">
-            {operationError}
+            {serverError}
           </div>
         )}
 
@@ -319,7 +312,7 @@ export function EventsPage() {
                   key={event.id}
                   event={event}
                   canManage={canManageEvents}
-                  isCoordinator={isCoordinator}
+                  isCoordinator={isCircuitCoordinator}
                   publishing={publishMutation.isPending && publishMutation.variables === event.id}
                   cancelling={cancelEventMutation.isPending && cancelEventMutation.variables === event.id}
                   onEdit={updateModal.open}
@@ -340,7 +333,7 @@ export function EventsPage() {
         onClose={updateModal.close}
         onSubmit={handleUpdateEvent}
         event={updateModal.item}
-        userRole={user?.role ?? null}
+        userRole={userRole}
       />
       <ConfirmDialog
         open={publishModal.isOpen}

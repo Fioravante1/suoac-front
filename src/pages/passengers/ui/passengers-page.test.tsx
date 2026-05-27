@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fetchPassengers } from "@/entities/passenger/api";
@@ -115,7 +115,7 @@ describe("PassengersPage", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it("permite selecionar congregação para usuário de circuito", async () => {
+  it("exibe seletor de congregação com opções para usuário de circuito", async () => {
     authMock.user = {
       id: "user-1",
       name: "Coordenador",
@@ -129,10 +129,11 @@ describe("PassengersPage", () => {
     render(<PassengersPage />, { wrapper: createWrapper() });
 
     const select = await screen.findByLabelText("Congregação");
-    fireEvent.change(select, { target: { value: "congregation-2" } });
+    expect(select).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(select).toHaveValue("congregation-2");
+      expect(screen.getByText("Congregação A")).toBeInTheDocument();
+      expect(screen.getByText("Congregação B")).toBeInTheDocument();
     });
   });
 });

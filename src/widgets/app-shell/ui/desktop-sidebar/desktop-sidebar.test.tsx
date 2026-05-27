@@ -5,13 +5,13 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/dashboard"),
 }));
 
-const mockUseAuth = vi.fn();
+const mockUseAuthPermissions = vi.fn();
 
 vi.mock("@/shared/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/shared/auth")>();
   return {
     ...actual,
-    useAuth: (...args: unknown[]) => mockUseAuth(...args),
+    useAuthPermissions: (...args: unknown[]) => mockUseAuthPermissions(...args),
   };
 });
 
@@ -23,7 +23,7 @@ import { DesktopSidebar } from "./desktop-sidebar";
 
 describe("DesktopSidebar", () => {
   it("renderiza todos os 6 itens para CIRCUIT_COORDINATOR", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -39,7 +39,7 @@ describe("DesktopSidebar", () => {
   });
 
   it("oculta Congregacoes e Configuracoes para CONGREGATION_COORDINATOR", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -55,7 +55,7 @@ describe("DesktopSidebar", () => {
   });
 
   it("renderiza o logo SUOAC", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -66,7 +66,7 @@ describe("DesktopSidebar", () => {
   });
 
   it("renderiza o nome do usuario", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -77,7 +77,7 @@ describe("DesktopSidebar", () => {
   });
 
   it("renderiza o botao de logout", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
     });
@@ -88,7 +88,7 @@ describe("DesktopSidebar", () => {
   });
 
   it("nao renderiza itens de navegacao quando nao ha usuario", () => {
-    mockUseAuth.mockReturnValue({
+    mockUseAuthPermissions.mockReturnValue({
       user: null,
       isAuthenticated: false,
     });

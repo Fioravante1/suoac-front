@@ -2,7 +2,7 @@
 
 import { Building2 } from "lucide-react";
 
-import { useAuth } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 import { useQuery, useMutation, useQueryClient, queryKeys } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
@@ -26,18 +26,18 @@ import { CongregationFormModal } from "./congregation-form-modal";
 import styles from "./congregations-page.module.css";
 
 export function CongregationsPage() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const circuitId = user?.circuitId ?? "";
-
+  const { userCircuitId } = useAuthPermissions();
   const { page, setPage } = usePagination();
+
+  const queryClient = useQueryClient();
+
   const formModal = useModal<Congregation>();
   const deleteModal = useModal<Congregation>();
 
-  const { data, isLoading } = useQuery(congregationListOptions(circuitId, page));
+  const { data, isLoading } = useQuery(congregationListOptions(userCircuitId, page));
 
   const createMutation = useMutation({
-    mutationFn: (dto: CongregationFormValues) => createCongregationAction(circuitId, dto),
+    mutationFn: (dto: CongregationFormValues) => createCongregationAction(userCircuitId, dto),
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });
