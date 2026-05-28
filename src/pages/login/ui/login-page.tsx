@@ -12,7 +12,7 @@ export function LoginPage() {
       <Card className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logoContainer}>
-            <Image src="/logo.png" alt="Logo SUOAC" width={48} height={48} className={styles.logoImage} />
+            <Image src="/logo.png" alt="Logo SUOAC" width={48} height={48} className={styles.logoImage} unoptimized />
             <span className={styles.logoText}>SUOAC</span>
           </div>
           <p className={styles.tagline}>Coordenação inteligente para o arranjo de ônibus.</p>
