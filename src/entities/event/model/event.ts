@@ -134,6 +134,10 @@ export function canCancelEventDay(eventStatus: EventStatus, dayStatus: EventDayS
   return eventStatus === EVENT_STATUSES.OPEN && dayStatus === EVENT_DAY_STATUSES.ACTIVE;
 }
 
+export function canEnrollPassengers(status: EventStatus): boolean {
+  return status === EVENT_STATUSES.OPEN;
+}
+
 export function canCancelEventStatus(status: EventStatus): boolean {
   return status === EVENT_STATUSES.OPEN;
 }

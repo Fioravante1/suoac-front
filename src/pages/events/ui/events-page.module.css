@@ -39,6 +39,12 @@
   gap: var(--suoac-space-3);
 }
 
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+}
+
 .eventType {
   font-size: var(--suoac-font-size-label);
   font-weight: var(--suoac-font-weight-semibold);

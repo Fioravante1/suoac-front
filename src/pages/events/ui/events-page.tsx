@@ -1,12 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, CalendarDays, ChevronRight, Clock, MapPin, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
+import {
+  Ban,
+  CalendarDays,
+  ChevronRight,
+  Clock,
+  MapPin,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Send,
+  Trash2,
+  UserPlus,
+} from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { useAuthPermissions } from "@/shared/auth";
+import { useAuthPermissions, isCircuitRole } from "@/shared/auth";
 import { routes } from "@/shared/config";
 import { formatCurrency, formatDate, useModal, usePagination, useServerError } from "@/shared/lib";
+import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -24,10 +37,11 @@ import {
   EVENT_TYPE_LABELS,
   canCancelEventStatus,
   canDeleteEventStatus,
+  canEnrollPassengers,
   canUpdateEventStatus,
   type Event,
 } from "@/entities/event";
-import { eventListOptions } from "@/entities/event/api";
+import { eventDetailOptions, eventListOptions } from "@/entities/event/api";
 import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
 import { createEventAction } from "@/features/create-event/api";
 import { cancelEventAction } from "@/features/cancel-event";
@@ -35,6 +49,7 @@ import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
 import { updateEventAction } from "@/features/update-event/api";
+import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
 
 import styles from "./events-page.module.css";
 
@@ -43,11 +58,45 @@ interface EventCardProps {
   canManage: boolean;
   isCoordinator: boolean;
   publishing: boolean;
-  cancelling: boolean;
   onEdit: (event: Event) => void;
   onDelete: (event: Event) => void;
   onPublish: (event: Event) => void;
   onCancel: (event: Event) => void;
+  onEnroll: (event: Event) => void;
+}
+
+function buildEventMenuItems(
+  event: Event,
+  isCoordinator: boolean,
+  onEdit: (event: Event) => void,
+  onDelete: (event: Event) => void,
+  onCancel: (event: Event) => void,
+): ActionMenuItem[] {
+  const items: (ActionMenuItem | false)[] = [
+    canUpdateEventStatus(event.status) && {
+      id: "edit",
+      label: "Editar",
+      icon: <Pencil size={16} />,
+      onSelect: () => onEdit(event),
+    },
+    canDeleteEventStatus(event.status) && {
+      id: "delete",
+      label: "Excluir",
+      icon: <Trash2 size={16} />,
+      variant: "danger" as const,
+      onSelect: () => onDelete(event),
+    },
+    canCancelEventStatus(event.status) &&
+      isCoordinator && {
+        id: "cancel",
+        label: "Cancelar evento",
+        icon: <Ban size={16} />,
+        variant: "danger" as const,
+        onSelect: () => onCancel(event),
+      },
+  ];
+
+  return items.filter((item): item is ActionMenuItem => Boolean(item));
 }
 
 function EventCard({
@@ -55,17 +104,22 @@ function EventCard({
   canManage,
   isCoordinator,
   publishing,
-  cancelling,
   onEdit,
   onDelete,
   onPublish,
   onCancel,
+  onEnroll,
 }: EventCardProps) {
+  const menuItems = canManage ? buildEventMenuItems(event, isCoordinator, onEdit, onDelete, onCancel) : [];
+
   return (
     <Card className={styles.eventCard}>
       <div className={styles.cardHeader}>
         <span className={styles.eventType}>{EVENT_TYPE_LABELS[event.type]}</span>
-        <Badge variant={EVENT_STATUS_BADGE_VARIANTS[event.status]}>{EVENT_STATUS_LABELS[event.status]}</Badge>
+        <div className={styles.cardHeaderRight}>
+          <Badge variant={EVENT_STATUS_BADGE_VARIANTS[event.status]}>{EVENT_STATUS_LABELS[event.status]}</Badge>
+          {menuItems.length > 0 && <ActionMenu menuId={`event-actions-${event.id}`} items={menuItems} />}
+        </div>
       </div>
 
       <h2 className={styles.eventTitle}>
@@ -103,41 +157,29 @@ function EventCard({
             <ChevronRight size={16} aria-hidden="true" />
           </Link>
         </div>
-        {canManage && (
+        {(canManage && event.status === EVENT_STATUSES.DRAFT) || canEnrollPassengers(event.status) ? (
           <div className={styles.cardActions}>
-            {canUpdateEventStatus(event.status) && (
-              <Button variant="ghost" size="small" onClick={() => onEdit(event)}>
-                <Pencil size={16} aria-hidden="true" />
-                Editar
-              </Button>
-            )}
-            {canDeleteEventStatus(event.status) && (
-              <Button variant="ghost" size="small" onClick={() => onDelete(event)}>
-                <Trash2 size={16} aria-hidden="true" />
-                Excluir
-              </Button>
-            )}
-            {canCancelEventStatus(event.status) && isCoordinator && (
-              <Button variant="destructive" size="small" onClick={() => onCancel(event)} disabled={cancelling}>
-                <Ban size={16} aria-hidden="true" />
-                Cancelar evento
-              </Button>
-            )}
-            {event.status === EVENT_STATUSES.DRAFT && (
+            {canManage && event.status === EVENT_STATUSES.DRAFT && (
               <Button variant="secondary" size="small" onClick={() => onPublish(event)} disabled={publishing}>
                 <Send size={16} aria-hidden="true" />
                 {publishing ? "Publicando…" : "Publicar evento"}
               </Button>
             )}
+            {canEnrollPassengers(event.status) && (
+              <Button size="small" onClick={() => onEnroll(event)}>
+                <UserPlus size={16} aria-hidden="true" />
+                Inscrever passageiro
+              </Button>
+            )}
           </div>
-        )}
+        ) : null}
       </div>
     </Card>
   );
 }
 
 export function EventsPage() {
-  const { userCircuitId, userRole, isCircuitUser, isCircuitCoordinator } = useAuthPermissions();
+  const { userCircuitId, userRole, userCongregationId, isCircuitUser, isCircuitCoordinator } = useAuthPermissions();
   const { page, setPage } = usePagination();
 
   const queryClient = useQueryClient();
@@ -146,11 +188,35 @@ export function EventsPage() {
   const publishModal = useModal<Event>();
   const deleteModal = useModal<Event>();
   const cancelEventModal = useModal<Event>();
+  const enrollModal = useModal<Event>();
 
   const { serverError, clearServerError, showServerError } = useServerError();
 
   const circuitId = userCircuitId;
   const canManageEvents = isCircuitUser;
+
+  const enrollEventId = enrollModal.item?.id ?? "";
+  const { data: enrollEventDetail } = useQuery({
+    ...eventDetailOptions(enrollEventId),
+    enabled: Boolean(enrollEventId),
+  });
+
+  const enrollMutation = useMutation({
+    mutationFn: (payload: EnrollPassengerPayload) => enrollPassengerAction(enrollEventId, payload),
+    onSuccess: (result) => {
+      if (!result.success) return;
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(enrollEventId) });
+    },
+  });
+
+  async function handleEnroll(payload: EnrollPassengerPayload) {
+    return enrollMutation.mutateAsync(payload);
+  }
+
+  const enrollCongregationId = userCongregationId ?? "";
+  const canShowEnrollModal = enrollEventDetail && (userCongregationId || (userRole && isCircuitRole(userRole)));
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
@@ -314,11 +380,11 @@ export function EventsPage() {
                   canManage={canManageEvents}
                   isCoordinator={isCircuitCoordinator}
                   publishing={publishMutation.isPending && publishMutation.variables === event.id}
-                  cancelling={cancelEventMutation.isPending && cancelEventMutation.variables === event.id}
                   onEdit={updateModal.open}
                   onDelete={deleteModal.open}
                   onPublish={publishModal.open}
                   onCancel={cancelEventModal.open}
+                  onEnroll={enrollModal.open}
                 />
               ))}
             </div>
@@ -365,6 +431,15 @@ export function EventsPage() {
         loading={cancelEventMutation.isPending}
         variant="destructive"
       />
+      {canShowEnrollModal && (
+        <EnrollPassengerModal
+          open={enrollModal.isOpen}
+          onClose={enrollModal.close}
+          onSubmit={handleEnroll}
+          event={enrollEventDetail}
+          congregationId={enrollCongregationId}
+        />
+      )}
     </div>
   );
 }

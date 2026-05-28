@@ -5,6 +5,7 @@ import {
   EVENT_STATUSES,
   canCancelEventDay,
   canCancelEventStatus,
+  canEnrollPassengers,
   canUpdateEventDayTimes,
   isLastActiveDayInEvent,
   type EventDayInEvent,
@@ -67,6 +68,28 @@ describe("canCancelEventDay", () => {
 
   it("retorna false para evento CANCELLED", () => {
     expect(canCancelEventDay(EVENT_STATUSES.CANCELLED, EVENT_DAY_STATUSES.ACTIVE)).toBe(false);
+  });
+});
+
+describe("canEnrollPassengers", () => {
+  it("retorna false para DRAFT", () => {
+    expect(canEnrollPassengers(EVENT_STATUSES.DRAFT)).toBe(false);
+  });
+
+  it("retorna true para OPEN", () => {
+    expect(canEnrollPassengers(EVENT_STATUSES.OPEN)).toBe(true);
+  });
+
+  it("retorna false para CLOSED", () => {
+    expect(canEnrollPassengers(EVENT_STATUSES.CLOSED)).toBe(false);
+  });
+
+  it("retorna false para FINISHED", () => {
+    expect(canEnrollPassengers(EVENT_STATUSES.FINISHED)).toBe(false);
+  });
+
+  it("retorna false para CANCELLED", () => {
+    expect(canEnrollPassengers(EVENT_STATUSES.CANCELLED)).toBe(false);
   });
 });
 

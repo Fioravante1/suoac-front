@@ -15,6 +15,7 @@ export {
   canCancelEventDay,
   canCancelEventStatus,
   canDeleteEventStatus,
+  canEnrollPassengers,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
   isLastActiveDayInEvent,

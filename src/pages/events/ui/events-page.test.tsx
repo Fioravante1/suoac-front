@@ -11,7 +11,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
-import { fetchEvents } from "@/entities/event/api/event.queries";
+import { fetchEvents, fetchEvent } from "@/entities/event/api/event.queries";
 import { createEventAction } from "@/features/create-event/api";
 import { cancelEventAction } from "@/features/cancel-event";
 import { deleteEventAction } from "@/features/delete-event";
@@ -58,6 +58,13 @@ vi.mock("@/shared/auth", async () => {
 
 vi.mock("@/entities/event/api/event.queries", () => ({
   fetchEvents: vi.fn(),
+  fetchEvent: vi.fn(),
+}));
+
+vi.mock("@/features/enroll-passenger", () => ({
+  EnrollPassengerModal: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="enroll-modal">Modal de inscrição</div> : null,
+  enrollPassengerAction: vi.fn(),
 }));
 
 vi.mock("@/features/create-event/api", () => ({
@@ -95,6 +102,7 @@ function createWrapper() {
 }
 
 const fetchEventsMock = vi.mocked(fetchEvents);
+const fetchEventMock = vi.mocked(fetchEvent);
 const createEventActionMock = vi.mocked(createEventAction);
 const publishEventActionMock = vi.mocked(publishEventAction);
 const updateEventActionMock = vi.mocked(updateEventAction);
@@ -120,6 +128,10 @@ const draftEvent = {
   updatedAt: "2026-05-21T00:00:00.000Z",
 };
 
+function openActionMenu() {
+  fireEvent.click(screen.getByRole("button", { name: /ações/i }));
+}
+
 describe("EventsPage", () => {
   beforeEach(() => {
     authMock.role = "CIRCUIT_COORDINATOR";
@@ -127,6 +139,7 @@ describe("EventsPage", () => {
       data: [],
       meta: { total: 0, page: 1, limit: 10, totalPages: 1 },
     });
+    fetchEventMock.mockResolvedValue(draftEvent);
     createEventActionMock.mockResolvedValue({ success: true, data: draftEvent });
     publishEventActionMock.mockResolvedValue({
       success: true,
@@ -193,11 +206,10 @@ describe("EventsPage", () => {
     expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /novo evento/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /publicar evento/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /editar/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /excluir/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /ações/i })).not.toBeInTheDocument();
   });
 
-  it("abre modal de edição e envia alterações", async () => {
+  it("abre modal de edição via ActionMenu e envia alterações", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -205,7 +217,10 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    fireEvent.click(await screen.findByRole("button", { name: /editar/i }));
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: /editar/i }));
+
     fireEvent.change(screen.getByLabelText("Título"), { target: { value: "Novo título" } });
     fireEvent.click(screen.getByRole("button", { name: "Salvar alterações" }));
 
@@ -218,7 +233,7 @@ describe("EventsPage", () => {
     });
   });
 
-  it("confirma exclusão de evento em rascunho", async () => {
+  it("confirma exclusão de evento via ActionMenu", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -226,7 +241,10 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    fireEvent.click(await screen.findByRole("button", { name: /excluir/i }));
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: /excluir/i }));
+
     fireEvent.click(screen.getAllByRole("button", { name: "Excluir" }).at(-1)!);
 
     await waitFor(() => {
@@ -234,19 +252,7 @@ describe("EventsPage", () => {
     });
   });
 
-  it("oculta botão cancelar evento para coordenador em DRAFT", async () => {
-    fetchEventsMock.mockResolvedValue({
-      data: [draftEvent],
-      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
-    });
-
-    render(<EventsPage />, { wrapper: createWrapper() });
-
-    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
-  });
-
-  it("exibe botão cancelar evento para coordenador em OPEN", async () => {
+  it("exibe ActionMenu com opção cancelar evento para coordenador em OPEN", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [{ ...draftEvent, status: EVENT_STATUSES.OPEN }],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -254,11 +260,12 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    expect(await screen.findByRole("button", { name: /cancelar evento/i })).toBeInTheDocument();
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    expect(screen.getByRole("menuitem", { name: /cancelar evento/i })).toBeInTheDocument();
   });
 
-  it("oculta botão cancelar evento para assistente de circuito", async () => {
-    authMock.role = "CIRCUIT_ASSISTANT";
+  it("oculta cancelar evento no ActionMenu para coordenador em DRAFT", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -266,11 +273,26 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    expect(screen.queryByRole("menuitem", { name: /cancelar evento/i })).not.toBeInTheDocument();
   });
 
-  it("oculta botão cancelar evento para congregação", async () => {
+  it("oculta cancelar evento para assistente de circuito", async () => {
+    authMock.role = "CIRCUIT_ASSISTANT";
+    fetchEventsMock.mockResolvedValue({
+      data: [{ ...draftEvent, status: EVENT_STATUSES.OPEN }],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    expect(screen.queryByRole("menuitem", { name: /cancelar evento/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta ActionMenu para congregação", async () => {
     authMock.role = "CONGREGATION_COORDINATOR";
     fetchEventsMock.mockResolvedValue({
       data: [draftEvent],
@@ -280,10 +302,10 @@ describe("EventsPage", () => {
     render(<EventsPage />, { wrapper: createWrapper() });
 
     expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /ações/i })).not.toBeInTheDocument();
   });
 
-  it("oculta botão cancelar evento para CLOSED", async () => {
+  it("oculta cancelar evento no ActionMenu para CLOSED", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [{ ...draftEvent, status: EVENT_STATUSES.CLOSED }],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -291,11 +313,12 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    expect(screen.queryByRole("menuitem", { name: /cancelar evento/i })).not.toBeInTheDocument();
   });
 
-  it("oculta botão cancelar evento para CANCELLED", async () => {
+  it("oculta cancelar evento no ActionMenu para CANCELLED", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [{ ...draftEvent, status: EVENT_STATUSES.CANCELLED }],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -304,10 +327,10 @@ describe("EventsPage", () => {
     render(<EventsPage />, { wrapper: createWrapper() });
 
     expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /cancelar evento/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /ações/i })).not.toBeInTheDocument();
   });
 
-  it("confirma cancelamento de evento e chama cancelEventAction", async () => {
+  it("exibe botão 'Inscrever passageiro' para evento OPEN", async () => {
     fetchEventsMock.mockResolvedValue({
       data: [{ ...draftEvent, status: EVENT_STATUSES.OPEN }],
       meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
@@ -315,7 +338,83 @@ describe("EventsPage", () => {
 
     render(<EventsPage />, { wrapper: createWrapper() });
 
-    fireEvent.click(await screen.findByRole("button", { name: /cancelar evento/i }));
+    expect(await screen.findByRole("button", { name: /inscrever passageiro/i })).toBeInTheDocument();
+  });
+
+  it("abre modal de inscrição ao clicar em 'Inscrever passageiro'", async () => {
+    const openEvent = { ...draftEvent, status: EVENT_STATUSES.OPEN };
+    fetchEventsMock.mockResolvedValue({
+      data: [openEvent],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+    fetchEventMock.mockResolvedValue(openEvent);
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    fireEvent.click(await screen.findByRole("button", { name: /inscrever passageiro/i }));
+
+    expect(await screen.findByTestId("enroll-modal")).toBeInTheDocument();
+  });
+
+  it("oculta botão 'Inscrever passageiro' para evento DRAFT", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [draftEvent],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /inscrever passageiro/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão 'Inscrever passageiro' para evento CLOSED", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [{ ...draftEvent, status: EVENT_STATUSES.CLOSED }],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /inscrever passageiro/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão 'Inscrever passageiro' para evento FINISHED", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [{ ...draftEvent, status: EVENT_STATUSES.FINISHED }],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /inscrever passageiro/i })).not.toBeInTheDocument();
+  });
+
+  it("oculta botão 'Inscrever passageiro' para evento CANCELLED", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [{ ...draftEvent, status: EVENT_STATUSES.CANCELLED }],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Assembleia SP 2026")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /inscrever passageiro/i })).not.toBeInTheDocument();
+  });
+
+  it("confirma cancelamento de evento via ActionMenu e chama cancelEventAction", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [{ ...draftEvent, status: EVENT_STATUSES.OPEN }],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    await screen.findByText("Assembleia SP 2026");
+    openActionMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: /cancelar evento/i }));
 
     expect(screen.getByRole("dialog", { name: "Cancelar Evento" })).toBeInTheDocument();
 

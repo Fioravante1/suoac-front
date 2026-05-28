@@ -178,7 +178,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   ];
 
   return (
-    <Card>
+    <Card id="inscricoes">
       <div className={styles.header}>
         <h2 className={styles.title}>Inscrições</h2>
         {canManage && (
