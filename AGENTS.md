@@ -444,6 +444,40 @@ Exemplos corretos:
 <Button disabled={isPending}>{isPending ? <Spinner size="small" /> : "Salvar"}</Button>;
 ```
 
+### Tabelas de dados
+
+- Tabelas que renderizam listas de dados devem usar `DataTable` de `shared/ui/data-table`, nunca
+  montar `TableHeader`/`TableRow`/`TableHead`/`TableCell` manualmente.
+- Defina as colunas com `ColumnDef<T>[]` de forma declarativa. Cada coluna tem `id`, `header`,
+  `cell(item)` e, opcionalmente, `visible`, `headerClassName` e `cellClassName`.
+- Use `visible` para colunas condicionais em vez de `{condition && <TableHead>}`.
+- Os primitivos de `shared/ui/table` (`Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`,
+  `TableCell`, `TableWrapper`) existem como base interna. Codigo de produto deve consumir
+  `DataTable`, nao os primitivos diretamente.
+
+```tsx
+// Correto — declarativo via DataTable
+import { DataTable, type ColumnDef } from "@/shared/ui/data-table";
+
+const columns: ColumnDef<Item>[] = [
+  { id: "name", header: "Nome", cell: (item) => item.name },
+  { id: "status", header: "Status", cell: (item) => <Badge>{item.status}</Badge> },
+  { id: "extras", header: "Extras", cell: (item) => item.extras, visible: showExtras },
+];
+
+<DataTable columns={columns} data={items} getRowKey={(item) => item.id} />;
+```
+
+```tsx
+// Errado — montar primitivos manualmente em codigo de produto
+<TableHeader>
+  <TableRow>
+    <TableHead>Nome</TableHead>
+    <TableHead>Status</TableHead>
+  </TableRow>
+</TableHeader>
+```
+
 ### Checklist visual
 
 Antes de concluir qualquer interface nova, verifique:

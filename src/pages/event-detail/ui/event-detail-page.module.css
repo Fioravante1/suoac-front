@@ -85,40 +85,9 @@
   margin-bottom: var(--suoac-space-4);
 }
 
-.infoGrid {
+.infoRow {
   display: grid;
-  gap: var(--suoac-space-4);
-}
-
-.infoItem {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--suoac-space-3);
-}
-
-.infoIcon {
-  flex: 0 0 auto;
-  color: var(--suoac-color-primary);
-  margin-top: 2px;
-}
-
-.infoContent {
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-1);
-}
-
-.infoLabel {
-  font-size: var(--suoac-font-size-label);
-  font-weight: var(--suoac-font-weight-semibold);
-  color: var(--suoac-color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.infoValue {
-  font-size: var(--suoac-font-size-body);
-  color: var(--suoac-color-text-primary);
+  gap: var(--suoac-space-5);
 }
 
 .observations {
@@ -126,26 +95,9 @@
 }
 
 .daysList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-3);
-}
-
-.dayCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-2);
-  padding: var(--suoac-space-4);
-  border: 1px solid var(--suoac-color-border);
-  border-radius: var(--suoac-radius-md);
-  background: var(--suoac-color-surface);
-}
-
-.dayHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--suoac-space-2);
+  display: grid;
+  gap: var(--suoac-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
 
 .dayLabel {
@@ -154,31 +106,10 @@
   color: var(--suoac-color-text-primary);
 }
 
-.dayMeta {
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-2);
-}
-
-.dayMetaItem {
+.dayHeaderRight {
   display: flex;
   align-items: center;
   gap: var(--suoac-space-2);
-  color: var(--suoac-color-text-secondary);
-  font-size: var(--suoac-font-size-small);
-}
-
-.dayMetaItem svg {
-  flex: 0 0 auto;
-  color: var(--suoac-color-primary);
-}
-
-.dayActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--suoac-space-2);
-  padding-top: var(--suoac-space-2);
-  border-top: 1px solid var(--suoac-color-border);
 }
 
 .emptyDays {
@@ -188,19 +119,30 @@
   font-size: var(--suoac-font-size-small);
 }
 
+.dayFooter {
+  display: flex;
+}
+
+.dayActionsDesktop {
+  display: none;
+}
+
 @media (min-width: 48rem) {
+  .infoRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .headerTop {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
   }
 
-  .infoGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .dayFooter {
+    display: none;
   }
 
-  .dayMeta {
-    flex-direction: row;
-    gap: var(--suoac-space-5);
+  .dayActionsDesktop {
+    display: flex;
   }
 }

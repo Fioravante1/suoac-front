@@ -34,10 +34,13 @@
   gap: var(--suoac-space-1);
 }
 
-.actions {
-  display: flex;
-  gap: var(--suoac-space-1);
-  align-items: center;
+.actionsHead {
+  text-align: right;
+}
+
+.actionsCell {
+  min-width: 4rem;
+  text-align: right;
 }
 
 /* Mobile cards — visible on small screens */
@@ -93,6 +96,7 @@
 /* Desktop table — hidden on small screens */
 .desktopTable {
   display: none;
+  overflow: visible;
 }
 
 @media (min-width: 48rem) {

@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES, type Event } from "@/entities/event";
+import { PAYMENT_STATUSES, type EventPassenger } from "@/entities/event-passenger";
 import { USER_ROLES } from "@/shared/auth";
 
 import { EventEnrollmentsSection } from "./event-enrollments-section";
@@ -60,6 +61,41 @@ vi.mock("@/features/remove-event-passenger", () => ({
   removeEventPassengerAction: vi.fn(),
 }));
 
+vi.mock("@/features/register-payment", () => ({
+  PassengerPaymentsModal: () => null,
+}));
+
+const basePassenger: EventPassenger = {
+  id: "event-passenger-1",
+  passenger: {
+    id: "passenger-1",
+    name: "Maria Silva",
+    rg: "12.345.678-9",
+    phone: "(11) 99999-9999",
+  },
+  totalAmount: "75.00",
+  paidAmount: "25.00",
+  paymentStatus: PAYMENT_STATUSES.PARTIAL,
+  exemptionReason: null,
+  observations: null,
+  eventId: "event-1",
+  congregationId: "congregation-1",
+  registeredById: "user-1",
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+  days: [
+    {
+      id: "event-passenger-day-1",
+      eventDayId: "day-1",
+      dayNumber: 1,
+      date: "2026-07-10T00:00:00.000Z",
+      label: "Dia 1",
+      checkedIn: false,
+      checkedInAt: null,
+    },
+  ],
+};
+
 const baseEvent: Event = {
   id: "event-1",
   title: "Congresso Regional 2026",
@@ -92,6 +128,16 @@ const baseEvent: Event = {
 };
 
 describe("EventEnrollmentsSection", () => {
+  beforeEach(async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+  });
+
   it("renderiza o título da seção", () => {
     render(
       <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
@@ -136,5 +182,31 @@ describe("EventEnrollmentsSection", () => {
     );
 
     expect(screen.getByText("Nenhuma inscrição")).toBeInTheDocument();
+  });
+
+  it("organiza ações da tabela em um menu compacto por inscrição", async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [basePassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    render(
+      <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
+    );
+
+    const actionsButton = screen.getByRole("button", { name: "Ações" });
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+    fireEvent.click(actionsButton);
+
+    const menu = screen.getByRole("menu");
+
+    expect(within(menu).getByRole("menuitem", { name: "Pagamentos" })).toBeInTheDocument();
+    expect(within(menu).getByRole("menuitem", { name: "Editar dias" })).toBeInTheDocument();
+    expect(within(menu).getByRole("menuitem", { name: "Remover inscrição" })).toBeInTheDocument();
   });
 });

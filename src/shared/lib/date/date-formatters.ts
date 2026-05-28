@@ -12,3 +12,7 @@ export function formatDate(value: string): string {
 export function formatWeekday(value: string): string {
   return BRAZILIAN_WEEKDAY_FORMATTER.format(new Date(value));
 }
+
+export function getTodayDateString(): string {
+  return new Date().toISOString().split("T")[0];
+}

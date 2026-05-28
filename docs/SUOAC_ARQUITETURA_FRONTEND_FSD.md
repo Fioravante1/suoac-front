@@ -1109,8 +1109,8 @@ formatacao. Assim, uma violacao de arquitetura falha localmente e tambem falhara
 
 ### Fase 2 — Dominio MVP
 
-- Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`. (parcial — `event` e `event-day` implementadas; `congregation` e `user` ja possuem base funcional)
-- Criar features `create-event`, `publish-event`, `update-event`, `delete-event`, `cancel-event`, `update-event-day`, `cancel-event-day`, `enroll-passenger`, `register-payment`. (parcial — eventos e dias implementados; passageiros e pagamentos pendentes)
+- Criar entidades `event`, `event-day`, `passenger`, `payment`, `congregation`, `user`. (parcial — `event`, `event-day`, `passenger`, `event-passenger` e `payment` implementadas; `congregation` e `user` ja possuem base funcional)
+- Criar features `create-event`, `publish-event`, `update-event`, `delete-event`, `cancel-event`, `update-event-day`, `cancel-event-day`, `enroll-passenger`, `register-payment`. (parcial — eventos, dias, inscricoes e pagamentos implementados)
 - Criar widgets `event-overview`, `financial-summary`.
 
 Status atual da fatia de eventos:
@@ -1128,14 +1128,30 @@ Status atual da fatia de eventos:
 - A edicao por campos permitidos em cada status foi implementada em `features/update-event`.
 - A exclusao de eventos em rascunho foi implementada em `features/delete-event`.
 
+Status atual da fatia de passageiros e inscricoes:
+
+- `entities/passenger` contem model, queries e options para listagem e busca por congregacao.
+- `entities/event-passenger` contem model com tipos (`EventPassenger`, `PaymentStatus`), constantes de status de pagamento (`PAYMENT_STATUSES`, `PAYMENT_STATUS_LABELS`, `PAYMENT_STATUS_BADGE_VARIANTS`), helper `canManageEventPassengers`, queries e options para listagem e detalhe.
+- `features/enroll-passenger` contem schema Zod com modos existente/inline, busca de passageiros, Server Action (POST) e modal de inscricao.
+- `features/update-event-passenger-days` contem Server Action (PATCH) e modal para alterar dias selecionados.
+- `features/remove-event-passenger` contem Server Action (DELETE) para remover inscricao.
+- `widgets/event-enrollments` exibe tabela de inscricoes com cards mobile e tabela desktop, botoes de inscricao, edicao de dias, remocao e pagamentos.
+
+Status atual da fatia de pagamentos:
+
+- `entities/payment` contem model (`Payment`), query (`fetchPayments`) e options (`paymentListOptions`) para listagem de pagamentos por inscricao. A API retorna array direto sem paginacao.
+- `features/register-payment` contem schema Zod (`registerPaymentSchema`), mapper (`toCreatePaymentPayload`), Server Actions para registrar (`registerPaymentAction`, POST) e remover (`deletePaymentAction`, DELETE) pagamentos, e o modal `PassengerPaymentsModal`.
+- O modal `PassengerPaymentsModal` exibe info card (total, pago, restante, status), formulario de registro de pagamento (valor, data, observacoes), historico de pagamentos com opcao de remocao, e respeita regras de negocio: visibilidade do formulario depende de evento OPEN, status nao EXEMPT, saldo restante > 0 e prazo de pagamento (roles de congregacao sao bloqueados apos o prazo, roles de circuito podem operar normalmente).
+- A integracao esta no widget `event-enrollments`, com botao "Pagamentos" (mobile) / "Pagar" (desktop) em cada inscricao, abrindo o modal.
+
 ### Fase 3 — Server state
 
 - Instalar TanStack Query. (concluido)
 - Instalar React Hook Form + Zod + resolvers. (concluido)
 - Criar `shared/api/client`. (concluido — `shared/api/http-client`)
 - Criar `shared/api/query-client`. (concluido)
-- Criar query factories por entidade. (parcial — `congregation`, `event` e `event-day`)
-- Criar mutations por feature. (parcial — `create-event`, `congregations`)
+- Criar query factories por entidade. (parcial — `congregation`, `event`, `event-day`, `passenger`, `event-passenger`, `payment`)
+- Criar mutations por feature. (parcial — `create-event`, `congregations`, `enroll-passenger`, `register-payment`)
 
 ### Fase 4 — Permissoes e fluxo autenticado (concluida)
 

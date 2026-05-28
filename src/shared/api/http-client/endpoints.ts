@@ -41,4 +41,9 @@ export const endpoints = {
     updateDays: (id: string) => `/event-passengers/${id}/days` as const,
     delete: (id: string) => `/event-passengers/${id}` as const,
   },
+  payments: {
+    list: (eventPassengerId: string) => `/event-passengers/${eventPassengerId}/payments` as const,
+    create: (eventPassengerId: string) => `/event-passengers/${eventPassengerId}/payments` as const,
+    delete: (id: string) => `/payments/${id}` as const,
+  },
 } as const;

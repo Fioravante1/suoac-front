@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Trash2, UserPlus, Users } from "lucide-react";
+import { CalendarCheck, DollarSign, Trash2, UserPlus, Users } from "lucide-react";
 
 import {
   PAYMENT_STATUS_BADGE_VARIANTS,
@@ -16,18 +16,20 @@ import type { ActionResult } from "@/shared/api";
 import { isCircuitRole } from "@/shared/auth";
 import type { UserRole } from "@/shared/auth";
 import { formatCurrency, useModal, usePagination, useServerError } from "@/shared/lib";
+import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { DataTable, type ColumnDef } from "@/shared/ui/data-table";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "@/shared/ui/table";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
 import { removeEventPassengerAction } from "@/features/remove-event-passenger";
+import { PassengerPaymentsModal } from "@/features/register-payment";
 
 import styles from "./event-enrollments-section.module.css";
 
@@ -44,6 +46,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const enrollModal = useModal();
   const updateDaysModal = useModal<EventPassenger>();
   const removeModal = useModal<EventPassenger>();
+  const paymentsModal = useModal<EventPassenger>();
 
   const queryClient = useQueryClient();
 
@@ -109,6 +112,71 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     removeMutation.mutate(removeModal.item.id);
   }
 
+  function buildActionMenuItems(ep: EventPassenger): ActionMenuItem[] {
+    const all: (ActionMenuItem | false)[] = [
+      {
+        id: "payments",
+        label: "Pagamentos",
+        icon: <DollarSign size={16} aria-hidden="true" />,
+        onSelect: () => paymentsModal.open(ep),
+      },
+      canManage &&
+        isRegionalConvention && {
+          id: "days",
+          label: "Editar dias",
+          icon: <CalendarCheck size={16} aria-hidden="true" />,
+          onSelect: () => updateDaysModal.open(ep),
+        },
+      canManage && {
+        id: "remove",
+        label: "Remover inscrição",
+        icon: <Trash2 size={16} aria-hidden="true" />,
+        onSelect: () => removeModal.open(ep),
+        variant: "danger",
+      },
+    ];
+
+    return all.filter(Boolean) as ActionMenuItem[];
+  }
+
+  const tableColumns: ColumnDef<EventPassenger>[] = [
+    { id: "name", header: "Nome", cell: (ep) => ep.passenger.name },
+    { id: "rg", header: "RG", cell: (ep) => ep.passenger.rg },
+    { id: "phone", header: "Telefone", cell: (ep) => ep.passenger.phone ?? "—" },
+    {
+      id: "days",
+      header: "Dias",
+      visible: isRegionalConvention,
+      cell: (ep) => (
+        <div className={styles.dayBadges}>
+          {ep.days.map((day) => (
+            <Badge key={day.id} variant="neutral">
+              {day.label}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
+    { id: "total", header: "Total", cell: (ep) => formatCurrency(ep.totalAmount) },
+    { id: "paid", header: "Pago", cell: (ep) => formatCurrency(ep.paidAmount) },
+    {
+      id: "status",
+      header: "Status",
+      cell: (ep) => (
+        <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
+          {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Ações",
+      headerClassName: styles.actionsHead,
+      cellClassName: styles.actionsCell,
+      cell: (ep) => <ActionMenu menuId={`enrollment-actions-${ep.id}`} items={buildActionMenuItems(ep)} />,
+    },
+  ];
+
   return (
     <Card>
       <div className={styles.header}>
@@ -171,82 +239,34 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
                   <span>Total: {formatCurrency(ep.totalAmount)}</span>
                   <span>Pago: {formatCurrency(ep.paidAmount)}</span>
                 </div>
-                {canManage && (
-                  <div className={styles.mobileCardActions}>
-                    {isRegionalConvention && (
-                      <Button variant="ghost" size="small" onClick={() => updateDaysModal.open(ep)}>
-                        <CalendarCheck size={16} aria-hidden="true" />
-                        Editar dias
-                      </Button>
-                    )}
+                <div className={styles.mobileCardActions}>
+                  <Button variant="ghost" size="small" onClick={() => paymentsModal.open(ep)}>
+                    <DollarSign size={16} aria-hidden="true" />
+                    Pagamentos
+                  </Button>
+                  {canManage && isRegionalConvention && (
+                    <Button variant="ghost" size="small" onClick={() => updateDaysModal.open(ep)}>
+                      <CalendarCheck size={16} aria-hidden="true" />
+                      Editar dias
+                    </Button>
+                  )}
+                  {canManage && (
                     <Button variant="ghost" size="small" onClick={() => removeModal.open(ep)}>
                       <Trash2 size={16} aria-hidden="true" />
                       Remover
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))}
           </div>
 
-          <TableWrapper className={styles.desktopTable}>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>RG</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  {isRegionalConvention && <TableHead>Dias</TableHead>}
-                  <TableHead>Total</TableHead>
-                  <TableHead>Pago</TableHead>
-                  <TableHead>Status</TableHead>
-                  {canManage && <TableHead>Ações</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {passengersData.data.map((ep) => (
-                  <TableRow key={ep.id}>
-                    <TableCell>{ep.passenger.name}</TableCell>
-                    <TableCell>{ep.passenger.rg}</TableCell>
-                    <TableCell>{ep.passenger.phone ?? "—"}</TableCell>
-                    {isRegionalConvention && (
-                      <TableCell>
-                        <div className={styles.dayBadges}>
-                          {ep.days.map((day) => (
-                            <Badge key={day.id} variant="neutral">
-                              {day.label}
-                            </Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                    )}
-                    <TableCell>{formatCurrency(ep.totalAmount)}</TableCell>
-                    <TableCell>{formatCurrency(ep.paidAmount)}</TableCell>
-                    <TableCell>
-                      <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
-                        {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
-                      </Badge>
-                    </TableCell>
-                    {canManage && (
-                      <TableCell>
-                        <div className={styles.actions}>
-                          {isRegionalConvention && (
-                            <Button variant="ghost" size="small" onClick={() => updateDaysModal.open(ep)}>
-                              <CalendarCheck size={16} aria-hidden="true" />
-                              Dias
-                            </Button>
-                          )}
-                          <Button variant="ghost" size="small" onClick={() => removeModal.open(ep)}>
-                            <Trash2 size={16} aria-hidden="true" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableWrapper>
+          <DataTable
+            columns={tableColumns}
+            data={passengersData.data}
+            getRowKey={(ep) => ep.id}
+            wrapperClassName={styles.desktopTable}
+          />
 
           {passengersData.meta.totalPages > 1 && (
             <Pagination page={page} totalPages={passengersData.meta.totalPages} onPageChange={setPage} />
@@ -281,6 +301,16 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
           onSubmit={handleUpdateDays}
           eventDays={event.days ?? []}
           selectedDayIds={updateDaysModal.item.days.map((d) => d.eventDayId)}
+        />
+      )}
+
+      {paymentsModal.item && (
+        <PassengerPaymentsModal
+          open={paymentsModal.isOpen}
+          onClose={paymentsModal.close}
+          eventPassenger={paymentsModal.item}
+          event={event}
+          userRole={userRole}
         />
       )}
 

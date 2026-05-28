@@ -21,11 +21,13 @@ import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { USER_ROLES, useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
 import { formatCurrency, formatDate, formatWeekday, useModal, useServerError } from "@/shared/lib";
+import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ErrorState } from "@/shared/ui/error-state";
+import { InfoCard, type InfoCardItem } from "@/shared/ui/info-card";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
 
 import {
@@ -278,114 +280,147 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
             )}
           </div>
 
-          <Card>
-            <h2 className={styles.cardTitle}>Informações gerais</h2>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <DollarSign size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Valor da passagem</span>
-                  <span className={styles.infoValue}>{formatCurrency(event.ticketPrice)}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <CalendarDays size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Prazo de inscrição</span>
-                  <span className={styles.infoValue}>{formatDate(event.registrationDeadline)}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <Clock size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Prazo de pagamento</span>
-                  <span className={styles.infoValue}>{formatDate(event.paymentDeadline)}</span>
-                </div>
-              </div>
-              {event.observations && (
-                <div className={styles.infoItem}>
-                  <FileText size={20} aria-hidden="true" className={styles.infoIcon} />
-                  <div className={styles.infoContent}>
-                    <span className={styles.infoLabel}>Observações</span>
-                    <span className={`${styles.infoValue} ${styles.observations}`}>{event.observations}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </Card>
+          <div className={styles.infoRow}>
+            <Card>
+              <h2 className={styles.cardTitle}>Informações gerais</h2>
+              <InfoCard
+                variant="grid"
+                items={
+                  (
+                    [
+                      {
+                        label: "Valor da passagem",
+                        value: formatCurrency(event.ticketPrice),
+                        icon: <DollarSign size={20} aria-hidden="true" />,
+                      },
+                      {
+                        label: "Prazo de inscrição",
+                        value: formatDate(event.registrationDeadline),
+                        icon: <CalendarDays size={20} aria-hidden="true" />,
+                      },
+                      {
+                        label: "Prazo de pagamento",
+                        value: formatDate(event.paymentDeadline),
+                        icon: <Clock size={20} aria-hidden="true" />,
+                      },
+                      event.observations && {
+                        label: "Observações",
+                        value: <span className={styles.observations}>{event.observations}</span>,
+                        icon: <FileText size={20} aria-hidden="true" />,
+                      },
+                    ] as (InfoCardItem | false)[]
+                  ).filter(Boolean) as InfoCardItem[]
+                }
+              />
+            </Card>
 
-          <Card>
-            <h2 className={styles.cardTitle}>Local</h2>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <MapPin size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Local</span>
-                  <span className={styles.infoValue}>{event.venue}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <MapPin size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Endereço</span>
-                  <span className={styles.infoValue}>{event.address}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <MapPin size={20} aria-hidden="true" className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>Cidade / UF</span>
-                  <span className={styles.infoValue}>
-                    {event.city} - {event.state}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
+            <Card>
+              <h2 className={styles.cardTitle}>Local</h2>
+              <InfoCard
+                variant="grid"
+                items={[
+                  {
+                    label: "Local",
+                    value: event.venue,
+                    icon: <MapPin size={20} aria-hidden="true" />,
+                  },
+                  {
+                    label: "Endereço",
+                    value: event.address,
+                    icon: <MapPin size={20} aria-hidden="true" />,
+                  },
+                  {
+                    label: "Cidade / UF",
+                    value: `${event.city} - ${event.state}`,
+                    icon: <MapPin size={20} aria-hidden="true" />,
+                  },
+                ]}
+              />
+            </Card>
+          </div>
 
           <Card>
             <h2 className={styles.cardTitle}>Dias do evento</h2>
             {event.days && event.days.length > 0 ? (
               <div className={styles.daysList}>
                 {event.days.map((day) => (
-                  <div key={day.id} className={styles.dayCard}>
-                    <div className={styles.dayHeader}>
-                      <span className={styles.dayLabel}>{day.label}</span>
-                      <Badge variant={EVENT_DAY_STATUS_BADGE_VARIANTS[day.status]}>
-                        {EVENT_DAY_STATUS_LABELS[day.status]}
-                      </Badge>
-                    </div>
-                    <div className={styles.dayMeta}>
-                      <span className={styles.dayMetaItem}>
-                        <CalendarDays size={16} aria-hidden="true" />
-                        {formatDate(day.date)} ({formatWeekday(day.date)})
-                      </span>
-                      <span className={styles.dayMetaItem}>
-                        <Clock size={16} aria-hidden="true" />
-                        Saída: {day.departureTime}
-                      </span>
-                      <span className={styles.dayMetaItem}>
-                        <Clock size={16} aria-hidden="true" />
-                        Retorno: {day.returnTime}
-                      </span>
-                    </div>
-                    {canManage && (
-                      <div className={styles.dayActions}>
-                        {canUpdateEventDayTimes(event.status, day.status) && (
-                          <Button variant="ghost" onClick={() => updateDayModal.open(day)}>
-                            <Pencil size={16} aria-hidden="true" />
-                            Editar horários
-                          </Button>
-                        )}
-                        {canCancelEventDay(event.status, day.status) && isCircuitCoordinator && (
-                          <Button variant="ghost" onClick={() => cancelDayModal.open(day)}>
-                            <XCircle size={16} aria-hidden="true" />
-                            Cancelar dia
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <InfoCard
+                    key={day.id}
+                    variant="list"
+                    header={
+                      <>
+                        <span className={styles.dayLabel}>{day.label}</span>
+                        <div className={styles.dayHeaderRight}>
+                          <Badge variant={EVENT_DAY_STATUS_BADGE_VARIANTS[day.status]}>
+                            {EVENT_DAY_STATUS_LABELS[day.status]}
+                          </Badge>
+                          {canManage && (
+                            <div className={styles.dayActionsDesktop}>
+                              <ActionMenu
+                                menuId={`day-actions-${day.id}`}
+                                items={
+                                  (
+                                    [
+                                      canUpdateEventDayTimes(event.status, day.status) && {
+                                        id: "edit",
+                                        label: "Editar horários",
+                                        icon: <Pencil size={16} aria-hidden="true" />,
+                                        onSelect: () => updateDayModal.open(day),
+                                      },
+                                      canCancelEventDay(event.status, day.status) &&
+                                        isCircuitCoordinator && {
+                                          id: "cancel",
+                                          label: "Cancelar dia",
+                                          icon: <XCircle size={16} aria-hidden="true" />,
+                                          onSelect: () => cancelDayModal.open(day),
+                                          variant: "danger" as const,
+                                        },
+                                    ] as (ActionMenuItem | false)[]
+                                  ).filter(Boolean) as ActionMenuItem[]
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    }
+                    items={[
+                      {
+                        label: "date",
+                        value: `${formatDate(day.date)} (${formatWeekday(day.date)})`,
+                        icon: <CalendarDays size={16} aria-hidden="true" />,
+                      },
+                      {
+                        label: "departure",
+                        value: `Saída: ${day.departureTime}`,
+                        icon: <Clock size={16} aria-hidden="true" />,
+                      },
+                      {
+                        label: "return",
+                        value: `Retorno: ${day.returnTime}`,
+                        icon: <Clock size={16} aria-hidden="true" />,
+                      },
+                    ]}
+                    footerClassName={styles.dayFooter}
+                    footer={
+                      canManage ? (
+                        <>
+                          {canUpdateEventDayTimes(event.status, day.status) && (
+                            <Button variant="ghost" size="small" onClick={() => updateDayModal.open(day)}>
+                              <Pencil size={16} aria-hidden="true" />
+                              Editar horários
+                            </Button>
+                          )}
+                          {canCancelEventDay(event.status, day.status) && isCircuitCoordinator && (
+                            <Button variant="ghost" size="small" onClick={() => cancelDayModal.open(day)}>
+                              <XCircle size={16} aria-hidden="true" />
+                              Cancelar dia
+                            </Button>
+                          )}
+                        </>
+                      ) : undefined
+                    }
+                  />
                 ))}
               </div>
             ) : (
@@ -393,11 +428,13 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
             )}
           </Card>
 
-          <EventEnrollmentsSection
-            event={event}
-            userRole={userRole ?? USER_ROLES.CONGREGATION_ASSISTANT}
-            userCongregationId={userCongregationId}
-          />
+          {event.status !== EVENT_STATUSES.DRAFT && (
+            <EventEnrollmentsSection
+              event={event}
+              userRole={userRole ?? USER_ROLES.CONGREGATION_ASSISTANT}
+              userCongregationId={userCongregationId}
+            />
+          )}
         </div>
       )}
 
