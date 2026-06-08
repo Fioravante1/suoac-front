@@ -220,3 +220,28 @@
   font-size: var(--suoac-font-size-small);
   cursor: pointer;
 }
+
+.paymentCheckbox {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  font-size: var(--suoac-font-size-small);
+  cursor: pointer;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--suoac-space-3);
+}
+
+@media (max-width: 30rem) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paymentHint {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}

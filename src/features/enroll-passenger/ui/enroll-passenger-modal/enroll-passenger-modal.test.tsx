@@ -162,4 +162,65 @@ describe("EnrollPassengerModal", () => {
 
     expect(screen.getByLabelText("Motivo da isenção")).toBeInTheDocument();
   });
+
+  it("exibe campos de pagamento ao marcar checkbox", () => {
+    render(
+      <EnrollPassengerModal open onClose={vi.fn()} onSubmit={vi.fn()} event={baseEvent} congregationId="cong-1" />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Registrar pagamento agora?"));
+
+    expect(screen.getByLabelText("Valor (R$)")).toBeInTheDocument();
+    expect(screen.getByLabelText("Data do pagamento")).toBeInTheDocument();
+    expect(screen.getByLabelText("Observações do pagamento (opcional)")).toBeInTheDocument();
+  });
+
+  it("esconde campos de pagamento quando checkbox está desmarcado", () => {
+    render(
+      <EnrollPassengerModal open onClose={vi.fn()} onSubmit={vi.fn()} event={baseEvent} congregationId="cong-1" />,
+    );
+
+    expect(screen.queryByLabelText("Valor (R$)")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Data do pagamento")).not.toBeInTheDocument();
+  });
+
+  it("desmarca isenção ao marcar pagamento (exclusão mútua)", () => {
+    render(
+      <EnrollPassengerModal open onClose={vi.fn()} onSubmit={vi.fn()} event={baseEvent} congregationId="cong-1" />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Isento de pagamento"));
+    expect(screen.getByLabelText("Motivo da isenção")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Registrar pagamento agora?"));
+
+    expect(screen.queryByLabelText("Motivo da isenção")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Valor (R$)")).toBeInTheDocument();
+  });
+
+  it("desmarca pagamento ao marcar isenção (exclusão mútua)", () => {
+    render(
+      <EnrollPassengerModal open onClose={vi.fn()} onSubmit={vi.fn()} event={baseEvent} congregationId="cong-1" />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Registrar pagamento agora?"));
+    expect(screen.getByLabelText("Valor (R$)")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Isento de pagamento"));
+
+    expect(screen.queryByLabelText("Valor (R$)")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Motivo da isenção")).toBeInTheDocument();
+  });
+
+  it("mostra valor total estimado quando há dias selecionados", () => {
+    render(
+      <EnrollPassengerModal open onClose={vi.fn()} onSubmit={vi.fn()} event={baseEvent} congregationId="cong-1" />,
+    );
+
+    fireEvent.click(screen.getByText("Dia 1 - Sexta-feira"));
+    fireEvent.click(screen.getByText("Dia 2 - Sábado"));
+    fireEvent.click(screen.getByLabelText("Registrar pagamento agora?"));
+
+    expect(screen.getByText(/Valor total estimado/)).toBeInTheDocument();
+  });
 });

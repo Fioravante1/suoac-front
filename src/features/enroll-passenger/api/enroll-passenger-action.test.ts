@@ -71,4 +71,23 @@ describe("enrollPassengerAction", () => {
 
     expect(result).toEqual({ success: false, error: "Passageiro já inscrito neste evento" });
   });
+
+  it("chama o endpoint com payload contendo payment", async () => {
+    const payload = {
+      passengerId: "p-1",
+      payment: {
+        amount: 75.0,
+        paidAt: "2026-01-15T03:00:00.000Z",
+        observations: "Pagamento via Pix",
+      },
+    };
+
+    const result = await enrollPassengerAction("event-1", payload);
+
+    expect(result.success).toBe(true);
+    expect(httpClientMock).toHaveBeenCalledWith("/events/event-1/passengers", {
+      method: "POST",
+      body: payload,
+    });
+  });
 });

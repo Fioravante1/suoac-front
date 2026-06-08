@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, UserPlus } from "lucide-react";
+import { DollarSign, Search, UserPlus } from "lucide-react";
 
 import type { EventPassenger } from "@/entities/event-passenger";
 import type { Event, EventDayInEvent } from "@/entities/event";
@@ -11,7 +11,7 @@ import { EVENT_DAY_STATUSES, EVENT_TYPES } from "@/entities/event";
 import type { Passenger } from "@/entities/passenger";
 import { useQuery } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
-import { useServerError } from "@/shared/lib";
+import { formatCurrency, getTodayDateString, useServerError } from "@/shared/lib";
 import { passengerListOptions } from "@/entities/passenger";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
@@ -51,6 +51,10 @@ const DEFAULT_VALUES: EnrollPassengerFormValues = {
   observations: "",
   isExempt: false,
   exemptionReason: "",
+  includePayment: false,
+  paymentAmount: undefined,
+  paymentPaidAt: "",
+  paymentObservations: "",
 };
 
 export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregationId }: EnrollPassengerModalProps) {
@@ -76,7 +80,11 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
 
   const activeTab = useWatch({ control, name: "mode" }) ?? DEFAULT_VALUES.mode;
   const isExempt = useWatch({ control, name: "isExempt" });
+  const includePayment = useWatch({ control, name: "includePayment" });
   const watchedDayIds = useWatch({ control, name: "dayIds" }) ?? [];
+
+  const selectedDaysCount = isRegionalConvention ? watchedDayIds.length : 1;
+  const estimatedTotal = Number(event.ticketPrice) * selectedDaysCount;
 
   const { data: passengersData, isLoading: isLoadingPassengers } = useQuery({
     ...passengerListOptions(congregationId, searchPage, searchTerm),
@@ -280,8 +288,79 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
         </div>
 
         <div className={styles.section}>
+          <label className={styles.paymentCheckbox}>
+            <input
+              type="checkbox"
+              checked={!!includePayment}
+              onChange={(e) => {
+                setValue("includePayment", e.target.checked);
+                if (e.target.checked) {
+                  setValue("isExempt", false);
+                  setValue("exemptionReason", "");
+                }
+              }}
+            />
+            <DollarSign size={16} aria-hidden="true" />
+            <span>Registrar pagamento agora?</span>
+          </label>
+
+          {includePayment && (
+            <>
+              {estimatedTotal > 0 && (
+                <p className={styles.paymentHint}>Valor total estimado: {formatCurrency(estimatedTotal)}</p>
+              )}
+              <div className={styles.formRow}>
+                <TextField
+                  label="Valor (R$)"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  max={estimatedTotal > 0 ? estimatedTotal : undefined}
+                  placeholder="0,00"
+                  error={errors.paymentAmount?.message}
+                  {...register("paymentAmount", { valueAsNumber: true })}
+                />
+                <TextField
+                  label="Data do pagamento"
+                  type="date"
+                  max={getTodayDateString()}
+                  error={errors.paymentPaidAt?.message}
+                  {...register("paymentPaidAt")}
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="payment-observations">
+                  Observações do pagamento (opcional)
+                </label>
+                <textarea
+                  id="payment-observations"
+                  className={`${styles.textarea} ${errors.paymentObservations ? styles.hasError : ""}`.trim()}
+                  placeholder="Ex: Pagamento via Pix"
+                  {...register("paymentObservations")}
+                />
+                {errors.paymentObservations?.message && (
+                  <span className={styles.errorMessage}>{errors.paymentObservations.message}</span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className={styles.section}>
           <label className={styles.exemptCheckbox}>
-            <input type="checkbox" {...register("isExempt")} />
+            <input
+              type="checkbox"
+              checked={!!isExempt}
+              onChange={(e) => {
+                setValue("isExempt", e.target.checked);
+                if (e.target.checked) {
+                  setValue("includePayment", false);
+                  setValue("paymentAmount", undefined);
+                  setValue("paymentPaidAt", "");
+                  setValue("paymentObservations", "");
+                }
+              }}
+            />
             <span>Isento de pagamento</span>
           </label>
 

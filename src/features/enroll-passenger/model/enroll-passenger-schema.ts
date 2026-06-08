@@ -12,6 +12,18 @@ const enrollPassengerBaseSchema = z.object({
   observations: z.string().max(500).optional(),
   exemptionReason: z.string().max(300).optional(),
   isExempt: z.boolean().optional(),
+  includePayment: z.boolean().optional(),
+  paymentAmount: z
+    .number({ message: "Informe um valor válido." })
+    .positive("O valor deve ser maior que zero.")
+    .multipleOf(0.01, "O valor deve ter no máximo 2 casas decimais.")
+    .optional(),
+  paymentPaidAt: z.string().optional(),
+  paymentObservations: z
+    .string()
+    .max(500, "Observações devem ter no máximo 500 caracteres.")
+    .optional()
+    .or(z.literal("")),
 });
 
 type EnrollPassengerBaseValues = z.infer<typeof enrollPassengerBaseSchema>;
@@ -44,15 +56,40 @@ function validateExemption(values: EnrollPassengerBaseValues, ctx: EnrollPasseng
   ctx.addIssue({ code: "custom", message: "Informe o motivo da isenção.", path: ["exemptionReason"] });
 }
 
-export const enrollPassengerSchema = enrollPassengerBaseSchema.superRefine((data, ctx) => {
-  if (data.mode === "existing") {
-    validateExistingPassenger(data, ctx);
-    validateExemption(data, ctx);
+function validatePayment(values: EnrollPassengerBaseValues, ctx: EnrollPassengerRefinementContext) {
+  if (!values.includePayment) return;
+
+  if (values.isExempt) {
+    ctx.addIssue({ code: "custom", message: "Passageiro isento não pode ter pagamento.", path: ["includePayment"] });
     return;
   }
 
-  validateInlinePassenger(data, ctx);
+  if (!values.paymentAmount || values.paymentAmount <= 0) {
+    ctx.addIssue({ code: "custom", message: "Informe o valor do pagamento.", path: ["paymentAmount"] });
+  }
+
+  if (!values.paymentPaidAt) {
+    ctx.addIssue({ code: "custom", message: "Informe a data do pagamento.", path: ["paymentPaidAt"] });
+  } else {
+    const paidDate = new Date(values.paymentPaidAt);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    if (paidDate > today) {
+      ctx.addIssue({ code: "custom", message: "A data do pagamento não pode ser futura.", path: ["paymentPaidAt"] });
+    }
+  }
+}
+
+export const enrollPassengerSchema = enrollPassengerBaseSchema.superRefine((data, ctx) => {
+  if (data.mode === "existing") {
+    validateExistingPassenger(data, ctx);
+  } else {
+    validateInlinePassenger(data, ctx);
+  }
+
   validateExemption(data, ctx);
+  validatePayment(data, ctx);
 });
 
 export type EnrollPassengerFormValues = z.infer<typeof enrollPassengerSchema>;
@@ -65,6 +102,11 @@ export interface EnrollPassengerPayload {
   dayIds?: string[];
   observations?: string;
   exemptionReason?: string;
+  payment?: {
+    amount: number;
+    paidAt: string;
+    observations?: string;
+  };
 }
 
 function fillPassengerPayload(payload: EnrollPassengerPayload, values: EnrollPassengerFormValues) {
@@ -97,6 +139,18 @@ export function toEnrollPayload(values: EnrollPassengerFormValues): EnrollPassen
   if (values.isExempt && values.exemptionReason?.trim()) {
     payload.exemptionReason = values.exemptionReason.trim();
   }
+
+  if (!values.includePayment || !values.paymentAmount || !values.paymentPaidAt) {
+    return payload;
+  }
+
+  const trimmedObs = values.paymentObservations?.trim();
+
+  payload.payment = {
+    amount: values.paymentAmount,
+    paidAt: new Date(values.paymentPaidAt).toISOString(),
+    ...(trimmedObs && { observations: trimmedObs }),
+  };
 
   return payload;
 }
