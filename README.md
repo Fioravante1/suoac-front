@@ -154,6 +154,61 @@ src/pages/home/ui/home-page.test.tsx
 
 ---
 
+## Fluxo de Trabalho
+
+### Branches
+
+O projeto usa duas branches protegidas:
+
+- **`main`** — branch de produção. Recebe merges apenas de `develop`.
+- **`develop`** — branch de desenvolvimento. Toda nova tarefa parte dela.
+
+Para trabalhar em uma funcionalidade ou correção:
+
+1. Crie uma branch a partir de `develop`:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feat/minha-feature
+   ```
+2. Desenvolva, faça commits e rode `yarn run check` antes de finalizar.
+3. Abra um PR para `develop`.
+4. Após aprovação e merge em `develop`, abra um PR de `develop` para `main` quando for
+   preparar uma release.
+
+### Proteção de branches
+
+As branches `main` e `develop` possuem as seguintes regras:
+
+| Regra               | Descrição                                           |
+| ------------------- | --------------------------------------------------- |
+| PR obrigatório      | Não é permitido push direto; todo merge requer PR   |
+| Revisão obrigatória | PRs de colaboradores precisam de aprovação do owner |
+| Force push restrito | Apenas o owner do repositório pode fazer force push |
+
+PRs abertos pelo owner do repositório não precisam de revisor.
+
+### CI (GitHub Actions)
+
+Todo push e PR para `main` ou `develop` aciona a pipeline de CI, que executa 5 jobs:
+
+```text
+lint ──────────┐
+typecheck ─────┤
+test ──────────┼──▶ build (só roda se todos passarem)
+architecture ──┘
+```
+
+- **lint** — ESLint + Prettier (`yarn lint` + `yarn format:check`)
+- **typecheck** — TypeScript (`yarn typecheck`)
+- **test** — Vitest com coverage (`yarn test:coverage`)
+- **architecture** — Steiger FSD (`yarn architecture:check`)
+- **build** — Next.js production build (`yarn build`), executa somente após os 4 checks
+
+A configuração fica em `.github/workflows/ci.yml`.
+
+---
+
 ## Qualidade
 
 Antes de concluir qualquer alteração de código, rode:
