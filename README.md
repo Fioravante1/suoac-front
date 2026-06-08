@@ -180,9 +180,9 @@ Para trabalhar em uma funcionalidade ou correção:
 
 As branches `main` e `develop` possuem as seguintes regras:
 
-| Regra | Descrição |
-|---|---|
-| PR obrigatório | Não é permitido push direto; todo merge requer PR |
+| Regra               | Descrição                                           |
+| ------------------- | --------------------------------------------------- |
+| PR obrigatório      | Não é permitido push direto; todo merge requer PR   |
 | Revisão obrigatória | PRs de colaboradores precisam de aprovação do owner |
 | Force push restrito | Apenas o owner do repositório pode fazer force push |
 
