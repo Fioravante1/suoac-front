@@ -1,6 +1,6 @@
 # Pages Router Placeholder
 
-This directory intentionally blocks accidental use of the legacy Next.js Pages Router.
+Este diretório bloqueia intencionalmente o uso acidental do roteador de páginas legado do Next.js.
 
-Application routes live in `/app`.
-Feature-Sliced Design pages live in `/src/pages`.
+As rotas da aplicação ficam em `/app`.
+As páginas do design por funcionalidades ficam em `/src/pages`.
