@@ -67,11 +67,11 @@ Existem dois perfis com visoes diferentes:
 
 Os dados necessarios podem ser compostos a partir de endpoints ja existentes:
 
-| Dado | Endpoint | Observacao |
-|---|---|---|
-| Evento ativo | `GET /circuits/:circuitId/events` | Filtrar por status `OPEN` |
-| Passageiros do evento | `GET /events/:eventId/passengers` | Paginado; para totais, usar `meta.total` |
-| Congregacoes | `GET /circuits/:circuitId/congregations` | Lista de congregacoes |
+| Dado                  | Endpoint                                 | Observacao                               |
+| --------------------- | ---------------------------------------- | ---------------------------------------- |
+| Evento ativo          | `GET /circuits/:circuitId/events`        | Filtrar por status `OPEN`                |
+| Passageiros do evento | `GET /events/:eventId/passengers`        | Paginado; para totais, usar `meta.total` |
+| Congregacoes          | `GET /circuits/:circuitId/congregations` | Lista de congregacoes                    |
 
 > **Nota**: o backend pode nao ter um endpoint especifico para dados agregados do dashboard
 > (totais financeiros, contagens por congregacao). Verificar com o backend se existe ou se sera
@@ -81,9 +81,9 @@ Os dados necessarios podem ser compostos a partir de endpoints ja existentes:
 ### Query keys existentes
 
 ```ts
-queryKeys.events.list(circuitId, page)
-queryKeys.eventPassengers.list(eventId, page)
-queryKeys.congregations.list(circuitId, page)
+queryKeys.events.list(circuitId, page);
+queryKeys.eventPassengers.list(eventId, page);
+queryKeys.congregations.list(circuitId, page);
 ```
 
 ## Arquitetura FSD
