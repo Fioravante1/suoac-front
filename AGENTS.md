@@ -26,12 +26,15 @@ Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio 
 - **Validador FSD**: Steiger + `@feature-sliced/steiger-plugin`
 - **Arquitetura no editor**: ESLint + `eslint-plugin-boundaries`
 - **Formatacao**: Prettier
-- **Documentacao do projeto**: pasta `docs/`, contendo:
-  - `SUOAC_REQUISITOS_v2.md` — requisitos funcionais, regras de negocio e stack prevista
-  - `SUOAC_ERD.md` — entidades e relacionamentos do dominio
-  - `SUOAC — Identidade Visual Oficial.md` — identidade visual, UX e design system
-  - `Design System Overview.png` — referencia visual
-  - `SUOAC_ARQUITETURA_FRONTEND_FSD.md` — arquitetura frontend obrigatoria
+- **Documentacao do projeto**: pasta `docs/`, organizada em:
+  - `docs/product/SUOAC_REQUISITOS_v2.md` — requisitos funcionais, regras de negocio e stack prevista
+  - `docs/product/SUOAC_ERD.md` — entidades e relacionamentos do dominio
+  - `docs/product/hus/` — historias de usuario
+  - `docs/design/SUOAC — Identidade Visual Oficial.md` — identidade visual, UX e design system
+  - `docs/design/Design System Overview.png` — referencia visual
+  - `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` — arquitetura frontend obrigatoria
+  - `docs/architecture/SUOAC_AUTENTICACAO.md` — fluxo de autenticacao
+  - `docs/integration/` — guias de integracao com APIs externas
 
 Antes de implementar qualquer funcionalidade, leia a documentacao relevante em `docs/`.
 
@@ -66,7 +69,7 @@ export { default } from "@/pages/home";
 A arquitetura obrigatoria esta documentada em:
 
 ```text
-docs/SUOAC_ARQUITETURA_FRONTEND_FSD.md
+docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md
 ```
 
 ### Estrutura de Diretórios
@@ -328,8 +331,8 @@ src/features/register-payment/
 
 Baseie UI e copy visual nos documentos:
 
-- `docs/SUOAC — Identidade Visual Oficial.md`
-- `docs/Design System Overview.png`
+- `docs/design/SUOAC — Identidade Visual Oficial.md`
+- `docs/design/Design System Overview.png`
 
 **Antes de construir qualquer interface, leia esses dois documentos.** Eles sao a fonte de verdade
 para cores, tipografia, espacamento, radius, iconografia e tom visual.
@@ -652,7 +655,7 @@ Quando solicitado para implementar uma funcionalidade:
 4. Exponha apenas o necessario via `index.ts`.
 5. Preserve a regra de dependencia entre camadas.
 6. Adicione teste unitario co-localizado para logica nova.
-7. Atualize `docs/SUOAC_ARQUITETURA_FRONTEND_FSD.md` se a arquitetura mudar.
+7. Atualize `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` se a arquitetura mudar.
 8. Atualize `README.md` se mudar setup, dependencias, scripts ou instrucoes.
 9. Rode `yarn run check` antes de concluir.
 
