@@ -23,10 +23,10 @@ Existem dois perfis com visoes diferentes:
 
 ## Requisitos de referencia
 
-- `docs/SUOAC_REQUISITOS_v2.md` — secoes 2.5.1 (Dashboard do Circuito) e 2.5.2 (Dashboard da
+- `docs/product/SUOAC_REQUISITOS_v2.md` — secoes 2.5.1 (Dashboard do Circuito) e 2.5.2 (Dashboard da
   Congregacao)
-- `docs/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
-- `docs/Design System Overview.png` — referencia visual
+- `docs/design/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
+- `docs/design/Design System Overview.png` — referencia visual
 
 ## Escopo MVP do dashboard
 

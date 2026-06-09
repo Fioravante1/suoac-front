@@ -28,9 +28,9 @@ Existem dois perfis com visoes diferentes:
 
 ## Requisitos de referencia
 
-- `docs/SUOAC_REQUISITOS_v2.md` — secoes 2.4.1, 2.4.2 e 2.4.3
-- `docs/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
-- `docs/Design System Overview.png` — referencia visual
+- `docs/product/SUOAC_REQUISITOS_v2.md` — secoes 2.4.1, 2.4.2 e 2.4.3
+- `docs/design/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
+- `docs/design/Design System Overview.png` — referencia visual
 
 ## Escopo MVP da pagina financeira
 
