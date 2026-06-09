@@ -28,9 +28,9 @@ Existem dois perfis com visoes diferentes:
 
 ## Requisitos de referencia
 
-- `docs/SUOAC_REQUISITOS_v2.md` — secoes 2.4.1, 2.4.2 e 2.4.3
-- `docs/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
-- `docs/Design System Overview.png` — referencia visual
+- `docs/product/SUOAC_REQUISITOS_v2.md` — secoes 2.4.1, 2.4.2 e 2.4.3
+- `docs/design/SUOAC — Identidade Visual Oficial.md` — design system e tokens visuais
+- `docs/design/Design System Overview.png` — referencia visual
 
 ## Escopo MVP da pagina financeira
 
@@ -56,15 +56,15 @@ congregacao, apenas da propria.
 
 Tabela usando `DataTable` de `@/shared/ui/data-table` com as colunas:
 
-| Coluna | Descricao |
-|---|---|
-| Nome | Nome do passageiro |
-| Congregacao | Nome da congregacao (visivel apenas para perfil de circuito) |
-| Dias | Quantidade de dias inscritos |
-| Valor total | `totalAmount` formatado |
-| Valor pago | `paidAmount` formatado |
-| Pendente | Diferenca, com destaque visual se > 0 |
-| Status | Badge de `paymentStatus` (Pendente / Parcial / Pago / Isento) |
+| Coluna      | Descricao                                                     |
+| ----------- | ------------------------------------------------------------- |
+| Nome        | Nome do passageiro                                            |
+| Congregacao | Nome da congregacao (visivel apenas para perfil de circuito)  |
+| Dias        | Quantidade de dias inscritos                                  |
+| Valor total | `totalAmount` formatado                                       |
+| Valor pago  | `paidAmount` formatado                                        |
+| Pendente    | Diferenca, com destaque visual se > 0                         |
+| Status      | Badge de `paymentStatus` (Pendente / Parcial / Pago / Isento) |
 
 ### Filtro por status de pagamento
 
@@ -89,11 +89,11 @@ Tabela usando `DataTable` de `@/shared/ui/data-table` com as colunas:
 
 ## API e dados
 
-| Dado | Endpoint | Observacao |
-|---|---|---|
-| Lista de eventos | `GET /circuits/:circuitId/events` | Para o seletor de evento |
-| Passageiros do evento | `GET /events/:eventId/passengers` | Retorna `totalAmount`, `paidAmount`, `paymentStatus` |
-| Congregacoes | `GET /circuits/:circuitId/congregations` | Para agrupar por congregacao |
+| Dado                  | Endpoint                                 | Observacao                                           |
+| --------------------- | ---------------------------------------- | ---------------------------------------------------- |
+| Lista de eventos      | `GET /circuits/:circuitId/events`        | Para o seletor de evento                             |
+| Passageiros do evento | `GET /events/:eventId/passengers`        | Retorna `totalAmount`, `paidAmount`, `paymentStatus` |
+| Congregacoes          | `GET /circuits/:circuitId/congregations` | Para agrupar por congregacao                         |
 
 > **Nota**: os totais financeiros (soma de `totalAmount`, soma de `paidAmount`) provavelmente
 > precisam ser calculados no frontend a partir da lista de passageiros, ou o backend precisa
@@ -105,18 +105,18 @@ Tabela usando `DataTable` de `@/shared/ui/data-table` com as colunas:
 ### Query keys existentes
 
 ```ts
-queryKeys.events.list(circuitId, page)
-queryKeys.eventPassengers.list(eventId, page)
-queryKeys.congregations.list(circuitId, page)
+queryKeys.events.list(circuitId, page);
+queryKeys.eventPassengers.list(eventId, page);
+queryKeys.congregations.list(circuitId, page);
 ```
 
 ### Constantes de dominio existentes
 
 ```ts
 // entities/event-passenger/model
-PAYMENT_STATUSES        // { PENDING, PARTIAL, PAID, EXEMPT }
-PAYMENT_STATUS_LABELS   // { PENDING: "Pendente", ... }
-PAYMENT_STATUS_BADGE_VARIANTS  // { PENDING: "warning", ... }
+PAYMENT_STATUSES; // { PENDING, PARTIAL, PAID, EXEMPT }
+PAYMENT_STATUS_LABELS; // { PENDING: "Pendente", ... }
+PAYMENT_STATUS_BADGE_VARIANTS; // { PENDING: "warning", ... }
 ```
 
 ## Arquitetura FSD

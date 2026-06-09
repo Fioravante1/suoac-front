@@ -28,10 +28,10 @@ operacional, controle de eventos, passageiros, pagamentos e dashboards.
 
 Leia estes arquivos antes de implementar funcionalidades:
 
-- [Requisitos](docs/SUOAC_REQUISITOS_v2.md)
-- [ERD](docs/SUOAC_ERD.md)
-- [Identidade Visual](docs/SUOAC%20%E2%80%94%20Identidade%20Visual%20Oficial.md)
-- [Arquitetura Frontend FSD](docs/SUOAC_ARQUITETURA_FRONTEND_FSD.md)
+- [Requisitos](docs/product/SUOAC_REQUISITOS_v2.md)
+- [ERD](docs/product/SUOAC_ERD.md)
+- [Identidade Visual](docs/design/SUOAC%20%E2%80%94%20Identidade%20Visual%20Oficial.md)
+- [Arquitetura Frontend FSD](docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md)
 
 Para alterações no Next.js, consulte também a documentação local instalada:
 
