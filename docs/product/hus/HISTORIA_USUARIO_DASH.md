@@ -65,18 +65,216 @@ Existem dois perfis com visoes diferentes:
 
 ## API e dados
 
-Os dados necessarios podem ser compostos a partir de endpoints ja existentes:
+### Endpoints
 
-| Dado                  | Endpoint                                 | Observacao                               |
-| --------------------- | ---------------------------------------- | ---------------------------------------- |
-| Evento ativo          | `GET /circuits/:circuitId/events`        | Filtrar por status `OPEN`                |
-| Passageiros do evento | `GET /events/:eventId/passengers`        | Paginado; para totais, usar `meta.total` |
-| Congregacoes          | `GET /circuits/:circuitId/congregations` | Lista de congregacoes                    |
+| #   | Endpoint                             | Quando usar                                          |
+| --- | ------------------------------------ | ---------------------------------------------------- |
+| 1   | `GET /events/:eventId/dashboard`     | Dados agregados do dashboard                         |
+| 2   | `GET /circuits/:circuitId/events`    | Obter evento ativo (filtrar por status `OPEN`)       |
 
-> **Nota**: o backend pode nao ter um endpoint especifico para dados agregados do dashboard
-> (totais financeiros, contagens por congregacao). Verificar com o backend se existe ou se sera
-> necessario criar. Se nao houver, documentar quais endpoints de agregacao sao necessarios e
-> alinhar com o backend antes de implementar.
+Todos os endpoints requerem `Authorization: Bearer <accessToken>`. Permissoes sao verificadas no
+backend pelo token do usuario.
+
+---
+
+### 1. `GET /events/:eventId/dashboard`
+
+Query params:
+
+| Param            | Tipo | Obrigatorio | Default | Descricao                                                     |
+| ---------------- | ---- | ----------- | ------- | ------------------------------------------------------------- |
+| `congregationId` | UUID | nao         | —       | Drill-down em congregacao especifica (so para roles de circuito) |
+
+Comportamento por role:
+
+| Role         | congregationId | Resultado                                                   |
+| ------------ | -------------- | ----------------------------------------------------------- |
+| Congregacao  | (ignorado)     | Dashboard da propria congregacao (usa JWT)                   |
+| Circuito     | ausente        | Visao geral do evento inteiro — `congregation: null`        |
+| Circuito     | presente       | Drill-down na congregacao especifica — `congregation: {...}` |
+
+Response (200):
+
+```ts
+{
+  event: {
+    id: string;
+    title: string;               // "Assembleia de Circuito SP-019 A"
+    type: string;                // "ASSEMBLY" | "REGIONAL_CONVENTION"
+    status: string;              // "DRAFT" | "OPEN" | "CLOSED" | "FINISHED" | "CANCELLED"
+    ticketPrice: string;         // "25.00"
+    registrationDeadline: string; // ISO 8601
+    paymentDeadline: string;      // ISO 8601
+    venue: string;
+    address: string;
+    city: string;
+    state: string;
+    days: Array<{
+      id: string;
+      date: string;              // ISO 8601
+      label: string;             // "Dia 1 - Sabado"
+      dayNumber: number;
+      status: string;            // "ACTIVE" | "CANCELLED"
+    }>;
+  };
+
+  // null quando circuito SEM congregationId (visao geral)
+  // objeto quando congregacao OU circuito COM congregationId
+  congregation: {
+    id: string;
+    name: string;
+    listStatus: string;          // "PENDING" | "FINALIZED"
+  } | null;
+
+  stats: {
+    totalPassengers: number;     // inclui isentos
+    totalExpected: string;       // exclui isentos
+    totalReceived: string;       // exclui isentos
+    totalPending: string;        // exclui isentos
+  };
+
+  paymentBreakdown: {
+    paid: number;
+    partial: number;
+    pending: number;
+    exempt: number;
+  };
+
+  pendingPassengers: Array<{     // top 5 com pagamento pendente/parcial
+    id: string;                  // eventPassenger ID
+    passengerName: string;
+    totalAmount: string;         // "25.00"
+    paidAmount: string;          // "10.00"
+    pendingAmount: string;       // "15.00" (calculado)
+    paymentStatus: string;       // "PENDING" | "PARTIAL"
+  }>;
+
+  totalPendingPassengers: number; // total real (para "ver todos")
+}
+```
+
+---
+
+### Como distinguir os cenarios no front
+
+```ts
+if (response.congregation === null) {
+  // Visao geral do circuito — stats refletem TODAS as congregacoes
+  // Nao ha listStatus para exibir
+} else {
+  // Visao de congregacao — stats refletem UMA congregacao
+  // response.congregation.listStatus -> badge "PENDING" | "FINALIZED"
+}
+```
+
+---
+
+### `pendingPassengers` — detalhes
+
+- Maximo 5 registros (top 5 ordenados por nome A-Z)
+- Apenas status `PENDING` ou `PARTIAL` (nunca `PAID` ou `EXEMPT`)
+- `totalPendingPassengers` e o total real (para mostrar "Ver todos os 13 pendentes")
+- `pendingAmount = totalAmount - paidAmount` (ja calculado pelo backend)
+
+---
+
+### Exemplos de resposta
+
+Congregacao (ou circuito com drill-down):
+
+```json
+{
+  "event": {
+    "id": "e1...",
+    "title": "Assembleia de Circuito SP-019 A",
+    "type": "ASSEMBLY",
+    "status": "OPEN",
+    "ticketPrice": "25.00",
+    "registrationDeadline": "2026-07-01T23:59:59.000Z",
+    "paymentDeadline": "2026-07-15T23:59:59.000Z",
+    "venue": "Salao de Assembleias",
+    "address": "Rua das Flores, 100",
+    "city": "Sao Paulo",
+    "state": "SP",
+    "days": [
+      { "id": "d1...", "date": "2026-07-20T00:00:00.000Z", "label": "Dia 1 - Sabado", "dayNumber": 1, "status": "ACTIVE" }
+    ]
+  },
+  "congregation": {
+    "id": "c1...",
+    "name": "Central",
+    "listStatus": "PENDING"
+  },
+  "stats": {
+    "totalPassengers": 30,
+    "totalExpected": "675.00",
+    "totalReceived": "425.00",
+    "totalPending": "250.00"
+  },
+  "paymentBreakdown": { "paid": 14, "partial": 5, "pending": 8, "exempt": 3 },
+  "pendingPassengers": [
+    { "id": "ep1...", "passengerName": "Ana Costa", "totalAmount": "25.00", "paidAmount": "10.00", "pendingAmount": "15.00", "paymentStatus": "PARTIAL" },
+    { "id": "ep2...", "passengerName": "Carlos Lima", "totalAmount": "50.00", "paidAmount": "0.00", "pendingAmount": "50.00", "paymentStatus": "PENDING" },
+    { "id": "ep3...", "passengerName": "Fernanda Reis", "totalAmount": "25.00", "paidAmount": "0.00", "pendingAmount": "25.00", "paymentStatus": "PENDING" },
+    { "id": "ep4...", "passengerName": "Joao Silva", "totalAmount": "25.00", "paidAmount": "15.00", "pendingAmount": "10.00", "paymentStatus": "PARTIAL" },
+    { "id": "ep5...", "passengerName": "Maria Souza", "totalAmount": "25.00", "paidAmount": "0.00", "pendingAmount": "25.00", "paymentStatus": "PENDING" }
+  ],
+  "totalPendingPassengers": 13
+}
+```
+
+Circuito sem congregationId (visao geral):
+
+```json
+{
+  "event": { "...": "mesma estrutura" },
+  "congregation": null,
+  "stats": {
+    "totalPassengers": 148,
+    "totalExpected": "3375.00",
+    "totalReceived": "1850.00",
+    "totalPending": "1525.00"
+  },
+  "paymentBreakdown": { "paid": 60, "partial": 22, "pending": 54, "exempt": 12 },
+  "pendingPassengers": [
+    { "id": "ep10...", "passengerName": "Alberto Nunes", "totalAmount": "25.00", "paidAmount": "0.00", "pendingAmount": "25.00", "paymentStatus": "PENDING" }
+  ],
+  "totalPendingPassengers": 76
+}
+```
+
+---
+
+### Regra de negocio: EXEMPT nos totais
+
+Valores monetarios (`totalExpected`, `totalReceived`, `totalPending`) **excluem isentos** em todos
+os endpoints. Isentos contam em `totalPassengers` e `paymentBreakdown.exempt`, mas nao geram
+expectativa de cobranca.
+
+```
+totalPassengers = paid + partial + pending + exempt
+totalExpected   = SUM(totalAmount) WHERE status != EXEMPT
+totalPending    = totalExpected - totalReceived
+```
+
+---
+
+### Erros possiveis
+
+| Status | Quando                                                                          |
+| ------ | ------------------------------------------------------------------------------- |
+| 400    | congregationId nao e UUID valido                                                |
+| 401    | Token ausente/expirado                                                          |
+| 403    | Evento de outro circuito / Congregacao sem congregationId no JWT                |
+| 404    | Evento nao existe, congregacao nao existe/inativa, ou DRAFT para role congregacao |
+
+Formato de erro (padrao em toda a API):
+
+```json
+{ "statusCode": 404, "message": "Evento nao encontrado", "error": "Not Found" }
+```
+
+---
 
 ### Query keys existentes
 
