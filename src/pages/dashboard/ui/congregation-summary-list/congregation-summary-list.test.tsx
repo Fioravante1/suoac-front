@@ -5,7 +5,8 @@ import type { DashboardCongregationSummary } from "../../model";
 
 import { CongregationSummaryList } from "./congregation-summary-list";
 
-vi.mock("@/shared/lib", () => ({
+vi.mock("@/shared/lib", async (importOriginal) => ({
+  ...(await importOriginal()),
   formatCurrency: (value: string | number) => `R$ ${Number(value).toFixed(2)}`,
 }));
 

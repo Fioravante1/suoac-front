@@ -15,6 +15,7 @@ export {
   DEADLINE_URGENCY_BG_COLORS,
 } from "./deadline";
 export type { DeadlineUrgency } from "./deadline";
+export { calcPercentage } from "./number";
 export { getInitials, getGreetingByTime, pluralize } from "./string";
 export { useModal } from "./use-modal";
 export { usePagination } from "./use-pagination";

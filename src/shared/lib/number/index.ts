@@ -1,0 +1,1 @@
+export { calcPercentage } from "./number";

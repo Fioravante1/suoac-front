@@ -1,5 +1,7 @@
-import { PAYMENT_STATUS_LABELS } from "@/entities/event-passenger";
+import type { PaymentStatus } from "@/entities/event-passenger";
+import { PAYMENT_STATUSES, PAYMENT_STATUS_LABELS } from "@/entities/event-passenger";
 import { Card } from "@/shared/ui/card";
+import { calcPercentage } from "@/shared/lib";
 
 import type { DashboardPaymentBreakdown } from "../../model";
 import { totalFromBreakdown } from "../../model";
@@ -10,11 +12,20 @@ interface PaymentProgressBarProps {
   breakdown: DashboardPaymentBreakdown;
 }
 
-const SEGMENTS: { key: keyof DashboardPaymentBreakdown; label: string; cssClass: string }[] = [
-  { key: "paid", label: PAYMENT_STATUS_LABELS.PAID, cssClass: "paid" },
-  { key: "partial", label: PAYMENT_STATUS_LABELS.PARTIAL, cssClass: "partial" },
-  { key: "pending", label: PAYMENT_STATUS_LABELS.PENDING, cssClass: "pending" },
-  { key: "exempt", label: PAYMENT_STATUS_LABELS.EXEMPT, cssClass: "exempt" },
+interface Segment {
+  key: keyof DashboardPaymentBreakdown;
+  status: PaymentStatus;
+}
+
+function breakdownKey(status: PaymentStatus): keyof DashboardPaymentBreakdown {
+  return status.toLowerCase() as keyof DashboardPaymentBreakdown;
+}
+
+const SEGMENTS: Segment[] = [
+  { key: breakdownKey(PAYMENT_STATUSES.PAID), status: PAYMENT_STATUSES.PAID },
+  { key: breakdownKey(PAYMENT_STATUSES.PARTIAL), status: PAYMENT_STATUSES.PARTIAL },
+  { key: breakdownKey(PAYMENT_STATUSES.PENDING), status: PAYMENT_STATUSES.PENDING },
+  { key: breakdownKey(PAYMENT_STATUSES.EXEMPT), status: PAYMENT_STATUSES.EXEMPT },
 ];
 
 export function PaymentProgressBar({ breakdown }: PaymentProgressBarProps) {
@@ -22,7 +33,8 @@ export function PaymentProgressBar({ breakdown }: PaymentProgressBarProps) {
 
   if (total === 0) return null;
 
-  const paidPercentage = Math.round(((breakdown.paid + breakdown.exempt) / total) * 100);
+  const settled = breakdown.paid + breakdown.exempt;
+  const paidPercentage = calcPercentage(settled, total);
 
   return (
     <Card className={styles.card}>
@@ -32,34 +44,32 @@ export function PaymentProgressBar({ breakdown }: PaymentProgressBarProps) {
       </div>
 
       <div className={styles.barContainer}>
-        {SEGMENTS.map(({ key, cssClass }) => {
+        {SEGMENTS.map(({ key, status }) => {
           const value = breakdown[key];
 
           if (value === 0) return null;
 
-          const widthPercent = (value / total) * 100;
-
           return (
             <div
               key={key}
-              className={`${styles.barSegment} ${styles[cssClass]}`}
-              style={{ width: `${widthPercent}%` }}
+              className={`${styles.barSegment} ${styles[key]}`}
+              style={{ width: `${(value / total) * 100}%` }}
               role="meter"
               aria-valuenow={value}
               aria-valuemin={0}
               aria-valuemax={total}
-              aria-label={`${PAYMENT_STATUS_LABELS[key.toUpperCase() as keyof typeof PAYMENT_STATUS_LABELS]}: ${value}`}
+              aria-label={`${PAYMENT_STATUS_LABELS[status]}: ${value}`}
             />
           );
         })}
       </div>
 
       <div className={styles.legend}>
-        {SEGMENTS.map(({ key, label, cssClass }) => (
+        {SEGMENTS.map(({ key, status }) => (
           <div key={key} className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles[cssClass]}`} />
+            <span className={`${styles.legendDot} ${styles[key]}`} />
             <span className={styles.legendLabel}>
-              {label}: {breakdown[key]}
+              {PAYMENT_STATUS_LABELS[status]}: {breakdown[key]}
             </span>
           </div>
         ))}

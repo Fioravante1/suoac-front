@@ -2,7 +2,7 @@ import { Building2 } from "lucide-react";
 
 import { Badge } from "@/shared/ui/badge";
 import { Card } from "@/shared/ui/card";
-import { formatCurrency } from "@/shared/lib";
+import { calcPercentage, formatCurrency } from "@/shared/lib";
 
 import type { DashboardCongregationSummary } from "../../model";
 
@@ -31,10 +31,7 @@ const STATUS_COLORS: Record<DashboardCongregationSummary["paymentStatus"], strin
 };
 
 function getPaymentProgress(congregation: DashboardCongregationSummary): number {
-  const expected = Number(congregation.totalExpected);
-  if (expected === 0) return 0;
-
-  return Math.min(100, Math.round((Number(congregation.totalReceived) / expected) * 100));
+  return Math.min(100, calcPercentage(Number(congregation.totalReceived), Number(congregation.totalExpected)));
 }
 
 export function CongregationSummaryList({ summaries }: CongregationSummaryListProps) {
