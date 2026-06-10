@@ -1,0 +1,115 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.title {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--suoac-space-3) var(--suoac-space-2);
+  margin: 0 calc(-1 * var(--suoac-space-2));
+  border-bottom: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-sm);
+  transition: background-color 150ms ease;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item:hover {
+  background-color: var(--suoac-color-surface-muted);
+}
+
+.congregationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+}
+
+.icon {
+  color: var(--suoac-color-primary);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.name {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  color: var(--suoac-color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding-left: calc(14px + var(--suoac-space-2));
+}
+
+.passengers {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}
+
+.progressBar {
+  width: 48px;
+  height: 4px;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-surface-muted);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--suoac-radius-pill);
+  transition: width 300ms ease;
+}
+
+.financialInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  flex-shrink: 0;
+}
+
+.amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.received {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.expected {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}

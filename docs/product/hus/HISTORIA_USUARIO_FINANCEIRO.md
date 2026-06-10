@@ -95,12 +95,206 @@ Tabela usando `DataTable` de `@/shared/ui/data-table` com as colunas:
 | Passageiros do evento | `GET /events/:eventId/passengers`        | Retorna `totalAmount`, `paidAmount`, `paymentStatus` |
 | Congregacoes          | `GET /circuits/:circuitId/congregations` | Para agrupar por congregacao                         |
 
-> **Nota**: os totais financeiros (soma de `totalAmount`, soma de `paidAmount`) provavelmente
-> precisam ser calculados no frontend a partir da lista de passageiros, ou o backend precisa
-> fornecer um endpoint de agregacao. Se a lista de passageiros for paginada, calcular totais no
-> front com os dados de uma pagina nao sera preciso. Verificar com o backend se existe ou sera
-> necessario um endpoint como `GET /events/:eventId/financial-summary`. Alinhar antes de
-> implementar.
+| #   | Endpoint                                          | Quando usar                              |
+| --- | ------------------------------------------------- | ---------------------------------------- |
+| 1   | `GET /events/:eventId/financial-summary`          | Cards de totais + tabela de congregacoes |
+| 2   | `GET /events/:eventId/passengers?paymentStatus=X` | Listagem detalhada com filtro por status |
+| 3   | `GET /circuits/:circuitId/events`                 | Seletor de evento                        |
+
+Todos os endpoints requerem `Authorization: Bearer <accessToken>`. Permissoes sao verificadas no
+backend pelo token do usuario.
+
+---
+
+### 1. `GET /events/:eventId/financial-summary`
+
+Sem query params. O backend resolve o escopo automaticamente pelo JWT:
+
+- **Circuito** — totais do evento inteiro + array `congregations` com todas
+- **Congregacao** — totais da propria congregacao + array `congregations` com 1 item (a propria)
+
+Response (200):
+
+```ts
+{
+  eventId: string; // UUID do evento
+  eventTitle: string; // "Assembleia de Circuito"
+  ticketPrice: string; // "25.00" (Decimal como string)
+
+  totals: {
+    totalPassengers: number; // contagem total (inclui isentos)
+    totalExpected: string; // soma de totalAmount dos NAO-isentos
+    totalReceived: string; // soma de paidAmount dos NAO-isentos
+    totalPending: string; // totalExpected - totalReceived
+    byStatus: {
+      paid: number; // qtd com status PAID
+      partial: number; // qtd com status PARTIAL
+      pending: number; // qtd com status PENDING
+      exempt: number; // qtd com status EXEMPT
+    }
+  }
+
+  congregations: Array<{
+    congregationId: string;
+    congregationName: string;
+    totalPassengers: number; // inclui isentos
+    totalExpected: string; // exclui isentos
+    totalReceived: string; // exclui isentos
+    totalPending: string; // exclui isentos
+    byStatus: { paid: number; partial: number; pending: number; exempt: number };
+  }>;
+  // ordenado por congregationName (A-Z)
+}
+```
+
+Exemplo real (circuito, 2 congregacoes):
+
+```json
+{
+  "eventId": "e1e2e3e4-...",
+  "eventTitle": "Assembleia de Circuito SP-019 A",
+  "ticketPrice": "25.00",
+  "totals": {
+    "totalPassengers": 48,
+    "totalExpected": "1075.00",
+    "totalReceived": "625.00",
+    "totalPending": "450.00",
+    "byStatus": { "paid": 20, "partial": 8, "pending": 15, "exempt": 5 }
+  },
+  "congregations": [
+    {
+      "congregationId": "c1...",
+      "congregationName": "Central",
+      "totalPassengers": 30,
+      "totalExpected": "675.00",
+      "totalReceived": "425.00",
+      "totalPending": "250.00",
+      "byStatus": { "paid": 14, "partial": 5, "pending": 8, "exempt": 3 }
+    },
+    {
+      "congregationId": "c2...",
+      "congregationName": "Norte",
+      "totalPassengers": 18,
+      "totalExpected": "400.00",
+      "totalReceived": "200.00",
+      "totalPending": "200.00",
+      "byStatus": { "paid": 6, "partial": 3, "pending": 7, "exempt": 2 }
+    }
+  ]
+}
+```
+
+---
+
+### 2. `GET /events/:eventId/passengers`
+
+Query params:
+
+| Param           | Tipo   | Obrigatorio | Default | Valores                        |
+| --------------- | ------ | ----------- | ------- | ------------------------------ |
+| `page`          | number | nao         | 1       | >= 1                           |
+| `limit`         | number | nao         | 20      | 1–100                          |
+| `paymentStatus` | string | nao         | —       | PENDING, PARTIAL, PAID, EXEMPT |
+
+Escopo por role (automatico via JWT):
+
+- **Circuito** — todos os passageiros do evento
+- **Congregacao** — apenas passageiros da propria congregacao
+
+Response (200):
+
+```ts
+{
+  data: Array<{
+    id: string; // UUID do eventPassenger
+    passenger: {
+      id: string;
+      name: string;
+      rg: string; // descriptografado
+      phone: string | null;
+    };
+    totalAmount: string; // "25.00"
+    paidAmount: string; // "10.00"
+    paymentStatus: string; // "PENDING" | "PARTIAL" | "PAID" | "EXEMPT"
+    exemptionReason: string | null;
+    observations: string | null;
+    eventId: string;
+    congregationId: string;
+    registeredById: string;
+    createdAt: string; // ISO 8601
+    updatedAt: string; // ISO 8601
+    days: Array<{
+      id: string;
+      eventDayId: string;
+      dayNumber: number;
+      date: string; // ISO 8601
+      label: string; // "Dia 1 - Sabado"
+      checkedIn: boolean;
+      checkedInAt: string | null;
+    }>;
+  }>;
+
+  meta: {
+    total: number; // total FILTRADO (respeita paymentStatus)
+    page: number;
+    limit: number;
+    totalPages: number;
+  }
+
+  financialSummary: {
+    // totais SEM filtro de paymentStatus (panorama geral sempre)
+    totalPassengers: number;
+    totalExpected: string; // exclui isentos
+    totalReceived: string; // exclui isentos
+    totalPending: string; // exclui isentos
+    byStatus: {
+      paid: number;
+      partial: number;
+      pending: number;
+      exempt: number;
+    }
+  }
+}
+```
+
+Comportamento chave:
+
+- `meta.total` = total **filtrado** (ex: com `?paymentStatus=PENDING`, conta apenas pendentes)
+- `financialSummary` = totais **sem filtro** (panorama geral, independente do `paymentStatus` no query)
+- Isso permite mostrar "Exibindo 15 pendentes de 48 total" e os cards financeiros ao mesmo tempo
+
+---
+
+### Regra de negocio: EXEMPT nos totais
+
+Valores monetarios (`totalExpected`, `totalReceived`, `totalPending`) **excluem isentos** em todos
+os endpoints. Isentos contam em `totalPassengers` e `byStatus.exempt`, mas nao geram expectativa
+de cobranca.
+
+```
+totalPassengers = paid + partial + pending + exempt
+totalExpected   = SUM(totalAmount) WHERE status != EXEMPT
+totalPending    = totalExpected - totalReceived
+```
+
+---
+
+### Erros possiveis
+
+| Status | Quando                                              |
+| ------ | --------------------------------------------------- |
+| 401    | Token ausente/expirado                              |
+| 403    | Evento de outro circuito                            |
+| 404    | eventId nao existe (ou DRAFT para role congregacao) |
+| 400    | paymentStatus com valor invalido                    |
+
+Formato de erro (padrao em toda a API):
+
+```json
+{ "statusCode": 404, "message": "Evento nao encontrado", "error": "Not Found" }
+```
+
+---
 
 ### Query keys existentes
 

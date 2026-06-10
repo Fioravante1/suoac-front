@@ -1,0 +1,68 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-8);
+}
+
+.greeting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.heroDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.deadlines {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--suoac-space-3);
+}
+
+.heroLink {
+  align-self: flex-end;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--suoac-space-4);
+}
+
+@media (min-width: 48rem) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.progressContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.legendRow {
+  display: flex;
+  gap: var(--suoac-space-4);
+}

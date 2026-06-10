@@ -54,6 +54,9 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
   const { data: passengersData, isLoading, isError } = useQuery(eventPassengerListOptions(event.id, page));
+  const paymentModalPassenger = paymentsModal.item
+    ? (passengersData?.data.find((passenger) => passenger.id === paymentsModal.item?.id) ?? paymentsModal.item)
+    : null;
 
   function invalidateQueries() {
     queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
@@ -304,11 +307,11 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         />
       )}
 
-      {paymentsModal.item && (
+      {paymentModalPassenger && (
         <PassengerPaymentsModal
           open={paymentsModal.isOpen}
           onClose={paymentsModal.close}
-          eventPassenger={paymentsModal.item}
+          eventPassenger={paymentModalPassenger}
           event={event}
           userRole={userRole}
         />
