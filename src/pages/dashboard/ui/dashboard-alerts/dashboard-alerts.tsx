@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { AlertTriangle, Clock } from "lucide-react";
 
-import { formatCurrency } from "@/shared/lib";
+import { formatCurrency, pluralize } from "@/shared/lib";
 
 import type { DashboardEvent, DeadlineUrgency } from "../../model";
 import { daysUntilDeadline, getDeadlineUrgency, DEADLINE_URGENCIES, DEADLINE_URGENCY_COLORS } from "../../model";
@@ -19,10 +19,6 @@ interface AlertItem {
   icon: ReactNode;
   message: string;
   borderColor: string;
-}
-
-function pluralize(count: number, singular: string): string {
-  return count !== 1 ? `${singular}s` : singular;
 }
 
 function buildRegistrationAlert(days: number, urgency: DeadlineUrgency): AlertItem | null {
