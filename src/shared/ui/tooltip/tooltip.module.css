@@ -1,0 +1,31 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.wrapper::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--suoac-space-2));
+  z-index: 50;
+  padding: var(--suoac-space-1) var(--suoac-space-2);
+  border-radius: var(--suoac-radius-sm);
+  background: var(--suoac-color-text-primary);
+  color: var(--suoac-color-text-inverse);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+  line-height: var(--suoac-line-height-tight);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(var(--suoac-space-1));
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.wrapper:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}

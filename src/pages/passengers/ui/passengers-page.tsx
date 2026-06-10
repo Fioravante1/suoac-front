@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, Users } from "lucide-react";
 
 import { congregationSelectOptions } from "@/entities/congregation/api";
 import type { Passenger, PassengerFormValues } from "@/entities/passenger";
-import { passengerListOptions } from "@/entities/passenger/api";
+import { passengerListByCircuitOptions, passengerListOptions } from "@/entities/passenger/api";
+
 import { createPassengerAction } from "@/features/create-passenger";
 import { deletePassengerAction } from "@/features/delete-passenger";
 import { updatePassengerAction } from "@/features/update-passenger";
+
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { isCircuitRole, useAuth } from "@/shared/auth";
-import { useModal, usePagination } from "@/shared/lib";
+import { useDebouncedValue, useModal, usePagination } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -20,6 +22,7 @@ import { PageHeader } from "@/shared/ui/page-header";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
 import { TextField } from "@/shared/ui/text-field";
+import { Tooltip } from "@/shared/ui/tooltip";
 
 import { PassengerFormModal } from "./passenger-form-modal";
 import { PassengerTable } from "./passenger-table";
@@ -42,15 +45,38 @@ export function PassengersPage() {
 
   const [selectedCongregationId, setSelectedCongregationId] = useState("");
   const [search, setSearch] = useState("");
-  const [appliedSearch, setAppliedSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
+  const activeSearch = debouncedSearch.length >= 3 ? debouncedSearch : "";
   const [pageError, setPageError] = useState<string | null>(null);
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setPage(1);
+  }, [activeSearch, setPage]);
 
   const congregationQuery = useQuery({
     ...congregationSelectOptions(circuitId),
     enabled: Boolean(circuitId && canSelectCongregation),
   });
+
   const activeCongregationId = canSelectCongregation ? selectedCongregationId : userCongregationId;
-  const passengerQuery = useQuery(passengerListOptions(activeCongregationId, page, appliedSearch));
+
+  const circuitPassengerQuery = useQuery({
+    ...passengerListByCircuitOptions(circuitId, page, activeSearch, selectedCongregationId),
+    enabled: Boolean(circuitId && canSelectCongregation),
+  });
+
+  const congregationPassengerQuery = useQuery({
+    ...passengerListOptions(userCongregationId, page, activeSearch),
+    enabled: Boolean(userCongregationId && !canSelectCongregation),
+  });
+
+  const passengerQuery = canSelectCongregation ? circuitPassengerQuery : congregationPassengerQuery;
 
   const createMutation = useMutation({
     mutationFn: (values: PassengerFormValues) => createPassengerAction(activeCongregationId, values),
@@ -103,31 +129,24 @@ export function PassengersPage() {
     deleteMutation.mutate(deleteModal.item.id);
   }
 
-  function handleSearchSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setPage(1);
-    setAppliedSearch(search.trim());
-  }
-
   function handleClearSearch() {
     setSearch("");
-    setAppliedSearch("");
     setPage(1);
   }
 
   function handleCongregationChange(congregationId: string) {
     setSelectedCongregationId(congregationId);
     setPage(1);
-    setAppliedSearch("");
     setSearch("");
   }
 
   const hasPassengers = Boolean(passengerQuery.data && passengerQuery.data.data.length > 0);
   const isEmpty = Boolean(passengerQuery.data && passengerQuery.data.data.length === 0);
-  const emptyTitle = appliedSearch ? "Nenhum passageiro encontrado" : "Nenhum passageiro cadastrado";
-  const emptyDescription = appliedSearch
+  const emptyTitle = activeSearch ? "Nenhum passageiro encontrado" : "Nenhum passageiro cadastrado";
+  const emptyDescription = activeSearch
     ? "Revise o nome ou RG pesquisado e tente novamente."
     : "Cadastre o primeiro passageiro da congregação para reaproveitar os dados em inscrições futuras.";
+  const canCreatePassenger = canSelectCongregation ? Boolean(selectedCongregationId) : Boolean(userCongregationId);
 
   return (
     <div className={styles.page}>
@@ -135,9 +154,13 @@ export function PassengersPage() {
         title="Passageiros"
         description="Gerencie o cadastro base de passageiros por congregação."
         action={
-          <Button onClick={() => formModal.open()} disabled={!activeCongregationId}>
-            + Novo passageiro
-          </Button>
+          !canCreatePassenger ? (
+            <Tooltip content="Selecione uma congregação para cadastrar">
+              <Button disabled>+ Novo passageiro</Button>
+            </Tooltip>
+          ) : (
+            <Button onClick={() => formModal.open()}>+ Novo passageiro</Button>
+          )
         }
       />
 
@@ -157,7 +180,7 @@ export function PassengersPage() {
               onChange={(event) => handleCongregationChange(event.target.value)}
               disabled={congregationQuery.isLoading}
             >
-              <option value="">Selecione uma congregação</option>
+              <option value="">Todas as congregações</option>
               {congregationQuery.data?.data.map((congregation) => (
                 <option key={congregation.id} value={congregation.id}>
                   {congregation.name}
@@ -167,34 +190,23 @@ export function PassengersPage() {
           </label>
         )}
 
-        <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
+        <div className={styles.searchGroup}>
           <TextField
             aria-label="Buscar passageiro por nome ou RG"
             placeholder="Buscar por nome ou RG"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             startIcon={<Search size={18} />}
-            disabled={!activeCongregationId}
           />
-          <Button type="submit" variant="secondary" disabled={!activeCongregationId}>
-            Buscar
-          </Button>
-          {appliedSearch && (
-            <Button type="button" variant="ghost" onClick={handleClearSearch}>
+          {search && (
+            <Button type="button" variant="secondary" onClick={handleClearSearch}>
               Limpar
             </Button>
           )}
-        </form>
+        </div>
       </section>
 
-      {!activeCongregationId && !congregationQuery.isLoading && (
-        <ErrorState
-          title="Selecione uma congregação"
-          description="A listagem de passageiros usa o cadastro base de uma congregação específica."
-        />
-      )}
-
-      {activeCongregationId && passengerQuery.isError && (
+      {passengerQuery.isError && (
         <ErrorState
           title="Não foi possível carregar passageiros"
           description={getErrorMessage(passengerQuery.error)}
@@ -202,7 +214,7 @@ export function PassengersPage() {
         />
       )}
 
-      {activeCongregationId && !passengerQuery.isError && (
+      {!passengerQuery.isError && (
         <div className={styles.content}>
           {passengerQuery.isLoading && <SkeletonTableRows rows={10} />}
 
@@ -211,7 +223,11 @@ export function PassengersPage() {
               icon={<Users size={48} strokeWidth={1.5} />}
               title={emptyTitle}
               description={emptyDescription}
-              action={!appliedSearch ? <Button onClick={() => formModal.open()}>+ Novo passageiro</Button> : undefined}
+              action={
+                !activeSearch && canCreatePassenger ? (
+                  <Button onClick={() => formModal.open()}>+ Novo passageiro</Button>
+                ) : undefined
+              }
             />
           )}
 
@@ -221,6 +237,7 @@ export function PassengersPage() {
                 passengers={passengerQuery.data?.data ?? []}
                 onEdit={(passenger) => formModal.open(passenger)}
                 onDelete={(passenger) => deleteModal.open(passenger)}
+                showCongregation={canSelectCongregation}
               />
               <Pagination
                 page={passengerQuery.data?.meta.page ?? 1}

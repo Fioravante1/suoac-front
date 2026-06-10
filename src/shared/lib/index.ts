@@ -17,6 +17,7 @@ export {
 export type { DeadlineUrgency } from "./deadline";
 export { calcPercentage } from "./number";
 export { getInitials, getGreetingByTime, pluralize } from "./string";
+export { useDebouncedValue } from "./use-debounced-value";
 export { useModal } from "./use-modal";
 export { usePagination } from "./use-pagination";
 export { useServerError } from "./use-server-error";

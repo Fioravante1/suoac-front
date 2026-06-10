@@ -12,6 +12,11 @@
   font-size: var(--suoac-font-size-label);
 }
 
+.congregation {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}
+
 .muted,
 .observations {
   color: var(--suoac-color-text-secondary);
@@ -94,6 +99,12 @@
 .mobileCardName {
   font-weight: var(--suoac-font-weight-semibold);
   color: var(--suoac-color-text-primary);
+}
+
+.mobileCardCongregation {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-info);
+  font-weight: var(--suoac-font-weight-medium);
 }
 
 .mobileCardRg,
