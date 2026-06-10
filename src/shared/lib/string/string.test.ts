@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getGreetingByTime, pluralize } from "./string";
+import { getInitials, getGreetingByTime, pluralize } from "./string";
 
 describe("pluralize", () => {
   it("retorna singular quando count e 1", () => {
@@ -17,6 +17,25 @@ describe("pluralize", () => {
 
   it("retorna plural para numeros negativos", () => {
     expect(pluralize(-3, "dia")).toBe("dias");
+  });
+});
+
+describe("getInitials", () => {
+  it("retorna iniciais do primeiro e ultimo nome", () => {
+    expect(getInitials("Maria Silva")).toBe("MS");
+  });
+
+  it("retorna inicial unica para nome simples", () => {
+    expect(getInitials("Joao")).toBe("J");
+  });
+
+  it("retorna iniciais do primeiro e ultimo em nome composto", () => {
+    expect(getInitials("Ana Paula de Souza")).toBe("AS");
+  });
+
+  it("retorna '?' para string vazia", () => {
+    expect(getInitials("")).toBe("?");
+    expect(getInitials("   ")).toBe("?");
   });
 });
 

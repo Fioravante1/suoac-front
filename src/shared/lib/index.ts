@@ -15,7 +15,7 @@ export {
   DEADLINE_URGENCY_BG_COLORS,
 } from "./deadline";
 export type { DeadlineUrgency } from "./deadline";
-export { pluralize, getGreetingByTime } from "./string";
+export { getInitials, getGreetingByTime, pluralize } from "./string";
 export { useModal } from "./use-modal";
 export { usePagination } from "./use-pagination";
 export { useServerError } from "./use-server-error";

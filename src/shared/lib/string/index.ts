@@ -1,1 +1,1 @@
-export { pluralize, getGreetingByTime } from "./string";
+export { getInitials, getGreetingByTime, pluralize } from "./string";
