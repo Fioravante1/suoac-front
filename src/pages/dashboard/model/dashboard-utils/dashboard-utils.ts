@@ -1,6 +1,13 @@
 import type { DashboardPaymentBreakdown } from "../dashboard-types";
 
-export type DeadlineUrgency = "safe" | "approaching" | "urgent" | "expired";
+export const DEADLINE_URGENCIES = {
+  safe: "safe",
+  approaching: "approaching",
+  urgent: "urgent",
+  expired: "expired",
+} as const;
+
+export type DeadlineUrgency = (typeof DEADLINE_URGENCIES)[keyof typeof DEADLINE_URGENCIES];
 
 export function daysUntilDeadline(deadline: string): number {
   const dateOnly = deadline.includes("T") ? deadline.split("T")[0] : deadline;
@@ -13,11 +20,11 @@ export function daysUntilDeadline(deadline: string): number {
 }
 
 export function getDeadlineUrgency(days: number): DeadlineUrgency {
-  if (days < 0) return "expired";
-  if (days <= 3) return "urgent";
-  if (days <= 7) return "approaching";
+  if (days < 0) return DEADLINE_URGENCIES.expired;
+  if (days <= 3) return DEADLINE_URGENCIES.urgent;
+  if (days <= 7) return DEADLINE_URGENCIES.approaching;
 
-  return "safe";
+  return DEADLINE_URGENCIES.safe;
 }
 
 export const DEADLINE_URGENCY_COLORS: Record<DeadlineUrgency, string> = {

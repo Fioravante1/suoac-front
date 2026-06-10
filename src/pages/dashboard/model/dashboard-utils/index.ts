@@ -4,6 +4,7 @@ export {
   getDeadlineUrgency,
   getGreetingByTime,
   totalFromBreakdown,
+  DEADLINE_URGENCIES,
   DEADLINE_URGENCY_COLORS,
   DEADLINE_URGENCY_BG_COLORS,
 } from "./dashboard-utils";
