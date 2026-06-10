@@ -20,7 +20,8 @@ vi.mock("@/entities/event", () => ({
   EVENT_TYPE_LABELS: { ASSEMBLY: "Assembleia" },
 }));
 
-vi.mock("@/entities/event-passenger", () => ({
+vi.mock("@/entities/event-passenger", async (importOriginal) => ({
+  ...(await importOriginal()),
   PAYMENT_STATUS_LABELS: { PENDING: "Pendente", PARTIAL: "Parcial", PAID: "Pago", EXEMPT: "Isento" },
   PAYMENT_STATUS_BADGE_VARIANTS: { PENDING: "critical", PARTIAL: "attention", PAID: "success", EXEMPT: "info" },
 }));
