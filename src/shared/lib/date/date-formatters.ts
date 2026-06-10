@@ -13,8 +13,16 @@ export function formatWeekday(value: string): string {
   return BRAZILIAN_WEEKDAY_FORMATTER.format(new Date(value));
 }
 
+export function toDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
+
 export function getTodayDateString(): string {
-  return new Date().toISOString().split("T")[0];
+  return toDateString(new Date());
 }
 
 export function formatDateRange(dates: string[]): string {

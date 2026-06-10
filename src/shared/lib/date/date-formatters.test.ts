@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { formatDate, formatDateRange, formatWeekday, getTodayDateString } from "./date-formatters";
+import { formatDate, formatDateRange, formatWeekday, toDateString, getTodayDateString } from "./date-formatters";
 
 describe("formatDate", () => {
   it("formata data no padrão brasileiro usando UTC", () => {
@@ -31,6 +31,16 @@ describe("formatDateRange", () => {
     expect(formatDateRange(["2026-05-27T03:00:00.000Z", "2026-05-28T03:00:00.000Z", "2026-05-29T03:00:00.000Z"])).toBe(
       "27/05/2026 - 29/05/2026",
     );
+  });
+});
+
+describe("toDateString", () => {
+  it("formata Date no padrao YYYY-MM-DD", () => {
+    expect(toDateString(new Date(2026, 4, 27))).toBe("2026-05-27");
+  });
+
+  it("adiciona zero a esquerda em mes e dia", () => {
+    expect(toDateString(new Date(2026, 0, 5))).toBe("2026-01-05");
   });
 });
 

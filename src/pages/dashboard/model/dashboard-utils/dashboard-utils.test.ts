@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { toDateString } from "@/shared/lib";
+
 import type { DashboardPaymentBreakdown } from "../dashboard-types";
 
 import {
@@ -10,37 +12,29 @@ import {
   totalFromBreakdown,
 } from "./dashboard-utils";
 
-function toLocalDateStr(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
-}
-
 describe("daysUntilDeadline", () => {
   it("retorna numero positivo para prazo futuro", () => {
     const future = new Date();
     future.setDate(future.getDate() + 5);
 
-    expect(daysUntilDeadline(toLocalDateStr(future))).toBe(5);
+    expect(daysUntilDeadline(toDateString(future))).toBe(5);
   });
 
   it("retorna 0 para prazo hoje", () => {
-    expect(daysUntilDeadline(toLocalDateStr(new Date()))).toBe(0);
+    expect(daysUntilDeadline(toDateString(new Date()))).toBe(0);
   });
 
   it("retorna numero negativo para prazo passado", () => {
     const past = new Date();
     past.setDate(past.getDate() - 3);
 
-    expect(daysUntilDeadline(toLocalDateStr(past))).toBe(-3);
+    expect(daysUntilDeadline(toDateString(past))).toBe(-3);
   });
 
   it("funciona com data ISO completa (com horario)", () => {
     const future = new Date();
     future.setDate(future.getDate() + 5);
-    const dateStr = toLocalDateStr(future);
+    const dateStr = toDateString(future);
     const isoStr = `${dateStr}T15:00:00.000Z`;
 
     expect(daysUntilDeadline(isoStr)).toBe(5);
