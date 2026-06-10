@@ -9,7 +9,7 @@ import type { Passenger } from "../model";
 export async function fetchPassengers(
   congregationId: string,
   page: number = 1,
-  limit: number = 20,
+  limit: number = 10,
   search: string = "",
 ): Promise<PaginatedResponse<Passenger>> {
   const params = new URLSearchParams({

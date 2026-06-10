@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, Users } from "lucide-react";
 
-import { congregationListOptions } from "@/entities/congregation/api";
+import { congregationSelectOptions } from "@/entities/congregation/api";
 import type { Passenger, PassengerFormValues } from "@/entities/passenger";
 import { passengerListOptions } from "@/entities/passenger/api";
 import { createPassengerAction } from "@/features/create-passenger";
@@ -46,7 +46,7 @@ export function PassengersPage() {
   const [pageError, setPageError] = useState<string | null>(null);
 
   const congregationQuery = useQuery({
-    ...congregationListOptions(circuitId, 1),
+    ...congregationSelectOptions(circuitId),
     enabled: Boolean(circuitId && canSelectCongregation),
   });
   const activeCongregationId = canSelectCongregation ? selectedCongregationId : userCongregationId;

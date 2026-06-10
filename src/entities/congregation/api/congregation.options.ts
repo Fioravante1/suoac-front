@@ -10,6 +10,16 @@ export function congregationListOptions(circuitId: string, page: number) {
   } as const;
 }
 
+const SELECT_LIMIT = 100;
+
+export function congregationSelectOptions(circuitId: string) {
+  return {
+    queryKey: queryKeys.congregations.select(circuitId),
+    queryFn: () => fetchCongregations(circuitId, 1, SELECT_LIMIT),
+    enabled: Boolean(circuitId),
+  } as const;
+}
+
 export function congregationDetailOptions(id: string) {
   return {
     queryKey: queryKeys.congregations.detail(id),

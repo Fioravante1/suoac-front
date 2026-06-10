@@ -41,15 +41,15 @@ vi.mock("@/entities/passenger/api", () => ({
 }));
 
 vi.mock("@/entities/congregation/api", () => ({
-  congregationListOptions: () => ({
-    queryKey: ["congregations"],
+  congregationSelectOptions: () => ({
+    queryKey: ["congregations", "select"],
     queryFn: () =>
       Promise.resolve({
         data: [
           { id: "congregation-1", name: "Congregação A", code: "001", email: "a@test.com", city: "Cidade" },
           { id: "congregation-2", name: "Congregação B", code: "002", email: "b@test.com", city: "Cidade" },
         ],
-        meta: { total: 2, page: 1, limit: 10, totalPages: 1 },
+        meta: { total: 2, page: 1, limit: 100, totalPages: 1 },
       }),
     enabled: true,
   }),

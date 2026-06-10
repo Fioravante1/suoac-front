@@ -5,7 +5,7 @@ import { fetchPassenger, fetchPassengers } from "./passenger.queries";
 export function passengerListOptions(congregationId: string, page: number, search: string) {
   return {
     queryKey: queryKeys.passengers.list(congregationId, page, search.trim()),
-    queryFn: () => fetchPassengers(congregationId, page, 20, search),
+    queryFn: () => fetchPassengers(congregationId, page, 10, search),
     enabled: Boolean(congregationId),
   } as const;
 }
