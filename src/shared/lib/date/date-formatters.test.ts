@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { formatDate, formatWeekday, getTodayDateString } from "./date-formatters";
+import { formatDate, formatDateRange, formatWeekday, getTodayDateString } from "./date-formatters";
 
 describe("formatDate", () => {
   it("formata data no padrão brasileiro usando UTC", () => {
@@ -11,6 +11,26 @@ describe("formatDate", () => {
 describe("formatWeekday", () => {
   it("formata dia da semana em português usando UTC", () => {
     expect(formatWeekday("2026-05-27T03:00:00.000Z")).toBe("quarta-feira");
+  });
+});
+
+describe("formatDateRange", () => {
+  it("retorna string vazia para array vazio", () => {
+    expect(formatDateRange([])).toBe("");
+  });
+
+  it("retorna data unica quando ha apenas uma data", () => {
+    expect(formatDateRange(["2026-05-27T03:00:00.000Z"])).toBe("27/05/2026");
+  });
+
+  it("retorna data unica quando primeira e ultima sao iguais", () => {
+    expect(formatDateRange(["2026-05-27T03:00:00.000Z", "2026-05-27T03:00:00.000Z"])).toBe("27/05/2026");
+  });
+
+  it("retorna range quando primeira e ultima sao diferentes", () => {
+    expect(formatDateRange(["2026-05-27T03:00:00.000Z", "2026-05-28T03:00:00.000Z", "2026-05-29T03:00:00.000Z"])).toBe(
+      "27/05/2026 - 29/05/2026",
+    );
   });
 });
 

@@ -5,7 +5,7 @@ import { EVENT_STATUS_BADGE_VARIANTS, EVENT_STATUS_LABELS, EVENT_TYPE_LABELS } f
 import { Badge } from "@/shared/ui/badge";
 import { Card } from "@/shared/ui/card";
 import { routes } from "@/shared/config";
-import { formatDate } from "@/shared/lib";
+import { formatDateRange } from "@/shared/lib";
 
 import type { DashboardEvent } from "../../model";
 import {
@@ -28,14 +28,7 @@ export function EventHeroCard({ event }: EventHeroCardProps) {
   const registrationUrgency = getDeadlineUrgency(registrationDays);
   const paymentUrgency = getDeadlineUrgency(paymentDays);
 
-  const firstDay = event.days[0];
-  const lastDay = event.days[event.days.length - 1];
-  const dateRange =
-    firstDay && lastDay && firstDay.date !== lastDay.date
-      ? `${formatDate(firstDay.date)} - ${formatDate(lastDay.date)}`
-      : firstDay
-        ? formatDate(firstDay.date)
-        : "";
+  const dateRange = formatDateRange(event.days.map((day) => day.date));
 
   return (
     <Card className={styles.card}>

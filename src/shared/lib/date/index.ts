@@ -1,1 +1,1 @@
-export { formatDate, formatWeekday, getTodayDateString } from "./date-formatters";
+export { formatDate, formatDateRange, formatWeekday, getTodayDateString } from "./date-formatters";

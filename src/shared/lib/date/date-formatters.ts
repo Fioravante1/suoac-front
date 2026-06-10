@@ -16,3 +16,15 @@ export function formatWeekday(value: string): string {
 export function getTodayDateString(): string {
   return new Date().toISOString().split("T")[0];
 }
+
+export function formatDateRange(dates: string[]): string {
+  const first = dates[0];
+  if (!first) return "";
+
+  const last = dates[dates.length - 1];
+  if (last && first !== last) {
+    return `${formatDate(first)} - ${formatDate(last)}`;
+  }
+
+  return formatDate(first);
+}
