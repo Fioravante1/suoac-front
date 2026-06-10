@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  background: var(--suoac-color-surface);
+  border-radius: var(--suoac-radius-md);
+  border-left: 4px solid;
+  box-shadow: var(--suoac-shadow-xs);
+  transition: transform 150ms ease;
+}
+
+.alert:hover {
+  transform: translateX(2px);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.message {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-primary);
+  line-height: var(--suoac-line-height-body);
+}

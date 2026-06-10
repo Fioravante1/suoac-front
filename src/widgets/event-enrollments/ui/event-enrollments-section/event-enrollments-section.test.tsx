@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES, type Event } from "@/entities/event";
 import { PAYMENT_STATUSES, type EventPassenger } from "@/entities/event-passenger";
@@ -62,7 +62,9 @@ vi.mock("@/features/remove-event-passenger", () => ({
 }));
 
 vi.mock("@/features/register-payment", () => ({
-  PassengerPaymentsModal: () => null,
+  PassengerPaymentsModal: ({ eventPassenger }: { eventPassenger: EventPassenger }) => (
+    <div data-testid="payments-modal-paid-amount">{eventPassenger.paidAmount}</div>
+  ),
 }));
 
 const basePassenger: EventPassenger = {
@@ -208,5 +210,37 @@ describe("EventEnrollmentsSection", () => {
     expect(within(menu).getByRole("menuitem", { name: "Pagamentos" })).toBeInTheDocument();
     expect(within(menu).getByRole("menuitem", { name: "Editar dias" })).toBeInTheDocument();
     expect(within(menu).getByRole("menuitem", { name: "Remover inscrição" })).toBeInTheDocument();
+  });
+
+  it("atualiza os dados do modal de pagamento quando a lista de inscrições refaz a busca", async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+    const updatedPassenger: EventPassenger = { ...basePassenger, paidAmount: "75.00" };
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [basePassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    const view = render(
+      <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Ações" }));
+    fireEvent.click(within(screen.getByRole("menu")).getByRole("menuitem", { name: "Pagamentos" }));
+
+    expect(screen.getByTestId("payments-modal-paid-amount")).toHaveTextContent("25.00");
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [updatedPassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    view.rerender(
+      <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
+    );
+
+    expect(screen.getByTestId("payments-modal-paid-amount")).toHaveTextContent("75.00");
   });
 });

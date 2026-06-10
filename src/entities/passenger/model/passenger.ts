@@ -5,6 +5,7 @@ export interface Passenger {
   phone: string | null;
   observations: string | null;
   congregationId: string;
+  congregationName?: string;
   createdAt: string;
   updatedAt: string;
 }

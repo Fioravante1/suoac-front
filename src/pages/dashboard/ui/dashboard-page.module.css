@@ -1,16 +1,5 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--suoac-space-4);
-}
-
-.heading {
-  font-size: var(--suoac-font-size-h1);
-  font-weight: var(--suoac-font-weight-bold);
-  color: var(--suoac-color-text-primary);
-}
-
-.greeting {
-  font-size: var(--suoac-font-size-body);
-  color: var(--suoac-color-text-secondary);
+  gap: var(--suoac-space-8);
 }

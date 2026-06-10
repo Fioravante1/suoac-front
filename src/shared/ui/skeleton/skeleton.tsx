@@ -39,9 +39,49 @@ export function SkeletonText({ lines = 3, className }: SkeletonTextProps) {
   );
 }
 
-export function SkeletonTableRows({ rows = 5 }: { rows?: number }) {
+export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={styles.tableRows} role="status" aria-label="Carregando">
+    <div className={`${styles.card} ${className ?? ""}`.trim()} aria-hidden="true">
+      <div className={styles.cardHeader}>
+        <span className={`${styles.bone} ${styles.cardLabel}`} />
+        <span className={`${styles.bone} ${styles.cardBadge}`} />
+      </div>
+      <span className={`${styles.bone} ${styles.cardTitle}`} />
+      <div className={styles.cardMeta}>
+        <span className={`${styles.bone} ${styles.cardMetaLine}`} />
+        <span className={`${styles.bone} ${styles.cardMetaLine}`} />
+        <span className={`${styles.bone} ${styles.cardMetaLineShort}`} />
+      </div>
+      <div className={styles.cardFooter}>
+        <span className={`${styles.bone} ${styles.cardFooterLine}`} />
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonCardGrid({ count = 4, className }: { count?: number; className?: string }) {
+  return (
+    <div className={`${styles.cardGrid} ${className ?? ""}`.trim()} role="status" aria-label="Carregando">
+      {Array.from({ length: count }, (_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  );
+}
+
+interface SkeletonTableRowsProps {
+  rows?: number;
+  announce?: boolean;
+}
+
+export function SkeletonTableRows({ rows = 5, announce = true }: SkeletonTableRowsProps) {
+  return (
+    <div
+      className={styles.tableRows}
+      role={announce ? "status" : undefined}
+      aria-label={announce ? "Carregando" : undefined}
+      aria-hidden={announce ? undefined : true}
+    >
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className={styles.tableRow}>
           <span className={`${styles.bone} ${styles.tableCell}`} aria-hidden="true" />

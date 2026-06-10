@@ -12,7 +12,13 @@ export default defineConfig([
   {
     // Next.js server/client boundary prevents barrel-exporting server-only
     // modules alongside client code. These files import server modules directly.
-    files: ["src/**/api/*-action.ts", "src/**/api/*.queries.ts", "src/app/providers/**", "src/pages/**/ui/**"],
+    files: [
+      "src/**/api/*-action.ts",
+      "src/**/api/*.queries.ts",
+      "src/**/api/**/*-query.ts",
+      "src/app/providers/**",
+      "src/pages/**/ui/**",
+    ],
     rules: {
       "fsd/no-public-api-sidestep": "off",
     },

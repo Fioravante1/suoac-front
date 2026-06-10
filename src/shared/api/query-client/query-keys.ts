@@ -3,12 +3,14 @@ export const queryKeys = {
   congregations: {
     all: ["suoac", "congregations"] as const,
     list: (circuitId: string, page: number) => ["suoac", "congregations", "list", circuitId, page] as const,
+    select: (circuitId: string) => ["suoac", "congregations", "select", circuitId] as const,
     detail: (id: string) => ["suoac", "congregations", "detail", id] as const,
   },
   events: {
     all: ["suoac", "events"] as const,
     list: (circuitId: string, page: number) => ["suoac", "events", "list", circuitId, page] as const,
     detail: (id: string) => ["suoac", "events", "detail", id] as const,
+    activeByCircuit: (circuitId: string) => ["suoac", "events", "active", circuitId] as const,
   },
   eventDays: {
     all: ["suoac", "event-days"] as const,
@@ -19,6 +21,8 @@ export const queryKeys = {
     all: ["suoac", "passengers"] as const,
     list: (congregationId: string, page: number, search: string) =>
       ["suoac", "passengers", "list", congregationId, page, search] as const,
+    listByCircuit: (circuitId: string, page: number, search: string, congregationId: string) =>
+      ["suoac", "passengers", "listByCircuit", circuitId, page, search, congregationId] as const,
     detail: (id: string) => ["suoac", "passengers", "detail", id] as const,
   },
   eventPassengers: {
@@ -29,5 +33,10 @@ export const queryKeys = {
   payments: {
     all: ["suoac", "payments"] as const,
     list: (eventPassengerId: string) => ["suoac", "payments", "list", eventPassengerId] as const,
+  },
+  dashboard: {
+    all: ["suoac", "dashboard"] as const,
+    byEvent: (eventId: string, congregationId?: string) =>
+      ["suoac", "dashboard", "byEvent", eventId, congregationId] as const,
   },
 };

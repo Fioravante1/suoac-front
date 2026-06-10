@@ -46,6 +46,77 @@
   flex-shrink: 0;
 }
 
+/* ---- Preset: card ---- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+  background-color: var(--suoac-color-surface);
+  border-radius: var(--suoac-radius-xl);
+  padding: var(--suoac-card-padding);
+  border: 1px solid var(--suoac-color-border);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardLabel {
+  height: 0.75rem;
+  width: 5rem;
+}
+
+.cardBadge {
+  height: 1.25rem;
+  width: 6rem;
+  border-radius: var(--suoac-radius-pill);
+}
+
+.cardTitle {
+  height: 1.25rem;
+  width: 70%;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.cardMetaLine {
+  height: 0.875rem;
+  width: 60%;
+}
+
+.cardMetaLineShort {
+  height: 0.875rem;
+  width: 40%;
+}
+
+.cardFooter {
+  padding-top: var(--suoac-space-3);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+.cardFooterLine {
+  height: 0.875rem;
+  width: 50%;
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--suoac-space-4);
+}
+
+@media (min-width: 56rem) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---- Preset: table ---- */
 .tableRows {
   padding: var(--suoac-space-4) var(--suoac-space-6);
 }

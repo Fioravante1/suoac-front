@@ -1,0 +1,197 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+}
+
+/* ---- Header ---- */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.typeLabel {
+  height: 0.8125rem;
+  width: 6rem;
+}
+
+.title {
+  height: 2rem;
+  width: 60%;
+}
+
+.badge {
+  height: 1.5rem;
+  width: 5rem;
+  border-radius: var(--suoac-radius-pill);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-2);
+}
+
+.actionButton {
+  height: 2.25rem;
+  width: 7rem;
+  border-radius: var(--suoac-radius-md);
+}
+
+/* ---- Info Row (two cards side-by-side) ---- */
+.infoRow {
+  display: grid;
+  gap: var(--suoac-space-5);
+}
+
+.card {
+  background-color: var(--suoac-color-surface);
+  border-radius: var(--suoac-radius-xl);
+  padding: var(--suoac-card-padding);
+  border: 1px solid var(--suoac-color-border);
+}
+
+.cardTitle {
+  height: 1.25rem;
+  width: 10rem;
+  margin-bottom: var(--suoac-space-4);
+}
+
+.infoGrid {
+  display: grid;
+  gap: var(--suoac-space-4);
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--suoac-space-3);
+}
+
+.infoIcon {
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.infoLabel {
+  height: 0.8125rem;
+  width: 5rem;
+}
+
+.infoValue {
+  height: 1rem;
+  width: 8rem;
+}
+
+/* ---- Days card ---- */
+.daysList {
+  display: grid;
+  gap: var(--suoac-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.dayCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface-muted);
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dayLabel {
+  height: 1rem;
+  width: 10rem;
+}
+
+.dayBadge {
+  height: 1.25rem;
+  width: 4rem;
+  border-radius: var(--suoac-radius-pill);
+}
+
+.dayMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.dayMetaLine {
+  height: 0.875rem;
+  width: 9rem;
+}
+
+.dayMetaLineShort {
+  height: 0.875rem;
+  width: 7rem;
+}
+
+/* ---- Enrollments section ---- */
+.enrollmentsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--suoac-space-4);
+}
+
+.enrollmentsTitle {
+  height: 1.25rem;
+  width: 7rem;
+}
+
+.enrollButton {
+  height: 2rem;
+  width: 10rem;
+  border-radius: var(--suoac-radius-md);
+}
+
+@media (min-width: 48rem) {
+  .infoRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .headerTop {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .infoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dayMeta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--suoac-space-4);
+  }
+}
