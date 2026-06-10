@@ -28,7 +28,7 @@ import { EmptyState } from "@/shared/ui/empty-state";
 import { ErrorState } from "@/shared/ui/error-state";
 import { PageHeader } from "@/shared/ui/page-header";
 import { Pagination } from "@/shared/ui/pagination";
-import { SkeletonTableRows } from "@/shared/ui/skeleton";
+import { SkeletonCardGrid } from "@/shared/ui/skeleton";
 
 import {
   EVENT_STATUS_BADGE_VARIANTS,
@@ -339,7 +339,7 @@ export function EventsPage() {
           </div>
         )}
 
-        {isLoading && <SkeletonTableRows rows={6} />}
+        {isLoading && <SkeletonCardGrid count={4} />}
 
         {isError && (
           <ErrorState

@@ -28,7 +28,7 @@ import { Card } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ErrorState } from "@/shared/ui/error-state";
 import { InfoCard, type InfoCardItem } from "@/shared/ui/info-card";
-import { SkeletonTableRows } from "@/shared/ui/skeleton";
+import { EventDetailSkeleton } from "./event-detail-skeleton";
 
 import {
   EVENT_DAY_STATUS_BADGE_VARIANTS,
@@ -214,7 +214,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
         Voltar para eventos
       </Link>
 
-      {isLoading && <SkeletonTableRows rows={6} />}
+      {isLoading && <EventDetailSkeleton />}
 
       {isError && (
         <ErrorState
