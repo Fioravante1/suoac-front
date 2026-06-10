@@ -1,0 +1,136 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--suoac-color-primary);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--suoac-shadow-md);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-bold);
+  color: var(--suoac-color-text-primary);
+  line-height: var(--suoac-line-height-heading);
+}
+
+.type {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+@media (min-width: 48rem) {
+  .details {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--suoac-space-5);
+  }
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.detailItem svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.deadlines {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--suoac-space-3);
+}
+
+.deadlineCard {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-3) var(--suoac-space-4);
+  border-radius: var(--suoac-radius-md);
+  border: 1px solid;
+  transition: transform 150ms ease;
+}
+
+.deadlineCard:hover {
+  transform: scale(1.02);
+}
+
+.deadlineContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.deadlineLabel {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.deadlineValue {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.link {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-primary);
+  padding: var(--suoac-space-2) var(--suoac-space-3);
+  border-radius: var(--suoac-radius-sm);
+  transition:
+    color 150ms,
+    background-color 150ms,
+    gap 150ms;
+}
+
+.link:hover {
+  color: var(--suoac-color-primary-dark);
+  background-color: var(--suoac-color-primary-light);
+  gap: var(--suoac-space-3);
+}

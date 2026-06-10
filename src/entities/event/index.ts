@@ -22,6 +22,7 @@ export {
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
 } from "./model";
+export { eventDetailOptions, eventListOptions } from "./api";
 export type {
   Event,
   EventDayInEvent,
