@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../model", () => ({
+vi.mock("@/shared/lib", async (importOriginal) => ({
+  ...(await importOriginal()),
   getGreetingByTime: () => "Bom dia",
 }));
 

@@ -5,7 +5,8 @@ import type { DashboardEvent } from "../../model";
 
 import { DashboardAlerts } from "./dashboard-alerts";
 
-vi.mock("@/shared/lib", () => ({
+vi.mock("@/shared/lib", async (importOriginal) => ({
+  ...(await importOriginal()),
   formatCurrency: (value: string | number) => `R$ ${Number(value).toFixed(2)}`,
 }));
 

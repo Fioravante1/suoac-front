@@ -5,16 +5,16 @@ import { EVENT_STATUS_BADGE_VARIANTS, EVENT_STATUS_LABELS, EVENT_TYPE_LABELS } f
 import { Badge } from "@/shared/ui/badge";
 import { Card } from "@/shared/ui/card";
 import { routes } from "@/shared/config";
-import { formatDateRange } from "@/shared/lib";
-
-import type { DashboardEvent } from "../../model";
 import {
-  daysUntilDeadline,
-  formatDeadlineText,
+  daysFromToday,
+  formatDateRange,
+  formatDaysRemaining,
   getDeadlineUrgency,
   DEADLINE_URGENCY_COLORS,
   DEADLINE_URGENCY_BG_COLORS,
-} from "../../model";
+} from "@/shared/lib";
+
+import type { DashboardEvent } from "../../model";
 
 import styles from "./event-hero-card.module.css";
 
@@ -23,8 +23,8 @@ interface EventHeroCardProps {
 }
 
 export function EventHeroCard({ event }: EventHeroCardProps) {
-  const registrationDays = daysUntilDeadline(event.registrationDeadline);
-  const paymentDays = daysUntilDeadline(event.paymentDeadline);
+  const registrationDays = daysFromToday(event.registrationDeadline);
+  const paymentDays = daysFromToday(event.paymentDeadline);
   const registrationUrgency = getDeadlineUrgency(registrationDays);
   const paymentUrgency = getDeadlineUrgency(paymentDays);
 
@@ -67,7 +67,7 @@ export function EventHeroCard({ event }: EventHeroCardProps) {
           <div className={styles.deadlineContent}>
             <span className={styles.deadlineLabel}>Inscricao</span>
             <span className={styles.deadlineValue} style={{ color: DEADLINE_URGENCY_COLORS[registrationUrgency] }}>
-              {formatDeadlineText(registrationDays)}
+              {formatDaysRemaining(registrationDays)}
             </span>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function EventHeroCard({ event }: EventHeroCardProps) {
           <div className={styles.deadlineContent}>
             <span className={styles.deadlineLabel}>Pagamento</span>
             <span className={styles.deadlineValue} style={{ color: DEADLINE_URGENCY_COLORS[paymentUrgency] }}>
-              {formatDeadlineText(paymentDays)}
+              {formatDaysRemaining(paymentDays)}
             </span>
           </div>
         </div>

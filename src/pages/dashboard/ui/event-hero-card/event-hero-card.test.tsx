@@ -5,7 +5,8 @@ import type { DashboardEvent } from "../../model";
 
 import { EventHeroCard } from "./event-hero-card";
 
-vi.mock("@/shared/lib", () => ({
+vi.mock("@/shared/lib", async (importOriginal) => ({
+  ...(await importOriginal()),
   formatDate: (value: string) => value,
 }));
 

@@ -32,6 +32,7 @@ vi.mock("@/shared/lib", async (importOriginal) => {
     ...actual,
     formatCurrency: (value: string | number) => `R$ ${Number(value).toFixed(2)}`,
     formatDate: (value: string) => value,
+    getGreetingByTime: () => "Bom dia",
   };
 });
 
@@ -45,15 +46,6 @@ vi.mock("../api", () => ({
   activeEventOptions: vi.fn(),
   dashboardOptions: vi.fn(),
 }));
-
-vi.mock("../model", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../model")>();
-
-  return {
-    ...actual,
-    getGreetingByTime: () => "Bom dia",
-  };
-});
 
 import { DashboardPage } from "./dashboard-page";
 

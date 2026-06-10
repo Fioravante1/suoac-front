@@ -1,4 +1,4 @@
-import { getGreetingByTime } from "../../model";
+import { getGreetingByTime } from "@/shared/lib";
 
 import styles from "./dashboard-greeting.module.css";
 

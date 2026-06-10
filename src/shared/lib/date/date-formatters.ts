@@ -25,6 +25,24 @@ export function getTodayDateString(): string {
   return toDateString(new Date());
 }
 
+export function daysFromToday(date: string): number {
+  const dateOnly = date.includes("T") ? date.split("T")[0] : date;
+  const target = new Date(dateOnly + "T00:00:00Z");
+  const now = new Date();
+  const todayUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const diffMs = target.getTime() - todayUtc.getTime();
+
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+export function formatDaysRemaining(days: number): string {
+  if (days < 0) return `Expirado hà ${Math.abs(days)} dia${Math.abs(days) !== 1 ? "s" : ""}`;
+  if (days === 0) return "Hoje";
+  if (days === 1) return "Amanhã";
+
+  return `${days} dias restantes`;
+}
+
 export function formatDateRange(dates: string[]): string {
   const first = dates[0];
   if (!first) return "";

@@ -2,10 +2,17 @@ import type { ReactNode } from "react";
 
 import { AlertTriangle, Clock } from "lucide-react";
 
-import { formatCurrency, pluralize } from "@/shared/lib";
+import type { DeadlineUrgency } from "@/shared/lib";
+import {
+  daysFromToday,
+  formatCurrency,
+  pluralize,
+  getDeadlineUrgency,
+  DEADLINE_URGENCIES,
+  DEADLINE_URGENCY_COLORS,
+} from "@/shared/lib";
 
-import type { DashboardEvent, DeadlineUrgency } from "../../model";
-import { daysUntilDeadline, getDeadlineUrgency, DEADLINE_URGENCIES, DEADLINE_URGENCY_COLORS } from "../../model";
+import type { DashboardEvent } from "../../model";
 
 import styles from "./dashboard-alerts.module.css";
 
@@ -69,8 +76,8 @@ function buildPaymentAlert(
 }
 
 export function DashboardAlerts({ event, totalPendingPassengers, totalPending }: DashboardAlertsProps) {
-  const regDays = daysUntilDeadline(event.registrationDeadline);
-  const payDays = daysUntilDeadline(event.paymentDeadline);
+  const regDays = daysFromToday(event.registrationDeadline);
+  const payDays = daysFromToday(event.paymentDeadline);
 
   const alerts = [
     buildRegistrationAlert(regDays, getDeadlineUrgency(regDays)),
