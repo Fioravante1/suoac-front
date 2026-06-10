@@ -4,7 +4,7 @@ import { AlertTriangle, Clock } from "lucide-react";
 
 import { formatCurrency } from "@/shared/lib";
 
-import type { DashboardEvent } from "../../model";
+import type { DashboardEvent, DeadlineUrgency } from "../../model";
 import { daysUntilDeadline, getDeadlineUrgency, DEADLINE_URGENCIES, DEADLINE_URGENCY_COLORS } from "../../model";
 
 import styles from "./dashboard-alerts.module.css";
@@ -21,42 +21,65 @@ interface AlertItem {
   borderColor: string;
 }
 
+function pluralize(count: number, singular: string): string {
+  return count !== 1 ? `${singular}s` : singular;
+}
+
+function buildRegistrationAlert(days: number, urgency: DeadlineUrgency): AlertItem | null {
+  if (urgency === DEADLINE_URGENCIES.expired) {
+    return {
+      icon: <AlertTriangle size={18} />,
+      message: `O prazo de inscricao expirou ha ${Math.abs(days)} ${pluralize(Math.abs(days), "dia")}.`,
+      borderColor: DEADLINE_URGENCY_COLORS.expired,
+    };
+  }
+
+  if (urgency === DEADLINE_URGENCIES.urgent || urgency === DEADLINE_URGENCIES.approaching) {
+    return {
+      icon: <Clock size={18} />,
+      message: `O prazo de inscricao encerra em ${days} ${pluralize(days, "dia")}.`,
+      borderColor: DEADLINE_URGENCY_COLORS[urgency],
+    };
+  }
+
+  return null;
+}
+
+function buildPaymentAlert(
+  days: number,
+  urgency: DeadlineUrgency,
+  pendingCount: number,
+  pendingAmount: string,
+): AlertItem | null {
+  if (pendingCount === 0) return null;
+
+  if (urgency === DEADLINE_URGENCIES.expired) {
+    return {
+      icon: <AlertTriangle size={18} />,
+      message: `O prazo de pagamento expirou. ${pendingCount} ${pluralize(pendingCount, "passageiro")} com ${formatCurrency(pendingAmount)} ${pluralize(pendingCount, "pendente")}.`,
+      borderColor: DEADLINE_URGENCY_COLORS.expired,
+    };
+  }
+
+  if (urgency === DEADLINE_URGENCIES.urgent || urgency === DEADLINE_URGENCIES.approaching) {
+    return {
+      icon: <Clock size={18} />,
+      message: `O prazo de pagamento encerra em ${days} ${pluralize(days, "dia")}. ${pendingCount} ${pluralize(pendingCount, "passageiro")} ainda ${pluralize(pendingCount, "pendente")}.`,
+      borderColor: DEADLINE_URGENCY_COLORS[urgency],
+    };
+  }
+
+  return null;
+}
+
 export function DashboardAlerts({ event, totalPendingPassengers, totalPending }: DashboardAlertsProps) {
-  const alerts: AlertItem[] = [];
-
   const regDays = daysUntilDeadline(event.registrationDeadline);
-  const regUrgency = getDeadlineUrgency(regDays);
-
-  if (regUrgency === DEADLINE_URGENCIES.expired) {
-    alerts.push({
-      icon: <AlertTriangle size={18} />,
-      message: `O prazo de inscricao expirou ha ${Math.abs(regDays)} dia${Math.abs(regDays) !== 1 ? "s" : ""}.`,
-      borderColor: DEADLINE_URGENCY_COLORS.expired,
-    });
-  } else if (regUrgency === DEADLINE_URGENCIES.urgent || regUrgency === DEADLINE_URGENCIES.approaching) {
-    alerts.push({
-      icon: <Clock size={18} />,
-      message: `O prazo de inscricao encerra em ${regDays} dia${regDays !== 1 ? "s" : ""}.`,
-      borderColor: DEADLINE_URGENCY_COLORS[regUrgency],
-    });
-  }
-
   const payDays = daysUntilDeadline(event.paymentDeadline);
-  const payUrgency = getDeadlineUrgency(payDays);
 
-  if (payUrgency === DEADLINE_URGENCIES.expired && totalPendingPassengers > 0) {
-    alerts.push({
-      icon: <AlertTriangle size={18} />,
-      message: `O prazo de pagamento expirou. ${totalPendingPassengers} passageiro${totalPendingPassengers !== 1 ? "s" : ""} com ${formatCurrency(totalPending)} pendente${totalPendingPassengers !== 1 ? "s" : ""}.`,
-      borderColor: DEADLINE_URGENCY_COLORS.expired,
-    });
-  } else if ((payUrgency === DEADLINE_URGENCIES.urgent || payUrgency === DEADLINE_URGENCIES.approaching) && totalPendingPassengers > 0) {
-    alerts.push({
-      icon: <Clock size={18} />,
-      message: `O prazo de pagamento encerra em ${payDays} dia${payDays !== 1 ? "s" : ""}. ${totalPendingPassengers} passageiro${totalPendingPassengers !== 1 ? "s" : ""} ainda pendente${totalPendingPassengers !== 1 ? "s" : ""}.`,
-      borderColor: DEADLINE_URGENCY_COLORS[payUrgency],
-    });
-  }
+  const alerts = [
+    buildRegistrationAlert(regDays, getDeadlineUrgency(regDays)),
+    buildPaymentAlert(payDays, getDeadlineUrgency(payDays), totalPendingPassengers, totalPending),
+  ].filter((alert): alert is AlertItem => alert !== null);
 
   if (alerts.length === 0) return null;
 
