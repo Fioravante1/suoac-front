@@ -1,3 +1,27 @@
+/**
+ * Por que este módulo existe (decisão de arquitetura — Next.js 16):
+ *
+ * O cenário "sessão expira no meio do uso, sem navegação" não tem primitivo
+ * estável no Next 16. As alternativas idiomáticas foram avaliadas e descartadas
+ * com base na documentação local (`node_modules/next/dist/docs/`):
+ *
+ * - `redirect()` dentro do `http-client`: a doc orienta chamar redirect fora de
+ *   blocos `try` ("redirect should be called outside the try block"), e todas as
+ *   mutations usam o padrão `ActionResult` com try/catch — o NEXT_REDIRECT seria
+ *   engolido. O escape hatch (`unstable_rethrow`) é API instável.
+ * - `unauthorized()` + `unauthorized.tsx`: é a API feita para este caso, mas é
+ *   experimental no Next 16 (flag `experimental.authInterrupts`).
+ *
+ * Por isso a detecção é feita em sinais que sobrevivem à produção (valor
+ * retornado em `ActionResult.error` e estado da sessão no `SessionGuard` — a
+ * mensagem de erros lançados por Server Actions é sanitizada em prod), e o
+ * redirect usa hard navigation para resetar o estado client-side (cache do
+ * React Query) entre sessões.
+ *
+ * TODO(next): quando `authInterrupts` estabilizar, migrar para `unauthorized()`
+ * no `http-client` + `unauthorized.tsx`, e remover este módulo, o
+ * `SessionGuard` e a detecção no `useServerError`/`query-client`.
+ */
 import { SESSION_EXPIRED_MESSAGE } from "../constants";
 
 let isRedirecting = false;
