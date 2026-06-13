@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { SESSION_EXPIRED_MESSAGE } from "../constants";
 
-import { isSessionExpiredError, redirectToSessionExpired, resetSessionRedirect } from "./session-redirect";
+import {
+  isSessionExpiredError,
+  redirectToSessionExpired,
+  resetSessionRedirect,
+  subscribeToSessionRedirect,
+} from "./session-redirect";
 
 const mockLocationHref = vi.fn();
 
@@ -54,5 +59,36 @@ describe("redirectToSessionExpired", () => {
     redirectToSessionExpired();
 
     expect(mockLocationHref).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("subscribeToSessionRedirect", () => {
+  it("notifica o listener quando o redirect dispara", () => {
+    const listener = vi.fn();
+    subscribeToSessionRedirect(listener);
+
+    redirectToSessionExpired();
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it("não notifica chamadas bloqueadas pelo gate", () => {
+    const listener = vi.fn();
+    subscribeToSessionRedirect(listener);
+
+    redirectToSessionExpired();
+    redirectToSessionExpired();
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it("não notifica após o unsubscribe", () => {
+    const listener = vi.fn();
+    const unsubscribe = subscribeToSessionRedirect(listener);
+
+    unsubscribe();
+    redirectToSessionExpired();
+
+    expect(listener).not.toHaveBeenCalled();
   });
 });

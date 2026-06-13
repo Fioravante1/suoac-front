@@ -1,1 +1,6 @@
-export { isSessionExpiredError, redirectToSessionExpired, resetSessionRedirect } from "./session-redirect";
+export {
+  isSessionExpiredError,
+  redirectToSessionExpired,
+  resetSessionRedirect,
+  subscribeToSessionRedirect,
+} from "./session-redirect";

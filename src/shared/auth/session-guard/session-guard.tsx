@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "../auth-context";
-import { redirectToSessionExpired } from "../session-redirect";
+import { redirectToSessionExpired, subscribeToSessionRedirect } from "../session-redirect";
+import { SessionExpiredOverlay } from "./session-expired-overlay";
 
 /**
  * Guarda de sessão para rotas privadas.
@@ -18,13 +19,20 @@ import { redirectToSessionExpired } from "../session-redirect";
  * Actions chamadas via `form action` direto e qualquer re-render que zere a
  * sessão. Complementa o `useServerError` (mutations) e o `query-client`
  * (queries).
+ *
+ * Enquanto a hard navigation para o login carrega, exibe o
+ * `SessionExpiredOverlay` — disparado por qualquer caminho de redirect via
+ * `subscribeToSessionRedirect`, para o usuário nunca ver a tela privada oca.
  */
-export function SessionGuard(): null {
+export function SessionGuard() {
   const { isAuthenticated } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => subscribeToSessionRedirect(() => setIsRedirecting(true)), []);
 
   useEffect(() => {
     if (!isAuthenticated) redirectToSessionExpired();
   }, [isAuthenticated]);
 
-  return null;
+  return isRedirecting ? <SessionExpiredOverlay /> : null;
 }
