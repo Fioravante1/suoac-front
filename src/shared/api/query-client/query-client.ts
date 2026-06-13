@@ -1,17 +1,9 @@
 import { QueryClient, QueryCache } from "@tanstack/react-query";
 
-import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
+import { isSessionExpiredError, redirectToSessionExpired } from "@/shared/auth/session-redirect";
 
-let isRedirecting = false;
-
-function handleAuthError(error: Error) {
-  if (isRedirecting) return;
-  if (error.message !== SESSION_EXPIRED_MESSAGE) return;
-
-  isRedirecting = true;
-  const returnUrl = window.location.pathname + window.location.search;
-  const params = new URLSearchParams({ sessionExpired: "true", returnUrl });
-  window.location.href = `/login?${params.toString()}`;
+function handleAuthError(error: Error): void {
+  if (isSessionExpiredError(error)) redirectToSessionExpired();
 }
 
 export function createQueryClient() {
@@ -23,17 +15,12 @@ export function createQueryClient() {
       queries: {
         refetchOnWindowFocus: false,
         retry: (failureCount, error) => {
-          if (error.message === SESSION_EXPIRED_MESSAGE) return false;
+          if (isSessionExpiredError(error)) return false;
           return failureCount < 1;
         },
         staleTime: 60 * 1000,
-        throwOnError: (error) => error.message !== SESSION_EXPIRED_MESSAGE,
+        throwOnError: (error) => !isSessionExpiredError(error),
       },
     },
   });
-}
-
-/** @internal Exported for testing only */
-export function resetRedirectingFlag() {
-  isRedirecting = false;
 }

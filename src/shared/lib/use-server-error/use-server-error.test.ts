@@ -1,7 +1,31 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+
+import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
+import { resetSessionRedirect } from "@/shared/auth/session-redirect";
 
 import { useServerError } from "./use-server-error";
+
+const mockLocationHref = vi.fn();
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  resetSessionRedirect();
+
+  Object.defineProperty(window, "location", {
+    value: {
+      pathname: "/financial",
+      search: "",
+      get href() {
+        return `${this.pathname}${this.search}`;
+      },
+      set href(url: string) {
+        mockLocationHref(url);
+      },
+    },
+    writable: true,
+  });
+});
 
 describe("useServerError", () => {
   it("inicia sem erro", () => {
@@ -41,6 +65,17 @@ describe("useServerError", () => {
       result.current.clearServerError();
     });
 
+    expect(result.current.serverError).toBeNull();
+  });
+
+  it("redireciona para login em sessão expirada e não exibe a mensagem inline", () => {
+    const { result } = renderHook(() => useServerError());
+
+    act(() => {
+      result.current.showServerError(SESSION_EXPIRED_MESSAGE);
+    });
+
+    expect(mockLocationHref).toHaveBeenCalledWith(expect.stringContaining("/login?sessionExpired=true"));
     expect(result.current.serverError).toBeNull();
   });
 });
