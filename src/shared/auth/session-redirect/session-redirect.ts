@@ -2,6 +2,23 @@ import { SESSION_EXPIRED_MESSAGE } from "../constants";
 
 let isRedirecting = false;
 
+type SessionRedirectListener = () => void;
+
+const listeners = new Set<SessionRedirectListener>();
+
+/**
+ * Registra um listener notificado no instante em que o redirect de sessão
+ * expirada é disparado, em qualquer caminho (query, mutation ou SessionGuard).
+ * Permite exibir feedback visual enquanto a hard navigation carrega o login.
+ * Retorna a função de unsubscribe.
+ */
+export function subscribeToSessionRedirect(listener: SessionRedirectListener): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
 /**
  * Indica se o erro representa uma sessão expirada.
  *
@@ -26,6 +43,8 @@ export function redirectToSessionExpired(): void {
   if (isRedirecting || typeof window === "undefined") return;
 
   isRedirecting = true;
+  listeners.forEach((listener) => listener());
+
   const returnUrl = window.location.pathname + window.location.search;
   const params = new URLSearchParams({ sessionExpired: "true", returnUrl });
   window.location.href = `/login?${params.toString()}`;

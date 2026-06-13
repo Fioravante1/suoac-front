@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 
 import { AuthProvider } from "../auth-context";
 import type { SessionUser } from "../session";
 import { USER_ROLES } from "../session/user-role";
-import { resetSessionRedirect } from "../session-redirect";
+import { redirectToSessionExpired, resetSessionRedirect } from "../session-redirect";
 
 import { SessionGuard } from "./session-guard";
 
@@ -50,7 +50,17 @@ describe("SessionGuard", () => {
     expect(mockLocationHref).toHaveBeenCalledWith(expect.stringContaining("/login?sessionExpired=true"));
   });
 
-  it("não redireciona quando há sessão ativa", () => {
+  it("exibe o overlay de sessão expirada enquanto redireciona", () => {
+    render(
+      <AuthProvider user={null}>
+        <SessionGuard />
+      </AuthProvider>,
+    );
+
+    expect(screen.getByText("Sua sessão expirou")).toBeInTheDocument();
+  });
+
+  it("não redireciona nem exibe overlay quando há sessão ativa", () => {
     render(
       <AuthProvider user={mockUser}>
         <SessionGuard />
@@ -58,6 +68,21 @@ describe("SessionGuard", () => {
     );
 
     expect(mockLocationHref).not.toHaveBeenCalled();
+    expect(screen.queryByText("Sua sessão expirou")).not.toBeInTheDocument();
+  });
+
+  it("exibe o overlay quando o redirect é disparado por outro caminho (mutation/query)", () => {
+    render(
+      <AuthProvider user={mockUser}>
+        <SessionGuard />
+      </AuthProvider>,
+    );
+
+    act(() => {
+      redirectToSessionExpired();
+    });
+
+    expect(screen.getByText("Sua sessão expirou")).toBeInTheDocument();
   });
 
   it("redireciona apenas uma vez", () => {
