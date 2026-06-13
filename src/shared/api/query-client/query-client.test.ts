@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
+import { resetSessionRedirect } from "@/shared/auth/session-redirect";
 
-import { createQueryClient, resetRedirectingFlag } from "./query-client";
+import { createQueryClient } from "./query-client";
 
 const mockLocationHref = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
-  resetRedirectingFlag();
+  resetSessionRedirect();
 
   Object.defineProperty(window, "location", {
     value: {
