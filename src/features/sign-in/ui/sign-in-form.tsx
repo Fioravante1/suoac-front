@@ -8,6 +8,7 @@ import { Mail, Lock, Loader2 } from "lucide-react";
 import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { TextField } from "@/shared/ui/text-field";
+import { PasswordField } from "@/shared/ui/password-field";
 
 import { signInSchema, type SignInFormValues } from "../model/sign-in-schema";
 import { signInAction } from "../api/sign-in-action";
@@ -69,9 +70,8 @@ export function SignInForm() {
         {...register("email")}
       />
 
-      <TextField
+      <PasswordField
         label="Senha"
-        type="password"
         placeholder="••••••••"
         error={errors.password?.message}
         startIcon={<Lock size={20} />}

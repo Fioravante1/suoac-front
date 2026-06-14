@@ -26,7 +26,7 @@ describe("SignInForm", () => {
   it("renderiza os campos e o botao corretamente", () => {
     render(<SignInForm />);
     expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Senha/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Senha")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Entrar/i })).toBeInTheDocument();
   });
 
@@ -64,7 +64,7 @@ describe("SignInForm", () => {
     fireEvent.change(screen.getByLabelText(/E-mail/i), {
       target: { value: "user@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/Senha/i), {
+    fireEvent.change(screen.getByLabelText("Senha"), {
       target: { value: "Senha@123" },
     });
 
@@ -89,7 +89,7 @@ describe("SignInForm", () => {
     fireEvent.change(screen.getByLabelText(/E-mail/i), {
       target: { value: "user@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/Senha/i), {
+    fireEvent.change(screen.getByLabelText("Senha"), {
       target: { value: "Senha@123" },
     });
 
@@ -126,7 +126,7 @@ describe("SignInForm", () => {
     fireEvent.change(screen.getByLabelText(/E-mail/i), {
       target: { value: "user@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/Senha/i), {
+    fireEvent.change(screen.getByLabelText("Senha"), {
       target: { value: "Senha@123" },
     });
 
@@ -148,7 +148,7 @@ describe("SignInForm", () => {
     fireEvent.change(screen.getByLabelText(/E-mail/i), {
       target: { value: "user@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/Senha/i), {
+    fireEvent.change(screen.getByLabelText("Senha"), {
       target: { value: "Senha@123" },
     });
 

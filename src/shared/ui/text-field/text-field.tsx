@@ -1,7 +1,7 @@
 import { type InputHTMLAttributes, type ReactNode, forwardRef, useId } from "react";
 import styles from "./text-field.module.css";
 
-interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   startIcon?: ReactNode;
