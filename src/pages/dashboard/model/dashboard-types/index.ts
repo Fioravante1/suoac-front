@@ -2,6 +2,7 @@ export type {
   DashboardData,
   DashboardEvent,
   DashboardEventDay,
+  DashboardDayCount,
   DashboardCongregation,
   DashboardCongregationSummary,
   DashboardStats,

@@ -3,3 +3,12 @@
   flex-direction: column;
   gap: var(--suoac-space-8);
 }
+
+/* Presença por dia + Pagamentos lado a lado no desktop, empilhados no mobile.
+   auto-fit colapsa a coluna vazia quando só um dos cards renderiza. */
+.dayPaymentRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--suoac-space-6);
+  align-items: stretch;
+}

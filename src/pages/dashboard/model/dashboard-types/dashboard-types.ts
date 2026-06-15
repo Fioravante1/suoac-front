@@ -53,6 +53,14 @@ export interface DashboardEvent {
   days: DashboardEventDay[];
 }
 
+export interface DashboardDayCount {
+  eventDayId: string;
+  dayNumber: number;
+  label: string;
+  date: string;
+  totalPassengers: number;
+}
+
 export interface DashboardCongregationSummary {
   id: string;
   name: string;
@@ -69,5 +77,6 @@ export interface DashboardData {
   paymentBreakdown: DashboardPaymentBreakdown;
   pendingPassengers: DashboardPendingPassenger[];
   totalPendingPassengers: number;
+  passengersByDay: DashboardDayCount[];
   congregationSummaries?: DashboardCongregationSummary[];
 }
