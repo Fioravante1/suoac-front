@@ -1,4 +1,5 @@
 .next
+.agents
 build
 coverage
 dist

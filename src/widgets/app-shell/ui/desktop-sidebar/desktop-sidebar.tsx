@@ -21,20 +21,27 @@ const navItems: NavItem[] = [
     roles: [USER_ROLES.CIRCUIT_COORDINATOR, USER_ROLES.CIRCUIT_ASSISTANT],
   },
   { label: "Passageiros", href: routes.passengers, icon: Users },
-  { label: "Financeiro", href: routes.financial, icon: Wallet },
+  { label: "Financeiro", href: routes.financial, icon: Wallet, pending: true },
   {
     label: "Configurações",
     href: routes.settings,
     icon: Settings,
     roles: [USER_ROLES.CIRCUIT_COORDINATOR, USER_ROLES.CIRCUIT_ASSISTANT],
+    pending: true,
   },
 ];
 
-export function DesktopSidebar() {
+type DesktopSidebarProps = Readonly<{
+  showPendingItems?: boolean;
+}>;
+
+export function DesktopSidebar({ showPendingItems = false }: DesktopSidebarProps) {
   const pathname = usePathname() ?? "";
   const { user } = useAuthPermissions();
 
-  const visibleItems = user ? filterNavItems(navItems, user.role) : [];
+  const visibleItems = user
+    ? filterNavItems(navItems, user.role).filter((item) => showPendingItems || !item.pending)
+    : [];
 
   return (
     <aside className={styles.sidebar}>

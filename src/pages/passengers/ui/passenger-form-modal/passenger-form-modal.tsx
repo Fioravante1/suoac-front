@@ -48,7 +48,12 @@ export function PassengerFormModal({ open, onClose, onSubmit, passenger }: Passe
 
     if (!result.success) {
       showServerError(result.error);
+      return;
     }
+
+    // Sucesso fecha o modal pela página (sem passar por handleClose), então limpamos
+    // o form aqui para não reabrir com os dados já cadastrados.
+    reset();
   }
 
   function handleClose() {

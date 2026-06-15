@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { showPendingMenuItemsFlag } from "@/shared/feature-flags";
+
 import { DesktopSidebar } from "../desktop-sidebar";
 import { MobileBottomNav } from "../mobile-bottom-nav";
 import styles from "./app-shell.module.css";
@@ -8,11 +10,13 @@ type AppShellProps = Readonly<{
   children: ReactNode;
 }>;
 
-export function AppShell({ children }: AppShellProps) {
+export async function AppShell({ children }: AppShellProps) {
+  const showPendingItems = await showPendingMenuItemsFlag();
+
   return (
     <div className={styles.layout}>
       <div className={styles.sidebar}>
-        <DesktopSidebar />
+        <DesktopSidebar showPendingItems={showPendingItems} />
       </div>
 
       <div className={styles.main}>
@@ -20,7 +24,7 @@ export function AppShell({ children }: AppShellProps) {
       </div>
 
       <div className={styles.bottomNav}>
-        <MobileBottomNav />
+        <MobileBottomNav showPendingItems={showPendingItems} />
       </div>
     </div>
   );

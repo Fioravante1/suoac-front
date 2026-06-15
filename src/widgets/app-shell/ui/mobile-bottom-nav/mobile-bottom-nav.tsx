@@ -14,14 +14,20 @@ const mobileNavItems: NavItem[] = [
   { label: "Dashboard", href: routes.dashboard, icon: LayoutDashboard },
   { label: "Eventos", href: routes.events, icon: CalendarDays },
   { label: "Passageiros", href: routes.passengers, icon: Users },
-  { label: "Financeiro", href: routes.financial, icon: Wallet },
+  { label: "Financeiro", href: routes.financial, icon: Wallet, pending: true },
 ];
 
-export function MobileBottomNav() {
+type MobileBottomNavProps = Readonly<{
+  showPendingItems?: boolean;
+}>;
+
+export function MobileBottomNav({ showPendingItems = false }: MobileBottomNavProps) {
   const pathname = usePathname() ?? "";
   const { user } = useAuthPermissions();
 
-  const visibleItems = user ? filterNavItems(mobileNavItems, user.role) : [];
+  const visibleItems = user
+    ? filterNavItems(mobileNavItems, user.role).filter((item) => showPendingItems || !item.pending)
+    : [];
 
   return (
     <nav className={styles.nav}>
