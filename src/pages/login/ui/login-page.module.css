@@ -1,49 +1,231 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.page {
+  display: grid;
+  grid-template-columns: 1fr;
+  flex: 1;
   width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
+  min-height: 100vh;
 }
 
-.card {
-  width: 100%;
-  padding: var(--suoac-space-8) var(--suoac-space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--suoac-space-8);
+/* ---------------------------------------------------------------- */
+/* Brand panel (desktop only)                                        */
+/* ---------------------------------------------------------------- */
+
+.brand {
+  display: none;
 }
 
-.header {
+.brandGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(58% 50% at 100% 0%, var(--suoac-color-primary-light) 0%, transparent 62%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.brandInner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
+  gap: var(--suoac-space-10);
+  max-width: 30rem;
+}
+
+.brandLogo {
+  display: flex;
   align-items: center;
-  text-align: center;
   gap: var(--suoac-space-3);
 }
 
-.logoContainer {
-  display: flex;
-  align-items: center;
-  gap: var(--suoac-space-3);
-}
-
-.logoImage {
+.brandLogoMark {
   object-fit: contain;
 }
 
-.logoText {
+.brandLogoText {
   font-size: var(--suoac-font-size-h2);
   font-weight: var(--suoac-font-weight-bold);
-  color: var(--suoac-color-text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
+  color: var(--suoac-color-sidebar);
 }
 
-.tagline {
+.brandCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.brandHeadline {
+  font-size: var(--suoac-font-size-h1);
+  font-weight: var(--suoac-font-weight-bold);
+  line-height: var(--suoac-line-height-heading);
+  letter-spacing: -0.02em;
+  color: var(--suoac-color-text-primary);
+}
+
+.brandTagline {
   font-size: var(--suoac-font-size-body);
-  color: var(--suoac-color-text-secondary);
   line-height: var(--suoac-line-height-body);
-  max-width: 280px;
+  color: var(--suoac-color-text-secondary);
+}
+
+/* Journey stepper — assinatura visual da marca */
+
+.journey {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+}
+
+.journeyKicker {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--suoac-color-primary);
+}
+
+.journeyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+  list-style: none;
+}
+
+.journeyStep {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-4);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  color: var(--suoac-color-text-primary);
+}
+
+.journeyIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--suoac-radius-md);
+  background-color: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+}
+
+.journeyStep:not(:last-child) .journeyIcon::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  width: 2px;
+  height: var(--suoac-space-5);
+  background-color: var(--suoac-color-border-strong);
+  transform: translateX(-50%);
+}
+
+/* ---------------------------------------------------------------- */
+/* Form side                                                         */
+/* ---------------------------------------------------------------- */
+
+.formSide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--suoac-space-6);
+  background-color: var(--suoac-color-background);
+}
+
+.formInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-8);
+  width: 100%;
+  max-width: 25rem;
+}
+
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--suoac-space-3);
+}
+
+.mobileBrandMark {
+  object-fit: contain;
+}
+
+.mobileBrandText {
+  font-size: var(--suoac-font-size-h2);
+  font-weight: var(--suoac-font-weight-bold);
+  letter-spacing: 0.04em;
+  color: var(--suoac-color-sidebar);
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  text-align: center;
+}
+
+.formTitle {
+  font-size: var(--suoac-font-size-h2);
+  font-weight: var(--suoac-font-weight-bold);
+  line-height: var(--suoac-line-height-heading);
+  letter-spacing: -0.01em;
+  color: var(--suoac-color-text-primary);
+}
+
+.formSubtitle {
+  font-size: var(--suoac-font-size-small);
+  line-height: var(--suoac-line-height-body);
+  color: var(--suoac-color-text-secondary);
+}
+
+/* ---------------------------------------------------------------- */
+/* Desktop layout                                                    */
+/* ---------------------------------------------------------------- */
+
+@media (min-width: 64rem) {
+  .page {
+    grid-template-columns: 1.05fr 1fr;
+  }
+
+  .brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: var(--suoac-space-12);
+    border-right: 1px solid var(--suoac-color-border);
+    background:
+      radial-gradient(110% 110% at 0% 0%, var(--suoac-color-surface-muted) 0%, transparent 55%),
+      linear-gradient(160deg, var(--suoac-color-border-strong) 0%, var(--suoac-color-border) 100%);
+  }
+
+  /* Textura de pontos discreta — ar SaaS moderno sem ruído visual */
+  .brand::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(13 43 69 / 0.05) 1px, transparent 1.4px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(ellipse 78% 76% at 50% 40%, #000, transparent 78%);
+    mask-image: radial-gradient(ellipse 78% 76% at 50% 40%, #000, transparent 78%);
+    pointer-events: none;
+  }
+
+  .mobileBrand {
+    display: none;
+  }
+
+  .formHeader {
+    text-align: left;
+  }
+
+  .formInner {
+    max-width: 24rem;
+  }
 }
