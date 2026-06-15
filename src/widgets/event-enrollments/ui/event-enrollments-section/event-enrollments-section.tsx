@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
 import { isCircuitRole } from "@/shared/auth";
 import type { UserRole } from "@/shared/auth";
-import { formatCurrency, useModal, usePagination, useServerError } from "@/shared/lib";
+import { formatCurrency, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -25,6 +25,7 @@ import { DataTable, type ColumnDef } from "@/shared/ui/data-table";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
+import { useToast } from "@/shared/ui/toast";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
@@ -40,7 +41,7 @@ interface EventEnrollmentsSectionProps {
 }
 
 export function EventEnrollmentsSection({ event, userRole, userCongregationId }: EventEnrollmentsSectionProps) {
-  const { serverError, clearServerError, showServerError } = useServerError();
+  const toast = useToast();
   const { page, setPage } = usePagination();
 
   const enrollModal = useModal();
@@ -67,8 +68,8 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     mutationFn: (payload: EnrollPassengerPayload) => enrollPassengerAction(event.id, payload),
     onSuccess: (result) => {
       if (result.success) {
-        clearServerError();
         invalidateQueries();
+        toast.success("Passageiro inscrito com sucesso.");
       }
     },
   });
@@ -77,8 +78,8 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     mutationFn: ({ epId, dayIds }: { epId: string; dayIds: string[] }) => updateEventPassengerDaysAction(epId, dayIds),
     onSuccess: (result) => {
       if (result.success) {
-        clearServerError();
         invalidateQueries();
+        toast.success("Dias da inscrição atualizados.");
       }
     },
   });
@@ -87,13 +88,11 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     mutationFn: (epId: string) => removeEventPassengerAction(epId),
     onSuccess: (result) => {
       if (result.success) {
-        clearServerError();
         invalidateQueries();
         removeModal.close();
-      }
-
-      if (!result.success) {
-        showServerError(result.error);
+        toast.success("Inscrição removida.");
+      } else {
+        toast.error(result.error);
       }
     },
   });
@@ -111,7 +110,6 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   function handleConfirmRemove() {
     if (!removeModal.item) return;
 
-    clearServerError();
     removeMutation.mutate(removeModal.item.id);
   }
 
@@ -191,12 +189,6 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
           </Button>
         )}
       </div>
-
-      {serverError && (
-        <div className={styles.errorBanner} role="alert">
-          {serverError}
-        </div>
-      )}
 
       {isLoading && <SkeletonTableRows rows={5} />}
 
