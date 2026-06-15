@@ -199,7 +199,7 @@ describe("EventEnrollmentsSection", () => {
       <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
     );
 
-    const actionsButton = screen.getByRole("button", { name: "Ações" });
+    const actionsButton = screen.getAllByRole("button", { name: "Ações" })[0];
 
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
 
@@ -226,7 +226,7 @@ describe("EventEnrollmentsSection", () => {
       <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Ações" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Ações" })[0]);
     fireEvent.click(within(screen.getByRole("menu")).getByRole("menuitem", { name: "Pagamentos" }));
 
     expect(screen.getByTestId("payments-modal-paid-amount")).toHaveTextContent("25.00");

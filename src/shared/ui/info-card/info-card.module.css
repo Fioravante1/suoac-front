@@ -54,6 +54,7 @@
   display: flex;
   align-items: flex-start;
   gap: var(--suoac-space-3);
+  min-width: 0;
 }
 
 .icon {
@@ -66,6 +67,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--suoac-space-1);
+  min-width: 0;
 }
 
 .gridLabel {
@@ -79,6 +81,7 @@
 .gridValue {
   font-size: var(--suoac-font-size-body);
   color: var(--suoac-color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 /* List variant — card with header, icon+text items, actions footer */

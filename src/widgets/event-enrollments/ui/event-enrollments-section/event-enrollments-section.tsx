@@ -216,53 +216,39 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
 
       {passengersData && passengersData.data.length > 0 && (
         <>
-          <div className={styles.mobileCards}>
+          <ul className={styles.mobileList}>
             {passengersData.data.map((ep) => (
-              <div key={ep.id} className={styles.mobileCard}>
-                <div className={styles.mobileCardHeader}>
-                  <strong className={styles.mobileCardName}>{ep.passenger.name}</strong>
-                  <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
-                    {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
-                  </Badge>
-                </div>
-                <div className={styles.mobileCardMeta}>
-                  <span>RG: {ep.passenger.rg}</span>
-                  {ep.passenger.phone && <span>Tel: {ep.passenger.phone}</span>}
-                </div>
-                {ep.days.length > 0 && (
-                  <div className={styles.dayBadges}>
-                    {ep.days.map((day) => (
-                      <Badge key={day.id} variant="neutral">
-                        {day.label}
-                      </Badge>
-                    ))}
+              <li key={ep.id} className={styles.mobileRow}>
+                <div className={styles.mobileRowInfo}>
+                  <span className={styles.mobileRowName}>{ep.passenger.name}</span>
+
+                  <div className={styles.mobileRowStatus}>
+                    <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
+                      {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
+                    </Badge>
+                    <span className={styles.mobileRowAmount}>
+                      {formatCurrency(ep.paidAmount)}{" "}
+                      <span className={styles.mobileRowAmountTotal}>de {formatCurrency(ep.totalAmount)}</span>
+                    </span>
                   </div>
-                )}
-                <div className={styles.mobileCardFinancial}>
-                  <span>Total: {formatCurrency(ep.totalAmount)}</span>
-                  <span>Pago: {formatCurrency(ep.paidAmount)}</span>
-                </div>
-                <div className={styles.mobileCardActions}>
-                  <Button variant="ghost" size="small" onClick={() => paymentsModal.open(ep)}>
-                    <DollarSign size={16} aria-hidden="true" />
-                    Pagamentos
-                  </Button>
-                  {canManage && isRegionalConvention && (
-                    <Button variant="ghost" size="small" onClick={() => updateDaysModal.open(ep)}>
-                      <CalendarCheck size={16} aria-hidden="true" />
-                      Editar dias
-                    </Button>
-                  )}
-                  {canManage && (
-                    <Button variant="ghost" size="small" onClick={() => removeModal.open(ep)}>
-                      <Trash2 size={16} aria-hidden="true" />
-                      Remover
-                    </Button>
+
+                  <span className={styles.mobileRowRg}>RG {ep.passenger.rg}</span>
+
+                  {ep.days.length > 0 && (
+                    <div className={styles.dayBadges}>
+                      {ep.days.map((day) => (
+                        <Badge key={day.id} variant="neutral">
+                          {day.label}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
                 </div>
-              </div>
+
+                <ActionMenu menuId={`enrollment-actions-mobile-${ep.id}`} items={buildActionMenuItems(ep)} />
+              </li>
             ))}
-          </div>
+          </ul>
 
           <DataTable
             columns={tableColumns}
