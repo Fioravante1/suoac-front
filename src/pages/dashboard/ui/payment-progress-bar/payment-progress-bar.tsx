@@ -44,7 +44,7 @@ export function PaymentProgressBar({ breakdown }: PaymentProgressBarProps) {
       </div>
 
       <div className={styles.barContainer}>
-        {SEGMENTS.map(({ key, status }) => {
+        {SEGMENTS.map(({ key, status }, index) => {
           const value = breakdown[key];
 
           if (value === 0) return null;
@@ -52,14 +52,20 @@ export function PaymentProgressBar({ breakdown }: PaymentProgressBarProps) {
           return (
             <div
               key={key}
-              className={`${styles.barSegment} ${styles[key]}`}
+              className={styles.segment}
               style={{ width: `${(value / total) * 100}%` }}
-              role="meter"
-              aria-valuenow={value}
-              aria-valuemin={0}
-              aria-valuemax={total}
-              aria-label={`${PAYMENT_STATUS_LABELS[status]}: ${value}`}
-            />
+              data-label={`${PAYMENT_STATUS_LABELS[status]}: ${value}`}
+            >
+              <span
+                className={`${styles.barSegment} ${styles[key]}`}
+                style={{ animationDelay: `${index * 100}ms` }}
+                role="meter"
+                aria-valuenow={value}
+                aria-valuemin={0}
+                aria-valuemax={total}
+                aria-label={`${PAYMENT_STATUS_LABELS[status]}: ${value}`}
+              />
+            </div>
           );
         })}
       </div>

@@ -16,6 +16,7 @@ import { DashboardGreeting } from "./dashboard-greeting";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 import { DashboardStatsGrid } from "./dashboard-stats-grid";
 import { EventHeroCard } from "./event-hero-card";
+import { PassengersByDay } from "./passengers-by-day";
 import { PaymentProgressBar } from "./payment-progress-bar";
 import styles from "./dashboard-page.module.css";
 
@@ -93,7 +94,10 @@ export function DashboardPage() {
 
       <DashboardStatsGrid stats={dashboard.stats} />
 
-      <PaymentProgressBar breakdown={dashboard.paymentBreakdown} />
+      <div className={styles.dayPaymentRow}>
+        <PassengersByDay days={dashboard.passengersByDay} totalPassengers={dashboard.stats.totalPassengers} />
+        <PaymentProgressBar breakdown={dashboard.paymentBreakdown} />
+      </div>
 
       {isCircuitUser && dashboard.congregationSummaries && (
         <CongregationSummaryList summaries={dashboard.congregationSummaries} />

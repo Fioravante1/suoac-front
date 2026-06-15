@@ -97,6 +97,7 @@ const mockDashboardData: DashboardData = {
     },
   ],
   totalPendingPassengers: 1,
+  passengersByDay: [],
 };
 
 describe("DashboardPage", () => {
