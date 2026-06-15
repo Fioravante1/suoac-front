@@ -22,7 +22,35 @@ vi.mock("@/features/sign-in", () => ({
 import { MobileBottomNav } from "./mobile-bottom-nav";
 
 describe("MobileBottomNav", () => {
-  it("renderiza todos os 4 itens para CIRCUIT_COORDINATOR", () => {
+  it("renderiza todos os 4 itens para CIRCUIT_COORDINATOR com a flag ligada", () => {
+    mockUseAuthPermissions.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
+    render(<MobileBottomNav showPendingItems />);
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.getByText("Passageiros")).toBeInTheDocument();
+    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+  });
+
+  it("renderiza todos os 4 itens para CONGREGATION_COORDINATOR com a flag ligada", () => {
+    mockUseAuthPermissions.mockReturnValue({
+      user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
+    render(<MobileBottomNav showPendingItems />);
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.getByText("Passageiros")).toBeInTheDocument();
+    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+  });
+
+  it("oculta o item pendente (Financeiro) com a flag desligada", () => {
     mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
@@ -33,21 +61,7 @@ describe("MobileBottomNav", () => {
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByText("Eventos")).toBeInTheDocument();
     expect(screen.getByText("Passageiros")).toBeInTheDocument();
-    expect(screen.getByText("Financeiro")).toBeInTheDocument();
-  });
-
-  it("renderiza todos os 4 itens para CONGREGATION_COORDINATOR", () => {
-    mockUseAuthPermissions.mockReturnValue({
-      user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
-      isAuthenticated: true,
-    });
-
-    render(<MobileBottomNav />);
-
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("Eventos")).toBeInTheDocument();
-    expect(screen.getByText("Passageiros")).toBeInTheDocument();
-    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+    expect(screen.queryByText("Financeiro")).not.toBeInTheDocument();
   });
 
   it("nao renderiza itens exclusivos do desktop", () => {
