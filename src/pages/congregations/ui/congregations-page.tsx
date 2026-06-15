@@ -10,6 +10,7 @@ import { PageHeader } from "@/shared/ui/page-header";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Pagination } from "@/shared/ui/pagination";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { useToast } from "@/shared/ui/toast";
 import { useModal, usePagination } from "@/shared/lib";
 
 import type { Congregation } from "@/entities/congregation";
@@ -30,6 +31,7 @@ export function CongregationsPage() {
   const { page, setPage } = usePagination();
 
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const formModal = useModal<Congregation>();
   const deleteModal = useModal<Congregation>();
@@ -42,6 +44,7 @@ export function CongregationsPage() {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });
         formModal.close();
+        toast.success("Congregação cadastrada com sucesso.");
       }
     },
   });
@@ -52,6 +55,7 @@ export function CongregationsPage() {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });
         formModal.close();
+        toast.success("Congregação atualizada com sucesso.");
       }
     },
   });
@@ -61,6 +65,9 @@ export function CongregationsPage() {
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });
+        toast.success("Congregação excluída.");
+      } else {
+        toast.error(result.error ?? "Não foi possível excluir a congregação.");
       }
       deleteModal.close();
     },

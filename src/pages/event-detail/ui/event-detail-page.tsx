@@ -20,7 +20,7 @@ import {
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { USER_ROLES, useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { formatCurrency, formatDate, formatWeekday, useModal, useServerError } from "@/shared/lib";
+import { formatCurrency, formatDate, formatWeekday, useModal } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -28,6 +28,7 @@ import { Card } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ErrorState } from "@/shared/ui/error-state";
 import { InfoCard, type InfoCardItem } from "@/shared/ui/info-card";
+import { useToast } from "@/shared/ui/toast";
 import { EventDetailSkeleton } from "./event-detail-skeleton";
 
 import {
@@ -64,9 +65,9 @@ interface EventDetailPageProps {
 }
 
 export function EventDetailPage({ eventId }: EventDetailPageProps) {
-  const { serverError, clearServerError, showServerError } = useServerError();
   const { userRole, userCongregationId, isCircuitUser, isCircuitCoordinator } = useAuthPermissions();
 
+  const toast = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
   const updateModal = useModal<Event>();
@@ -84,14 +85,14 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => publishEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       publishModal.close();
+      toast.success("Evento publicado.");
     },
   });
 
@@ -99,15 +100,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: ({ ev, values }: { ev: Event; values: UpdateEventFormValues }) =>
       updateEventAction(ev.id, ev.status, values),
     onSuccess: (result) => {
-      if (!result.success) {
-        showServerError(result.error);
-        return;
-      }
+      if (!result.success) return;
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       updateModal.close();
+      toast.success("Evento atualizado.");
     },
   });
 
@@ -115,12 +113,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => deleteEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      toast.success("Evento excluído.");
       router.push(routes.events);
     },
   });
@@ -137,15 +135,15 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (dayId: string) => cancelEventDayAction(dayId),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.eventDays.all });
       cancelDayModal.close();
+      toast.success("Dia cancelado.");
     },
   });
 
@@ -153,14 +151,14 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     mutationFn: (id: string) => cancelEventAction(id),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       cancelEventModal.close();
+      toast.success("Evento cancelado.");
     },
   });
 
@@ -174,6 +172,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
     if (result.success) {
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.eventDays.all });
+      toast.success("Horários atualizados.");
     }
 
     return result;
@@ -182,28 +181,24 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   function handleConfirmPublish() {
     if (!publishModal.item) return;
 
-    clearServerError();
     publishMutation.mutate(publishModal.item.id);
   }
 
   function handleConfirmDelete() {
     if (!deleteModal.item) return;
 
-    clearServerError();
     deleteMutation.mutate(deleteModal.item.id);
   }
 
   function handleConfirmCancelDay() {
     if (!cancelDayModal.item) return;
 
-    clearServerError();
     cancelDayMutation.mutate(cancelDayModal.item.id);
   }
 
   function handleConfirmCancelEvent() {
     if (!cancelEventModal.item) return;
 
-    clearServerError();
     cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
@@ -231,12 +226,6 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
       {event && (
         <div className={styles.content}>
-          {serverError && (
-            <div className={styles.errorBanner} role="alert">
-              {serverError}
-            </div>
-          )}
-
           <div className={styles.header}>
             <div className={styles.headerTop}>
               <div className={styles.titleGroup}>
