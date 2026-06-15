@@ -18,7 +18,7 @@ import {
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { useAuthPermissions, isCircuitRole } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { formatCurrency, formatDate, useModal, usePagination, useServerError } from "@/shared/lib";
+import { formatCurrency, formatDate, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -29,6 +29,7 @@ import { ErrorState } from "@/shared/ui/error-state";
 import { PageHeader } from "@/shared/ui/page-header";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonCardGrid } from "@/shared/ui/skeleton";
+import { useToast } from "@/shared/ui/toast";
 
 import {
   EVENT_STATUS_BADGE_VARIANTS,
@@ -190,7 +191,7 @@ export function EventsPage() {
   const cancelEventModal = useModal<Event>();
   const enrollModal = useModal<Event>();
 
-  const { serverError, clearServerError, showServerError } = useServerError();
+  const toast = useToast();
 
   const circuitId = userCircuitId;
   const canManageEvents = isCircuitUser;
@@ -208,6 +209,7 @@ export function EventsPage() {
 
       queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(enrollEventId) });
+      toast.success("Passageiro inscrito com sucesso.");
     },
   });
 
@@ -228,6 +230,7 @@ export function EventsPage() {
 
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       createModal.close();
+      toast.success("Evento criado com sucesso.");
     },
   });
 
@@ -235,13 +238,13 @@ export function EventsPage() {
     mutationFn: (eventId: string) => publishEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       publishModal.close();
+      toast.success("Evento publicado.");
     },
   });
 
@@ -249,14 +252,11 @@ export function EventsPage() {
     mutationFn: ({ event, values }: { event: Event; values: UpdateEventFormValues }) =>
       updateEventAction(event.id, event.status, values),
     onSuccess: (result) => {
-      if (!result.success) {
-        showServerError(result.error);
-        return;
-      }
+      if (!result.success) return;
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       updateModal.close();
+      toast.success("Evento atualizado.");
     },
   });
 
@@ -264,13 +264,13 @@ export function EventsPage() {
     mutationFn: (eventId: string) => deleteEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       deleteModal.close();
+      toast.success("Evento excluído.");
     },
   });
 
@@ -278,13 +278,13 @@ export function EventsPage() {
     mutationFn: (eventId: string) => cancelEventAction(eventId),
     onSuccess: (result) => {
       if (!result.success) {
-        showServerError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      clearServerError();
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       cancelEventModal.close();
+      toast.success("Evento cancelado.");
     },
   });
 
@@ -299,21 +299,18 @@ export function EventsPage() {
   function handleConfirmPublish() {
     if (!publishModal.item) return;
 
-    clearServerError();
     publishMutation.mutate(publishModal.item.id);
   }
 
   function handleConfirmDelete() {
     if (!deleteModal.item) return;
 
-    clearServerError();
     deleteMutation.mutate(deleteModal.item.id);
   }
 
   function handleConfirmCancelEvent() {
     if (!cancelEventModal.item) return;
 
-    clearServerError();
     cancelEventMutation.mutate(cancelEventModal.item.id);
   }
 
@@ -333,12 +330,6 @@ export function EventsPage() {
       />
 
       <div className={styles.content}>
-        {serverError && (
-          <div className={styles.errorBanner} role="alert">
-            {serverError}
-          </div>
-        )}
-
         {isLoading && <SkeletonCardGrid count={4} />}
 
         {isError && (

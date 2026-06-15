@@ -22,6 +22,7 @@ import { PageHeader } from "@/shared/ui/page-header";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
 import { TextField } from "@/shared/ui/text-field";
+import { useToast } from "@/shared/ui/toast";
 import { Tooltip } from "@/shared/ui/tooltip";
 
 import { PassengerFormModal } from "./passenger-form-modal";
@@ -36,6 +37,7 @@ function getErrorMessage(error: unknown): string {
 export function PassengersPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { page, setPage } = usePagination();
   const formModal = useModal<Passenger>();
   const deleteModal = useModal<Passenger>();
@@ -47,7 +49,6 @@ export function PassengersPage() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
   const activeSearch = debouncedSearch.length >= 3 ? debouncedSearch : "";
-  const [pageError, setPageError] = useState<string | null>(null);
 
   const isFirstRender = useRef(true);
 
@@ -83,9 +84,9 @@ export function PassengersPage() {
     onSuccess: (result) => {
       if (!result.success) return;
 
-      setPageError(null);
       queryClient.invalidateQueries({ queryKey: queryKeys.passengers.all });
       formModal.close();
+      toast.success("Passageiro cadastrado com sucesso.");
     },
   });
 
@@ -94,9 +95,9 @@ export function PassengersPage() {
     onSuccess: (result) => {
       if (!result.success) return;
 
-      setPageError(null);
       queryClient.invalidateQueries({ queryKey: queryKeys.passengers.all });
       formModal.close();
+      toast.success("Passageiro atualizado com sucesso.");
     },
   });
 
@@ -104,12 +105,10 @@ export function PassengersPage() {
     mutationFn: (id: string) => deletePassengerAction(id),
     onSuccess: (result) => {
       if (result.success) {
-        setPageError(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.passengers.all });
-      }
-
-      if (!result.success) {
-        setPageError(result.error);
+        toast.success("Passageiro excluído.");
+      } else {
+        toast.error(result.error);
       }
 
       deleteModal.close();
@@ -163,12 +162,6 @@ export function PassengersPage() {
           )
         }
       />
-
-      {pageError && (
-        <div className={styles.errorBanner} role="alert">
-          {pageError}
-        </div>
-      )}
 
       <section className={styles.toolbar} aria-label="Filtros de passageiros">
         {canSelectCongregation && (

@@ -29,6 +29,7 @@ import { InfoCard } from "@/shared/ui/info-card";
 import { Modal } from "@/shared/ui/modal";
 import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
+import { useToast } from "@/shared/ui/toast";
 
 import { registerPaymentAction } from "../../api/register-payment-action";
 import { deletePaymentAction } from "../../api/delete-payment-action";
@@ -96,6 +97,7 @@ export function PassengerPaymentsModal({
   userRole,
 }: PassengerPaymentsModalProps) {
   const { serverError, clearServerError, showServerError } = useServerError();
+  const toast = useToast();
   const deleteConfirm = useModal<Payment>();
   const queryClient = useQueryClient();
 
@@ -128,14 +130,12 @@ export function PassengerPaymentsModal({
     mutationFn: (paymentId: string) => deletePaymentAction(paymentId),
     onSuccess: (result) => {
       if (result.success) {
-        clearServerError();
         invalidateQueries();
         deleteConfirm.close();
-      }
-
-      if (!result.success) {
-        showServerError(result.error);
+        toast.success("Pagamento removido.");
+      } else {
         deleteConfirm.close();
+        toast.error(result.error);
       }
     },
   });
@@ -152,6 +152,7 @@ export function PassengerPaymentsModal({
 
     reset({ amount: undefined, paidAt: getTodayDateString(), observations: "" });
     invalidateQueries();
+    toast.success("Pagamento registrado.");
   }
 
   function handleConfirmDelete() {

@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/shared/auth";
 import { getSession } from "@/shared/auth/session";
+import { ToastProvider } from "@/shared/ui/toast";
 
 import { QueryProvider } from "./query-provider";
 
@@ -12,7 +13,9 @@ export async function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <AuthProvider user={session}>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </QueryProvider>
     </AuthProvider>
   );
 }
