@@ -5,12 +5,23 @@ const BRAZILIAN_WEEKDAY_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "UTC",
 });
 
+const BRAZILIAN_WEEKDAY_SHORT_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
+  weekday: "short",
+  timeZone: "UTC",
+});
+
 export function formatDate(value: string): string {
   return BRAZILIAN_DATE_FORMATTER.format(new Date(value));
 }
 
 export function formatWeekday(value: string): string {
   return BRAZILIAN_WEEKDAY_FORMATTER.format(new Date(value));
+}
+
+/** Dia da semana abreviado e capitalizado, sem ponto final (ex.: "Sex", "Sáb"). */
+export function formatWeekdayShort(value: string): string {
+  const formatted = BRAZILIAN_WEEKDAY_SHORT_FORMATTER.format(new Date(value)).replace(/\.$/, "");
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
 export function toDateString(date: Date): string {

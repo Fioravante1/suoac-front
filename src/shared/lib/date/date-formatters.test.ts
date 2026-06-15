@@ -6,6 +6,7 @@ import {
   formatDateRange,
   formatDaysRemaining,
   formatWeekday,
+  formatWeekdayShort,
   toDateString,
   getTodayDateString,
 } from "./date-formatters";
@@ -19,6 +20,14 @@ describe("formatDate", () => {
 describe("formatWeekday", () => {
   it("formata dia da semana em português usando UTC", () => {
     expect(formatWeekday("2026-05-27T03:00:00.000Z")).toBe("quarta-feira");
+  });
+});
+
+describe("formatWeekdayShort", () => {
+  it("formata dia da semana abreviado, capitalizado e sem ponto", () => {
+    expect(formatWeekdayShort("2026-07-10T00:00:00.000Z")).toBe("Sex");
+    expect(formatWeekdayShort("2026-07-11T00:00:00.000Z")).toBe("Sáb");
+    expect(formatWeekdayShort("2026-07-12T00:00:00.000Z")).toBe("Dom");
   });
 });
 

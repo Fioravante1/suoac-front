@@ -2,6 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--suoac-space-5);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--suoac-shadow-md);
 }
 
 .header {
@@ -28,13 +36,78 @@
   width: 100%;
   height: 16px;
   border-radius: var(--suoac-radius-pill);
-  overflow: hidden;
   background: var(--suoac-color-surface-muted);
 }
 
-.barSegment {
+/* Cada setor = item flex da barra; carrega a largura e ancora o tooltip. */
+.segment {
+  position: relative;
   height: 100%;
-  transition: width 500ms ease;
+}
+
+/* Tooltip do setor, centralizado acima (padrão de gráfico). */
+.segment::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + var(--suoac-space-2));
+  z-index: 50;
+  padding: var(--suoac-space-1) var(--suoac-space-2);
+  border-radius: var(--suoac-radius-sm);
+  background: var(--suoac-color-text-primary);
+  color: var(--suoac-color-text-inverse);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+  line-height: var(--suoac-line-height-tight);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, var(--suoac-space-1));
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.segment:hover::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.barSegment {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  transition:
+    filter 200ms ease,
+    transform 200ms ease;
+  animation: segmentReveal 650ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* Setor "pula" e clareia ao passar o mouse (tooltip fica no wrapper, sem distorcer). */
+.barSegment:hover {
+  filter: brightness(1.08);
+  transform: scaleY(1.22);
+}
+
+.segment:first-child .barSegment {
+  border-top-left-radius: var(--suoac-radius-pill);
+  border-bottom-left-radius: var(--suoac-radius-pill);
+}
+
+.segment:last-child .barSegment {
+  border-top-right-radius: var(--suoac-radius-pill);
+  border-bottom-right-radius: var(--suoac-radius-pill);
+}
+
+@keyframes segmentReveal {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .barSegment.paid {
@@ -94,4 +167,31 @@
   font-size: var(--suoac-font-size-label);
   color: var(--suoac-color-text-secondary);
   font-weight: var(--suoac-font-weight-medium);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .barSegment {
+    animation: none;
+  }
+
+  .barSegment:hover {
+    transform: none;
+  }
+
+  .segment::after {
+    transition: opacity 150ms ease;
+    transform: translateX(-50%);
+  }
+
+  .segment:hover::after {
+    transform: translateX(-50%);
+  }
 }
