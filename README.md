@@ -63,6 +63,36 @@ http://localhost:3000
 
 ---
 
+## Variáveis de ambiente
+
+Definidas em `.env.local` (local) e no painel da Vercel (deploy). Variáveis sem o
+prefixo `NEXT_PUBLIC_` só existem no servidor.
+
+| Variável       | Descrição                                                               |
+| -------------- | ----------------------------------------------------------------------- |
+| `API_BASE_URL` | URL base da API backend.                                                |
+| `FLAGS`        | Chave do Vercel Flags usada pelo `vercelAdapter()`. Gerada pela Vercel. |
+| `FLAGS_SECRET` | Segredo do Flags SDK (Flags Explorer e precompute). Gerado pela Vercel. |
+
+`FLAGS` e `FLAGS_SECRET` são sincronizadas com `vercel env pull`.
+
+## Feature flags
+
+Usamos o [Flags SDK](https://flags-sdk.dev) (`flags/next`) com o provedor **Vercel Flags**
+(`@flags-sdk/vercel`). As flags são declaradas em `src/shared/feature-flags/`,
+expostas via `@/shared/feature-flags` e avaliadas server-side (`await flag()`).
+Por dependerem de APIs server-only (`async_hooks`), são mantidas fora de `@/shared/config`
+(consumido por Client Components) e só devem ser importadas em Server Components.
+
+| Flag                      | Tipo    | Descrição                                                                                    |
+| ------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `SHOW_PENDING_MENU_ITEMS` | boolean | Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações). |
+
+Os valores das flags são gerenciados no painel do Vercel Flags (ou via `vercel flags`),
+por ambiente (production/preview/development).
+
+---
+
 ## Arquitetura
 
 O projeto segue **Feature-Sliced Design**.

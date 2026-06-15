@@ -13,6 +13,8 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   roles?: UserRole[];
+  /** Item cuja pagina ainda nao foi implementada; oculto sem a flag visibleItemMenu. */
+  pending?: boolean;
 }
 
 export function filterNavItems(items: readonly NavItem[], role: UserRole): NavItem[] {

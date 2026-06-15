@@ -22,7 +22,23 @@ vi.mock("@/features/sign-in", () => ({
 import { DesktopSidebar } from "./desktop-sidebar";
 
 describe("DesktopSidebar", () => {
-  it("renderiza todos os 6 itens para CIRCUIT_COORDINATOR", () => {
+  it("renderiza todos os 6 itens para CIRCUIT_COORDINATOR com a flag ligada", () => {
+    mockUseAuthPermissions.mockReturnValue({
+      user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
+      isAuthenticated: true,
+    });
+
+    render(<DesktopSidebar showPendingItems />);
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Eventos")).toBeInTheDocument();
+    expect(screen.getByText("Congregações")).toBeInTheDocument();
+    expect(screen.getByText("Passageiros")).toBeInTheDocument();
+    expect(screen.getByText("Financeiro")).toBeInTheDocument();
+    expect(screen.getByText("Configurações")).toBeInTheDocument();
+  });
+
+  it("oculta itens pendentes (Financeiro e Configuracoes) com a flag desligada", () => {
     mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,
@@ -34,17 +50,17 @@ describe("DesktopSidebar", () => {
     expect(screen.getByText("Eventos")).toBeInTheDocument();
     expect(screen.getByText("Congregações")).toBeInTheDocument();
     expect(screen.getByText("Passageiros")).toBeInTheDocument();
-    expect(screen.getByText("Financeiro")).toBeInTheDocument();
-    expect(screen.getByText("Configurações")).toBeInTheDocument();
+    expect(screen.queryByText("Financeiro")).not.toBeInTheDocument();
+    expect(screen.queryByText("Configurações")).not.toBeInTheDocument();
   });
 
-  it("oculta Congregacoes e Configuracoes para CONGREGATION_COORDINATOR", () => {
+  it("oculta Congregacoes e Configuracoes para CONGREGATION_COORDINATOR mesmo com a flag ligada", () => {
     mockUseAuthPermissions.mockReturnValue({
       user: { name: "Maria Souza", role: "CONGREGATION_COORDINATOR" },
       isAuthenticated: true,
     });
 
-    render(<DesktopSidebar />);
+    render(<DesktopSidebar showPendingItems />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByText("Eventos")).toBeInTheDocument();
