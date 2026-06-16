@@ -2,6 +2,7 @@
 
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 
 import styles from "./confirm-dialog.module.css";
 
@@ -12,6 +13,7 @@ interface ConfirmDialogProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  loadingLabel?: string;
   cancelLabel?: string;
   loading?: boolean;
   variant?: "primary" | "destructive";
@@ -24,6 +26,7 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel = "Confirmar",
+  loadingLabel,
   cancelLabel = "Cancelar",
   loading = false,
   variant = "primary",
@@ -39,7 +42,8 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button variant={variant} onClick={onConfirm} disabled={loading}>
-            {loading ? "Aguarde…" : confirmLabel}
+            {loading && <Spinner size="small" />}
+            {loading ? (loadingLabel ?? confirmLabel) : confirmLabel}
           </Button>
         </>
       }

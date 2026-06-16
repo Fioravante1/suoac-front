@@ -23,6 +23,13 @@ describe("PasswordField", () => {
     expect(screen.getByLabelText("Senha")).toHaveAttribute("type", "password");
   });
 
+  it("desabilita o campo e o botão de visibilidade quando disabled", () => {
+    render(<PasswordField label="Senha" disabled />);
+
+    expect(screen.getByLabelText("Senha")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Mostrar senha" })).toBeDisabled();
+  });
+
   it("propaga o valor digitado e a mensagem de erro", () => {
     render(<PasswordField label="Senha" error="Campo obrigatório" />);
 

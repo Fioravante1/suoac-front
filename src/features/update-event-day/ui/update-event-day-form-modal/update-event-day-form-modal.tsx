@@ -7,6 +7,7 @@ import type { EventDayInEvent } from "@/entities/event";
 import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 
 import { updateEventDaySchema, type UpdateEventDayFormValues } from "../../model";
@@ -74,6 +75,7 @@ export function UpdateEventDayFormModal({ open, onClose, onSubmit, day }: Update
             Cancelar
           </Button>
           <Button type="submit" form="update-event-day-form" disabled={isSubmitting || !day}>
+            {isSubmitting && <Spinner size="small" />}
             {isSubmitting ? "Salvando…" : "Salvar"}
           </Button>
         </>

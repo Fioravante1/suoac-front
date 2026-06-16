@@ -27,6 +27,7 @@ export const PasswordField = forwardRef(function PasswordField(props: PasswordFi
           aria-label={toggleLabel}
           title={toggleLabel}
           tabIndex={-1}
+          disabled={props.disabled}
         >
           {visible ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>

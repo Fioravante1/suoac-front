@@ -111,9 +111,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteEventAction(id),
-    onSuccess: (result) => {
+    onSuccess: (result, id) => {
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(id) },
+        });
         return;
       }
 
@@ -133,9 +135,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
   const cancelDayMutation = useMutation({
     mutationFn: (dayId: string) => cancelEventDayAction(dayId),
-    onSuccess: (result) => {
+    onSuccess: (result, dayId) => {
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => cancelDayMutation.mutate(dayId) },
+        });
         return;
       }
 
@@ -149,9 +153,11 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
 
   const cancelEventMutation = useMutation({
     mutationFn: (id: string) => cancelEventAction(id),
-    onSuccess: (result) => {
+    onSuccess: (result, id) => {
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => cancelEventMutation.mutate(id) },
+        });
         return;
       }
 

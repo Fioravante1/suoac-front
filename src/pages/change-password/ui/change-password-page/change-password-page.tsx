@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { KeyRound, Lock, LogOut, ShieldCheck } from "lucide-react";
+import { KeyRound, Lock, ShieldCheck } from "lucide-react";
 
 import { ChangePasswordForm } from "@/features/change-password";
 import { signOutAction } from "@/features/sign-in";
-import { Button } from "@/shared/ui/button";
 
+import { LogoutButton } from "../logout-button";
 import styles from "./change-password-page.module.css";
 
 const securityPoints = [
@@ -68,10 +68,7 @@ export function ChangePasswordPage() {
           <ChangePasswordForm />
 
           <form action={signOutAction} className={styles.logoutForm}>
-            <Button type="submit" variant="secondary" fullWidth>
-              <LogOut size={18} />
-              Sair da conta
-            </Button>
+            <LogoutButton />
           </form>
         </div>
       </main>

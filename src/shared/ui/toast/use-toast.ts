@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 
-import { useToastContext } from "./toast-provider";
+import { useToastContext, type ToastOptions } from "./toast-provider";
 
 interface ToastApi {
-  success: (message: string, durationMs?: number) => void;
-  error: (message: string, durationMs?: number) => void;
-  info: (message: string, durationMs?: number) => void;
-  warning: (message: string, durationMs?: number) => void;
+  success: (message: string, options?: ToastOptions) => void;
+  error: (message: string, options?: ToastOptions) => void;
+  info: (message: string, options?: ToastOptions) => void;
+  warning: (message: string, options?: ToastOptions) => void;
   dismiss: (id: string) => void;
 }
 
@@ -15,10 +15,10 @@ export function useToast(): ToastApi {
 
   return useMemo(
     () => ({
-      success: (message, durationMs) => showToast("success", message, durationMs),
-      error: (message, durationMs) => showToast("error", message, durationMs),
-      info: (message, durationMs) => showToast("info", message, durationMs),
-      warning: (message, durationMs) => showToast("warning", message, durationMs),
+      success: (message, options) => showToast("success", message, options),
+      error: (message, options) => showToast("error", message, options),
+      info: (message, options) => showToast("info", message, options),
+      warning: (message, options) => showToast("warning", message, options),
       dismiss: dismissToast,
     }),
     [showToast, dismissToast],

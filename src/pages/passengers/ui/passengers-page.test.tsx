@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fetchCircuitPassengers, fetchPassengers } from "@/entities/passenger/api";
@@ -121,6 +121,50 @@ describe("PassengersPage", () => {
     render(<PassengersPage />, { wrapper: createWrapper() });
 
     expect(screen.getByRole("status")).toBeInTheDocument();
+  });
+
+  it("reexibe o skeleton durante o refetch em background ao atualizar a lista", async () => {
+    const passenger = {
+      id: "p-1",
+      name: "Maria",
+      rg: "111",
+      phone: null,
+      observations: null,
+      congregationId: "congregation-1",
+      congregationName: "Congregação A",
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+    };
+
+    // Primeira carga resolve com dados; o refetch seguinte fica pendente para
+    // mantermos `isFetching` ligado e observar o skeleton reaparecer.
+    fetchPassengersMock.mockReset();
+    fetchPassengersMock.mockResolvedValueOnce({
+      data: [passenger],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+    fetchPassengersMock.mockReturnValue(new Promise(() => {}));
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    function Wrapper({ children }: { children: ReactNode }) {
+      return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    }
+
+    render(<PassengersPage />, { wrapper: Wrapper });
+
+    // Lista carregada: tabela visível e sem skeleton.
+    await screen.findAllByText("Maria");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    // Simula a invalidação feita pelo onSuccess do cadastro/edição/exclusão.
+    // Não aguardamos a promise: o refetch fica pendente de propósito para observar o skeleton.
+    act(() => {
+      void queryClient.invalidateQueries({ queryKey: ["passengers"] });
+    });
+
+    // Refetch em andamento: skeleton volta e os dados antigos somem.
+    await waitFor(() => expect(screen.getByRole("status")).toBeInTheDocument());
+    expect(screen.queryAllByText("Maria")).toHaveLength(0);
   });
 
   it("exibe campo de busca sem botão Buscar", () => {

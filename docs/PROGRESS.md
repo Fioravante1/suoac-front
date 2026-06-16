@@ -1,23 +1,23 @@
 # Progresso do Projeto - SUOAC Frontend
 
-**Atualizado em:** 25/05/2026
-**Fase atual:** Domínio MVP - eventos
+**Atualizado em:** 15/06/2026
+**Fase atual:** Domínio MVP - eventos, passageiros, pagamentos e dashboard
 
 Este arquivo acompanha o estado do frontend, o que já foi entregue e quais frentes ainda precisam avançar.
 
 ## Estado Geral
 
-| Frente                 | Estado      | Observação                                                                               |
-| ---------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| Fundação Next.js + FSD | Concluído   | Estrutura base, App Router em `/app`, FSD em `src/`, Steiger e ESLint configurados.      |
-| Design system base     | Concluído   | Tokens globais, componentes compartilhados e padrões visuais iniciais.                   |
-| Autenticação e sessão  | Concluído   | Login, logout, sessão via cookies HttpOnly, proxy de proteção e RBAC de navegação.       |
-| App shell autenticado  | Concluído   | Sidebar desktop, bottom nav mobile e rotas privadas.                                     |
-| Congregações           | Parcial     | Listagem, criação, edição e exclusão já integradas ao backend.                           |
-| Eventos                | Parcial     | Listagem, criação, publicação, edição, exclusão e cancelamento já integrados ao backend. |
-| Passageiros            | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                                    |
-| Pagamentos             | Placeholder | Tela existe, domínio e fluxo ainda não implementados.                                    |
-| Dashboards             | Placeholder | Tela inicial existe, widgets de domínio ainda não implementados.                         |
+| Frente                 | Estado    | Observação                                                                                                               |
+| ---------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Fundação Next.js + FSD | Concluído | Estrutura base, App Router em `/app`, FSD em `src/`, Steiger e ESLint configurados.                                      |
+| Design system base     | Concluído | Tokens globais, componentes compartilhados e padrões visuais iniciais.                                                   |
+| Autenticação e sessão  | Concluído | Login, logout, sessão via cookies HttpOnly, refresh, proxy, RBAC de navegação e troca de senha obrigatória no 1º acesso. |
+| App shell autenticado  | Concluído | Sidebar desktop, bottom nav mobile e rotas privadas.                                                                     |
+| Congregações           | Parcial   | Listagem, criação, edição e exclusão já integradas ao backend.                                                           |
+| Eventos                | Parcial   | Listagem, criação, publicação, edição, exclusão e cancelamento já integrados ao backend.                                 |
+| Passageiros            | Parcial   | `entities/passenger`, CRUD e inscrição em eventos (`enroll-passenger`) integrados.                                       |
+| Pagamentos             | Parcial   | `entities/payment` e `register-payment` integrados; resumo financeiro no dashboard.                                      |
+| Dashboards             | Parcial   | Dashboard com stats, progresso de pagamentos, presença por dia e resumo por congregação.                                 |
 
 ## Entregas Concluídas
 
@@ -53,6 +53,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - `shared/auth` com sessão por cookies HttpOnly, refresh de sessão, `AuthProvider` e `useAuth`.
 - `proxy.ts` protegendo rotas privadas.
 - `app-shell` autenticado com navegação filtrada por papel.
+- Troca de senha obrigatória no primeiro acesso (ver entrega 11 e `docs/architecture/SUOAC_AUTENTICACAO.md` §3.5).
 
 ### 4. API e Server State
 
@@ -137,21 +138,41 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
   - Ações com `size="small"` e grid `auto-fit` com `minmax(7rem, max-content)` que distribui botões em 2 colunas no mobile e linha única no tablet, alinhados à direita.
   - Ordem dos botões: Editar → Excluir → Cancelar evento → Publicar evento (CTA principal sempre por último à direita).
 
+### 11. Troca de Senha Obrigatória no Primeiro Acesso
+
+- `features/change-password` com schema Zod (atual/nova/confirmação, nova ≠ atual), Server Action `changePasswordAction` e formulário (`"use client"`).
+- `pages/change-password` (tela "Defina sua senha" em layout de duas colunas, espelhando o login) e rota `app/change-password`.
+- `SessionUser`/`User` ganharam a flag opcional `mustChangePassword`; `signInAction` redireciona para `/change-password` quando ativa.
+- Imposição em três camadas: `proxy.ts` (lê a flag do cookie e prende a navegação), redirect pós-login e rede de segurança de 403 (`PASSWORD_CHANGE_REQUIRED_MESSAGE` detectada em `useServerError`/`query-client`/`session-redirect`).
+- Sucesso substitui os tokens via `createSession` e redireciona ao dashboard. Erros mapeados por campo (401 → senha atual, 422 → nova senha) e sessão inválida força relogin.
+- Detalhado em `docs/architecture/SUOAC_AUTENTICACAO.md` §3.5.
+
+### 12. Dashboard — Presença por Dia e Micro-interações
+
+- Endpoint de dashboard passou a expor `passengersByDay`; nova seção "Presença por dia" (gráfico de colunas ancorado ao total de inscritos), renderizada só em eventos multi-dia.
+- "Presença por dia" e "Pagamentos" lado a lado (grid responsivo) com hover-lift nos cards, animação de revelação das barras e tooltip por setor na barra de pagamentos (respeitando `prefers-reduced-motion`).
+- Formatador global `formatWeekdayShort` em `shared/lib/date`.
+
+### 13. Feature Flags (Vercel)
+
+- Integração com o Flags SDK (`flags/next` + `@flags-sdk/vercel`) em `shared/feature-flags` (segmento isolado por ser server-only).
+- Flag `SHOW_PENDING_MENU_ITEMS` controla a exibição de itens de menu cujas páginas ainda não foram implementadas.
+
 ## Validação Mais Recente
 
-Última validação completa executada após o redesign dos cards e ajuste das regras de cancelamento:
+Última validação completa executada após a troca de senha obrigatória e a reconciliação da documentação:
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, 229 testes unitários e Prettier.
+Resultado: passou com typecheck, lint, architecture check, 593 testes unitários e Prettier.
 
 ## Próximos Passos Recomendados
 
-1. Implementar `entities/passenger` e `features/enroll-passenger`.
-2. Implementar `entities/payment` e `features/register-payment`.
-3. Evoluir widgets `event-overview` e `financial-summary` para alimentar dashboards reais.
+1. Data Access Layer (`verifySession()`) para revalidar a sessão em Server Components.
+2. Proteção por role no proxy (cookie `suoac-user`).
+3. Relatórios e exportações sobre os dados de eventos/passageiros/pagamentos.
 
 ## Pendências Conhecidas
 

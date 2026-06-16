@@ -96,25 +96,3 @@
   white-space: nowrap;
   min-width: 0;
 }
-
-.logoutButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  border-radius: var(--suoac-radius-sm);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
-}
-
-.logoutButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--suoac-color-critical);
-}

@@ -250,6 +250,35 @@ features/register-payment/api/register-payment.mutation.ts
 shared/api/query-client.ts
 ```
 
+### Invalidacao de cache e atualizacao do Dashboard
+
+- Toda mutation deve invalidar as queries cujo dado ela alterou. Apos `mutateAsync`/`mutate` com
+  sucesso, chame `queryClient.invalidateQueries({ queryKey: queryKeys.X })` para cada conjunto de
+  dados afetado. Nao confie em `staleTime` para "consertar sozinho": com `refetchOnWindowFocus`
+  desligado e `staleTime` de 60s, dados em cache permanecem defasados ate o usuario recarregar.
+- **O Dashboard agrega dados produzidos em outras telas** (inscricoes, pagamentos, dias, etc.). Por
+  isso vale a regra obrigatoria: **sempre que uma acao em qualquer lugar do sistema alterar um dado
+  que o Dashboard exibe ou agrega, a mutation correspondente deve invalidar `queryKeys.dashboard.all`**
+  (alem das queries diretas da propria tela).
+- Isso inclui, no minimo: inscrever/remover passageiro em evento, editar dias da inscricao, registrar
+  ou remover pagamento, e qualquer mudanca em valores financeiros, contagens ou status que componham
+  os cards/graficos do Dashboard. Na duvida sobre se um dado aparece no Dashboard, invalide.
+- O Dashboard normalmente esta fora de tela no momento da acao. `invalidateQueries` marca a query
+  como stale e o refetch acontece ao remontar (quando o usuario volta), entao a invalidacao funciona
+  mesmo sem a tela montada — nao tente "atualizar na mao" nem forcar navegacao.
+- Centralize as invalidacoes de uma feature em uma unica funcao `invalidateQueries()` local e
+  reutilize-a em todos os `onSuccess` daquela feature, para nao esquecer nenhum conjunto de dados.
+
+```ts
+// Exemplo: mutation que afeta a tela atual E o Dashboard
+function invalidateQueries() {
+  queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
+  queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
+  // Obrigatorio: o Dashboard agrega contagens/valores das inscricoes.
+  queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+}
+```
+
 ### Paginacao
 
 - Listas paginadas devem usar `usePagination` de `@/shared/lib` em vez de `useState(1)` local para controlar pagina. Use `setPage` como handler de `Pagination` e `reset()` quando filtros, busca ou contexto da lista precisarem voltar para a primeira pagina.

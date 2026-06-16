@@ -262,9 +262,11 @@ export function EventsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (eventId: string) => deleteEventAction(eventId),
-    onSuccess: (result) => {
+    onSuccess: (result, eventId) => {
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(eventId) },
+        });
         return;
       }
 
@@ -276,9 +278,11 @@ export function EventsPage() {
 
   const cancelEventMutation = useMutation({
     mutationFn: (eventId: string) => cancelEventAction(eventId),
-    onSuccess: (result) => {
+    onSuccess: (result, eventId) => {
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => cancelEventMutation.mutate(eventId) },
+        });
         return;
       }
 

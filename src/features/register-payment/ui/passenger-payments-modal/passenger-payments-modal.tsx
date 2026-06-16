@@ -124,18 +124,24 @@ export function PassengerPaymentsModal({
   function invalidateQueries() {
     queryClient.invalidateQueries({ queryKey: queryKeys.payments.list(eventPassenger.id) });
     queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
+    // Pagamentos alteram os totais financeiros agregados no dashboard. Marcamos como stale para
+    // refazer o fetch ao voltar, evitando exibir valores defasados.
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
   }
 
   const deleteMutation = useMutation({
     mutationFn: (paymentId: string) => deletePaymentAction(paymentId),
-    onSuccess: (result) => {
+    onSuccess: (result, paymentId) => {
       if (result.success) {
         invalidateQueries();
         deleteConfirm.close();
         toast.success("Pagamento removido.");
       } else {
         deleteConfirm.close();
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(paymentId) },
+        });
       }
     },
   });
