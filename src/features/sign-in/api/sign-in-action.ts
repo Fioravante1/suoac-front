@@ -27,6 +27,8 @@ export async function signInAction(_prevState: SignInState | undefined, formData
     return { error: "Dados inválidos. Verifique os campos e tente novamente." };
   }
 
+  let mustChangePassword = false;
+
   try {
     const response = await httpClient<SignInResponseDto>(endpoints.auth.login, {
       method: "POST",
@@ -44,13 +46,21 @@ export async function signInAction(_prevState: SignInState | undefined, formData
       isActive: response.user.isActive,
       circuitId: response.user.circuitId,
       congregationId: response.user.congregationId,
+      mustChangePassword: response.user.mustChangePassword,
     });
+
+    mustChangePassword = response.user.mustChangePassword === true;
   } catch (error) {
     if (error instanceof HttpError && error.status === 401) {
       return { error: "E-mail ou senha incorretos." };
     }
 
     return { error: "Ocorreu um erro inesperado. Tente novamente." };
+  }
+
+  // Primeiro acesso: ignora returnUrl e força a tela de definição de senha.
+  if (mustChangePassword) {
+    redirect(routes.changePassword);
   }
 
   const safeReturnUrl = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//") ? returnUrl : null;

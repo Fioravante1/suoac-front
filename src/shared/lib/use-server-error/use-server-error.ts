@@ -1,6 +1,11 @@
 import { useCallback, useState } from "react";
 
-import { isSessionExpiredError, redirectToSessionExpired } from "@/shared/auth/session-redirect";
+import {
+  isSessionExpiredError,
+  redirectToSessionExpired,
+  isPasswordChangeRequiredError,
+  redirectToPasswordChangeRequired,
+} from "@/shared/auth/session-redirect";
 
 const DEFAULT_SERVER_ERROR_MESSAGE = "Ocorreu um erro inesperado.";
 
@@ -22,6 +27,12 @@ export function useServerError(): UseServerErrorReturn {
     // redireciona para /login em vez de exibir a mensagem inline.
     if (isSessionExpiredError(error)) {
       redirectToSessionExpired();
+      return;
+    }
+
+    // Troca de senha obrigatória: redireciona para a tela de definição de senha.
+    if (isPasswordChangeRequiredError(error)) {
+      redirectToPasswordChangeRequired();
       return;
     }
 
