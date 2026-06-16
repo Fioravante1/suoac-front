@@ -22,7 +22,9 @@
  * no `http-client` + `unauthorized.tsx`, e remover este módulo, o
  * `SessionGuard` e a detecção no `useServerError`/`query-client`.
  */
-import { SESSION_EXPIRED_MESSAGE } from "../constants";
+import { SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE } from "../constants";
+
+const CHANGE_PASSWORD_PATH = "/change-password";
 
 let isRedirecting = false;
 
@@ -72,6 +74,29 @@ export function redirectToSessionExpired(): void {
   const returnUrl = window.location.pathname + window.location.search;
   const params = new URLSearchParams({ sessionExpired: "true", returnUrl });
   window.location.href = `/login?${params.toString()}`;
+}
+
+/**
+ * Indica se o erro representa a exigência de troca de senha obrigatória (403 do
+ * backend em qualquer rota enquanto a flag estiver ativa). Aceita `Error`
+ * (queries) ou `string` (ActionResult.error de mutations).
+ */
+export function isPasswordChangeRequiredError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : error;
+  return message === PASSWORD_CHANGE_REQUIRED_MESSAGE;
+}
+
+/**
+ * Rede de segurança: redireciona para a tela de definição de senha quando a API
+ * responde 403 de troca obrigatória em páginas já carregadas (navegação normal é
+ * coberta pelo proxy). Usa hard navigation e compartilha o gate `isRedirecting`
+ * com o redirect de sessão — no máximo um redirect por ciclo de vida da página.
+ */
+export function redirectToPasswordChangeRequired(): void {
+  if (isRedirecting || typeof window === "undefined") return;
+
+  isRedirecting = true;
+  window.location.href = CHANGE_PASSWORD_PATH;
 }
 
 /** @internal Exported for testing only */

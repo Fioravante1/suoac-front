@@ -14,6 +14,8 @@ export interface SessionUser {
   isActive: boolean;
   circuitId: string;
   congregationId: string | null;
+  /** Troca de senha obrigatória no primeiro acesso. Ausência é tratada como `false`. */
+  mustChangePassword?: boolean;
 }
 
 const ACCESS_TOKEN_COOKIE = "suoac-access-token";
