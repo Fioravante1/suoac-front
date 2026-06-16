@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
+import { SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE } from "@/shared/auth/constants";
 import { resetSessionRedirect } from "@/shared/auth/session-redirect";
 
 import { useServerError } from "./use-server-error";
@@ -76,6 +76,17 @@ describe("useServerError", () => {
     });
 
     expect(mockLocationHref).toHaveBeenCalledWith(expect.stringContaining("/login?sessionExpired=true"));
+    expect(result.current.serverError).toBeNull();
+  });
+
+  it("redireciona para a troca de senha obrigatória e não exibe a mensagem inline", () => {
+    const { result } = renderHook(() => useServerError());
+
+    act(() => {
+      result.current.showServerError(PASSWORD_CHANGE_REQUIRED_MESSAGE);
+    });
+
+    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
     expect(result.current.serverError).toBeNull();
   });
 });
