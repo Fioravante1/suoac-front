@@ -54,7 +54,13 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const canManage = canManageEventPassengers(event.status);
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
-  const { data: passengersData, isLoading, isError } = useQuery(eventPassengerListOptions(event.id, page));
+  const { data: passengersData, isFetching, isError } = useQuery(eventPassengerListOptions(event.id, page));
+
+  // `isFetching` cobre a carga inicial e o refetch em background disparado pela invalidação após
+  // inscrever/remover/editar dias. Com `refetchOnWindowFocus` desligado, todo fetch é intencional,
+  // então exibir o skeleton nesses momentos dá feedback sem flashes acidentais.
+  const skeletonRows = passengersData?.data.length || 5;
+
   const paymentModalPassenger = paymentsModal.item
     ? (passengersData?.data.find((passenger) => passenger.id === paymentsModal.item?.id) ?? paymentsModal.item)
     : null;
@@ -190,11 +196,13 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         )}
       </div>
 
-      {isLoading && <SkeletonTableRows rows={5} />}
+      {isFetching && <SkeletonTableRows rows={skeletonRows} />}
 
-      {isError && <p className={styles.errorMessage}>Não foi possível carregar as inscrições. Tente novamente.</p>}
+      {!isFetching && isError && (
+        <p className={styles.errorMessage}>Não foi possível carregar as inscrições. Tente novamente.</p>
+      )}
 
-      {passengersData && passengersData.data.length === 0 && (
+      {!isFetching && passengersData?.data.length === 0 && (
         <EmptyState
           icon={<Users size={48} />}
           title="Nenhuma inscrição"
@@ -206,7 +214,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         />
       )}
 
-      {passengersData && passengersData.data.length > 0 && (
+      {!isFetching && passengersData && passengersData.data.length > 0 && (
         <>
           <ul className={styles.mobileList}>
             {passengersData.data.map((ep) => (
@@ -302,6 +310,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         title="Remover inscrição"
         message={`Tem certeza que deseja remover a inscrição de "${removeModal.item?.passenger.name}"? Essa ação não pode ser desfeita.`}
         confirmLabel="Remover"
+        loadingLabel="Removendo..."
         loading={removeMutation.isPending}
         variant="destructive"
       />
