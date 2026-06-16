@@ -82,6 +82,7 @@ export const themeTokens = {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
     sm: "0 8px 24px rgb(31 110 90 / 0.08)",
     md: "0 16px 40px rgb(31 110 90 / 0.12)",
+    lg: "0 12px 28px rgb(16 24 40 / 0.18), 0 2px 6px rgb(16 24 40 / 0.12)",
   },
   overlay: {
     blur: "4px",

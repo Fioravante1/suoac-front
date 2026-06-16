@@ -16,6 +16,7 @@ import {
 import { USER_ROLES, type UserRole } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 
 import { updateEventSchema, type UpdateEventFormValues } from "../../model";
@@ -122,6 +123,7 @@ export function UpdateEventFormModal({ open, onClose, onSubmit, event, userRole 
             Cancelar
           </Button>
           <Button type="submit" form="update-event-form" disabled={isSubmitting || !event}>
+            {isSubmitting && <Spinner size="small" />}
             {isSubmitting ? "Salvando…" : "Salvar alterações"}
           </Button>
         </>

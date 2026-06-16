@@ -132,14 +132,16 @@ export function PassengerPaymentsModal({
 
   const deleteMutation = useMutation({
     mutationFn: (paymentId: string) => deletePaymentAction(paymentId),
-    onSuccess: (result) => {
+    onSuccess: (result, paymentId) => {
       if (result.success) {
         invalidateQueries();
         deleteConfirm.close();
         toast.success("Pagamento removido.");
       } else {
         deleteConfirm.close();
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(paymentId) },
+        });
       }
     },
   });

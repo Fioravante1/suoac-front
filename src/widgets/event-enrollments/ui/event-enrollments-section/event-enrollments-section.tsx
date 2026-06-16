@@ -95,13 +95,15 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
 
   const removeMutation = useMutation({
     mutationFn: (epId: string) => removeEventPassengerAction(epId),
-    onSuccess: (result) => {
+    onSuccess: (result, epId) => {
       if (result.success) {
         invalidateQueries();
         removeModal.close();
         toast.success("Inscrição removida.");
       } else {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => removeMutation.mutate(epId) },
+        });
       }
     },
   });

@@ -104,12 +104,14 @@ export function PassengersPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deletePassengerAction(id),
-    onSuccess: (result) => {
+    onSuccess: (result, id) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.passengers.all });
         toast.success("Passageiro excluído.");
       } else {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(id) },
+        });
       }
 
       deleteModal.close();

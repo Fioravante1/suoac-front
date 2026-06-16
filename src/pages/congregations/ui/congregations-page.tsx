@@ -62,12 +62,14 @@ export function CongregationsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCongregationAction(id),
-    onSuccess: (result) => {
+    onSuccess: (result, id) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });
         toast.success("Congregação excluída.");
       } else {
-        toast.error(result.error ?? "Não foi possível excluir a congregação.");
+        toast.error(result.error ?? "Não foi possível excluir a congregação.", {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(id) },
+        });
       }
       deleteModal.close();
     },

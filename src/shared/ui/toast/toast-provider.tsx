@@ -6,14 +6,26 @@ import { Toaster } from "./toaster";
 
 export type ToastVariant = "success" | "error" | "info" | "warning";
 
+/** Ação de recuperação opcional exibida dentro do toast (ex.: "Tentar novamente"). */
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
+export interface ToastOptions {
+  durationMs?: number;
+  action?: ToastAction;
+}
+
 export interface ToastRecord {
   id: string;
   variant: ToastVariant;
   message: string;
+  action?: ToastAction;
 }
 
 interface ToastContextValue {
-  showToast: (variant: ToastVariant, message: string, durationMs?: number) => void;
+  showToast: (variant: ToastVariant, message: string, options?: ToastOptions) => void;
   dismissToast: (id: string) => void;
 }
 
@@ -46,13 +58,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const showToast = useCallback(
-    (variant: ToastVariant, message: string, durationMs?: number) => {
+    (variant: ToastVariant, message: string, options?: ToastOptions) => {
       counter.current += 1;
       const id = `toast-${counter.current}`;
 
-      setToasts((current) => [...current, { id, variant, message }].slice(-MAX_TOASTS));
+      setToasts((current) => [...current, { id, variant, message, action: options?.action }].slice(-MAX_TOASTS));
 
-      const timer = setTimeout(() => dismissToast(id), durationMs ?? DEFAULT_DURATION_MS[variant]);
+      // Toast com ação de recuperação não some sozinho (salvo duração explícita): o usuário precisa
+      // de tempo para reagir. Sem ação, usa a duração padrão da variante.
+      const duration = options?.durationMs ?? (options?.action ? null : DEFAULT_DURATION_MS[variant]);
+      if (duration === null) return;
+
+      const timer = setTimeout(() => dismissToast(id), duration);
       timers.current.set(id, timer);
     },
     [dismissToast],
