@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
+import { SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE } from "@/shared/auth/constants";
 import { resetSessionRedirect } from "@/shared/auth/session-redirect";
 
 import { createQueryClient } from "./query-client";
@@ -34,6 +34,15 @@ describe("query-client handleAuthError", () => {
     cache.config.onError?.(new Error(SESSION_EXPIRED_MESSAGE), undefined!);
 
     expect(mockLocationHref).toHaveBeenCalledWith("/login?sessionExpired=true&returnUrl=%2Fcongregations%3Fpage%3D2");
+  });
+
+  it("redireciona para a troca de senha quando erro tem PASSWORD_CHANGE_REQUIRED_MESSAGE", () => {
+    const client = createQueryClient();
+    const cache = client.getQueryCache();
+
+    cache.config.onError?.(new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE), undefined!);
+
+    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
   });
 
   it("nao redireciona para outros erros", () => {
@@ -78,6 +87,16 @@ describe("query-client throwOnError", () => {
       expect(result).toBe(false);
     }
   });
+
+  it("nao propaga erro de troca de senha obrigatoria para o error boundary", () => {
+    const client = createQueryClient();
+    const throwOnError = client.getDefaultOptions().queries?.throwOnError;
+
+    if (typeof throwOnError === "function") {
+      const result = throwOnError(new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE), undefined!);
+      expect(result).toBe(false);
+    }
+  });
 });
 
 describe("query-client retry", () => {
@@ -89,6 +108,16 @@ describe("query-client retry", () => {
 
     if (typeof retryFn === "function") {
       const result = retryFn(0, new Error(SESSION_EXPIRED_MESSAGE));
+      expect(result).toBe(false);
+    }
+  });
+
+  it("desabilita retry para erro de troca de senha obrigatoria", () => {
+    const client = createQueryClient();
+    const retryFn = client.getDefaultOptions().queries?.retry;
+
+    if (typeof retryFn === "function") {
+      const result = retryFn(0, new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE));
       expect(result).toBe(false);
     }
   });

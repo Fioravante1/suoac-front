@@ -1,6 +1,7 @@
 export const routes = {
   home: "/",
   login: "/login",
+  changePassword: "/change-password",
   dashboard: "/dashboard",
   events: "/events",
   eventDetail: (id: string) => `/events/${id}`,

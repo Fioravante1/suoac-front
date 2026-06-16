@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { SESSION_EXPIRED_MESSAGE } from "../constants";
+import { SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE } from "../constants";
 
 import {
   isSessionExpiredError,
   redirectToSessionExpired,
+  isPasswordChangeRequiredError,
+  redirectToPasswordChangeRequired,
   resetSessionRedirect,
   subscribeToSessionRedirect,
 } from "./session-redirect";
@@ -56,6 +58,34 @@ describe("redirectToSessionExpired", () => {
 
   it("dispara apenas uma vez (gate isRedirecting)", () => {
     redirectToSessionExpired();
+    redirectToSessionExpired();
+
+    expect(mockLocationHref).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("isPasswordChangeRequiredError", () => {
+  it("reconhece a mensagem de troca obrigatória (Error e string)", () => {
+    expect(isPasswordChangeRequiredError(new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE))).toBe(true);
+    expect(isPasswordChangeRequiredError(PASSWORD_CHANGE_REQUIRED_MESSAGE)).toBe(true);
+  });
+
+  it("ignora outros erros", () => {
+    expect(isPasswordChangeRequiredError(new Error(SESSION_EXPIRED_MESSAGE))).toBe(false);
+    expect(isPasswordChangeRequiredError("Forbidden")).toBe(false);
+    expect(isPasswordChangeRequiredError(null)).toBe(false);
+  });
+});
+
+describe("redirectToPasswordChangeRequired", () => {
+  it("redireciona para /change-password", () => {
+    redirectToPasswordChangeRequired();
+
+    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
+  });
+
+  it("compartilha o gate com o redirect de sessão (dispara uma vez)", () => {
+    redirectToPasswordChangeRequired();
     redirectToSessionExpired();
 
     expect(mockLocationHref).toHaveBeenCalledTimes(1);
