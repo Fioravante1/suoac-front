@@ -124,6 +124,10 @@ export function PassengerPaymentsModal({
   function invalidateQueries() {
     queryClient.invalidateQueries({ queryKey: queryKeys.payments.list(eventPassenger.id) });
     queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
+    // Pagamentos alteram os totais financeiros agregados no dashboard. Marcamos como stale para
+    // refazer o fetch ao voltar, evitando exibir valores defasados.
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
   }
 
   const deleteMutation = useMutation({

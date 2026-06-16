@@ -68,6 +68,9 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   function invalidateQueries() {
     queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
+    // O dashboard agrega contagens/valores das inscrições. Como ele costuma estar fora de tela neste
+    // momento, marcamos como stale para refazer o fetch ao voltar, em vez de exibir dados defasados.
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
   }
 
   const enrollMutation = useMutation({

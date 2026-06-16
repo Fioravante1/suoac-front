@@ -186,6 +186,24 @@ describe("EventEnrollmentsSection", () => {
     expect(screen.getByText("Nenhuma inscrição")).toBeInTheDocument();
   });
 
+  it("exibe skeleton durante o refetch em background, ocultando os dados anteriores", async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+
+    // Dados em cache presentes, mas refetch em andamento (isFetching): deve mostrar skeleton.
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [basePassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isFetching: true,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    render(
+      <EventEnrollmentsSection event={baseEvent} userRole={USER_ROLES.CIRCUIT_COORDINATOR} userCongregationId={null} />,
+    );
+
+    expect(screen.getByRole("status", { name: "Carregando" })).toBeInTheDocument();
+    expect(screen.queryByText("Maria Silva")).not.toBeInTheDocument();
+  });
+
   it("organiza ações da tabela em um menu compacto por inscrição", async () => {
     const { useQuery: useQueryMock } = await import("@/shared/api");
 
