@@ -22,6 +22,8 @@ export const themeTokens = {
     attentionSoft: "#FFF4CF",
     criticalSoft: "#FDECEC",
     neutralSoft: "#F1F3F3",
+    scrim: "rgb(16 24 40 / 0.45)",
+    overlay: "rgb(247 249 248 / 0.72)",
   },
   event: {
     open: "#1F6E5A",
@@ -80,6 +82,15 @@ export const themeTokens = {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
     sm: "0 8px 24px rgb(31 110 90 / 0.08)",
     md: "0 16px 40px rgb(31 110 90 / 0.12)",
+  },
+  overlay: {
+    blur: "4px",
+  },
+  zIndex: {
+    dropdown: 50,
+    modal: 100,
+    toast: 120,
+    overlay: 200,
   },
   layout: {
     mobileNavHeight: "4.5rem",

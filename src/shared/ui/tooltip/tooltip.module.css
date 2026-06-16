@@ -8,7 +8,7 @@
   position: absolute;
   right: 0;
   bottom: calc(100% + var(--suoac-space-2));
-  z-index: 50;
+  z-index: var(--suoac-z-dropdown);
   padding: var(--suoac-space-1) var(--suoac-space-2);
   border-radius: var(--suoac-radius-sm);
   background: var(--suoac-color-text-primary);

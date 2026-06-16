@@ -67,6 +67,7 @@ export function SignInForm() {
         placeholder="seu.email@exemplo.com"
         error={errors.email?.message}
         startIcon={<Mail size={20} />}
+        disabled={isSubmitting}
         {...register("email")}
       />
 
@@ -75,6 +76,7 @@ export function SignInForm() {
         placeholder="••••••••"
         error={errors.password?.message}
         startIcon={<Lock size={20} />}
+        disabled={isSubmitting}
         {...register("password")}
       />
 

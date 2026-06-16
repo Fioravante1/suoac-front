@@ -60,6 +60,7 @@ export function ChangePasswordForm() {
           autoFocus
           error={errors.currentPassword?.message}
           startIcon={<Lock size={20} />}
+          disabled={isSubmitting}
           {...register("currentPassword")}
         />
         <p className={styles.hint}>É a mesma senha que você usou para entrar agora.</p>
@@ -71,6 +72,7 @@ export function ChangePasswordForm() {
         autoComplete="new-password"
         error={errors.newPassword?.message}
         startIcon={<KeyRound size={20} />}
+        disabled={isSubmitting}
         {...register("newPassword")}
       />
 
@@ -80,6 +82,7 @@ export function ChangePasswordForm() {
         autoComplete="new-password"
         error={errors.confirmPassword?.message}
         startIcon={<KeyRound size={20} />}
+        disabled={isSubmitting}
         {...register("confirmPassword")}
       />
 

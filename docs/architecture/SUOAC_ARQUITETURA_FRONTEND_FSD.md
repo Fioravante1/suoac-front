@@ -254,7 +254,16 @@ src/
       model/
         sign-in-schema.ts
       api/
-        sign-in.mutation.ts
+        sign-in-action.ts      # Server Action ("use server")
+
+    change-password/           # troca de senha obrigatoria no 1º acesso
+      index.ts
+      ui/
+        change-password-form.tsx
+      model/
+        change-password-schema.ts
+      api/
+        change-password-action.ts
 
     create-event/
       index.ts
@@ -502,12 +511,12 @@ Telas de produto.
 No SUOAC:
 
 - `login`
+- `change-password`
 - `dashboard`
 - `events`
-- `event-details`
+- `event-detail`
 - `passengers`
 - `financial`
-- `reports`
 - `settings`
 
 Pages podem compor widgets, features e entities. Pequenas logicas especificas de uma unica tela
@@ -564,6 +573,7 @@ Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client
 | Feature                       | Camada  | Observacao                                |
 | ----------------------------- | ------- | ----------------------------------------- |
 | `sign-in`                     | feature | Login por e-mail/senha e futuro OAuth     |
+| `change-password`             | feature | Troca de senha obrigatoria no 1º acesso   |
 | `create-event`                | feature | Criacao de assembleia/congresso           |
 | `publish-event`               | feature | Mudanca de status para inscricoes abertas |
 | `update-event-day`            | feature | Edicao de horarios de saida/retorno       |
@@ -629,14 +639,14 @@ entities/event/model/event.ts
 
 ### 7.4 TanStack Query
 
-Quando TanStack Query for instalado:
+TanStack Query esta integrado. Infra:
 
 ```txt
-src/shared/api/query-client.ts
-src/_app/providers/query-provider.tsx
+src/shared/api/query-client/query-client.ts
+src/app/providers/query-provider.tsx
 ```
 
-Query factories devem ficar proximas do dominio:
+Query factories ficam proximas do dominio:
 
 ```txt
 entities/event/api/event.queries.ts
@@ -644,11 +654,13 @@ entities/passenger/api/passenger.queries.ts
 entities/payment/api/payment.queries.ts
 ```
 
-Mutations devem ficar perto do caso de uso:
+Mutations ficam perto do caso de uso. No codigo, as mutações são implementadas como **Server
+Actions** com o sufixo `*-action.ts` (ex.: `sign-in-action.ts`, `change-password-action.ts`,
+`register-payment-action.ts`):
 
 ```txt
-features/register-payment/api/register-payment.mutation.ts
-features/enroll-passenger/api/enroll-passenger.mutation.ts
+features/register-payment/api/register-payment-action.ts
+features/enroll-passenger/api/enroll-passenger-action.ts
 ```
 
 Nao misturar queries e mutations no mesmo arquivo por conveniencia.

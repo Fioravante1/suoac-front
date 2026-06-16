@@ -101,6 +101,38 @@ describe("SignInForm", () => {
     });
   });
 
+  it("desabilita os campos enquanto o login esta em andamento", async () => {
+    let resolveAction: (value: { error?: string }) => void = () => {};
+    signInActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+
+    render(<SignInForm />);
+
+    const emailInput = screen.getByLabelText(/E-mail/i);
+    const passwordInput = screen.getByLabelText("Senha");
+
+    fireEvent.change(emailInput, { target: { value: "user@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "Senha@123" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /Entrar/i }));
+
+    await waitFor(() => {
+      expect(emailInput).toBeDisabled();
+      expect(passwordInput).toBeDisabled();
+    });
+
+    resolveAction({});
+
+    await waitFor(() => {
+      expect(emailInput).not.toBeDisabled();
+      expect(passwordInput).not.toBeDisabled();
+    });
+  });
+
   it("exibe banner informativo quando sessionExpired=true", () => {
     mockSearchParams.set("sessionExpired", "true");
 

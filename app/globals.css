@@ -83,6 +83,17 @@
   --suoac-shadow-sm: 0 8px 24px rgb(31 110 90 / 0.08);
   --suoac-shadow-md: 0 16px 40px rgb(31 110 90 / 0.12);
 
+  /* Scrim & overlay */
+  --suoac-color-scrim: rgb(16 24 40 / 0.45);
+  --suoac-color-overlay: rgb(247 249 248 / 0.72);
+  --suoac-overlay-blur: 4px;
+
+  /* Elevation (z-index scale) */
+  --suoac-z-dropdown: 50;
+  --suoac-z-modal: 100;
+  --suoac-z-toast: 120;
+  --suoac-z-overlay: 200;
+
   /* Layout */
   --suoac-layout-mobile-nav-height: 4.5rem;
   --suoac-layout-sidebar-width: 17rem;
