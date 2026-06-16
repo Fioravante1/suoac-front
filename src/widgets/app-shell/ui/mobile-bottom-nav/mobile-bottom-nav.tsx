@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Users, Wallet, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Users, Wallet } from "lucide-react";
 
 import { useAuthPermissions, filterNavItems, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
+import { LogoutButton } from "../logout-button";
+import { LogoutOverlay } from "../logout-overlay";
 import styles from "./mobile-bottom-nav.module.css";
 
 const mobileNavItems: NavItem[] = [
@@ -42,10 +44,8 @@ export function MobileBottomNav({ showPendingItems = false }: MobileBottomNavPro
         );
       })}
       <form action={signOutAction} className={styles.navItem}>
-        <button type="submit" className={styles.logoutButton} aria-label="Sair">
-          <LogOut size={22} />
-          <span className={styles.label}>Sair</span>
-        </button>
+        <LogoutButton variant="stacked" />
+        <LogoutOverlay />
       </form>
     </nav>
   );

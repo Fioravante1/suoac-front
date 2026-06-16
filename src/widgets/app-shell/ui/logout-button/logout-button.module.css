@@ -1,0 +1,43 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: progress;
+}
+
+/* Variante `icon` — sidebar desktop (fundo escuro). */
+.icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--suoac-radius-sm);
+  color: rgba(255, 255, 255, 0.6);
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.icon:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--suoac-color-critical);
+}
+
+/* Variante `stacked` — bottom nav mobile. Cor herda do `.navItem` pai. */
+.stacked {
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  color: inherit;
+  font: inherit;
+  transition: color 0.15s;
+}
+
+.label {
+  font-size: 0.6875rem;
+  line-height: var(--suoac-line-height-tight);
+}

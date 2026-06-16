@@ -1,8 +1,8 @@
 # SUOAC — Fluxo de Autenticacao
 
-**Versao:** 1.0
-**Data:** 19/05/2026
-**Escopo:** Autenticacao, sessao, protecao de rotas e autorizacao no frontend Next.js
+**Versao:** 2.0
+**Data:** 15/06/2026
+**Escopo:** Autenticacao, sessao, protecao de rotas, troca de senha obrigatoria e autorizacao no frontend Next.js
 
 ---
 
@@ -11,6 +11,7 @@
 1. [Visao geral](#1-visao-geral)
 2. [Arquitetura BFF](#2-arquitetura-bff)
 3. [Fluxo de login](#3-fluxo-de-login)
+   3.5. [Troca de senha obrigatoria (primeiro acesso)](#35-troca-de-senha-obrigatoria-primeiro-acesso)
 4. [Fluxo de logout](#4-fluxo-de-logout)
 5. [Gerenciamento de sessao](#5-gerenciamento-de-sessao)
 6. [Protecao de rotas](#6-protecao-de-rotas)
@@ -121,11 +122,15 @@ Comportamento:
 1. Extrai `email` e `password` do `FormData`.
 2. Valida com `signInSchema.safeParse()` (reusa o mesmo schema do client).
 3. Chama `POST /auth/login` via `httpClient`.
-4. Em caso de sucesso, chama `createSession()` com os tokens e dados do usuario.
+4. Em caso de sucesso, chama `createSession()` com os tokens e dados do usuario (incluindo a flag
+   `mustChangePassword`).
 5. Em caso de erro 401, retorna `{ error: "E-mail ou senha incorretos." }`.
 6. Em caso de erro inesperado, retorna `{ error: "Ocorreu um erro inesperado. Tente novamente." }`.
-7. `redirect(routes.home)` e chamado **fora do try/catch** — o Next.js lanca internamente ao
-   redirecionar, e capturar essa excecao impediria o redirect.
+7. O redirect e chamado **fora do try/catch** (o Next.js lanca internamente ao redirecionar, e
+   capturar essa excecao impediria o redirect):
+   - Se `user.mustChangePassword === true` → `redirect(routes.changePassword)` (`/change-password`),
+     ignorando o `returnUrl`.
+   - Caso contrario → `redirect(returnUrl seguro ?? routes.dashboard)`.
 
 ### 3.3 Contrato com o backend
 
@@ -152,11 +157,15 @@ Response body (200):
     "email": "coordenador@suoac.dev",
     "role": "CIRCUIT_COORDINATOR",
     "isActive": true,
+    "mustChangePassword": false,
     "circuitId": "2eb3651e-06c6-46d3-b141-16a616eae18a",
     "congregationId": null
   }
 }
 ```
+
+> `mustChangePassword` e opcional no contrato (tokens/usuarios antigos podem nao envia-la).
+> Ausencia e tratada como `false`.
 
 Response body (401):
 
@@ -184,6 +193,95 @@ O `redirect()` do Next.js dentro de uma Server Action retorna HTTP 303 (See Othe
 o navegador a fazer um GET na URL de destino, implementando o padrao PRG (Post-Redirect-Get).
 Se o usuario apertar F5 apos o login, o navegador repete o GET em `/` em vez de reenviar as
 credenciais.
+
+---
+
+## 3.5 Troca de senha obrigatoria (primeiro acesso)
+
+Usuarios criados via seed ou pela API recebem uma senha temporaria definida por um coordenador.
+No primeiro acesso (ou apos um reset por admin) o backend marca `mustChangePassword: true` e
+**bloqueia toda a API com 403** ate a senha ser trocada — exceto `POST /auth/change-password` e
+`POST /auth/logout`. A obrigatoriedade e **imposta pelo servidor**; o front apenas reflete a
+experiencia.
+
+### 3.5.1 Diagrama
+
+```txt
+Login (senha temporaria) ──► 200 + user.mustChangePassword: true
+        │  (createSession persiste a flag no cookie suoac-user)
+        ▼
+signInAction → redirect(/change-password)
+        │  (qualquer outra rota e barrada pelo proxy / API responde 403)
+        ▼
+ChangePasswordForm → changePasswordAction → POST /auth/change-password
+        │
+        ▼
+200 + NOVO par de tokens (mustChangePassword: false)
+        │  (createSession substitui os tokens) → redirect(/dashboard)
+        ▼
+Acesso liberado
+```
+
+### 3.5.2 Imposicao em tres camadas
+
+| Camada                | Papel                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `proxy.ts`            | Le `mustChangePassword` do cookie `suoac-user` e prende a navegacao em `/change-password` (cobre F5/URL forcada).               |
+| `signInAction`        | Apos login com a flag, redireciona direto para `/change-password`.                                                              |
+| Rede de seguranca 403 | `httpClient` propaga o 403; `useServerError`/`query-client` detectam e redirecionam (chamadas de API em paginas ja carregadas). |
+
+### 3.5.3 Server Action: `changePasswordAction`
+
+Arquivo: `src/features/change-password/api/change-password-action.ts`
+
+```ts
+"use server";
+
+export async function changePasswordAction(
+  _prevState: ChangePasswordState | undefined,
+  formData: FormData,
+): Promise<ChangePasswordState>;
+
+interface ChangePasswordState {
+  error?: string;
+  field?: "currentPassword" | "newPassword"; // erro inline no campo correspondente
+}
+```
+
+Comportamento:
+
+1. Valida `currentPassword`, `newPassword` e `confirmPassword` com `changePasswordSchema`
+   (nova senha 8–100 chars, confirmacao coincide, nova != atual).
+2. Chama `POST /auth/change-password` com `{ currentPassword, newPassword }` (o `confirmPassword`
+   nao vai ao backend).
+3. Em caso de sucesso, `createSession()` **substitui** os tokens pelos novos (flag ja `false`).
+4. `redirect(routes.dashboard)` **fora do try/catch**.
+5. Mapeamento de erros (`mapChangePasswordError`, com early returns):
+
+| Status / sinal                             | Retorno                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `SESSION_EXPIRED_MESSAGE` (refresh falhou) | `{ error: SESSION_EXPIRED_MESSAGE }` → relogin                                 |
+| `401` "Credenciais invalidas"              | `{ error: SESSION_EXPIRED_MESSAGE }` → relogin                                 |
+| `401` "Senha atual incorreta"              | `{ field: "currentPassword", error: "Senha atual incorreta." }`                |
+| `422`                                      | `{ field: "newPassword", error: "A nova senha deve ser diferente da atual." }` |
+| `400`                                      | `{ error: "Verifique os campos e tente novamente." }`                          |
+| outro                                      | `{ error: "Não foi possível alterar a senha. Tente novamente." }`              |
+
+> **Importante:** substituir os tokens apos o 200 e obrigatorio. Continuar com o token antigo
+> (que ainda carrega `mustChangePassword: true`) manteria o 403 ate ele expirar.
+
+### 3.5.4 Rede de seguranca (403 global)
+
+A constante `PASSWORD_CHANGE_REQUIRED_MESSAGE` (`src/shared/auth/constants`) corresponde a
+mensagem do backend. A deteccao e o redirect espelham o fluxo de sessao expirada:
+
+- `isPasswordChangeRequiredError` / `redirectToPasswordChangeRequired` em `shared/auth/session-redirect`
+  (hard navigation para `/change-password`, compartilhando o gate `isRedirecting`).
+- Consumido por `useServerError` (mutations) e pelo `query-client` (`onError`, `retry`,
+  `throwOnError`).
+
+A navegacao normal ja e coberta pelo proxy; o 403 e a rede de seguranca para chamadas de API
+disparadas em paginas ja carregadas ou apos rotacao de token.
 
 ---
 
@@ -231,7 +329,8 @@ o usuario consegue sair do sistema.
 ### 5.1 Cookies
 
 O gerenciamento de sessao e feito via cookies no servidor Next.js. O modulo responsavel e
-`src/shared/api/session.ts`, que importa `"server-only"` para impedir uso acidental no client.
+`src/shared/auth/session/session.ts`, que importa `"server-only"` para impedir uso acidental no
+client.
 
 | Cookie                | httpOnly | Conteudo                 | Proposito                                 |
 | --------------------- | -------- | ------------------------ | ----------------------------------------- |
@@ -262,13 +361,14 @@ JavaScript.
 
 ### 5.3 Funcoes do modulo `session.ts`
 
-| Funcao           | Assinatura                                                        | Descricao                                   |
-| ---------------- | ----------------------------------------------------------------- | ------------------------------------------- |
-| `createSession`  | `(accessToken, refreshToken, user: SessionUser) => Promise<void>` | Cria os 3 cookies apos login                |
-| `getSession`     | `() => Promise<SessionUser \| null>`                              | Le e parseia o cookie `suoac-user`          |
-| `getAccessToken` | `() => Promise<string \| null>`                                   | Retorna o access token do cookie httpOnly   |
-| `deleteSession`  | `() => Promise<void>`                                             | Remove os 3 cookies                         |
-| `hasSession`     | `() => Promise<boolean>`                                          | Verifica se o cookie de access token existe |
+| Funcao            | Assinatura                                                        | Descricao                                   |
+| ----------------- | ----------------------------------------------------------------- | ------------------------------------------- |
+| `createSession`   | `(accessToken, refreshToken, user: SessionUser) => Promise<void>` | Cria os 3 cookies apos login                |
+| `getSession`      | `() => Promise<SessionUser \| null>`                              | Le e parseia o cookie `suoac-user`          |
+| `getAccessToken`  | `() => Promise<string \| null>`                                   | Retorna o access token do cookie httpOnly   |
+| `getRefreshToken` | `() => Promise<string \| null>`                                   | Retorna o refresh token do cookie httpOnly  |
+| `deleteSession`   | `() => Promise<void>`                                             | Remove os 3 cookies                         |
+| `hasSession`      | `() => Promise<boolean>`                                          | Verifica se o cookie de access token existe |
 
 ### 5.4 Interface `SessionUser`
 
@@ -277,10 +377,11 @@ interface SessionUser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   isActive: boolean;
   circuitId: string;
   congregationId: string | null;
+  mustChangePassword?: boolean; // troca obrigatoria no primeiro acesso (ausencia = false)
 }
 ```
 
@@ -304,14 +405,21 @@ Logica:
 Se NAO tem cookie "suoac-access-token":
   Se a rota NAO e publica (/login):
     → Redireciona para /login
+  Senao:
+    → Permite (NextResponse.next())
 
 Se TEM cookie "suoac-access-token":
-  Se a rota E publica (/login):
-    → Redireciona para /
+  Se mustChangePassword (lido do cookie suoac-user) e a rota != /change-password:
+    → Redireciona para /change-password
+  Se NAO ha pendencia e a rota e /login ou /change-password:
+    → Redireciona para /dashboard
 
 Caso contrario:
   → Permite a requisicao (NextResponse.next())
 ```
+
+A logica usa early returns (sem ifs aninhados). A flag `mustChangePassword` e lida do cookie
+`suoac-user` (nao-httpOnly); ausencia/JSON invalido e tratado como `false`.
 
 ### 6.2 Matcher
 
@@ -319,28 +427,28 @@ O proxy exclui rotas que nao precisam de protecao:
 
 ```ts
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|api|favicon\\.ico|icon\\.png).*)"],
+  matcher: ["/((?!_next/static|_next/image|api|.*\\.\\w+$).*)"],
 };
 ```
 
 Rotas excluidas:
 
-| Padrao         | Motivo                                |
-| -------------- | ------------------------------------- |
-| `_next/static` | Assets estaticos gerados pelo Next.js |
-| `_next/image`  | Otimizacao de imagens do Next.js      |
-| `api`          | Route handlers (se houver no futuro)  |
-| `favicon.ico`  | Icone do navegador                    |
-| `icon.png`     | Icone PWA                             |
+| Padrao         | Motivo                                       |
+| -------------- | -------------------------------------------- |
+| `_next/static` | Assets estaticos gerados pelo Next.js        |
+| `_next/image`  | Otimizacao de imagens do Next.js             |
+| `api`          | Route handlers (se houver no futuro)         |
+| `.*\.\w+$`     | Qualquer arquivo com extensao (icones, etc.) |
 
 ### 6.3 Rotas publicas vs protegidas
 
-| Rota         | Tipo      | Comportamento                                                           |
-| ------------ | --------- | ----------------------------------------------------------------------- |
-| `/login`     | Publica   | Acessivel sem autenticacao. Redireciona para `/dashboard` se ja logado. |
-| `/`          | Protegida | Redireciona para `/dashboard`.                                          |
-| `/dashboard` | Protegida | Requer cookie. Redireciona para `/login` se nao autenticado.            |
-| `/*`         | Protegida | Qualquer outra rota segue a mesma regra.                                |
+| Rota               | Tipo                 | Comportamento                                                                                                    |
+| ------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/login`           | Publica              | Acessivel sem autenticacao. Redireciona para `/dashboard` se logado (ou `/change-password` se houver pendencia). |
+| `/change-password` | Autenticada/especial | Requer cookie. So permanece aqui quem tem `mustChangePassword`; sem pendencia → `/dashboard`.                    |
+| `/`                | Protegida            | Redireciona para `/dashboard`.                                                                                   |
+| `/dashboard`       | Protegida            | Requer cookie. Redireciona para `/login` se nao autenticado, ou `/change-password` se pendente.                  |
+| `/*`               | Protegida            | Qualquer outra rota segue a mesma regra.                                                                         |
 
 ### 6.4 Limitacao de seguranca do proxy
 
@@ -360,7 +468,7 @@ A verificacao real de autorizacao deve acontecer:
 
 ### 7.1 AuthProvider
 
-Arquivo: `src/shared/auth/auth-context.tsx`
+Arquivo: `src/shared/auth/auth-context/auth-context.tsx`
 
 O `AuthProvider` e um Client Component que recebe os dados do usuario como prop (injetados pelo
 Server Component `AppProviders`) e os disponibiliza via React Context.
@@ -380,24 +488,19 @@ RootLayout (Server Component)
 const { user, isAuthenticated } = useAuth();
 ```
 
-| Campo             | Tipo               | Descricao                        |
-| ----------------- | ------------------ | -------------------------------- |
-| `user`            | `AuthUser \| null` | Dados do usuario logado, ou null |
-| `isAuthenticated` | `boolean`          | `true` se `user !== null`        |
+| Campo             | Tipo                  | Descricao                        |
+| ----------------- | --------------------- | -------------------------------- |
+| `user`            | `SessionUser \| null` | Dados do usuario logado, ou null |
+| `isAuthenticated` | `boolean`             | `true` se `user !== null`        |
 
-### 7.3 Interface `AuthUser`
+O hook de mais alto nivel `useAuthPermissions()` (`src/shared/auth/use-auth-permissions`) deriva
+de `useAuth()` campos prontos como `userCircuitId`, `userCongregationId`, `isCircuitUser` e os
+booleanos por role.
 
-```ts
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-  circuitId: string;
-  congregationId: string | null;
-}
-```
+### 7.3 Tipo do usuario no contexto
+
+O contexto usa diretamente a interface `SessionUser` (secao 5.4) — nao ha um tipo `AuthUser`
+separado. `SessionUser` ja carrega `role: UserRole` e a flag `mustChangePassword`.
 
 ### 7.4 Por que `shared/auth` e nao `app/`
 
@@ -450,7 +553,7 @@ Isso garante que:
 
 ### 9.2 HttpError
 
-Arquivo: `src/shared/api/http-client.ts`
+Arquivo: `src/shared/api/http-client/http-client.ts`
 
 ```ts
 class HttpError extends Error {
@@ -501,6 +604,32 @@ O banner usa tokens do design system:
 }
 ```
 
+### 9.4 Erros na troca de senha
+
+A tela `/change-password` distingue erro de campo (inline via `setError`) de erro global (banner):
+
+| Cenario                                         | Tratamento no front                                          |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| `401` "Senha atual incorreta"                   | Inline no campo **senha atual** (`field: "currentPassword"`) |
+| `422` nova == atual                             | Inline no campo **nova senha** (`field: "newPassword"`)      |
+| `400` validacao                                 | Banner global                                                |
+| `401` "Credenciais invalidas" / sessao expirada | Redireciona para `/login` (relogin)                          |
+
+### 9.5 Sessao expirada e redirects globais
+
+Quando o refresh falha, o `httpClient` lanca `HttpError(401, SESSION_EXPIRED_MESSAGE)` e apaga a
+sessao. A deteccao por **valor de retorno** (`ActionResult.error`/`SessionState.error`) e confiavel
+em producao — diferente de erros lancados por Server Actions, cuja mensagem o Next.js sanitiza no
+build. O modulo `shared/auth/session-redirect` centraliza a deteccao e o hard redirect:
+
+| Sinal                              | Detector                        | Acao                                                      |
+| ---------------------------------- | ------------------------------- | --------------------------------------------------------- |
+| `SESSION_EXPIRED_MESSAGE`          | `isSessionExpiredError`         | `redirectToSessionExpired()` → `/login`                   |
+| `PASSWORD_CHANGE_REQUIRED_MESSAGE` | `isPasswordChangeRequiredError` | `redirectToPasswordChangeRequired()` → `/change-password` |
+
+Ambos sao consumidos por `useServerError` (mutations), `query-client` (queries) e pelo
+`SessionGuard` (estado de sessao), e compartilham um unico gate (`isRedirecting`).
+
 ---
 
 ## 10. Seguranca
@@ -530,12 +659,13 @@ o Next.js **falha o build imediatamente** se qualquer Client Component tentar im
 modulo — diretamente ou via barrel export. O erro e explicito e acontece em tempo de compilacao,
 nao em runtime.
 
-No SUOAC, os dois arquivos que usam `server-only` sao:
+No SUOAC, os arquivos que usam `server-only` no fluxo de auth sao:
 
-| Arquivo          | Motivo                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------- |
-| `http-client.ts` | Contem `process.env.API_BASE_URL` (segredo server-side) e faz fetch direto ao backend |
-| `session.ts`     | Usa `cookies()` de `next/headers` para manipular cookies httpOnly                     |
+| Arquivo                                          | Motivo                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `shared/api/http-client/http-client.ts`          | Contem `process.env.API_BASE_URL` (segredo server-side) e faz fetch direto ao backend |
+| `shared/auth/session/session.ts`                 | Usa `cookies()` de `next/headers` para manipular cookies httpOnly                     |
+| `shared/auth/refresh-session/refresh-session.ts` | Renova tokens via backend lendo/gravando cookies httpOnly                             |
 
 Foi exatamente o `server-only` que revelou o problema do barrel export descrito na
 [secao 12](#12-fronteira-serverclient-no-nextjs): quando o barrel `src/shared/api/index.ts`
@@ -584,21 +714,34 @@ validado. Isso impede bypass da validacao por requisicoes forjadas.
 
 ### 11.1 Infraestrutura (shared)
 
+Cada modulo fica no seu proprio subdiretorio com `index.ts` como API publica (regra FSD).
+
 ```txt
 src/shared/api/
-  http-client.ts          HTTP client server-side (import "server-only")
-  session.ts              Gerenciamento de cookies (import "server-only")
-  types.ts                ActionResult<T> type
-  query-client.ts         TanStack Query client (client-safe)
-  query-keys.ts           Chaves de query (client-safe)
+  http-client/
+    http-client.ts        HTTP client server-side + HttpError + refresh on 401 (import "server-only")
+    endpoints.ts          Mapa de endpoints { auth.login, auth.changePassword, ... }
+    types.ts              ActionResult<T>, PaginatedResponse
+    index.ts
+  query-client/
+    query-client.ts       TanStack Query client; trata sessao expirada e troca de senha
+    query-keys.ts
+    index.ts
   index.ts                Barrel — exporta APENAS modulos client-safe
 
 src/shared/auth/
-  auth-context.tsx        AuthProvider + useAuth ("use client")
-  index.ts                Barrel publico
+  session/                createSession/getSession/getAccessToken/getRefreshToken/... (import "server-only")
+  refresh-session/        refreshSession() — rotation de tokens (import "server-only")
+  session-redirect/       deteccao + hard redirect (sessao expirada e troca de senha)
+  session-guard/          SessionGuard + SessionExpiredOverlay ("use client")
+  auth-context/           AuthProvider + useAuth ("use client")
+  use-auth-permissions/   useAuthPermissions() ("use client")
+  rbac/                   NavItem, filterNavItems, isCircuitRole
+  constants/              SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE
+  index.ts                Barrel publico (client-safe)
 
 src/shared/config/
-  routes.ts               Mapa de rotas { home, login, dashboard, events, ... }
+  routes/                 Mapa de rotas { home, login, changePassword, dashboard, events, ... }
   index.ts                Barrel publico
 ```
 
@@ -615,16 +758,28 @@ src/entities/user/
 ```txt
 src/features/sign-in/
   api/
-    sign-in-action.ts     Server Action de login ("use server")
-    sign-out-action.ts    Server Action de logout ("use server")
-    sign-in.dto.ts        DTO da resposta do backend
+    sign-in-action.ts       Server Action de login ("use server")
+    sign-out-action.ts      Server Action de logout ("use server")
+    sign-in.dto.ts          DTO da resposta do backend
   model/
-    sign-in-schema.ts     Schema Zod de validacao
+    sign-in-schema.ts       Schema Zod de validacao
   ui/
-    sign-in-form.tsx      Formulario de login ("use client")
+    sign-in-form.tsx        Formulario de login ("use client")
     sign-in-form.module.css
     sign-in-form.test.tsx
-  index.ts                Barrel — exporta SignInForm e signOutAction
+  index.ts                  Barrel — exporta SignInForm e signOutAction
+
+src/features/change-password/
+  api/
+    change-password-action.ts   Server Action de troca de senha ("use server")
+    change-password.dto.ts       DTO da resposta (novos tokens + user)
+  model/
+    change-password-schema.ts    Schema Zod (atual/nova/confirmacao)
+  ui/
+    change-password-form.tsx     Formulario de troca ("use client")
+    change-password-form.module.css
+    change-password-form.test.tsx
+  index.ts                       Barrel — exporta ChangePasswordForm
 ```
 
 ### 11.4 Providers (app)
@@ -645,10 +800,16 @@ app/
     layout.tsx            Layout visual para rotas de autenticacao
     login/
       page.tsx            Exporta LoginPage de @/pages/login
+  change-password/
+    page.tsx              Exporta ChangePasswordPage de @/pages/change-password (tela focada, sem AppShell)
   (private)/
     layout.tsx            Layout autenticado — <AppShell>
     dashboard/
       page.tsx            Exporta DashboardPage de @/pages/dashboard
+
+src/pages/change-password/
+  ui/change-password-page.tsx   Tela "Defina sua senha" (layout 2 colunas, espelha o login)
+  index.ts
 
 src/widgets/app-shell/
   ui/
@@ -688,11 +849,11 @@ Barrels exportam **apenas** codigo client-safe. Modulos server-only sao importad
 pelo caminho especifico:
 
 ```ts
-// Server Action — importa direto
+// Server Action — importa direto os modulos server-only
 import { httpClient } from "@/shared/api/http-client";
-import { createSession } from "@/shared/api/session";
+import { createSession } from "@/shared/auth/session";
 
-// Client Component — importa pelo barrel
+// Client Component — importa pelo barrel client-safe
 import { createQueryClient } from "@/shared/api";
 ```
 
@@ -705,7 +866,13 @@ e desabilitada para arquivos que precisam importar modulos server-only:
 ```js
 // steiger.config.mjs
 {
-  files: ["src/**/api/*-action.ts", "src/app/providers/**", "src/pages/**/ui/**"],
+  files: [
+    "src/**/api/*-action.ts",
+    "src/**/api/*.queries.ts",
+    "src/**/api/**/*-query.ts",
+    "src/app/providers/**",
+    "src/pages/**/ui/**",
+  ],
   rules: {
     "fsd/no-public-api-sidestep": "off",
   },
@@ -715,10 +882,14 @@ e desabilitada para arquivos que precisam importar modulos server-only:
 Essa excecao e estritamente scoped:
 
 - `src/**/api/*-action.ts` — Server Actions que importam httpClient/session
+- `src/**/api/*.queries.ts` e `**/*-query.ts` — queries que importam o http-client
 - `src/app/providers/**` — AppProviders que importa getSession
 - `src/pages/**/ui/**` — Paginas que importam Server Actions diretamente
 
-A protecao arquitetural permanece ativa para todos os outros arquivos do projeto.
+A protecao arquitetural permanece ativa para todos os outros arquivos do projeto. Observacao: o
+caso da feature `change-password` mostrou o outro lado da regra — `SESSION_EXPIRED_MESSAGE` faz
+parte da API publica `@/shared/auth`, entao deve ser importado de la (e nao de
+`@/shared/auth/constants`), sob pena de `no-public-api-sidestep`.
 
 ---
 
@@ -782,7 +953,7 @@ servidor e do backend.
 
 ### 14.2 Testes do HTTP client
 
-Arquivo: `src/shared/api/http-client.test.ts`
+Arquivo: `src/shared/api/http-client/http-client.test.ts`
 
 | Teste                                                           | Tipo    |
 | --------------------------------------------------------------- | ------- |
@@ -795,7 +966,7 @@ Os modulos `server-only` e `fetch` sao mockados.
 
 ### 14.3 Testes da sessao
 
-Arquivo: `src/shared/api/session.test.ts`
+Arquivo: `src/shared/auth/session/session.test.ts`
 
 | Teste                                                   | Tipo        |
 | ------------------------------------------------------- | ----------- |
@@ -810,35 +981,46 @@ Arquivo: `src/shared/api/session.test.ts`
 
 Os modulos `server-only` e `next/headers` (`cookies()`) sao mockados.
 
+### 14.4 Testes da troca de senha
+
+| Arquivo                                                            | Cobertura                                                                  |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `features/change-password/api/change-password-action.test.ts`      | Endpoint/payload, troca de sessao, redirect, mapeamento 400/401/422/sessao |
+| `features/change-password/ui/change-password-form.test.tsx`        | Render, validacao, erro por campo vs banner, chamada da action             |
+| `features/change-password/model/change-password-schema.test.ts`    | Regras do schema (min 8, confirmacao, nova != atual)                       |
+| `pages/change-password/ui/change-password-page.test.tsx`           | Render da tela, instrucao, botao "Sair da conta"                           |
+| `shared/auth/session-redirect/session-redirect.test.ts`            | `isPasswordChangeRequiredError` + `redirectToPasswordChangeRequired`       |
+| `shared/lib/use-server-error` e `shared/api/query-client` (testes) | Redirect para `/change-password` no sinal de 403                           |
+
 ---
 
 ## 15. Limitacoes e evolucoes futuras
 
-### 15.1 Limitacoes atuais
+### 15.1 Ja implementado (desde a v1.0 deste doc)
 
-| Limitacao                                                | Impacto                                          |
-| -------------------------------------------------------- | ------------------------------------------------ |
-| Proxy verifica apenas existencia do cookie, nao validade | Token expirado nao e detectado no proxy          |
-| Nao ha refresh token rotation                            | Access token expira e requer novo login          |
-| Nao ha role-based route protection                       | Proxy nao diferencia roles                       |
-| Nao ha Data Access Layer (DAL)                           | Server Components nao verificam sessao           |
-| Nao ha tratamento de token expirado nas requests         | Requisicoes ao backend com token expirado falham |
+| Recurso                     | Onde                                                              |
+| --------------------------- | ----------------------------------------------------------------- |
+| Refresh token rotation      | `shared/auth/refresh-session` + retry de 401 no `httpClient`      |
+| Interceptor de 401 global   | `httpClient` tenta refresh e, se falhar, sinaliza sessao expirada |
+| Feedback de sessao expirada | `SessionGuard` + `SessionExpiredOverlay` + `session-redirect`     |
+| Troca de senha obrigatoria  | Secao 3.5 (proxy + `change-password` + rede de seguranca 403)     |
+| Hook de permissoes por role | `useAuthPermissions` (`shared/auth/use-auth-permissions`)         |
 
-### 15.2 Evolucoes planejadas
+### 15.2 Limitacoes atuais
 
-1. **Refresh token rotation**: Quando o access token expirar, usar o refresh token para obter
-   novos tokens automaticamente, sem exigir novo login. Implementar como interceptor no
-   `httpClient`.
+| Limitacao                                                         | Impacto                                                                             |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Proxy verifica existencia do cookie + flag, nao validade do token | Token adulterado/expirado nao e detectado no proxy (validacao real fica no backend) |
+| Proxy nao diferencia rotas por role                               | Autorizacao por papel depende de backend/UI                                         |
+| Nao ha Data Access Layer (DAL)                                    | Server Components nao revalidam sessao antes de carregar dados                      |
 
-2. **DAL (Data Access Layer)**: Criar `verifySession()` em `shared/api` que verifica a validade
-   do token antes de carregar dados em Server Components. Usar `cache()` do React para
-   deduplicar a verificacao na mesma requisicao.
+### 15.3 Evolucoes planejadas
 
-3. **Protecao por role no proxy**: Expandir o proxy para verificar o cookie `suoac-user` e
-   redirecionar com base na role (ex: congregacao nao acessa rotas de circuito).
+1. **DAL (Data Access Layer)**: Criar `verifySession()` que valida o token antes de carregar
+   dados em Server Components, com `cache()` do React para deduplicar na mesma requisicao.
 
-4. **Interceptor de 401 global**: Quando qualquer chamada ao backend retornar 401, tentar
-   refresh automatico e, se falhar, redirecionar para `/login`.
+2. **Protecao por role no proxy**: Expandir o proxy para redirecionar com base na role do cookie
+   `suoac-user` (ex: congregacao nao acessa rotas exclusivas de circuito).
 
-5. **Pagina de erro de sessao expirada**: Exibir uma mensagem amigavel quando a sessao expirar,
-   em vez de redirecionar silenciosamente.
+3. **Migrar para `unauthorized()` + `unauthorized.tsx`**: quando a flag `experimental.authInterrupts`
+   do Next.js estabilizar, substituir o mecanismo de `session-redirect`/`SessionGuard`.

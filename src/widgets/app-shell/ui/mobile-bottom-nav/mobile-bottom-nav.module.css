@@ -38,16 +38,3 @@
   font-size: 0.6875rem;
   line-height: var(--suoac-line-height-tight);
 }
-
-.logoutButton {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--suoac-space-1);
-  border: none;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}

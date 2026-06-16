@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Building2, Users, Wallet, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Building2, Users, Wallet, Settings } from "lucide-react";
 
 import { useAuthPermissions, filterNavItems, USER_ROLES, type NavItem } from "@/shared/auth";
 import { signOutAction } from "@/features/sign-in";
 import { routes } from "@/shared/config";
 
+import { LogoutButton } from "../logout-button";
+import { LogoutOverlay } from "../logout-overlay";
 import styles from "./desktop-sidebar.module.css";
 
 const navItems: NavItem[] = [
@@ -77,9 +79,8 @@ export function DesktopSidebar({ showPendingItems = false }: DesktopSidebarProps
       <div className={styles.footer}>
         <span className={styles.userName}>{user?.name ?? "Usuário"}</span>
         <form action={signOutAction}>
-          <button type="submit" className={styles.logoutButton} aria-label="Sair">
-            <LogOut size={18} />
-          </button>
+          <LogoutButton variant="icon" />
+          <LogoutOverlay />
         </form>
       </div>
     </aside>

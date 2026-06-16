@@ -8,6 +8,7 @@ import { EVENT_TYPE_LABELS, EVENT_TYPES } from "@/entities/event";
 import { useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 
 import { createEventDefaultValues, createEventSchema, type CreateEventFormValues } from "../../model";
@@ -75,6 +76,7 @@ export function CreateEventFormModal({ open, onClose, onSubmit }: CreateEventFor
             Cancelar
           </Button>
           <Button type="submit" form="create-event-form" disabled={isSubmitting}>
+            {isSubmitting && <Spinner size="small" />}
             {isSubmitting ? "Criando…" : "Criar evento"}
           </Button>
         </>

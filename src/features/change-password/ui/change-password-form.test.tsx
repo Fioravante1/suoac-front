@@ -80,6 +80,39 @@ describe("ChangePasswordForm", () => {
     expect(formData.get("confirmPassword")).toBe("NovaSenhaForte123");
   });
 
+  it("desabilita os campos enquanto a troca de senha está em andamento", async () => {
+    let resolveAction: (value: { error?: string }) => void = () => {};
+    changePasswordActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+
+    render(<ChangePasswordForm />);
+    fillValidForm();
+
+    const currentPassword = screen.getByLabelText("Senha atual");
+    const newPassword = screen.getByLabelText("Nova senha");
+    const confirmPassword = screen.getByLabelText("Confirmar nova senha");
+
+    fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
+
+    await waitFor(() => {
+      expect(currentPassword).toBeDisabled();
+      expect(newPassword).toBeDisabled();
+      expect(confirmPassword).toBeDisabled();
+    });
+
+    resolveAction({});
+
+    await waitFor(() => {
+      expect(currentPassword).not.toBeDisabled();
+      expect(newPassword).not.toBeDisabled();
+      expect(confirmPassword).not.toBeDisabled();
+    });
+  });
+
   it("exibe o erro do servidor em banner quando a action retorna erro genérico", async () => {
     changePasswordActionMock.mockResolvedValue({ error: "Não foi possível alterar a senha. Tente novamente." });
 

@@ -36,6 +36,18 @@ export function ToastItem({ toast, onDismiss }: ToastItemProps) {
         <Icon size={20} aria-hidden="true" />
       </span>
       <p className={styles.message}>{toast.message}</p>
+      {toast.action && (
+        <button
+          type="button"
+          className={styles.action}
+          onClick={() => {
+            toast.action?.onClick();
+            onDismiss(toast.id);
+          }}
+        >
+          {toast.action.label}
+        </button>
+      )}
       <button type="button" className={styles.close} onClick={() => onDismiss(toast.id)} aria-label="Fechar">
         <X size={16} aria-hidden="true" />
       </button>

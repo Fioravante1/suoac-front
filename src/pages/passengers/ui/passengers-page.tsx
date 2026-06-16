@@ -36,9 +36,10 @@ function getErrorMessage(error: unknown): string {
 
 export function PassengersPage() {
   const { user } = useAuth();
+  const { page, setPage } = usePagination();
+
   const queryClient = useQueryClient();
   const toast = useToast();
-  const { page, setPage } = usePagination();
   const formModal = useModal<Passenger>();
   const deleteModal = useModal<Passenger>();
   const circuitId = user?.circuitId ?? "";
@@ -103,12 +104,14 @@ export function PassengersPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deletePassengerAction(id),
-    onSuccess: (result) => {
+    onSuccess: (result, id) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.passengers.all });
         toast.success("Passageiro excluído.");
       } else {
-        toast.error(result.error);
+        toast.error(result.error, {
+          action: { label: "Tentar novamente", onClick: () => deleteMutation.mutate(id) },
+        });
       }
 
       deleteModal.close();
@@ -139,6 +142,11 @@ export function PassengersPage() {
     setSearch("");
   }
 
+  // `isFetching` cobre tanto a carga inicial quanto o refetch em background disparado pela
+  // invalidação após cadastrar/editar/excluir. Como `refetchOnWindowFocus` está desligado, todo
+  // fetch é intencional, então exibir o skeleton nesses momentos dá feedback sem flashes acidentais.
+  const isFetchingList = passengerQuery.isFetching;
+  const skeletonRows = passengerQuery.data?.data.length || 10;
   const hasPassengers = Boolean(passengerQuery.data && passengerQuery.data.data.length > 0);
   const isEmpty = Boolean(passengerQuery.data && passengerQuery.data.data.length === 0);
   const emptyTitle = activeSearch ? "Nenhum passageiro encontrado" : "Nenhum passageiro cadastrado";
@@ -209,9 +217,9 @@ export function PassengersPage() {
 
       {!passengerQuery.isError && (
         <div className={styles.content}>
-          {passengerQuery.isLoading && <SkeletonTableRows rows={10} />}
+          {isFetchingList && <SkeletonTableRows rows={skeletonRows} />}
 
-          {isEmpty && (
+          {!isFetchingList && isEmpty && (
             <EmptyState
               icon={<Users size={48} strokeWidth={1.5} />}
               title={emptyTitle}
@@ -224,7 +232,7 @@ export function PassengersPage() {
             />
           )}
 
-          {hasPassengers && (
+          {!isFetchingList && hasPassengers && (
             <>
               <PassengerTable
                 passengers={passengerQuery.data?.data ?? []}
@@ -256,6 +264,7 @@ export function PassengersPage() {
         title="Excluir passageiro"
         message={`Tem certeza que deseja excluir o passageiro "${deleteModal.item?.name}"? Essa ação não pode ser desfeita.`}
         confirmLabel="Excluir"
+        loadingLabel="Excluindo..."
         loading={deleteMutation.isPending}
       />
     </div>
