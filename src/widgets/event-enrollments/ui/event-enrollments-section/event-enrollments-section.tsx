@@ -7,6 +7,7 @@ import {
   PAYMENT_STATUS_LABELS,
   canManageEventPassengers,
   type EventPassenger,
+  type EventPassengerDay,
   type PaymentStatus,
 } from "@/entities/event-passenger";
 import { eventPassengerListOptions } from "@/entities/event-passenger";
@@ -15,7 +16,7 @@ import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
 import { isCircuitRole } from "@/shared/auth";
 import type { UserRole } from "@/shared/auth";
-import { formatCurrency, useModal, usePagination } from "@/shared/lib";
+import { formatCurrency, formatWeekdayShort, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -25,6 +26,7 @@ import { DataTable, type ColumnDef } from "@/shared/ui/data-table";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Pagination } from "@/shared/ui/pagination";
 import { SkeletonTableRows } from "@/shared/ui/skeleton";
+import { Tooltip } from "@/shared/ui/tooltip";
 import { useToast } from "@/shared/ui/toast";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
@@ -34,6 +36,11 @@ import { removeEventPassengerAction } from "@/features/remove-event-passenger";
 import { PassengerPaymentsModal } from "@/features/register-payment";
 
 import styles from "./event-enrollments-section.module.css";
+
+/** Ordena os dias da inscrição cronologicamente para padronizar a exibição (ex.: sempre Sex, Sáb, Dom). */
+function sortDaysByDate(days: EventPassengerDay[]): EventPassengerDay[] {
+  return [...days].sort((a, b) => a.date.localeCompare(b.date));
+}
 
 interface EventEnrollmentsSectionProps {
   event: Event;
@@ -162,23 +169,23 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
       visible: isRegionalConvention,
       cell: (ep) => (
         <div className={styles.dayBadges}>
-          {ep.days.map((day) => (
+          {sortDaysByDate(ep.days).map((day) => (
             <Badge key={day.id} variant="neutral">
-              {day.label}
+              {formatWeekdayShort(day.date)}
             </Badge>
           ))}
         </div>
       ),
     },
-    { id: "total", header: "Total", cell: (ep) => formatCurrency(ep.totalAmount) },
-    { id: "paid", header: "Pago", cell: (ep) => formatCurrency(ep.paidAmount) },
     {
       id: "status",
       header: "Status",
       cell: (ep) => (
-        <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
-          {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
-        </Badge>
+        <Tooltip content={`Pago ${formatCurrency(ep.paidAmount)} de ${formatCurrency(ep.totalAmount)}`}>
+          <Badge variant={PAYMENT_STATUS_BADGE_VARIANTS[ep.paymentStatus as PaymentStatus]}>
+            {PAYMENT_STATUS_LABELS[ep.paymentStatus as PaymentStatus]}
+          </Badge>
+        </Tooltip>
       ),
     },
     {
@@ -245,9 +252,9 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
 
                   {ep.days.length > 0 && (
                     <div className={styles.dayBadges}>
-                      {ep.days.map((day) => (
+                      {sortDaysByDate(ep.days).map((day) => (
                         <Badge key={day.id} variant="neutral">
-                          {day.label}
+                          {formatWeekdayShort(day.date)}
                         </Badge>
                       ))}
                     </div>
