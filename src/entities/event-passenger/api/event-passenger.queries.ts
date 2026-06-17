@@ -8,7 +8,7 @@ import type { EventPassenger } from "../model";
 export async function fetchEventPassengers(
   eventId: string,
   page: number = 1,
-  limit: number = 20,
+  limit: number = 10,
 ): Promise<PaginatedResponse<EventPassenger>> {
   const url = `${endpoints.eventPassengers.list(eventId)}?page=${page}&limit=${limit}`;
 

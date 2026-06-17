@@ -32,6 +32,7 @@
 }
 
 .variant-neutral {
-  background-color: var(--suoac-color-neutral-soft);
+  background-color: var(--suoac-color-surface);
   color: var(--suoac-color-text-secondary);
+  border: 1px solid var(--suoac-color-border-strong);
 }
