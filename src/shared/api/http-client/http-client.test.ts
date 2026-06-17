@@ -18,7 +18,7 @@ vi.mock("@/shared/auth/refresh-session", () => ({
 
 import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth/constants";
 
-import { httpClient, HttpError } from "./http-client";
+import { httpClient, httpClientRaw, HttpError } from "./http-client";
 
 const fetchMock = vi.fn();
 vi.stubGlobal("fetch", fetchMock);
@@ -225,5 +225,59 @@ describe("httpClient", () => {
 
     expect(mockRefreshSession).not.toHaveBeenCalled();
     expect(mockDeleteSession).not.toHaveBeenCalled();
+  });
+});
+
+describe("httpClientRaw", () => {
+  it("sucesso → retorna o Response cru sem fazer parse", async () => {
+    const response = { ok: true, status: 200 };
+    fetchMock.mockResolvedValue(response);
+
+    const result = await httpClientRaw("/export.pdf");
+
+    expect(result).toBe(response);
+  });
+
+  it("erro non-401 (ex.: 422) → retorna o Response cru sem lancar nem refresh", async () => {
+    const response = { ok: false, status: 422 };
+    fetchMock.mockResolvedValue(response);
+
+    const result = await httpClientRaw("/export.pdf");
+
+    expect(result).toBe(response);
+    expect(mockRefreshSession).not.toHaveBeenCalled();
+    expect(mockDeleteSession).not.toHaveBeenCalled();
+  });
+
+  it("401 com token → refresh ok → retry e retorna o novo Response", async () => {
+    const retry = { ok: true, status: 200 };
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 401 }).mockResolvedValueOnce(retry);
+    mockRefreshSession.mockResolvedValue("new-access-token");
+
+    const result = await httpClientRaw("/export.pdf");
+
+    expect(mockRefreshSession).toHaveBeenCalledOnce();
+    expect(result).toBe(retry);
+    expect(mockDeleteSession).not.toHaveBeenCalled();
+  });
+
+  it("401 com token → refresh null → deleta sessao e lanca HttpError 401", async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 401 });
+    mockRefreshSession.mockResolvedValue(null);
+
+    await expect(httpClientRaw("/export.pdf")).rejects.toMatchObject({
+      status: 401,
+      message: SESSION_EXPIRED_MESSAGE,
+    });
+    expect(mockDeleteSession).toHaveBeenCalledOnce();
+  });
+
+  it("401 sem token → deleta sessao e lanca HttpError 401", async () => {
+    mockGetAccessToken.mockResolvedValue(null);
+    fetchMock.mockResolvedValue({ ok: false, status: 401 });
+
+    await expect(httpClientRaw("/export.pdf")).rejects.toBeInstanceOf(HttpError);
+    expect(mockRefreshSession).not.toHaveBeenCalled();
+    expect(mockDeleteSession).toHaveBeenCalledOnce();
   });
 });

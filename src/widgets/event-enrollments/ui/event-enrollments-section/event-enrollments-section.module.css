@@ -12,6 +12,12 @@
   color: var(--suoac-color-text-primary);
 }
 
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-2);
+}
+
 .errorBanner {
   padding: var(--suoac-space-3) var(--suoac-space-4);
   border: 1px solid var(--suoac-color-critical);

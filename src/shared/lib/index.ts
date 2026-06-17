@@ -16,6 +16,7 @@ export {
   DEADLINE_URGENCY_BG_COLORS,
 } from "./deadline";
 export type { DeadlineUrgency } from "./deadline";
+export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
 export { calcPercentage } from "./number";
 export { getInitials, getGreetingByTime, pluralize } from "./string";
 export { useDebouncedValue } from "./use-debounced-value";
