@@ -28,6 +28,7 @@ import { SkeletonTableRows } from "@/shared/ui/skeleton";
 import { useToast } from "@/shared/ui/toast";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
+import { ExportPassengersButton } from "@/features/export-event-passengers-pdf";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
 import { removeEventPassengerAction } from "@/features/remove-event-passenger";
 import { PassengerPaymentsModal } from "@/features/register-payment";
@@ -193,12 +194,15 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     <Card id="inscricoes">
       <div className={styles.header}>
         <h2 className={styles.title}>Inscrições</h2>
-        {canManage && (
-          <Button size="small" onClick={() => enrollModal.open()}>
-            <UserPlus size={16} aria-hidden="true" />
-            Inscrever passageiro
-          </Button>
-        )}
+        <div className={styles.headerActions}>
+          <ExportPassengersButton event={event} userRole={userRole} />
+          {canManage && (
+            <Button size="small" onClick={() => enrollModal.open()}>
+              <UserPlus size={16} aria-hidden="true" />
+              Inscrever passageiro
+            </Button>
+          )}
+        </div>
       </div>
 
       {isFetching && <SkeletonTableRows rows={skeletonRows} />}

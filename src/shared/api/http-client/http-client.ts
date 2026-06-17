@@ -57,6 +57,38 @@ async function parseErrorMessage(response: Response): Promise<string> {
   return message;
 }
 
+/**
+ * Variante de `httpClient` para respostas não-JSON (ex.: binário/PDF). Retorna o `Response` cru,
+ * aplicando a mesma lógica de refresh-on-401. O chamador é responsável por consumir o corpo
+ * (`body`/`blob`/`text`) e repassar status/headers.
+ *
+ * - sucesso/erros não-401 → retorna o `Response` cru (o chamador repassa status + corpo);
+ * - 401 com token → tenta refresh e refaz a requisição;
+ * - 401 sem token ou refresh falho → encerra a sessão e lança `HttpError(401, SESSION_EXPIRED_MESSAGE)`.
+ */
+export async function httpClientRaw(path: string, options: HttpClientOptions = {}): Promise<Response> {
+  const token = await getAccessToken();
+  const response = await performRequest(path, options, token);
+
+  if (response.status !== 401) {
+    return response;
+  }
+
+  if (!token) {
+    await deleteSession();
+    throw new HttpError(401, SESSION_EXPIRED_MESSAGE);
+  }
+
+  const newToken = await refreshSession();
+
+  if (!newToken) {
+    await deleteSession();
+    throw new HttpError(401, SESSION_EXPIRED_MESSAGE);
+  }
+
+  return performRequest(path, options, newToken);
+}
+
 export async function httpClient<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
   const token = await getAccessToken();
   const response = await performRequest(path, options, token);

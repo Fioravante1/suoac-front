@@ -16,6 +16,10 @@ export default defineConfig([
       "src/**/api/*-action.ts",
       "src/**/api/*.queries.ts",
       "src/**/api/**/*-query.ts",
+      // Proxies server-only consumidos por Route Handlers (ex.: exportação de PDF). Importam
+      // módulos server-only (`http-client`, `session`) diretamente pela mesma razão das actions.
+      "src/**/api/**/*-response.ts",
+      "src/**/api/**/*-response.test.ts",
       "src/app/providers/**",
       "src/pages/**/ui/**",
     ],

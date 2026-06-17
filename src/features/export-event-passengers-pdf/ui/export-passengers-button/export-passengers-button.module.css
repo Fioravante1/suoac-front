@@ -1,0 +1,65 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.label {
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.select {
+  width: 100%;
+  height: var(--suoac-input-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-sm);
+  background-color: var(--suoac-color-surface);
+  font-family: var(--suoac-font-family-sans);
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-primary);
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+  outline: none;
+}
+
+.select:focus {
+  border-color: var(--suoac-color-primary);
+  box-shadow: 0 0 0 2px var(--suoac-color-primary-light);
+}
+
+.select:disabled {
+  background-color: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-secondary);
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
+}
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-primary);
+  cursor: pointer;
+}
+
+.checkboxField input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--suoac-color-primary);
+  cursor: pointer;
+}
