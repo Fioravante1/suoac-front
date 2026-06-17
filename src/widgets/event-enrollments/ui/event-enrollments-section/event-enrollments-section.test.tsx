@@ -31,6 +31,12 @@ vi.mock("@/shared/api", () => ({
     events: {
       detail: () => ["events", "detail"],
     },
+    dashboard: {
+      all: ["dashboard"],
+    },
+    congregations: {
+      select: () => ["congregations", "select"],
+    },
   },
 }));
 
@@ -167,6 +173,21 @@ describe("EventEnrollmentsSection", () => {
       />,
     );
 
+    expect(screen.queryByText("Inscrever passageiro")).not.toBeInTheDocument();
+  });
+
+  it("mostra o botão de exportar PDF mesmo com evento fechado (independente de canManage)", () => {
+    const closedEvent = { ...baseEvent, status: EVENT_STATUSES.CLOSED as typeof baseEvent.status };
+
+    render(
+      <EventEnrollmentsSection
+        event={closedEvent}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        userCongregationId={null}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /Exportar PDF/ })).toBeInTheDocument();
     expect(screen.queryByText("Inscrever passageiro")).not.toBeInTheDocument();
   });
 

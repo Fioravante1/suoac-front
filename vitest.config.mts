@@ -11,7 +11,7 @@ export default defineConfig({
     globals: false,
     clearMocks: true,
     setupFiles: ["./tests/setup/vitest.setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}", "app/**/*.test.{ts,tsx}"],
     exclude: ["node_modules/**", ".next/**"],
     coverage: {
       provider: "v8",
