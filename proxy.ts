@@ -1,53 +1,41 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/login"];
-const CHANGE_PASSWORD_PATH = "/change-password";
-const DEFAULT_PRIVATE_PATH = "/dashboard";
+import { routeGuard } from "@/shared/auth/route-guard";
+import { buildContentSecurityPolicy, generateNonce } from "@/shared/security";
+
+const CSP_HEADER = "Content-Security-Policy";
 
 /**
- * Lê a flag de troca obrigatória do cookie de usuário (não-httpOnly, JSON).
- * Ausência/ erro de parse é tratado como `false` (token antigo sem a claim).
+ * Next.js 16 Proxy (antigo Middleware). Compõe dois concerns testáveis:
+ *
+ * 1. `routeGuard` — gate de autenticação (lê o cookie de sessão assinado);
+ * 2. CSP por nonce — gerada por requisição e aplicada às respostas que renderizam
+ *    página (o Next lê o header CSP da requisição e aplica o nonce nos próprios
+ *    scripts no SSR). Headers de segurança estáticos ficam no `next.config.ts`.
+ *
+ * O `matcher` precisa ser literal estático para ser analisado em build-time.
+ * Exclui assets do Next, arquivos com extensão e rotas de API (que fazem a própria
+ * checagem de sessão e respondem JSON, não devendo ser redirecionadas).
  */
-function mustChangePassword(request: NextRequest): boolean {
-  const userCookie = request.cookies.get("suoac-user")?.value;
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const decision = await routeGuard(request);
 
-  if (!userCookie) return false;
-
-  try {
-    return (JSON.parse(userCookie) as { mustChangePassword?: boolean }).mustChangePassword === true;
-  } catch {
-    return false;
-  }
-}
-
-export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const hasToken = request.cookies.has("suoac-access-token");
-  const isPublicPath = publicPaths.some((path) => pathname === path);
-  const isChangePasswordPath = pathname === CHANGE_PASSWORD_PATH;
-
-  if (!hasToken && !isPublicPath) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Redirects não renderizam página — devolve sem nonce/CSP.
+  if (decision.headers.has("location")) {
+    return decision;
   }
 
-  if (!hasToken) {
-    return NextResponse.next();
-  }
+  const nonce = generateNonce();
+  const csp = buildContentSecurityPolicy(nonce, process.env.NODE_ENV === "development");
 
-  const pendingPasswordChange = mustChangePassword(request);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set(CSP_HEADER, csp);
 
-  // Troca de senha obrigatória prende o usuário na tela de definição de senha.
-  if (pendingPasswordChange && !isChangePasswordPath) {
-    return NextResponse.redirect(new URL(CHANGE_PASSWORD_PATH, request.url));
-  }
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set(CSP_HEADER, csp);
 
-  // Sem pendência: login e a própria tela de troca redirecionam para o app.
-  if (!pendingPasswordChange && (isPublicPath || isChangePasswordPath)) {
-    return NextResponse.redirect(new URL(DEFAULT_PRIVATE_PATH, request.url));
-  }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

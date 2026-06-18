@@ -18,6 +18,15 @@ vi.mock("next/headers", () => ({
   ),
 }));
 
+// Assinatura mockada de forma determinística: `signed(<payload>)` representa o token
+// gravado no cookie; `unsignSession` reverte apenas tokens nesse formato.
+vi.mock("./session-signature", () => ({
+  signSession: vi.fn((payload: string) => Promise.resolve(`signed(${payload})`)),
+  unsignSession: vi.fn((token: string) =>
+    Promise.resolve(token.startsWith("signed(") && token.endsWith(")") ? token.slice(7, -1) : null),
+  ),
+}));
+
 import { createSession, getSession, getAccessToken, getRefreshToken, deleteSession, hasSession } from "./session";
 import type { SessionUser } from "./session";
 
@@ -63,9 +72,9 @@ describe("createSession", () => {
 
     expect(mockSet).toHaveBeenCalledWith(
       "suoac-user",
-      JSON.stringify(testUser),
+      `signed(${JSON.stringify(testUser)})`,
       expect.objectContaining({
-        httpOnly: false,
+        httpOnly: true,
         sameSite: "lax",
         path: "/",
       }),
@@ -74,8 +83,8 @@ describe("createSession", () => {
 });
 
 describe("getSession", () => {
-  it("retorna usuario quando cookie existe", async () => {
-    mockGet.mockReturnValue({ value: JSON.stringify(testUser) });
+  it("retorna usuario quando o cookie tem assinatura valida", async () => {
+    mockGet.mockReturnValue({ value: `signed(${JSON.stringify(testUser)})` });
 
     const session = await getSession();
 
@@ -91,8 +100,16 @@ describe("getSession", () => {
     expect(session).toBeNull();
   });
 
-  it("retorna null quando cookie tem JSON invalido", async () => {
-    mockGet.mockReturnValue({ value: "invalid-json" });
+  it("retorna null quando a assinatura do cookie e invalida (adulterado)", async () => {
+    mockGet.mockReturnValue({ value: JSON.stringify(testUser) });
+
+    const session = await getSession();
+
+    expect(session).toBeNull();
+  });
+
+  it("retorna null quando o payload assinado tem JSON invalido", async () => {
+    mockGet.mockReturnValue({ value: "signed(invalid-json)" });
 
     const session = await getSession();
 
