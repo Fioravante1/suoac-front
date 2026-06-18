@@ -68,13 +68,30 @@ http://localhost:3000
 Definidas em `.env.local` (local) e no painel da Vercel (deploy). Variáveis sem o
 prefixo `NEXT_PUBLIC_` só existem no servidor.
 
-| Variável       | Descrição                                                               |
-| -------------- | ----------------------------------------------------------------------- |
-| `API_BASE_URL` | URL base da API backend.                                                |
-| `FLAGS`        | Chave do Vercel Flags usada pelo `vercelAdapter()`. Gerada pela Vercel. |
-| `FLAGS_SECRET` | Segredo do Flags SDK (Flags Explorer e precompute). Gerado pela Vercel. |
+| Variável         | Descrição                                                               |
+| ---------------- | ----------------------------------------------------------------------- |
+| `API_BASE_URL`   | URL base da API backend.                                                |
+| `SESSION_SECRET` | Segredo HMAC que assina o cookie de sessão (`suoac-user`). Ver abaixo.  |
+| `FLAGS`          | Chave do Vercel Flags usada pelo `vercelAdapter()`. Gerada pela Vercel. |
+| `FLAGS_SECRET`   | Segredo do Flags SDK (Flags Explorer e precompute). Gerado pela Vercel. |
 
 `FLAGS` e `FLAGS_SECRET` são sincronizadas com `vercel env pull`.
+
+### `SESSION_SECRET`
+
+O cookie de sessão do usuário é assinado com HMAC-SHA256 para ser à prova de
+adulteração (impede editar `circuitId`/`role` no navegador para escalar acesso).
+É **obrigatório** em todos os ambientes; sem ele o login falha e nenhuma sessão é
+considerada válida (fail-closed).
+
+Gere um valor aleatório forte e cadastre na Vercel (Production, Preview e
+Development) e no seu `.env.local`:
+
+```bash
+node -e 'console.log(require("crypto").randomBytes(32).toString("base64url"))'
+```
+
+> Trocar o valor invalida todas as sessões ativas (usuários precisam logar de novo).
 
 ## Feature flags
 

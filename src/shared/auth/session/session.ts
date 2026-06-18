@@ -2,6 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
+import { signSession, unsignSession } from "./session-signature";
 import type { UserRole } from "./user-role";
 
 export type { UserRole };
@@ -24,7 +25,7 @@ const USER_COOKIE = "suoac-user";
 
 const MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
-function cookieOptions(httpOnly: boolean): {
+function cookieOptions(): {
   httpOnly: boolean;
   secure: boolean;
   sameSite: "lax";
@@ -32,7 +33,10 @@ function cookieOptions(httpOnly: boolean): {
   maxAge: number;
 } {
   return {
-    httpOnly,
+    // Todos os cookies de sessão são httpOnly: tokens nunca devem ser lidos por JS,
+    // e o cookie de usuário chega ao client via prop do AuthProvider (server-side),
+    // sem precisar de leitura no navegador.
+    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
@@ -43,9 +47,13 @@ function cookieOptions(httpOnly: boolean): {
 export async function createSession(accessToken: string, refreshToken: string, user: SessionUser): Promise<void> {
   const cookieStore = await cookies();
 
-  cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, cookieOptions(true));
-  cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions(true));
-  cookieStore.set(USER_COOKIE, JSON.stringify(user), cookieOptions(false));
+  // O cookie de usuário é assinado (HMAC) para ser à prova de adulteração: impede que
+  // o circuitId/role sejam editados no navegador para escalar acesso. Ver session-signature.
+  const signedUser = await signSession(JSON.stringify(user));
+
+  cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, cookieOptions());
+  cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions());
+  cookieStore.set(USER_COOKIE, signedUser, cookieOptions());
 }
 
 export async function getSession(): Promise<SessionUser | null> {
@@ -56,8 +64,14 @@ export async function getSession(): Promise<SessionUser | null> {
     return null;
   }
 
+  const payload = await unsignSession(userCookie.value);
+
+  if (!payload) {
+    return null;
+  }
+
   try {
-    return JSON.parse(userCookie.value) as SessionUser;
+    return JSON.parse(payload) as SessionUser;
   } catch {
     return null;
   }
