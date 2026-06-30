@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 
+import { EXPORT_VARIANTS } from "../export-variant";
 import { buildExportPath } from "./export-options";
 
 describe("buildExportPath", () => {
@@ -7,10 +8,8 @@ describe("buildExportPath", () => {
     expect(buildExportPath("evt-1")).toBe("/api/events/evt-1/passengers/export");
   });
 
-  it("omite congregationId vazio e includeSensitive false", () => {
-    expect(buildExportPath("evt-1", { congregationId: "", includeSensitive: false })).toBe(
-      "/api/events/evt-1/passengers/export",
-    );
+  it("omite congregationId vazio e variant ausente", () => {
+    expect(buildExportPath("evt-1", { congregationId: "" })).toBe("/api/events/evt-1/passengers/export");
   });
 
   it("inclui congregationId quando preenchido", () => {
@@ -19,15 +18,21 @@ describe("buildExportPath", () => {
     );
   });
 
-  it("inclui includeSensitive apenas quando true", () => {
-    expect(buildExportPath("evt-1", { includeSensitive: true })).toBe(
-      "/api/events/evt-1/passengers/export?includeSensitive=true",
+  it("inclui variant boarding quando informado", () => {
+    expect(buildExportPath("evt-1", { variant: EXPORT_VARIANTS.BOARDING })).toBe(
+      "/api/events/evt-1/passengers/export?variant=boarding",
     );
   });
 
-  it("combina congregationId e includeSensitive", () => {
-    expect(buildExportPath("evt-1", { congregationId: "cong-9", includeSensitive: true })).toBe(
-      "/api/events/evt-1/passengers/export?congregationId=cong-9&includeSensitive=true",
+  it("inclui variant carrier quando informado", () => {
+    expect(buildExportPath("evt-1", { variant: EXPORT_VARIANTS.CARRIER })).toBe(
+      "/api/events/evt-1/passengers/export?variant=carrier",
+    );
+  });
+
+  it("combina congregationId e variant", () => {
+    expect(buildExportPath("evt-1", { congregationId: "cong-9", variant: EXPORT_VARIANTS.CARRIER })).toBe(
+      "/api/events/evt-1/passengers/export?congregationId=cong-9&variant=carrier",
     );
   });
 });

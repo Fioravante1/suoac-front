@@ -6,7 +6,8 @@ import { getSession } from "@/shared/auth/session";
 interface ExportParams {
   eventId: string;
   congregationId?: string;
-  includeSensitive?: boolean;
+  /** Variante do PDF (`carrier`/`boarding`). Repassada como string; o backend valida (400 se inválida). */
+  variant?: string;
 }
 
 const GENERIC_ERROR = "Não foi possível exportar o PDF.";
@@ -34,7 +35,7 @@ function normalizeMessage(value: unknown, fallback: string): string {
 export async function exportEventPassengersPdfResponse({
   eventId,
   congregationId,
-  includeSensitive,
+  variant,
 }: ExportParams): Promise<Response> {
   const session = await getSession();
 
@@ -44,7 +45,7 @@ export async function exportEventPassengersPdfResponse({
 
   const params = new URLSearchParams();
   if (congregationId) params.set("congregationId", congregationId);
-  if (includeSensitive) params.set("includeSensitive", "true");
+  if (variant) params.set("variant", variant);
 
   const basePath = endpoints.eventPassengers.exportPdf(session.circuitId, eventId);
   const query = params.toString();
