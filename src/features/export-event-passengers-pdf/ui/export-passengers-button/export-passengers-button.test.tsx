@@ -74,23 +74,25 @@ describe("ExportPassengersButton", () => {
     vi.unstubAllGlobals();
   });
 
-  it("role de congregação: exporta direto, sem modal nem opção de RG", async () => {
+  it("role de congregação: exporta a lista de embarque direto, sem modal nem variante carrier", async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
 
-    expect(screen.queryByText("Incluir RG no PDF")).not.toBeInTheDocument();
+    expect(screen.queryByText("Lista para a empresa de ônibus")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export", { credentials: "same-origin" });
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding", {
+      credentials: "same-origin",
+    });
     expect(downloadResponseAsFile).toHaveBeenCalledOnce();
     expect(toastSuccess).toHaveBeenCalled();
   });
 
-  it("role de circuito: abre modal com RG e seletor e envia includeSensitive=true", async () => {
+  it("role de circuito: abre modal e baixa a variante carrier", async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse());
     vi.stubGlobal("fetch", fetchMock);
 
@@ -98,12 +100,25 @@ describe("ExportPassengersButton", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
 
-    expect(screen.getByText("Incluir RG no PDF")).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText("Incluir RG no PDF"));
-    fireEvent.click(screen.getByRole("button", { name: "Exportar" }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista para a empresa de ônibus/ }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?includeSensitive=true", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=carrier", {
+      credentials: "same-origin",
+    });
+  });
+
+  it("role de circuito: baixa a variante boarding pelo modal", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(okResponse());
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<ExportPassengersButton event={event} userRole={USER_ROLES.CIRCUIT_COORDINATOR} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding", {
       credentials: "same-origin",
     });
   });
@@ -113,10 +128,20 @@ describe("ExportPassengersButton", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(toastError).toHaveBeenCalledWith("Você não tem permissão para esta exportação."));
     expect(downloadResponseAsFile).not.toHaveBeenCalled();
+  });
+
+  it("mostra toast de erro mapeado para variante inválida (400)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(errorResponse(400));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
+
+    await waitFor(() => expect(toastError).toHaveBeenCalledWith("Opção de exportação inválida."));
   });
 
   it("usa a mensagem do backend no 422", async () => {
@@ -124,7 +149,7 @@ describe("ExportPassengersButton", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(toastError).toHaveBeenCalledWith("O evento possui 3000 inscritos."));
   });
@@ -134,7 +159,7 @@ describe("ExportPassengersButton", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(redirectToSessionExpired).toHaveBeenCalledOnce());
     expect(toastError).not.toHaveBeenCalled();

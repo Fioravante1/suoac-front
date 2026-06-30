@@ -1,6 +1,6 @@
 # Progresso do Projeto - SUOAC Frontend
 
-**Atualizado em:** 15/06/2026
+**Atualizado em:** 30/06/2026
 **Fase atual:** Domínio MVP - eventos, passageiros, pagamentos e dashboard
 
 Este arquivo acompanha o estado do frontend, o que já foi entregue e quais frentes ainda precisam avançar.
@@ -15,9 +15,10 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 | App shell autenticado  | Concluído | Sidebar desktop, bottom nav mobile e rotas privadas.                                                                     |
 | Congregações           | Parcial   | Listagem, criação, edição e exclusão já integradas ao backend.                                                           |
 | Eventos                | Parcial   | Listagem, criação, publicação, edição, exclusão e cancelamento já integrados ao backend.                                 |
-| Passageiros            | Parcial   | `entities/passenger`, CRUD e inscrição em eventos (`enroll-passenger`) integrados.                                       |
+| Passageiros            | Parcial   | `entities/passenger`, CRUD, inscrição em eventos (`enroll-passenger`) e exportação de inscritos em PDF integrados.       |
 | Pagamentos             | Parcial   | `entities/payment` e `register-payment` integrados; resumo financeiro no dashboard.                                      |
 | Dashboards             | Parcial   | Dashboard com stats, progresso de pagamentos, presença por dia e resumo por congregação.                                 |
+| Segurança              | Parcial   | Cookies de sessão assinados com HMAC-SHA256, headers de segurança e Content-Security-Policy via proxy/route-guard.       |
 
 ## Entregas Concluídas
 
@@ -158,21 +159,50 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - Integração com o Flags SDK (`flags/next` + `@flags-sdk/vercel`) em `shared/feature-flags` (segmento isolado por ser server-only).
 - Flag `SHOW_PENDING_MENU_ITEMS` controla a exibição de itens de menu cujas páginas ainda não foram implementadas.
 
+### 14. Exportação de Inscritos em PDF
+
+- `features/export-event-passengers-pdf` implementada com:
+  - schema Zod de opções de exportação (`model/export-form`) e modelo de opções (`model/export-options`);
+  - DTO/mapper da resposta em `api/export-event-passengers-pdf-response`;
+  - botão de exportação (`ui/export-passengers-button`) com feedback de loading e erro.
+- Route Handler em `app/api/events/[eventId]/passengers/export/route.ts` faz a ponte com o backend.
+- `shared/api/http-client` ganhou suporte a respostas binárias (blob) para download de arquivos.
+- Novo helper `shared/lib/download` para disparar o download do arquivo no browser.
+- Botão de exportação disponível na seção de inscritos do evento (`event-enrollments-section`).
+
+### 15. Refinamento da Lista de Inscritos
+
+- `event-enrollments-section` otimizada na exibição de dias e status de pagamento.
+- Ajuste no estilo de `shared/ui/badge` para refletir os estados de pagamento.
+- Query de `entities/event-passenger` ajustada para a nova exibição.
+
+### 16. Assinatura HMAC-SHA256 dos Cookies de Sessão
+
+- `shared/auth/session/session-signature.ts` assina e valida os cookies de sessão com HMAC-SHA256.
+- `session.ts` passou a gravar/ler o payload assinado, rejeitando cookies adulterados.
+- Documentado no `README.md`.
+
+### 17. Headers de Segurança e Content-Security-Policy
+
+- `next.config.ts` configura headers de segurança na resposta.
+- `shared/security/content-security-policy` centraliza a montagem da política de CSP.
+- `shared/auth/route-guard` extraído para padronizar a proteção de rotas no `proxy.ts`.
+
 ## Validação Mais Recente
 
-Última validação completa executada após a troca de senha obrigatória e a reconciliação da documentação:
+Última validação completa executada após a exportação de PDF e o reforço de segurança (cookies assinados e CSP):
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, 593 testes unitários e Prettier.
+Resultado: passou com typecheck, lint, architecture check, 666 testes unitários (109 arquivos) e Prettier.
 
 ## Próximos Passos Recomendados
 
 1. Data Access Layer (`verifySession()`) para revalidar a sessão em Server Components.
 2. Proteção por role no proxy (cookie `suoac-user`).
-3. Relatórios e exportações sobre os dados de eventos/passageiros/pagamentos.
+3. Ampliar relatórios e exportações sobre os dados de eventos/passageiros/pagamentos (PDF de inscritos já entregue na entrega 14).
 
 ## Pendências Conhecidas
 

@@ -1,14 +1,16 @@
+import type { ExportVariant } from "../export-variant";
+
 export interface ExportOptions {
   /** Congregação específica. Vazio/ausente exporta todas (apenas roles de circuito). */
   congregationId?: string;
-  /** Inclui a coluna RG no PDF (apenas roles de circuito). */
-  includeSensitive?: boolean;
+  /** Variante do PDF (`carrier` inclui RG, restrita a circuito; `boarding` inclui telefone). */
+  variant?: ExportVariant;
 }
 
 /**
- * Monta a URL same-origin do Route Handler de exportação. Usa `URLSearchParams` e **omite** params
- * vazios/`false` para não enviar `congregationId` vazio ou `includeSensitive=false` (evita 400/UUID
- * inválido no backend).
+ * Monta a URL same-origin do Route Handler de exportação. Usa `URLSearchParams` e **omite** o
+ * `congregationId` vazio (evita 400/UUID inválido no backend). O `variant` é enviado quando
+ * presente; se omitido, o backend assume `boarding` (variante sem dado sensível).
  */
 export function buildExportPath(eventId: string, options: ExportOptions = {}): string {
   const params = new URLSearchParams();
@@ -17,8 +19,8 @@ export function buildExportPath(eventId: string, options: ExportOptions = {}): s
     params.set("congregationId", options.congregationId);
   }
 
-  if (options.includeSensitive) {
-    params.set("includeSensitive", "true");
+  if (options.variant) {
+    params.set("variant", options.variant);
   }
 
   const query = params.toString();
