@@ -473,16 +473,23 @@ O sistema é composto por dois backends e um frontend:
 
 ### 7.4 Frontend
 
-| Camada                           | Tecnologia                   |
-| -------------------------------- | ---------------------------- |
-| Framework                        | Next.js (App Router)         |
-| Linguagem                        | TypeScript                   |
-| UI Library                       | Material-UI (MUI)            |
-| Gerenciamento de estado servidor | TanStack Query (React Query) |
-| Formulários                      | React Hook Form + Zod        |
-| Mapas (tracking)                 | Leaflet ou Google Maps API   |
-| Gráficos (dashboards)            | Recharts                     |
-| HTTP Client                      | Axios ou fetch nativo        |
+| Camada                           | Tecnologia                                    |
+| -------------------------------- | --------------------------------------------- |
+| Framework                        | Next.js (App Router)                          |
+| Linguagem                        | TypeScript                                    |
+| Estilo / Design System           | CSS Modules + CSS Custom Properties (tokens)  |
+| Gerenciamento de estado servidor | TanStack Query (React Query)                  |
+| Formulários                      | React Hook Form + Zod                         |
+| Mapas (tracking)                 | Leaflet ou Google Maps API                    |
+| Gráficos (dashboards)            | Componentes próprios (CSS, sem lib de charts) |
+| HTTP Client                      | fetch nativo (`shared/api/http-client`)       |
+
+> **Divergência consciente em relação ao planejamento original.** A v2 previa Material-UI (MUI),
+> Recharts e Axios para o frontend. Na implementação optou-se por **CSS Modules + tokens de design
+> system**, **gráficos próprios** (sem Recharts) e **fetch nativo** (sem Axios). A decisão está
+> registrada aqui para evitar confusão futura entre o documento de requisitos e o código real; a
+> fonte de verdade da arquitetura frontend é `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md`
+> e o `AGENTS.md` na raiz do repositório.
 
 #### Abordagem:
 

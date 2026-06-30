@@ -20,24 +20,24 @@ describe("GET /api/events/[eventId]/passengers/export", () => {
     vi.clearAllMocks();
   });
 
-  it("aguarda params e repassa eventId + query (congregationId, includeSensitive)", async () => {
+  it("aguarda params e repassa eventId + query (congregationId, variant)", async () => {
     const expected = new Response("ok", { status: 200 });
     exportMock.mockResolvedValue(expected);
 
     const request = makeRequest(
-      "http://localhost/api/events/evt-1/passengers/export?congregationId=cong-9&includeSensitive=true",
+      "http://localhost/api/events/evt-1/passengers/export?congregationId=cong-9&variant=carrier",
     );
     const result = await GET(request, { params: Promise.resolve({ eventId: "evt-1" }) });
 
     expect(exportMock).toHaveBeenCalledWith({
       eventId: "evt-1",
       congregationId: "cong-9",
-      includeSensitive: true,
+      variant: "carrier",
     });
     expect(result).toBe(expected);
   });
 
-  it("envia congregationId undefined e includeSensitive false quando ausentes", async () => {
+  it("envia congregationId e variant undefined quando ausentes", async () => {
     exportMock.mockResolvedValue(new Response(null, { status: 200 }));
 
     const request = makeRequest("http://localhost/api/events/evt-2/passengers/export");
@@ -46,7 +46,7 @@ describe("GET /api/events/[eventId]/passengers/export", () => {
     expect(exportMock).toHaveBeenCalledWith({
       eventId: "evt-2",
       congregationId: undefined,
-      includeSensitive: false,
+      variant: undefined,
     });
   });
 });

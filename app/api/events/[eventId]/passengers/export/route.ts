@@ -14,6 +14,6 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ eventId
   return exportEventPassengersPdfResponse({
     eventId,
     congregationId: searchParams.get("congregationId") ?? undefined,
-    includeSensitive: searchParams.get("includeSensitive") === "true",
+    variant: searchParams.get("variant") ?? undefined,
   });
 }

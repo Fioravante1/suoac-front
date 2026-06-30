@@ -16,6 +16,12 @@ import { Spinner } from "@/shared/ui/spinner";
 import { useToast } from "@/shared/ui/toast";
 
 import { buildExportPath, type ExportOptions } from "../../model/export-options";
+import {
+  EXPORT_VARIANTS,
+  EXPORT_VARIANT_DESCRIPTIONS,
+  EXPORT_VARIANT_LABELS,
+  type ExportVariant,
+} from "../../model/export-variant";
 import { exportFormDefaultValues, exportFormSchema, type ExportFormValues } from "../../model/export-form";
 import styles from "./export-passengers-button.module.css";
 
@@ -25,6 +31,7 @@ interface ExportPassengersButtonProps {
 }
 
 function messageForStatus(status: number, backendMessage?: string): string {
+  if (status === 400) return "Opção de exportação inválida.";
   if (status === 403) return "Você não tem permissão para esta exportação.";
   if (status === 404) return "Evento ou congregação não encontrado.";
   if (status === 422) return backendMessage ?? "Há muitos inscritos. Exporte por congregação.";
@@ -35,7 +42,7 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
   const toast = useToast();
   const optionsModal = useModal();
   const isCircuit = isCircuitRole(userRole);
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportingVariant, setExportingVariant] = useState<ExportVariant | null>(null);
 
   const congregationsQuery = useQuery({
     ...congregationSelectOptions(event.circuitId),
@@ -47,8 +54,8 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
     defaultValues: exportFormDefaultValues,
   });
 
-  async function performExport(options: ExportOptions): Promise<void> {
-    setIsExporting(true);
+  async function performExport(options: ExportOptions & { variant: ExportVariant }): Promise<void> {
+    setExportingVariant(options.variant);
 
     try {
       const response = await fetch(buildExportPath(event.id, options), { credentials: "same-origin" });
@@ -70,7 +77,7 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
     } catch {
       toast.error("Não foi possível exportar o PDF. Tente novamente.");
     } finally {
-      setIsExporting(false);
+      setExportingVariant(null);
     }
   }
 
@@ -79,21 +86,31 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
     optionsModal.open();
   }
 
-  function onSubmit(values: ExportFormValues): Promise<void> {
-    return performExport({
-      congregationId: values.congregationId || undefined,
-      includeSensitive: values.includeSensitive,
-    });
+  /** Roda a validação do formulário (congregação) e dispara a exportação da variante escolhida. */
+  function submitWithVariant(variant: ExportVariant): () => void {
+    return handleSubmit((values: ExportFormValues) =>
+      performExport({ congregationId: values.congregationId || undefined, variant }),
+    );
   }
 
+  // Papel de congregação: só a lista de embarque (sem RG). Exporta direto, sem modal.
   if (!isCircuit) {
+    const isExporting = exportingVariant !== null;
+
     return (
-      <Button size="small" variant="secondary" onClick={() => performExport({})} disabled={isExporting}>
+      <Button
+        size="small"
+        variant="secondary"
+        onClick={() => performExport({ variant: EXPORT_VARIANTS.BOARDING })}
+        disabled={isExporting}
+      >
         {isExporting ? <Spinner size="small" /> : <Download size={16} aria-hidden="true" />}
-        {isExporting ? "Exportando..." : "Exportar PDF"}
+        {isExporting ? "Exportando..." : "Lista de embarque"}
       </Button>
     );
   }
+
+  const isExporting = exportingVariant !== null;
 
   return (
     <>
@@ -107,18 +124,12 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
         onClose={optionsModal.close}
         title="Exportar PDF"
         footer={
-          <>
-            <Button variant="ghost" onClick={optionsModal.close} disabled={isExporting}>
-              Cancelar
-            </Button>
-            <Button type="submit" form="export-passengers-form" disabled={isExporting}>
-              {isExporting && <Spinner size="small" />}
-              {isExporting ? "Exportando..." : "Exportar"}
-            </Button>
-          </>
+          <Button variant="ghost" onClick={optionsModal.close} disabled={isExporting}>
+            Fechar
+          </Button>
         }
       >
-        <form id="export-passengers-form" className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <form id="export-passengers-form" className={styles.form} onSubmit={(e) => e.preventDefault()}>
           <label className={styles.field}>
             <span className={styles.label}>Congregação</span>
             <select className={styles.select} disabled={congregationsQuery.isLoading} {...register("congregationId")}>
@@ -136,10 +147,23 @@ export function ExportPassengersButton({ event, userRole }: ExportPassengersButt
             )}
           </label>
 
-          <label className={styles.checkboxField}>
-            <input type="checkbox" {...register("includeSensitive")} />
-            <span>Incluir RG no PDF</span>
-          </label>
+          <div className={styles.variants}>
+            {([EXPORT_VARIANTS.CARRIER, EXPORT_VARIANTS.BOARDING] as const).map((variant) => (
+              <button
+                key={variant}
+                type="button"
+                className={styles.variantButton}
+                onClick={submitWithVariant(variant)}
+                disabled={isExporting}
+              >
+                <span className={styles.variantHeader}>
+                  {exportingVariant === variant ? <Spinner size="small" /> : <Download size={16} aria-hidden="true" />}
+                  <span className={styles.variantLabel}>{EXPORT_VARIANT_LABELS[variant]}</span>
+                </span>
+                <span className={styles.variantDescription}>{EXPORT_VARIANT_DESCRIPTIONS[variant]}</span>
+              </button>
+            ))}
+          </div>
         </form>
       </Modal>
     </>

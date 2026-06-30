@@ -48,18 +48,59 @@
   color: var(--suoac-color-text-secondary);
 }
 
-.checkboxField {
+.variants {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--suoac-space-3);
-  font-size: var(--suoac-font-size-body);
-  color: var(--suoac-color-text-primary);
-  cursor: pointer;
 }
 
-.checkboxField input {
-  width: 1.125rem;
-  height: 1.125rem;
-  accent-color: var(--suoac-color-primary);
+.variantButton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  width: 100%;
+  padding: var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-sm);
+  background-color: var(--suoac-color-surface);
+  text-align: left;
   cursor: pointer;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.variantButton:hover:not(:disabled) {
+  border-color: var(--suoac-color-primary);
+  background-color: var(--suoac-color-surface-muted);
+}
+
+.variantButton:focus-visible {
+  outline: none;
+  border-color: var(--suoac-color-primary);
+  box-shadow: 0 0 0 2px var(--suoac-color-primary-light);
+}
+
+.variantButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.variantHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  color: var(--suoac-color-primary);
+}
+
+.variantLabel {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+}
+
+.variantDescription {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-text-secondary);
 }

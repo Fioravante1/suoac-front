@@ -42,17 +42,17 @@ describe("exportEventPassengersPdfResponse", () => {
     expect(httpClientRawMock).not.toHaveBeenCalled();
   });
 
-  it("monta endpoint com circuitId da sessão e query (congregationId + includeSensitive)", async () => {
+  it("monta endpoint com circuitId da sessão e query (congregationId + variant)", async () => {
     httpClientRawMock.mockResolvedValue(new Response("ok", { status: 200 }));
 
     await exportEventPassengersPdfResponse({
       eventId: "evt-1",
       congregationId: "cong-9",
-      includeSensitive: true,
+      variant: "carrier",
     });
 
     expect(httpClientRawMock).toHaveBeenCalledWith(
-      "/circuits/circuit-1/events/evt-1/passengers/export.pdf?congregationId=cong-9&includeSensitive=true",
+      "/circuits/circuit-1/events/evt-1/passengers/export.pdf?congregationId=cong-9&variant=carrier",
     );
   });
 
