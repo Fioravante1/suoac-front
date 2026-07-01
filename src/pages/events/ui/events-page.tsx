@@ -209,6 +209,9 @@ export function EventsPage() {
 
       queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(enrollEventId) });
+      // A inscrição altera contagens/valores agregados no Dashboard e na tela Financeira.
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.financialSummary.all });
       toast.success("Passageiro inscrito com sucesso.");
     },
   });

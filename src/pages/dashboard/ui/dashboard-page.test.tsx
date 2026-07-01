@@ -18,6 +18,7 @@ vi.mock("@/entities/event", () => ({
   EVENT_STATUS_LABELS: { OPEN: "Inscricoes abertas" },
   EVENT_STATUS_BADGE_VARIANTS: { OPEN: "success" },
   EVENT_TYPE_LABELS: { ASSEMBLY: "Assembleia" },
+  activeEventOptions: vi.fn(),
 }));
 
 vi.mock("@/entities/event-passenger", async (importOriginal) => ({
@@ -44,7 +45,6 @@ vi.mock("@/shared/config", () => ({
 }));
 
 vi.mock("../api", () => ({
-  activeEventOptions: vi.fn(),
   dashboardOptions: vi.fn(),
 }));
 
