@@ -3,14 +3,18 @@ import "server-only";
 import { endpoints, httpClientRaw, HttpError } from "@/shared/api/http-client";
 import { getSession } from "@/shared/auth/session";
 
+import { EXPORT_FORMAT_CONTENT_TYPES, parseExportFormat } from "../../model/export-format";
+
 interface ExportParams {
   eventId: string;
   congregationId?: string;
-  /** Variante do PDF (`carrier`/`boarding`). Repassada como string; o backend valida (400 se inválida). */
+  /** Variante da lista (`carrier`/`boarding`). Repassada como string; o backend valida (400 se inválida). */
   variant?: string;
+  /** Formato cru vindo da query (`pdf`/`xlsx`). Validado aqui via `parseExportFormat`. */
+  format?: string;
 }
 
-const GENERIC_ERROR = "Não foi possível exportar o PDF.";
+const GENERIC_ERROR = "Não foi possível exportar o arquivo.";
 
 function jsonError(statusCode: number, message: string): Response {
   return Response.json({ statusCode, message }, { status: statusCode });
@@ -24,19 +28,27 @@ function normalizeMessage(value: unknown, fallback: string): string {
 }
 
 /**
- * Proxy server-side da exportação de PDF de inscritos. Lê a sessão (circuitId/token), chama o backend
- * via `httpClientRaw` e devolve uma `Response`:
+ * Proxy server-side da exportação de inscritos (PDF ou Excel). Lê a sessão (circuitId/token), valida
+ * o formato, chama o backend via `httpClientRaw` e devolve uma `Response`:
+ * - formato inválido → 400 JSON (sem tocar o backend);
  * - sucesso → repassa o binário (Content-Type/Content-Disposition);
  * - erro do backend → normaliza para JSON `{ statusCode, message }` preservando o status;
  * - sessão expirada → 401 JSON.
  *
  * Server-only. Consumido apenas pelo Route Handler em `/app`.
  */
-export async function exportEventPassengersPdfResponse({
+export async function exportEventPassengersResponse({
   eventId,
   congregationId,
   variant,
+  format: rawFormat,
 }: ExportParams): Promise<Response> {
+  const format = parseExportFormat(rawFormat ?? null);
+
+  if (format === null) {
+    return jsonError(400, "Formato de exportação inválido.");
+  }
+
   const session = await getSession();
 
   if (!session) {
@@ -47,7 +59,7 @@ export async function exportEventPassengersPdfResponse({
   if (congregationId) params.set("congregationId", congregationId);
   if (variant) params.set("variant", variant);
 
-  const basePath = endpoints.eventPassengers.exportPdf(session.circuitId, eventId);
+  const basePath = endpoints.eventPassengers.export(session.circuitId, eventId, format);
   const query = params.toString();
   const path = query ? `${basePath}?${query}` : basePath;
 
@@ -71,9 +83,9 @@ export async function exportEventPassengersPdfResponse({
     return new Response(upstream.body, {
       status: 200,
       headers: {
-        "Content-Type": upstream.headers.get("Content-Type") ?? "application/pdf",
+        "Content-Type": upstream.headers.get("Content-Type") ?? EXPORT_FORMAT_CONTENT_TYPES[format],
         "Content-Disposition":
-          upstream.headers.get("Content-Disposition") ?? `attachment; filename="inscritos-${eventId}.pdf"`,
+          upstream.headers.get("Content-Disposition") ?? `attachment; filename="inscritos-${eventId}.${format}"`,
       },
     });
   } catch (error) {

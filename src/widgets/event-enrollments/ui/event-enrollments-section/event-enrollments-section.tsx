@@ -30,7 +30,7 @@ import { Tooltip } from "@/shared/ui/tooltip";
 import { useToast } from "@/shared/ui/toast";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
-import { ExportPassengersButton } from "@/features/export-event-passengers-pdf";
+import { ExportPassengersButton } from "@/features/export-event-passengers";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
 import { removeEventPassengerAction } from "@/features/remove-event-passenger";
 import { PassengerPaymentsModal } from "@/features/register-payment";
