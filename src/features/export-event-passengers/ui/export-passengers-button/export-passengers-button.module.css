@@ -4,6 +4,59 @@
   gap: var(--suoac-space-5);
 }
 
+/* Seletor segmentado de formato (PDF · Excel) no modal de circuito. */
+.formatGroup {
+  display: flex;
+  gap: var(--suoac-space-2);
+}
+
+.formatButton {
+  flex: 1;
+  min-height: var(--suoac-input-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-sm);
+  background-color: var(--suoac-color-surface);
+  font-family: var(--suoac-font-family-sans);
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-text-primary);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.formatButton:hover:not(:disabled) {
+  border-color: var(--suoac-color-primary);
+  background-color: var(--suoac-color-surface-muted);
+}
+
+.formatButton:focus-visible {
+  outline: none;
+  border-color: var(--suoac-color-primary);
+  box-shadow: 0 0 0 2px var(--suoac-color-primary-light);
+}
+
+.formatButtonActive {
+  border-color: var(--suoac-color-primary);
+  background-color: var(--suoac-color-primary);
+  color: var(--suoac-color-text-inverse);
+}
+
+.formatButtonActive:hover:not(:disabled) {
+  border-color: var(--suoac-color-primary-dark);
+  background-color: var(--suoac-color-primary-dark);
+  color: var(--suoac-color-text-inverse);
+}
+
+.formatButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -19,10 +72,14 @@
 .select {
   width: 100%;
   height: var(--suoac-input-height);
-  padding: 0 var(--suoac-space-4);
+  padding: 0 var(--suoac-space-10) 0 var(--suoac-space-4);
   border: 1px solid var(--suoac-color-border-strong);
   border-radius: var(--suoac-radius-sm);
   background-color: var(--suoac-color-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--suoac-space-3) center;
+  appearance: none;
   font-family: var(--suoac-font-family-sans);
   font-size: var(--suoac-font-size-body);
   color: var(--suoac-color-text-primary);

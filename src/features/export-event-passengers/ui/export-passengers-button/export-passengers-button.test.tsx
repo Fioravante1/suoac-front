@@ -74,51 +74,53 @@ describe("ExportPassengersButton", () => {
     vi.unstubAllGlobals();
   });
 
-  it("role de congregação: exporta a lista de embarque direto, sem modal nem variante carrier", async () => {
+  it("role de congregação: exporta a lista de embarque direto em PDF, sem modal nem variante carrier", async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CONGREGATION_COORDINATOR} />);
 
     expect(screen.queryByText("Lista para a empresa de ônibus")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Embarque · Excel/ })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding&format=pdf", {
       credentials: "same-origin",
     });
     expect(downloadResponseAsFile).toHaveBeenCalledOnce();
     expect(toastSuccess).toHaveBeenCalled();
   });
 
-  it("role de circuito: abre modal e baixa a variante carrier", async () => {
+  it("role de circuito: abre modal e baixa a variante carrier em PDF (formato default)", async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CIRCUIT_COORDINATOR} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Exportar/ }));
 
     fireEvent.click(screen.getByRole("button", { name: /Lista para a empresa de ônibus/ }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=carrier", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=carrier&format=pdf", {
       credentials: "same-origin",
     });
   });
 
-  it("role de circuito: baixa a variante boarding pelo modal", async () => {
+  it("role de circuito: seleciona Excel e baixa a variante boarding em xlsx", async () => {
     const fetchMock = vi.fn().mockResolvedValue(okResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ExportPassengersButton event={event} userRole={USER_ROLES.CIRCUIT_COORDINATOR} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Exportar PDF/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Exportar/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Excel" }));
     fireEvent.click(screen.getByRole("button", { name: /Lista de embarque/ }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/events/evt-1/passengers/export?variant=boarding&format=xlsx", {
       credentials: "same-origin",
     });
   });
@@ -134,7 +136,7 @@ describe("ExportPassengersButton", () => {
     expect(downloadResponseAsFile).not.toHaveBeenCalled();
   });
 
-  it("mostra toast de erro mapeado para variante inválida (400)", async () => {
+  it("mostra toast de erro mapeado para opção inválida (400)", async () => {
     const fetchMock = vi.fn().mockResolvedValue(errorResponse(400));
     vi.stubGlobal("fetch", fetchMock);
 
