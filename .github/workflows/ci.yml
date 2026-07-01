@@ -93,6 +93,13 @@ jobs:
   # So roda em push para main e apenas se toda a verificacao acima passou.
   # O auto-deploy do Vercel em main esta desligado via vercel.json
   # (git.deploymentEnabled.main = false) para nao duplicar o deploy.
+  #
+  # O build roda na infra da Vercel (via `vercel deploy`, sem --prebuilt) de
+  # proposito: o app usa o Vercel Flags SDK, que na avaliacao das flags durante
+  # o build depende de env/token de sistema (FLAGS, VERCEL_OIDC_TOKEN) que a
+  # Vercel injeta no proprio build e nao sao reproduziveis no runner do Actions.
+  # Buildar no Actions com --prebuilt quebra com "@vercel/flags-core: Missing
+  # sdkKey". A verificacao de build ja acontece no job `build` (yarn build).
   deploy-production:
     name: Deploy Production (Vercel)
     runs-on: ubuntu-latest
@@ -111,19 +118,11 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-          cache: yarn
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
-      - name: Pull Vercel environment
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-      - name: Build project artifacts
-        run: vercel build --prod --token="$VERCEL_TOKEN"
       - name: Deploy to production
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          url=$(vercel deploy --prod --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Deploy de producao concluido: $url"
