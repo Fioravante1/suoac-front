@@ -1,3 +1,5 @@
+import type { PaginatedResponse } from "@/shared/api";
+
 export interface EventPassengerDay {
   id: string;
   eventDayId: string;
@@ -56,4 +58,63 @@ export const PAYMENT_STATUS_BADGE_VARIANTS: Record<PaymentStatus, "critical" | "
 
 export function canManageEventPassengers(eventStatus: string): boolean {
   return eventStatus === "OPEN";
+}
+
+// --- Domínio financeiro (resumo do evento) ---------------------------------------------------------
+// `event-passenger` é o dono de `PaymentStatus`/`totalAmount`/`paidAmount`, então o resumo financeiro
+// — que agrega esses valores — vive aqui também (evita cross-import entre entidades). Ver
+// docs/plans/PLANO_PAGINA_FINANCEIRA.md §3.2.
+
+/** Contagem de inscrições por status de pagamento. Chaves em lowercase como vêm do backend. */
+export interface PaymentStatusCounts {
+  paid: number;
+  partial: number;
+  pending: number;
+  exempt: number;
+}
+
+/**
+ * Mapa tipado `PaymentStatus` (uppercase) → chave de contagem em `PaymentStatusCounts` (lowercase).
+ * Garante exaustividade em compilação e elimina literais soltos no filtro/contadores da UI.
+ */
+export const PAYMENT_STATUS_COUNT_KEYS: Record<PaymentStatus, keyof PaymentStatusCounts> = {
+  [PAYMENT_STATUSES.PENDING]: "pending",
+  [PAYMENT_STATUSES.PARTIAL]: "partial",
+  [PAYMENT_STATUSES.PAID]: "paid",
+  [PAYMENT_STATUSES.EXEMPT]: "exempt",
+};
+
+/**
+ * Totais financeiros de um escopo (evento inteiro ou uma congregação). Valores monetários vêm como
+ * string (Decimal) e **excluem isentos**; `totalPassengers` e `byStatus.exempt` contam os isentos.
+ */
+export interface FinancialTotals {
+  totalPassengers: number;
+  totalExpected: string;
+  totalReceived: string;
+  totalPending: string;
+  byStatus: PaymentStatusCounts;
+}
+
+/** Resumo financeiro de uma congregação dentro do evento. */
+export interface CongregationFinancial extends FinancialTotals {
+  congregationId: string;
+  congregationName: string;
+}
+
+/** Resposta do endpoint de resumo financeiro do evento (`GET /events/:id/financial-summary`). */
+export interface FinancialSummary {
+  eventId: string;
+  eventTitle: string;
+  ticketPrice: string;
+  totals: FinancialTotals;
+  congregations: CongregationFinancial[];
+}
+
+/**
+ * Resposta paginada da listagem financeira de passageiros. Estende `PaginatedResponse` com
+ * `financialSummary` (totais SEM filtro de status — panorama geral, independente do `paymentStatus`).
+ */
+export interface EventPassengersFinancialResponse extends PaginatedResponse<EventPassenger> {
+  financialSummary: FinancialTotals;
 }

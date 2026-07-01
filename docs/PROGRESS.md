@@ -18,6 +18,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 | Passageiros            | Parcial   | `entities/passenger`, CRUD, inscrição em eventos (`enroll-passenger`) e exportação de inscritos em PDF integrados.       |
 | Pagamentos             | Parcial   | `entities/payment` e `register-payment` integrados; resumo financeiro no dashboard.                                      |
 | Dashboards             | Parcial   | Dashboard com stats, progresso de pagamentos, presença por dia e resumo por congregação.                                 |
+| Financeiro             | Parcial   | Página financeira por evento: cards de totais, resumo por congregação (circuito), tabela com filtro por status.          |
 | Segurança              | Parcial   | Cookies de sessão assinados com HMAC-SHA256, headers de segurança e Content-Security-Policy via proxy/route-guard.       |
 
 ## Entregas Concluídas
@@ -188,21 +189,43 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - `shared/security/content-security-policy` centraliza a montagem da política de CSP.
 - `shared/auth/route-guard` extraído para padronizar a proteção de rotas no `proxy.ts`.
 
+### 18. Página Financeira
+
+- Implementada conforme `docs/plans/PLANO_PAGINA_FINANCEIRA.md` e `docs/product/hus/HISTORIA_USUARIO_FINANCEIRO.md`.
+- Domínio financeiro consolidado em `entities/event-passenger` (sem cross-import entre entidades):
+  tipos `FinancialSummary`/`FinancialTotals`/`CongregationFinancial`/`PaymentStatusCounts`/
+  `EventPassengersFinancialResponse`, mapa `PAYMENT_STATUS_COUNT_KEYS`, query `fetchFinancialSummary`
+  e a variante `fetchEventPassengersFinancial` (filtro por `paymentStatus`, key própria
+  `eventPassengers.financialList`).
+- `fetchActiveEvent`/`activeEventOptions` movidos de `pages/dashboard` para `entities/event` e novo
+  `eventSelectOptions` (seletor de eventos, espelhando `congregationSelectOptions`).
+- Novo componente genérico `shared/ui/select`.
+- Widgets `financial-summary` (cards de totais + resumo por congregação ordenado por pendente) e
+  `financial-passengers` (filtro de status com contagem + tabela paginada via `DataTable`).
+- Página `pages/financial`: seletor de evento (default no ativo), escopo por papel (circuito vê todas
+  as congregações; congregação vê só a própria, coluna "Congregação" só para circuito), estados de
+  loading/erro/empty. Nome da congregação resolvido por join no front (`congregationSelectOptions`).
+- Mutations financeiras (`register-payment`, inscrições) passam a invalidar `financialSummary.all`.
+- Item de menu "Financeiro" deixou de ser `pending` na sidebar e na bottom nav.
+- Pendência: confirmar com o backend os endpoints `GET /events/:id/financial-summary` e o filtro
+  `?paymentStatus=` em `/events/:id/passengers` (Fase 0 do plano — implementado conforme contrato da HU).
+
 ## Validação Mais Recente
 
-Última validação completa executada após a exportação de PDF e o reforço de segurança (cookies assinados e CSP):
+Última validação completa executada após a implementação da página financeira:
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, 666 testes unitários (109 arquivos) e Prettier.
+Resultado: passou com typecheck, lint, architecture check, 701 testes unitários (119 arquivos) e Prettier.
 
 ## Próximos Passos Recomendados
 
 1. Data Access Layer (`verifySession()`) para revalidar a sessão em Server Components.
 2. Proteção por role no proxy (cookie `suoac-user`).
-3. Ampliar relatórios e exportações sobre os dados de eventos/passageiros/pagamentos (PDF de inscritos já entregue na entrega 14).
+3. Ampliar relatórios e exportações sobre os dados de eventos/passageiros/pagamentos (PDF de inscritos
+   já entregue na entrega 14; exportação do relatório financeiro segue pós-MVP).
 
 ## Pendências Conhecidas
 

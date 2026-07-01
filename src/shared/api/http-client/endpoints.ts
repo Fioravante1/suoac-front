@@ -21,6 +21,7 @@ export const endpoints = {
     cancel: (id: string) => `/events/${id}/cancel` as const,
     delete: (id: string) => `/events/${id}` as const,
     dashboard: (eventId: string) => `/events/${eventId}/dashboard` as const,
+    financialSummary: (eventId: string) => `/events/${eventId}/financial-summary` as const,
   },
   eventDays: {
     list: (eventId: string) => `/events/${eventId}/days` as const,

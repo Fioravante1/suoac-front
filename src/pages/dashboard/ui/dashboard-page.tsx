@@ -2,13 +2,14 @@
 
 import { Calendar } from "lucide-react";
 
+import { activeEventOptions } from "@/entities/event";
 import { useQuery } from "@/shared/api";
 import { useAuthPermissions } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { ErrorState } from "@/shared/ui/error-state";
 
-import { activeEventOptions, dashboardOptions } from "../api";
+import { dashboardOptions } from "../api";
 
 import { CongregationSummaryList } from "./congregation-summary-list";
 import { DashboardAlerts } from "./dashboard-alerts";
