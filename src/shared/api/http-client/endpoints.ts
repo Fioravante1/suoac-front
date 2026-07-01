@@ -21,6 +21,7 @@ export const endpoints = {
     cancel: (id: string) => `/events/${id}/cancel` as const,
     delete: (id: string) => `/events/${id}` as const,
     dashboard: (eventId: string) => `/events/${eventId}/dashboard` as const,
+    financialSummary: (eventId: string) => `/events/${eventId}/financial-summary` as const,
   },
   eventDays: {
     list: (eventId: string) => `/events/${eventId}/days` as const,
@@ -43,8 +44,8 @@ export const endpoints = {
     detail: (id: string) => `/event-passengers/${id}` as const,
     updateDays: (id: string) => `/event-passengers/${id}/days` as const,
     delete: (id: string) => `/event-passengers/${id}` as const,
-    exportPdf: (circuitId: string, eventId: string) =>
-      `/circuits/${circuitId}/events/${eventId}/passengers/export.pdf` as const,
+    export: (circuitId: string, eventId: string, format: "pdf" | "xlsx") =>
+      `/circuits/${circuitId}/events/${eventId}/passengers/export.${format}` as const,
   },
   payments: {
     list: (eventPassengerId: string) => `/event-passengers/${eventPassengerId}/payments` as const,

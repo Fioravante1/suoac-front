@@ -50,7 +50,7 @@ describe("MobileBottomNav", () => {
     expect(screen.getByText("Financeiro")).toBeInTheDocument();
   });
 
-  it("oculta o item pendente (Financeiro) com a flag desligada", () => {
+  it("oculta Financeiro (item pendente) com a flag desligada", () => {
     mockUseAuthPermissions.mockReturnValue({
       user: { name: "João Silva", role: "CIRCUIT_COORDINATOR" },
       isAuthenticated: true,

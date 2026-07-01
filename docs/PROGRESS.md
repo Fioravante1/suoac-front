@@ -18,6 +18,7 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 | Passageiros            | Parcial   | `entities/passenger`, CRUD, inscrição em eventos (`enroll-passenger`) e exportação de inscritos em PDF integrados.       |
 | Pagamentos             | Parcial   | `entities/payment` e `register-payment` integrados; resumo financeiro no dashboard.                                      |
 | Dashboards             | Parcial   | Dashboard com stats, progresso de pagamentos, presença por dia e resumo por congregação.                                 |
+| Financeiro             | Parcial   | Página financeira por evento: cards de totais, resumo por congregação (circuito), tabela com filtro por status.          |
 | Segurança              | Parcial   | Cookies de sessão assinados com HMAC-SHA256, headers de segurança e Content-Security-Policy via proxy/route-guard.       |
 
 ## Entregas Concluídas
@@ -159,15 +160,21 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - Integração com o Flags SDK (`flags/next` + `@flags-sdk/vercel`) em `shared/feature-flags` (segmento isolado por ser server-only).
 - Flag `SHOW_PENDING_MENU_ITEMS` controla a exibição de itens de menu cujas páginas ainda não foram implementadas.
 
-### 14. Exportação de Inscritos em PDF
+### 14. Exportação de Inscritos (PDF e Excel)
 
-- `features/export-event-passengers-pdf` implementada com:
-  - schema Zod de opções de exportação (`model/export-form`) e modelo de opções (`model/export-options`);
-  - DTO/mapper da resposta em `api/export-event-passengers-pdf-response`;
-  - botão de exportação (`ui/export-passengers-button`) com feedback de loading e erro.
-- Route Handler em `app/api/events/[eventId]/passengers/export/route.ts` faz a ponte com o backend.
-- `shared/api/http-client` ganhou suporte a respostas binárias (blob) para download de arquivos.
-- Novo helper `shared/lib/download` para disparar o download do arquivo no browser.
+- `features/export-event-passengers` (renomeada de `export-event-passengers-pdf` ao ganhar Excel):
+  - schema Zod de opções de exportação (`model/export-form`, com `congregationId` e `format`) e
+    modelo de opções (`model/export-options`, `format` sempre presente na URL, default `pdf`);
+  - domínio de formato em `model/export-format` (`EXPORT_FORMATS`, labels, content-types e
+    `parseExportFormat` para validar a query);
+  - proxy server-only em `api/export-event-passengers-response` (valida o formato → 400, repassa o
+    binário com Content-Type/Content-Disposition ou normaliza o erro em JSON);
+  - botão de exportação (`ui/export-passengers-button`) com escolha de formato (PDF · Excel),
+    feedback de loading por botão e erro via toast.
+- Route Handler em `app/api/events/[eventId]/passengers/export/route.ts` faz a ponte com o backend
+  (`export.pdf`/`export.xlsx`), repassando `congregationId`, `variant` e `format`.
+- `shared/api/http-client` suporta respostas binárias (blob) para download de arquivos.
+- Helper `shared/lib/download` dispara o download no browser lendo o `Content-Disposition`.
 - Botão de exportação disponível na seção de inscritos do evento (`event-enrollments-section`).
 
 ### 15. Refinamento da Lista de Inscritos
@@ -188,21 +195,44 @@ Este arquivo acompanha o estado do frontend, o que já foi entregue e quais fren
 - `shared/security/content-security-policy` centraliza a montagem da política de CSP.
 - `shared/auth/route-guard` extraído para padronizar a proteção de rotas no `proxy.ts`.
 
+### 18. Página Financeira
+
+- Implementada conforme `docs/plans/PLANO_PAGINA_FINANCEIRA.md` e `docs/product/hus/HISTORIA_USUARIO_FINANCEIRO.md`.
+- Domínio financeiro consolidado em `entities/event-passenger` (sem cross-import entre entidades):
+  tipos `FinancialSummary`/`FinancialTotals`/`CongregationFinancial`/`PaymentStatusCounts`/
+  `EventPassengersFinancialResponse`, mapa `PAYMENT_STATUS_COUNT_KEYS`, query `fetchFinancialSummary`
+  e a variante `fetchEventPassengersFinancial` (filtro por `paymentStatus`, key própria
+  `eventPassengers.financialList`).
+- `fetchActiveEvent`/`activeEventOptions` movidos de `pages/dashboard` para `entities/event` e novo
+  `eventSelectOptions` (seletor de eventos, espelhando `congregationSelectOptions`).
+- Novo componente genérico `shared/ui/select`.
+- Widgets `financial-summary` (cards de totais + resumo por congregação ordenado por pendente) e
+  `financial-passengers` (filtro de status com contagem + tabela paginada via `DataTable`).
+- Página `pages/financial`: seletor de evento (default no ativo), escopo por papel (circuito vê todas
+  as congregações; congregação vê só a própria, coluna "Congregação" só para circuito), estados de
+  loading/erro/empty. Nome da congregação resolvido por join no front (`congregationSelectOptions`).
+- Mutations financeiras (`register-payment`, inscrições) passam a invalidar `financialSummary.all`.
+- Item de menu "Financeiro" segue `pending` na sidebar e na bottom nav (só visível com a flag
+  `SHOW_PENDING_MENU_ITEMS` ligada): a página ainda não será liberada ao usuário final.
+- Pendência: confirmar com o backend os endpoints `GET /events/:id/financial-summary` e o filtro
+  `?paymentStatus=` em `/events/:id/passengers` (Fase 0 do plano — implementado conforme contrato da HU).
+
 ## Validação Mais Recente
 
-Última validação completa executada após a exportação de PDF e o reforço de segurança (cookies assinados e CSP):
+Última validação completa executada após a implementação da página financeira:
 
 ```bash
 yarn run check
 ```
 
-Resultado: passou com typecheck, lint, architecture check, 666 testes unitários (109 arquivos) e Prettier.
+Resultado: passou com typecheck, lint, architecture check, 701 testes unitários (119 arquivos) e Prettier.
 
 ## Próximos Passos Recomendados
 
 1. Data Access Layer (`verifySession()`) para revalidar a sessão em Server Components.
 2. Proteção por role no proxy (cookie `suoac-user`).
-3. Ampliar relatórios e exportações sobre os dados de eventos/passageiros/pagamentos (PDF de inscritos já entregue na entrega 14).
+3. Ampliar relatórios e exportações sobre os dados de eventos/passageiros/pagamentos (PDF de inscritos
+   já entregue na entrega 14; exportação do relatório financeiro segue pós-MVP).
 
 ## Pendências Conhecidas
 

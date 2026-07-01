@@ -30,7 +30,7 @@ import { Tooltip } from "@/shared/ui/tooltip";
 import { useToast } from "@/shared/ui/toast";
 
 import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
-import { ExportPassengersButton } from "@/features/export-event-passengers-pdf";
+import { ExportPassengersButton } from "@/features/export-event-passengers";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
 import { removeEventPassengerAction } from "@/features/remove-event-passenger";
 import { PassengerPaymentsModal } from "@/features/register-payment";
@@ -76,9 +76,11 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   function invalidateQueries() {
     queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
-    // O dashboard agrega contagens/valores das inscrições. Como ele costuma estar fora de tela neste
-    // momento, marcamos como stale para refazer o fetch ao voltar, em vez de exibir dados defasados.
+    // O dashboard e a página financeira agregam contagens/valores das inscrições. Como costumam estar
+    // fora de tela neste momento, marcamos como stale para refazer o fetch ao voltar, em vez de
+    // exibir dados defasados.
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.financialSummary.all });
   }
 
   const enrollMutation = useMutation({
