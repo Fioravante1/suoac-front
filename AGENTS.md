@@ -651,7 +651,12 @@ deles, funcao local no proprio arquivo continua sendo a resposta certa.
 ### Testes E2E com Playwright
 
 Decisao de 09/10/2026: **Playwright e obrigatorio no projeto**. Substitui a regra anterior, que
-proibia E2E sem decisao explicita. Setup em SUC-40.
+proibia E2E sem decisao explicita.
+
+Os testes ficam em `tests/e2e/`, rodam contra o **build de producao** (nao `next dev`, que difere em
+CSP, cache e tempo de resposta) e **nao entram em `yarn run check`**: o check roda a cada mudanca e
+precisa ser rapido — subir navegador a cada vez transformaria validacao em espera, e validacao lenta
+acaba sendo pulada. No CI a suite roda em job proprio, em paralelo com os demais.
 
 E2E existe para cobrir o que `jsdom` nao alcanca: navegacao real entre rotas, cookies HttpOnly,
 Content-Security-Policy, renderizacao no servidor, tema aplicado antes da primeira pintura e o
@@ -679,7 +684,14 @@ fluxo completo que atravessa varias telas.
 
 ```bash
 yarn test:e2e      # suite Playwright
+yarn test:e2e:ui   # modo interativo, para investigar falha
+yarn test:all      # unitarios + E2E
 ```
+
+Regressao visual com `toHaveScreenshot()` ainda **nao** esta configurada: baselines tiradas antes de
+existir tela redesenhada fotografariam apenas telas que vao morrer. Entra na Fatia 1, junto com a
+primeira tela nova — e com o tratamento das duas armadilhas conhecidas, fonte/plataforma e animacao
+de entrada.
 
 ### Simulacao de eventos de usuario
 
