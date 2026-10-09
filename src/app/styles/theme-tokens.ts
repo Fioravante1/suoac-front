@@ -97,6 +97,22 @@ export const themeTokens = {
   overlay: {
     blur: "4px",
   },
+  motion: {
+    duration: {
+      fast: "180ms",
+      base: "200ms",
+      medium: "300ms",
+      slow: "400ms",
+    },
+    ease: {
+      standard: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      overshoot: "cubic-bezier(0.3, 1.5, 0.5, 1)",
+    },
+    stagger: {
+      step: "25ms",
+      max: "400ms",
+    },
+  },
   zIndex: {
     dropdown: 50,
     modal: 100,

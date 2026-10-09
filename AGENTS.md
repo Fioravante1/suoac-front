@@ -937,6 +937,23 @@ qualquer coisa do redesign. O que segue e o resumo operacional.
   escuro sem ter pedido.
 - Interface nova so esta pronta depois de conferida **nos dois temas**.
 
+### Animacao
+
+- Use os `@keyframes` globais do design system, prefixados com `suoac-`: `suoac-rise` (entradas),
+  `suoac-fade`, `suoac-modal-in`, `suoac-pop` (toast), `suoac-grow` (barras), `suoac-seat`
+  (poltronas), `suoac-draw` (graficos), `suoac-shake` (erro) e `suoac-spin`.
+- Duracao e curva vem dos tokens `--suoac-motion-*`. A curva padrao e
+  `--suoac-motion-ease-standard`; qualquer outra precisa de motivo.
+- Listas entram escalonadas: 25ms por item (`--suoac-motion-stagger-step`), com teto de 400ms
+  (`--suoac-motion-stagger-max`). Sem o teto, uma lista de 40 passageiros levaria um segundo para
+  terminar de aparecer.
+- Nao redeclare esses `@keyframes` em CSS Module: dentro de um module eles sao escopados por
+  arquivo, e a mesma animacao acabaria existindo em varias versoes levemente diferentes.
+- Animacao especifica de uma tela nasce no CSS Module daquela tela.
+- Movimento reduzido ja e tratado globalmente: sob `prefers-reduced-motion`, os tokens de duracao
+  caem para valores irrisorios. Nao remova a animacao — entradas com `both`/`forwards` dependem do
+  estado final do keyframe para ficarem visiveis.
+
 ### Medidas que o handoff usa e a escala atual nao tem
 
 O handoff usa raios de 6px e 14px e alturas de controle de 50px e 54px, fora da escala atual

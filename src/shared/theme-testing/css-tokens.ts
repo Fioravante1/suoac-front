@@ -94,3 +94,39 @@ export function createTokenResolver(
 export function camelToKebab(key: string): string {
   return key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
+
+/**
+ * Mapeia os `@keyframes` declarados num CSS, com o corpo normalizado (sem espacos
+ * supérfluos), para que a mesma animacao escrita em formatacoes diferentes possa
+ * ser comparada.
+ */
+export function extractKeyframes(css: string): Map<string, string> {
+  const keyframes = new Map<string, string>();
+  const pattern = /@keyframes\s+([\w-]+)\s*\{/g;
+
+  for (const match of css.matchAll(pattern)) {
+    const blockStart = match.index + match[0].length - 1;
+    let depth = 0;
+
+    for (let index = blockStart; index < css.length; index += 1) {
+      if (css[index] === "{") depth += 1;
+      if (css[index] === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          keyframes.set(match[1], normalizeKeyframeBody(css.slice(blockStart + 1, index)));
+          break;
+        }
+      }
+    }
+  }
+
+  return keyframes;
+}
+
+function normalizeKeyframeBody(body: string): string {
+  return body
+    .replace(/\s+/g, "")
+    .replace(/;}/g, "}")
+    .replace(/0\.(\d)/g, ".$1")
+    .toLowerCase();
+}
