@@ -33,6 +33,7 @@ Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio 
   - `docs/design/SUOAC — Identidade Visual Oficial.md` — identidade visual, UX e design system
   - `docs/design/Design System Overview.png` — referencia visual
   - `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` — arquitetura frontend obrigatoria
+  - `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` — estrategia do redesign incremental em curso
   - `docs/architecture/SUOAC_AUTENTICACAO.md` — fluxo de autenticacao
   - `docs/integration/` — guias de integracao com APIs externas
 
@@ -376,7 +377,13 @@ Referencia visual: Material 3, Linear, Stripe, Notion, Google Workspace.
 
 Principios obrigatorios:
 
-- **Mobile-first**: todo layout comeca pelo mobile e expande para desktop.
+- **Desktop-first**: telas novas sao projetadas para desktop, com largura minima de 1280px.
+  A regra anterior de mobile-first foi **descontinuada** em 09/10/2026. O SUOAC e operado por
+  coordenadores sentados, planejando viagem; o uso em celular e pontual e sera tratado como um
+  recorte proprio, com as funcionalidades essenciais de campo, **depois** do redesign (ver
+  `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md`, Fatia 10). Nao gaste esforco adaptando telas
+  novas para telas pequenas enquanto o redesign estiver em andamento, e **nao altere** a
+  responsividade das telas ainda nao redesenhadas.
 - **Minimalismo funcional**: cada elemento deve ter proposito. Remova o que nao agrega.
 - **Espacamento generoso**: usar a escala oficial (4, 8, 12, 16, 20, 24, 32, 40, 48px). Nunca
   comprimir conteudo. Ar entre elementos transmite clareza.
@@ -553,7 +560,12 @@ Nao gere codigo fora desse padrao. Rode `yarn format` quando necessario.
 
 ## 8. Testes
 
-O projeto esta configurado inicialmente apenas com testes unitarios.
+O projeto tem duas camadas de teste, **ambas obrigatorias**:
+
+- **Unitario** — Vitest + React Testing Library + jsdom, co-localizado com o codigo.
+- **End-to-end** — Playwright, em `tests/e2e/` (ver subsecao propria).
+
+### Testes unitarios
 
 - Framework: Vitest.
 - DOM/testing: React Testing Library + jsdom.
@@ -576,8 +588,6 @@ Regras:
   - **Funcoes utilitarias e servicos** (`*.ts`): casos normais, bordas e erros esperados.
 - Testes devem descrever comportamento esperado em portugues quando forem de negocio.
 - Nao use `.skip` para esconder teste quebrado.
-- Nao adicione testes de integracao ou E2E sem decisao explicita. Eles foram deixados fora por
-  enquanto para reduzir complexidade inicial.
 
 Scripts:
 
@@ -585,6 +595,39 @@ Scripts:
 yarn test          # watch mode do Vitest
 yarn test:unit     # vitest run
 yarn test:coverage # coverage com V8
+```
+
+### Testes E2E com Playwright
+
+Decisao de 09/10/2026: **Playwright e obrigatorio no projeto**. Substitui a regra anterior, que
+proibia E2E sem decisao explicita. Setup em SUC-40.
+
+E2E existe para cobrir o que `jsdom` nao alcanca: navegacao real entre rotas, cookies HttpOnly,
+Content-Security-Policy, renderizacao no servidor, tema aplicado antes da primeira pintura e o
+fluxo completo que atravessa varias telas.
+
+**O que precisa de E2E**
+
+- Todo fluxo critico de usuario: entrar no sistema, recuperar senha, aceitar convite, autocadastrar
+  circuito, inscrever passageiro, registrar pagamento, importar lista, gerar lista de embarque.
+- Toda fatia do redesign, antes de a flag dela ser considerada pronta para producao.
+- Regressao visual das telas redesenhadas, **nos dois temas**.
+
+**Regras**
+
+- E2E cobre fluxo, nao unidade. Nao duplique em E2E o que o teste unitario ja cobre — a suite fica
+  lenta e a lentidao e o que faz uma suite ser ignorada.
+- Selecione elementos por papel e texto acessivel (`getByRole`, `getByLabel`), nunca por classe de
+  CSS Module, que e gerada e muda sozinha.
+- Dados vem de interceptacao de rede (`page.route`), nao de backend real: E2E deve falhar por
+  regressao de codigo, nunca porque um dado mudou no servidor. A contrapartida e explicita — a
+  integracao real com a API e verificada em staging antes de ligar a flag da fatia, nao aqui.
+- Baselines visuais sao capturadas em ambiente padronizado e com animacao desabilitada. Atualizar
+  baseline exige inspecionar o diff imagem a imagem, como se revisa codigo.
+- Teste intermitente e bug: corrija ou remova. Nunca `.skip`, nunca retry para mascarar.
+
+```bash
+yarn test:e2e      # suite Playwright
 ```
 
 ### Simulacao de eventos de usuario
@@ -640,7 +683,7 @@ Observacao: em Yarn v1, `yarn check` pode chamar um comando interno do Yarn. Pre
 
 ---
 
-## 9. Padrão de Commits (Conventional Commits)
+## 10. Padrão de Commits (Conventional Commits)
 
 - Use mensagens no formato: `tipo(escopo opcional): descrição breve no imperativo`, em português.
 - Tipos permitidos: `feat`, `fix`, `chore`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `style`, `revert`
@@ -648,6 +691,11 @@ Observacao: em Yarn v1, `yarn check` pode chamar um comando interno do Yarn. Pre
 - Cabeçalho até 50 caracteres; corpo e rodapé com linhas até 72 caracteres
 - Escreva a descrição no imperativo e em português
 - `escopo` é opcional e em `kebab-case` (ex.: `user-form`, `segments-api`)
+- Inclua a chave do card no rodapé: `Refs: SUC-XX` (ver §11)
+- **Nunca** adicione trailers de atribuição a IA — `Co-Authored-By: Claude`, `Generated with…`,
+  `🤖` ou equivalente de qualquer modelo. O histórico do repositório registra autoria humana; a
+  ferramenta usada para escrever o código não é informação de commit. Vale também para descrições
+  de PR e comentários no Jira.
 
 ### Exemplos
 
@@ -674,10 +722,185 @@ Atualizar chamadas nas features de cadastro e perfis.
 
 ---
 
-## 11. Fluxo de Trabalho para AI Assistant
+## 11. Rastreamento do Trabalho no Jira
+
+O planejamento e o acompanhamento deste projeto vivem no Jira, no projeto **SUOAC (`SUC`)**. A regra
+é simples: **todo trabalho feito neste repositório corresponde a um card**. Código sem card é
+trabalho invisível — ninguém consegue saber o que está em andamento, o que ficou pela metade nem por
+que uma decisão foi tomada.
+
+O site Atlassian é resolvido em tempo de execução via `getAccessibleAtlassianResources`. Não
+registre URL nem `cloudId` em arquivos do repositório.
+
+### Antes de começar qualquer tarefa
+
+1. **Localize o card.** Busque por JQL no projeto `SUC` (por épico, label ou texto) antes de
+   escrever qualquer linha.
+2. **Se o card não existir, crie antes de codificar** — descrevendo o que será feito, não o que já
+   foi. Card escrito depois vira relatório, não planejamento, e perde a função de avisar os outros
+   do que está em andamento.
+3. **Leia o card inteiro, inclusive os comentários.** Decisões de contrato, prazos combinados e
+   mudanças de escopo costumam estar lá e não no código.
+4. **Mova para `Em andamento`** quando começar de fato. Esse é o sinal que o board dá a quem olha de
+   fora.
+
+### Durante a execução
+
+- **Desvio do que está escrito no card**: comente no card explicando o motivo **antes** de seguir.
+  Não reescreva a descrição em silêncio — a descrição é o que foi combinado; o comentário é como a
+  realidade mudou.
+- **Decisão técnica relevante** (contrato de API, formato de dado, troca de abordagem, limite
+  descoberto): registre como comentário no card. É o que torna a decisão recuperável meses depois.
+- **Trabalho fora do escopo descoberto no caminho**: crie um card novo e siga. Inchar o card atual
+  esconde esforço e atrasa o fechamento.
+- **Bloqueio**: comente dizendo o que está bloqueando e por quem/pelo quê depende, e deixe o card em
+  `Em andamento` ou mova para `A fazer` se for parar de verdade. Bloqueio silencioso é o pior estado
+  possível do board.
+
+### Ao concluir
+
+- `yarn run check` precisa passar.
+- Comente no card: o que foi entregue, branch/PR, o que ficou de fora e por quê.
+- `Em análise` enquanto o PR aguarda revisão; `Concluído` apenas **após o merge**.
+- Nunca feche um card cujo trabalho você não executou ou não verificou.
+
+### Commits, branches e PRs
+
+- Branch: `tipo/suc-XX-descricao-curta` (ex.: `feat/suc-23-formulario-login`).
+- Commit: Conventional Commits conforme §10, com a chave no rodapé — o cabeçalho continua limitado a
+  50 caracteres:
+
+```text
+feat(login): adicionar formulario de entrada
+
+Implementa campos, estados do botao e deteccao de Caps Lock
+conforme o desenho novo.
+
+Refs: SUC-23
+```
+
+- Título do PR começa com a chave: `SUC-23 — formulário de entrada`.
+- **O PR segue `.github/PULL_REQUEST_TEMPLATE.md`**, que abre preenchido ao criar o PR. Todas as
+  seções são obrigatórias: card, o que muda, por que, como verificar, riscos e checklist. "Nada" é
+  resposta válida para riscos; deixar a seção em branco não é.
+- Um PR por card, sempre que possível. Quando um PR carregar mais de um card — o que deve ser
+  exceção justificada —, o título leva o card principal e a seção **Card** lista todos.
+- **Commits organizados por intenção, não por arquivo ou por ordem de escrita.** Cada commit faz
+  uma coisa e tem um `Refs:` próprio; mudança de documentação, ajuste de ferramenta e código de
+  produto não se misturam no mesmo commit. Um commit precisa poder ser revertido sozinho sem
+  derrubar o resto.
+
+### Convenções do projeto SUC
+
+- Tipos disponíveis: **Epic**, **História**, **Tarefa**, **Subtask**. **Não existe o tipo Bug** —
+  use `Tarefa` com a label `bug`.
+- **Não há Story Points nem Prioridade** configurados. Não invente campos: a organização é por
+  **label**.
+- Trabalho de backend fica **no mesmo projeto**, com a label `backend`, dentro do épico da fatia que
+  o consome — a dependência entre front e API precisa ser visível no mesmo board.
+- Labels em uso: `redesign`, `fatia-N`, `frontend`, `backend`, `design-system`, `feature-flags`,
+  `corte-legado`, `divida-temporaria`, `decisao`, `testes`, `documentacao`, `bug`.
+- Hierarquia: Epic → História/Tarefa. Histórias descrevem o que o usuário ganha; Tarefas descrevem
+  trabalho técnico, de infraestrutura ou de backend.
+
+### Como um card deve ser escrito
+
+Um card é lido por alguém — ou por um agente — que não participou da conversa que o originou. Ele
+precisa bastar sozinho.
+
+Todo card tem:
+
+- **Título**: uma ação concreta, não um tema. "Formulário de entrada no sistema", não "Login".
+- **Contexto**: por que o card existe e o que há hoje. Quando algo não existe no sistema, diga isso
+  explicitamente — é a informação que mais economiza tempo de quem for executar.
+- **Escopo** e, quando houver risco de confusão, **fora de escopo**.
+- **Critérios de aceite verificáveis**, em checklist, cobrindo também os **casos de erro** e não
+  apenas o caminho feliz.
+- **Dependências** nomeadas pela chave do card (`Depende de SUC-35`).
+- **Decisões pendentes** explicitadas, com quem decide e quando — nunca escondidas numa frase vaga.
+
+Não são aceitáveis: card de uma linha, título genérico ("melhorar a tela"), critério de aceite não
+verificável ("ficar bom"), ou escopo que só existe na cabeça de quem escreveu.
+
+### O que não fazer
+
+- Criar card duplicado sem buscar antes.
+- Usar o Jira como changelog de commits — o histórico do Git já faz isso. O card registra
+  **intenção, decisão e estado**.
+- Marcar como `Concluído` algo parcialmente entregue; o correto é comentar o que falta e manter o
+  estado real.
+- Alterar cards de épicos de fatias futuras para refletir ideias novas sem registrar o porquê.
+
+---
+
+## 12. Diretrizes do Redesign (em andamento)
+
+O sistema esta sendo redesenhado de forma incremental, com a aplicacao atual em producao o tempo
+todo. O documento mestre e `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` — leia antes de tocar em
+qualquer coisa do redesign. O que segue e o resumo operacional.
+
+### Fonte da verdade do design
+
+- `docs/design_handoff_suoac_redesign/*.dc.html` sao a especificacao final: cores, espacamentos,
+  estados e microinteracoes. Quando uma captura em `screenshots/` divergir do HTML, **o HTML vence**.
+- Esses arquivos sao artefatos recebidos, nao codigo do projeto. Estao fora do ESLint e do Prettier
+  de proposito. **Nao os edite, nao os formate, nao os "corrija".**
+
+### Coexistencia entre o sistema atual e o novo
+
+- O ponto de decisao entre versao antiga e nova e **o arquivo de rota em `/app`**, que ja deve ser
+  fino. Nenhum `if (flag)` espalhado pelo resto do codigo.
+- O slice novo nasce ao lado do antigo com sufixo `-next` (`src/pages/login-next`).
+- `login` e `login-next` **nunca** importam um do outro. Se algo for reaproveitavel, copie para o
+  slice novo ou promova para uma camada inferior antes de usar nos dois.
+- A URL nunca muda. Nao crie rotas `/v2`.
+- O corte do codigo antigo e **PR proprio**, que so apaga, renomeia e remove a flag.
+
+### Feature flags do redesign
+
+- Uma flag por fatia, prefixo `REDESIGN_`, declarada com o helper `booleanFlag` e `defaultValue: false`.
+- O PR que cria a flag cria tambem o card de remocao dela.
+- Teto de **2 flags `REDESIGN_*` ligadas em producao** sem corte pendente. Na terceira, a prioridade
+  passa a ser cortar, nao construir.
+
+### Tema claro e escuro
+
+- Todo token de cor e de sombra precisa de par claro e escuro em `app/globals.css` e em
+  `src/app/styles/theme-tokens.ts`. Os tipos de `theme-tokens.ts` quebram a compilacao se faltar um.
+- CSS Modules **nunca** declaram cor, sombra ou scrim fora de `var(--suoac-*)`.
+- O tema escuro so se aplica mediante opt-in explicito:
+
+| Preferencia | Atributo em `<html>`  | Resultado                                           |
+| ----------- | --------------------- | --------------------------------------------------- |
+| escuro      | `data-theme="dark"`   | escuro sempre                                       |
+| claro       | `data-theme="light"`  | claro sempre                                        |
+| sistema     | `data-theme="system"` | decidido por `prefers-color-scheme`, sem JavaScript |
+| ausente     | nenhum atributo       | claro, mesmo com o sistema operacional em escuro    |
+
+- O ultimo caso e a trava da transicao: enquanto houver tela nao redesenhada, ninguem recebe tema
+  escuro sem ter pedido.
+- Interface nova so esta pronta depois de conferida **nos dois temas**.
+
+### Medidas que o handoff usa e a escala atual nao tem
+
+O handoff usa raios de 6px e 14px e alturas de controle de 50px e 54px, fora da escala atual
+(8/12/16/20px; 44/48px). Quando uma tela precisar desses valores, **crie o token** em `globals.css` e
+no espelho TypeScript — nao escreva o valor solto no CSS Module.
+
+### O que nao fazer
+
+- Redesenhar tela que nao e a da fatia da vez.
+- Alterar aparencia ou responsividade de tela ainda nao redesenhada.
+- Introduzir dependencia nova (biblioteca de UI, de animacao, de estado) sem decisao explicita
+  registrada. O redesign se faz com o que o projeto ja tem.
+
+---
+
+## 13. Fluxo de Trabalho para AI Assistant
 
 Quando solicitado para implementar uma funcionalidade:
 
+0. Localize (ou crie) o card no Jira e mova para `Em andamento` — ver §11.
 1. Leia os documentos relevantes em `docs/`.
 2. Se tocar Next.js, consulte `node_modules/next/dist/docs/`.
 3. Defina a camada FSD correta antes de criar arquivos.
@@ -687,6 +910,7 @@ Quando solicitado para implementar uma funcionalidade:
 7. Atualize `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` se a arquitetura mudar.
 8. Atualize `README.md` se mudar setup, dependencias, scripts ou instrucoes.
 9. Rode `yarn run check` antes de concluir.
+10. Comente no card o que foi entregue e atualize o estado dele — ver §11.
 
 Nao implemente atalhos que enfraquecam type safety, lint, arquitetura ou testes. Se uma regra
 parecer inadequada, explique o motivo e proponha ajuste explicito em vez de contornar localmente.
