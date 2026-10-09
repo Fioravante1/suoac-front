@@ -1,0 +1,74 @@
+/*
+ * Contencao de tema para telas ainda nao redesenhadas.
+ *
+ * CRIADO EM 09/10/2026 — TEMPORARIO. Removido na Fatia 10 (card SUC-14), junto
+ * com a ultima tela v1.
+ *
+ * Tokens sao globais: quando o usuario escolhe o tema escuro, toda a arvore passa
+ * a ser pintada em escuro, inclusive telas que nunca tiveram contraste
+ * verificado. Este escopo redeclara os valores do tema claro, de modo que uma
+ * tela v1 permaneca legivel mesmo com o tema escuro ativo.
+ *
+ * O resultado e deliberado: uma tela antiga clara dentro de um shell escuro fica
+ * feia por algumas semanas. Feio e legivel e aceitavel; ilegivel nao e. A
+ * alternativa seria redesenhar tudo antes de liberar o tema escuro — exatamente o
+ * big bang que a estrategia existe para evitar.
+ *
+ * Os valores abaixo precisam ser identicos aos do `:root` em `app/globals.css`, e
+ * precisam cobrir todo token que `html[data-theme="dark"]` sobrescreve.
+ * `legacy-theme-scope.test.tsx` falha quando isso deixa de valer.
+ */
+
+.scope {
+  /*
+   * O escopo precisa ser uma caixa que pinta, nao um `display: contents`: o
+   * `body` fica fora dele e continuaria escuro, deixando texto claro sobre fundo
+   * escuro. Por isso repete o fundo e a cor de texto, e se estica como os
+   * layouts filhos esperam.
+   */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  background-color: var(--suoac-color-background);
+  color: var(--suoac-color-text-primary);
+
+  /* Controles nativos (inputs, barras de rolagem) acompanham o escopo. */
+  color-scheme: light;
+
+  --suoac-color-primary: #1f6e5a;
+  --suoac-color-primary-dark: #174e40;
+  --suoac-color-primary-light: #e6f4ef;
+  --suoac-color-info: #2f6fed;
+  --suoac-color-success: #2e9e5b;
+  --suoac-color-attention: #f5b700;
+  --suoac-color-critical: #d64545;
+  --suoac-color-critical-dark: #b53232;
+  --suoac-color-background: #f7f9f8;
+  --suoac-color-surface: #ffffff;
+  --suoac-color-surface-muted: #f1f5f3;
+  --suoac-color-border: #e3e8e6;
+  --suoac-color-border-strong: #cfd8d4;
+  --suoac-color-text-primary: #1e1f24;
+  --suoac-color-text-secondary: #667085;
+  --suoac-color-navy: #0d2b45;
+  --suoac-color-on-primary: #ffffff;
+  --suoac-color-attention-text: #8a6d00;
+  --suoac-color-glass: rgb(255 255 255 / 0.78);
+  --suoac-color-info-soft: #e8f0ff;
+  --suoac-color-success-soft: #e7f6ee;
+  --suoac-color-attention-soft: #fff4cf;
+  --suoac-color-critical-soft: #fdecec;
+  --suoac-color-neutral-soft: #f1f3f3;
+  --suoac-shadow-xs: 0 1px 2px rgb(16 24 40 / 0.06);
+  --suoac-shadow-sm: 0 8px 24px rgb(31 110 90 / 0.08);
+  --suoac-shadow-md: 0 16px 40px rgb(31 110 90 / 0.12);
+  --suoac-shadow-lg: 0 12px 28px rgb(16 24 40 / 0.18), 0 2px 6px rgb(16 24 40 / 0.12);
+  --suoac-shadow-dropdown: 0 24px 60px rgb(13 43 69 / 0.28);
+  --suoac-shadow-menu: 0 18px 40px rgb(13 43 69 / 0.2);
+  --suoac-shadow-modal: 0 40px 100px rgb(10 26 41 / 0.45);
+  --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
+  --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
+  --suoac-color-scrim: rgb(16 24 40 / 0.45);
+  --suoac-color-overlay: rgb(247 249 248 / 0.72);
+}
