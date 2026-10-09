@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0d2b45;font-family:Geist,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1f6e5a;text-decoration:none}a:hover{color:#174e40}
+button,input{font-family:inherit}
+[data-art]{--bg:#f7f9f8;--surface:#fff;--muted:#f1f5f3;--border:#e3e8e6;--border2:#cfd8d4;--text:#1e1f24;--text2:#667085;--primary:#1f6e5a;--primary-d:#174e40;--primary-s:#e6f4ef;--crit:#d64545;--crit-s:#fdecec;--on-primary:#fff}
+[data-art][data-theme="dark"]{--bg:#0e1413;--surface:#151d1b;--muted:#1c2623;--border:#25312e;--border2:#34433f;--text:#e9efed;--text2:#9aa8a3;--primary:#4fb393;--primary-d:#7fcfb4;--primary-s:#183229;--crit:#f07272;--crit-s:#3a1d1d;--on-primary:#0e1413}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@keyframes tlItem{0%{opacity:.28;transform:translateX(-6px)}5%,90%{opacity:1;transform:none}97%,100%{opacity:.28;transform:none}}
+@keyframes tlI0{0%{opacity:.35;transform:translateX(-4px)}3%,88%{opacity:1;transform:none}93%,100%{opacity:.35;transform:translateX(-4px)}}
+@keyframes tlT0{0%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}3%,88%{background:#4fb393;color:#0a1a29;box-shadow:0 0 0 6px rgb(79 179 147/.15)}93%,100%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}}
+@keyframes tlI1{0%,18%{opacity:.35;transform:translateX(-4px)}21%,88%{opacity:1;transform:none}93%,100%{opacity:.35;transform:translateX(-4px)}}
+@keyframes tlT1{0%,18%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}21%,88%{background:#4fb393;color:#0a1a29;box-shadow:0 0 0 6px rgb(79 179 147/.15)}93%,100%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}}
+@keyframes tlI2{0%,36%{opacity:.35;transform:translateX(-4px)}39%,88%{opacity:1;transform:none}93%,100%{opacity:.35;transform:translateX(-4px)}}
+@keyframes tlT2{0%,36%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}39%,88%{background:#4fb393;color:#0a1a29;box-shadow:0 0 0 6px rgb(79 179 147/.15)}93%,100%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}}
+@keyframes tlI3{0%,54%{opacity:.35;transform:translateX(-4px)}57%,88%{opacity:1;transform:none}93%,100%{opacity:.35;transform:translateX(-4px)}}
+@keyframes tlT3{0%,54%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}57%,88%{background:#4fb393;color:#0a1a29;box-shadow:0 0 0 6px rgb(79 179 147/.15)}93%,100%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}}
+@keyframes tlL{0%{transform:scaleY(0)}54%,88%{transform:scaleY(1)}93%,100%{transform:scaleY(0)}}
+@keyframes tlTile{0%,1%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}6%,90%{background:#4fb393;color:#0a1a29;box-shadow:0 0 0 6px rgb(79 179 147/.15)}97%,100%{background:rgb(255 255 255/.06);color:rgb(255 255 255/.55);box-shadow:inset 0 0 0 1px rgb(255 255 255/.12)}}
+@keyframes tlDot{0%,1%{background:#0d2b45;box-shadow:inset 0 0 0 2px rgb(255 255 255/.22)}5%,90%{background:#4fb393;box-shadow:0 0 0 5px rgb(79 179 147/.18)}97%,100%{background:#0d2b45;box-shadow:inset 0 0 0 2px rgb(255 255 255/.22)}}
+@keyframes tlLine{0%{transform:scaleY(0)}62%,90%{transform:scaleY(1)}97%,100%{transform:scaleY(0)}}
+@keyframes seatLoop{0%,4%{background:transparent;transform:scale(.7)}9%,86%{background:#4fb393;transform:scale(1)}94%,100%{background:transparent;transform:scale(1)}}
+@keyframes barLoop{0%{transform:scaleX(0)}55%,86%{transform:scaleX(.83)}96%,100%{transform:scaleX(0)}}
+@keyframes toastLoop{0%,6%{opacity:0;transform:translateY(-10px) scale(.97)}14%,70%{opacity:1;transform:none}80%,100%{opacity:0;transform:translateY(-6px)}}
+@keyframes floatY{50%{transform:translateY(-6px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgb(79 179 147/.6)}70%{box-shadow:0 0 0 14px rgb(79 179 147/0)}100%{box-shadow:0 0 0 0 rgb(79 179 147/0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+@keyframes swap{from{opacity:0;transform:translateX(16px)}}
+</style>
+</helmet>
+<div data-art="1" data-theme="{{ theme }}" style="min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(480px,1fr);background:var(--bg);color:var(--text);font-family:Geist,sans-serif;transition:background-color .3s,color .3s">
+
+<div style="position:relative;display:flex;align-items:center;justify-content:center;padding:56px;background:#0d2b45;background-image:radial-gradient(rgb(255 255 255/.06) 1px,transparent 1px);background-size:22px 22px;color:#fff;overflow:hidden">
+<div style="position:absolute;right:-200px;top:-200px;width:560px;height:560px;border-radius:50%;border:1px solid rgb(255 255 255/.06)"></div>
+<div style="position:absolute;right:-90px;top:-90px;width:340px;height:340px;border-radius:50%;border:1px solid rgb(255 255 255/.05)"></div>
+<div style="position:relative;width:100%;max-width:480px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;align-items:center;gap:12px;animation:rise .6s ease both">
+<img src="assets/logo-mark-dark.png" alt="SUOAC" style="width:42px;height:42px;border-radius:12px">
+<span style="font:700 22px Geist;letter-spacing:.06em">SUOAC</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;animation:rise .6s .08s ease both">
+<h1 style="margin:0;font:600 40px/1.15 Geist;font-size:clamp(30px,3vw,40px);letter-spacing:-0.025em;text-wrap:balance">Coordenação inteligente para o arranjo de ônibus.</h1>
+<p style="margin:0;font:400 17px/1.55 Geist;color:rgb(255 255 255/.68);text-wrap:pretty">Mais que um sistema, uma ferramenta para pensar, coordenar e organizar cada viagem.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:18px;animation:rise .6s .16s ease both">
+<span style="font:600 12px Geist;letter-spacing:.12em;text-transform:uppercase;color:#7fcfb4">Sua jornada, simplificada</span>
+<div style="position:relative;display:flex;flex-direction:column;gap:16px">
+<div style="position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:#4fb393;transform-origin:top;animation:tlL 10s linear infinite"></div>
+<sc-for list="{{ steps }}" as="t" hint-placeholder-count="4">
+<div style="position:relative;display:flex;align-items:center;gap:16px;animation:{{ t.ai }}">
+<span style="position:relative;z-index:1;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;animation:{{ t.at }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg></span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font:600 16px Geist">{{ t.title }}</span><span style="font:400 13px Geist;color:rgb(255 255 255/.55)">{{ t.sub }}</span></span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+<div style="position:relative;display:flex;flex-direction:column;padding:32px 40px">
+<div style="display:flex;justify-content:flex-end">
+<button onClick="{{ toggleTheme }}" title="Alternar tema" style="width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="border-color:var(--border2)">
+<sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></sc-if>
+<sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></sc-if>
+</button>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 0">
+<div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:28px">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:28px;animation:{{ viewAnim }}">
+<div style="display:flex;flex-direction:column;gap:8px">
+<h2 style="margin:0;font:600 32px/1.15 Geist;letter-spacing:-0.025em">Entrar</h2>
+<span style="font:400 15px/1.5 Geist;color:var(--text2)">Acesso para coordenadores do arranjo de ônibus no circuito e nas congregações.</span>
+</div>
+<sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--crit-s);color:var(--crit);font:500 14px Geist;animation:shake .4s ease both"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01"></path></svg>{{ error }}</div>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:18px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">E-mail</span>
+<div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border:1.5px solid {{ emailBd }};border-radius:14px;background:var(--surface);transition:border-color .2s,box-shadow .2s;box-shadow:{{ emailSh }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 6L2 7"></path></svg>
+<input value="{{ email }}" onChange="{{ onEmail }}" onFocus="{{ focusEmail }}" onBlur="{{ blur }}" onKeyDown="{{ onKey }}" type="email" autoComplete="email" placeholder="seu@email.com" style="flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none">
+</div>
+</label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:baseline;font:500 14px Geist">Senha<button onClick="{{ goForgot }}" style="border:0;background:transparent;padding:0;color:var(--primary);font:500 13px Geist;cursor:pointer">Esqueci a senha</button></span>
+<div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 6px 0 14px;border:1.5px solid {{ passBd }};border-radius:14px;background:var(--surface);transition:border-color .2s,box-shadow .2s;box-shadow:{{ passSh }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<input value="{{ pass }}" onChange="{{ onPass }}" onFocus="{{ focusPass }}" onBlur="{{ blur }}" onKeyDown="{{ onKey }}" type="{{ passType }}" autoComplete="current-password" placeholder="Sua senha" style="flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none">
+<button onClick="{{ toggleShow }}" title="{{ showTitle }}" style="width:38px;height:38px;border:0;border-radius:10px;background:transparent;color:var(--text2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--muted);color:var(--text)">
+<sc-if value="{{ showPass }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10 10 0 0 1 12 20c-7 0-10-8-10-8a18 18 0 0 1 5.1-5.9M9.9 4.2A9 9 0 0 1 12 4c7 0 10 8 10 8a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"></path></svg></sc-if>
+<sc-if value="{{ hidePass }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-8 10-8 10 8 10 8-3 8-10 8S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></sc-if>
+</button>
+</div>
+<sc-if value="{{ capsOn }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px Geist;color:var(--attn,#8a6d00)">Caps Lock está ativado</span></sc-if>
+</label>
+<button onClick="{{ toggleRemember }}" style="display:flex;align-items:center;gap:10px;padding:0;border:0;background:transparent;color:var(--text);cursor:pointer;text-align:left">
+<span style="width:20px;height:20px;border-radius:6px;background:{{ remChk }};box-shadow:{{ remRing }};display:grid;place-items:center;transition:all .2s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ remOp }}"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<span style="font:500 14px Geist">Manter conectado neste computador</span>
+</button>
+</div>
+<button onClick="{{ submit }}" style="position:relative;height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;background:{{ btnBg }};color:var(--on-primary);font:600 16px Geist;cursor:pointer;box-shadow:0 10px 24px rgb(31 110 90/.28);transition:all .25s" style-hover="transform:translateY(-1px)">
+<sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:10px">Entrar<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></span></sc-if>
+<sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;border:2.5px solid rgb(255 255 255/.35);border-top-color:#fff;animation:spin .7s linear infinite"></span>Verificando…</span></sc-if>
+<sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:10px;animation:pop .3s cubic-bezier(.3,1.5,.5,1) both"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Bem-vindo, {{ firstName }}</span></sc-if>
+</button>
+<div style="display:flex;flex-direction:column;border-radius:14px;border:1px solid var(--border);overflow:hidden">
+<div style="display:flex;flex-direction:column;gap:4px;padding:14px 16px"><span style="font:600 14px Geist">Recebeu um convite?</span><span style="font:400 13px/1.5 Geist;color:var(--text2)">Coordenadores das congregações entram pelo link enviado por e-mail ou WhatsApp.</span></div>
+<button onClick="{{ goSignup }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:0;border-top:1px solid var(--border);background:var(--muted);color:var(--text);text-align:left;cursor:pointer;transition:background .2s" style-hover="background:var(--primary-s)">
+<span style="width:36px;height:36px;border-radius:10px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></span>
+<span style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font:600 14px Geist">Seu circuito ainda não usa o SUOAC?</span><span style="font:400 13px Geist;color:var(--text2)">Cadastre o circuito em poucos minutos</span></span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</div>
+</div>
+</sc-if>
+
+
+<sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:24px;animation:{{ viewAnim }}">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<button onClick="{{ su.back }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;border:0;border-radius:9px;background:transparent;color:var(--text2);font:500 14px Geist;cursor:pointer" style-hover="background:var(--muted);color:var(--text)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>{{ su.backLabel }}</button>
+<sc-if value="{{ su.showSteps }}" hint-placeholder-val="{{ true }}"><span style="font:500 13px Geist;color:var(--text2);font-variant-numeric:tabular-nums">Etapa {{ su.n }} de 3</span></sc-if>
+</div>
+<sc-if value="{{ su.showSteps }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><sc-for list="{{ su.bars }}" as="b" hint-placeholder-count="3"><span style="height:4px;border-radius:999px;background:var(--border);overflow:hidden"><span style="display:block;height:100%;width:{{ b.w }};background:var(--primary);transition:width .4s cubic-bezier(.2,.8,.2,1)"></span></span></sc-for></div>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 28px/1.15 Geist;letter-spacing:-0.02em">{{ su.title }}</h2><span style="font:400 15px/1.5 Geist;color:var(--text2);text-wrap:pretty">{{ su.sub }}</span></div>
+<sc-if value="{{ su.hasErr }}" hint-placeholder-val="{{ false }}"><div style="padding:11px 14px;border-radius:12px;background:var(--crit-s);color:var(--crit);font:500 14px Geist;animation:shake .4s ease both">{{ su.err }}</div></sc-if>
+
+<sc-if value="{{ su.s1 }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:16px;animation:swap .3s ease both">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Nome completo</span><input value="{{ su.f.nome }}" onChange="{{ su.on.nome }}" placeholder="Seu nome" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">E-mail</span><input value="{{ su.f.email }}" onChange="{{ su.on.email }}" type="email" placeholder="seu@email.com" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Celular (WhatsApp)</span><input value="{{ su.f.phone }}" onChange="{{ su.on.phone }}" inputMode="tel" placeholder="(19) 99999-9999" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;font-variant-numeric:tabular-nums" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Crie uma senha</span><input value="{{ su.f.pass }}" onChange="{{ su.on.pass }}" type="password" placeholder="Mínimo de 8 caracteres" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px"><sc-for list="{{ su.strength }}" as="b" hint-placeholder-count="4"><span style="height:4px;border-radius:999px;background:{{ b.c }};transition:background .25s"></span></sc-for></div><span style="font:400 12px Geist;color:var(--text2)">{{ su.strengthLabel }}</span></label>
+</div>
+</sc-if>
+
+<sc-if value="{{ su.s2 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;animation:swap .3s ease both">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Circuito</span><input value="{{ su.f.circ }}" onChange="{{ su.on.circ }}" placeholder="Ex.: SP-17" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;text-transform:uppercase" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Cidade principal</span><input value="{{ su.f.cidade }}" onChange="{{ su.on.cidade }}" placeholder="Ex.: Campinas" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">UF</span><input value="{{ su.f.uf }}" onChange="{{ su.on.uf }}" placeholder="SP" maxLength="2" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;text-transform:uppercase;text-align:center" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Seu privilégio</span>
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:13px;background:var(--primary-s);color:var(--primary);font:600 14px/1.35 Geist"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>Coordenador do arranjo de ônibus no circuito</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ su.s3 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:12px;animation:swap .3s ease both">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 36px;gap:8px;font:500 13px Geist;color:var(--text2)"><span>Congregação</span><span>Código</span><span></span></div>
+<div style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;padding:2px">
+<sc-for list="{{ su.congs }}" as="c" hint-placeholder-count="3">
+<sc-if value="{{ c.own }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;font:600 12px Geist;color:var(--primary)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Sua congregação · obrigatória</span></sc-if>
+<sc-if value="{{ c.firstOther }}" hint-placeholder-val="{{ false }}"><span style="padding-top:6px;font:600 12px Geist;color:var(--text2)">Outras congregações · opcional</span></sc-if>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 36px;gap:8px;align-items:center;animation:rise .25s ease both">
+<input value="{{ c.name }}" onChange="{{ c.onName }}" placeholder="{{ c.ph }}" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;height:42px;font-size:14px" style-focus="border-color:var(--primary)">
+<input value="{{ c.code }}" onChange="{{ c.onCode }}" inputMode="numeric" placeholder="Código" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;height:42px;font-size:14px;font-variant-numeric:tabular-nums" style-focus="border-color:var(--primary)">
+<button onClick="{{ c.remove }}" title="Remover" style="width:36px;height:36px;border:0;border-radius:9px;background:transparent;color:var(--text2);cursor:pointer;display:grid;place-items:center;visibility:{{ c.rmVis }}" style-hover="background:var(--crit-s);color:var(--crit)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ su.addCong }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px 0 8px;border:1px dashed var(--border2);border-radius:10px;background:transparent;color:var(--primary);font:500 14px Geist;cursor:pointer" style-hover="border-color:var(--primary);background:var(--primary-s)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>Adicionar congregação</button>
+<span style="font:400 13px/1.5 Geist;color:var(--text2)">Você pode completar a lista e convidar os coordenadores das congregações depois, pelo painel.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ su.s4 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:18px;animation:swap .3s ease both">
+<div onClick="{{ su.focusCode }}" style="position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;cursor:text">
+<input ref="{{ codeRef }}" value="{{ su.f.code }}" onChange="{{ su.on.code }}" inputMode="numeric" autoComplete="one-time-code" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0">
+<sc-for list="{{ su.boxes }}" as="b" hint-placeholder-count="6"><span style="height:58px;border-radius:13px;border:1.5px solid {{ b.bd }};background:var(--surface);box-shadow:{{ b.sh }};display:grid;place-items:center;font:600 24px Geist;font-variant-numeric:tabular-nums;transition:all .15s">{{ b.v }}</span></sc-for>
+</div>
+<span style="font:400 13px Geist;color:var(--text2)">Não recebeu? <button onClick="{{ su.resend }}" style="border:0;background:transparent;padding:0;color:var(--primary);font:500 13px Geist;cursor:pointer">{{ su.resendLabel }}</button></span>
+</div>
+</sc-if>
+
+<sc-if value="{{ su.s5 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:16px;background:var(--muted);animation:rise .4s ease both">
+<sc-for list="{{ su.summary }}" as="r" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;font:400 14px Geist"><span style="color:var(--text2)">{{ r.k }}</span><span style="font-weight:600;text-align:right">{{ r.v }}</span></div></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ su.showTerms }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ su.toggleTerms }}" style="display:flex;align-items:flex-start;gap:10px;padding:0;border:0;background:transparent;color:var(--text);cursor:pointer;text-align:left"><span style="width:20px;height:20px;margin-top:1px;border-radius:6px;background:{{ su.tChk }};box-shadow:{{ su.tRing }};display:grid;place-items:center;flex-shrink:0;transition:all .2s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ su.tOp }}"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="font:400 14px/1.45 Geist;color:var(--text2)">Li e aceito os termos de uso e a política de privacidade do SUOAC</span></button>
+</sc-if>
+<button onClick="{{ su.next }}" style="height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 16px Geist;cursor:pointer;box-shadow:0 10px 24px rgb(31 110 90/.28);opacity:{{ su.okOp }};transition:all .2s" style-hover="background:var(--primary-d)">
+<sc-if value="{{ su.busy }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:50%;border:2.5px solid rgb(255 255 255/.35);border-top-color:#fff;animation:spin .7s linear infinite"></span></sc-if>{{ su.cta }}</button>
+<sc-if value="{{ su.s3 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ su.skip }}" style="height:40px;border:0;border-radius:11px;background:transparent;color:var(--text2);font:500 14px Geist;cursor:pointer" style-hover="background:var(--muted);color:var(--text)">Adicionar as outras depois</button></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ isForgot }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:24px;animation:{{ viewAnim }}">
+<button onClick="{{ goLogin }}" style="align-self:flex-start;display:flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;border:0;border-radius:9px;background:transparent;color:var(--text2);font:500 14px Geist;cursor:pointer" style-hover="background:var(--muted);color:var(--text)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Voltar</button>
+<sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 30px/1.15 Geist;letter-spacing:-0.025em">Recuperar senha</h2><span style="font:400 15px/1.5 Geist;color:var(--text2)">Informe o e-mail cadastrado. Enviaremos um link para criar uma nova senha.</span></div>
+<div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border:1.5px solid {{ emailBd }};border-radius:14px;background:var(--surface);box-shadow:{{ emailSh }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 6L2 7"></path></svg>
+<input value="{{ email }}" onChange="{{ onEmail }}" onFocus="{{ focusEmail }}" onBlur="{{ blur }}" type="email" placeholder="seu@email.com" style="flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none">
+</div>
+<button onClick="{{ sendReset }}" style="height:54px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 16px Geist;cursor:pointer;opacity:{{ resetOp }}" style-hover="background:var(--primary-d)">Enviar link</button>
+</div>
+</sc-if>
+<sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:18px;animation:rise .4s ease both">
+<span style="width:60px;height:60px;border-radius:18px;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;animation:pop .4s cubic-bezier(.3,1.5,.5,1) both"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg></span>
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 28px/1.15 Geist;letter-spacing:-0.02em">Confira seu e-mail</h2><span style="font:400 15px/1.5 Geist;color:var(--text2);text-wrap:pretty">Se <b style="color:var(--text);font-weight:600">{{ email }}</b> estiver cadastrado, você vai receber o link em alguns minutos. Verifique também a caixa de spam.</span></div>
+<button onClick="{{ goLogin }}" style="height:46px;padding:0 20px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 15px Geist;cursor:pointer" style-hover="background:var(--muted)">Voltar para o login</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+<div style="display:flex;justify-content:center;gap:18px;font:400 13px Geist;color:var(--text2)"><span>© 2026 SUOAC</span><a href="#" style="color:var(--text2)">Privacidade</a><a href="#" style="color:var(--text2)">Ajuda</a></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'login', email: '', pass: '', show: false, remember: true, focus: null, status: 'idle', error: '', caps: false, sent: false, par: false };
+  stageRef = React.createRef();
+  codeRef = React.createRef();
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._t2); this._ro && this._ro.disconnect(); }
+  renderVals() {
+    const s = this.state, theme = s.theme || this.props.theme || 'light';
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email.trim());
+    const ring = on => on ? '0 0 0 4px var(--primary-s)' : 'none';
+    const errE = s.error && s.errField === 'email', errP = s.error && s.errField === 'pass';
+    const go = view => this.setState(p => ({ view, error: '', sent: false, par: !p.par }));
+    const submit = () => {
+      if (s.status !== 'idle') return;
+      if (!emailOk) return this.setState({ error: 'Informe um e-mail válido', errField: 'email' });
+      if (s.pass.length < 6) return this.setState({ error: 'A senha precisa ter pelo menos 6 caracteres', errField: 'pass' });
+      this.setState({ status: 'loading', error: '' });
+      this._t = setTimeout(() => {
+        if (s.pass === 'errada') return this.setState({ status: 'idle', error: 'E-mail ou senha incorretos', errField: 'pass' });
+        this.setState({ status: 'done' });
+        this._t2 = setTimeout(() => { window.location.href = 'SUOAC Dashboard v2.dc.html'; }, 1100);
+      }, 1200);
+    };
+    const local = s.email.split('@')[0] || '';
+    const firstName = local ? local.split(/[._-]/)[0].replace(/^./, c => c.toUpperCase()) : '';
+    return {
+      steps: [['Evento criado', 'Datas, local e valor definidos', 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4'], ['Inscrições abertas', 'Congregações montam suas listas', 'M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1zM16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h4'], ['Passageiros registrados', 'Poltronas e pagamentos organizados', 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'], ['Viagem realizada', 'Embarque e rastreamento no dia', 'M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3M9 18h5M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM16 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4z']].map(([title, sub, icon], k) => ({ title, sub, icon, ai: 'tlI' + k + ' 10s ease-out infinite', at: 'tlT' + k + ' 10s ease-out infinite' })), theme, isDark: theme === 'dark', isLight: theme !== 'dark', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      seats: (() => { const out = []; let idx = 0; for (let r = 0; r < 12; r++) for (let c = 0; c < 5; c++) { if (c === 2 || (r === 7 && c >= 3)) { out.push({ vis: 'hidden', anim: 'none' }); continue; } idx++; out.push({ vis: 'visible', anim: idx <= 38 ? 'seatLoop 14s ' + (0.4 + idx * 0.16).toFixed(2) + 's cubic-bezier(.2,.8,.2,1) infinite backwards' : 'none' }); } return out; })(),
+      isLogin: s.view === 'login', isForgot: s.view === 'forgot', viewAnim: 'swap .35s cubic-bezier(.2,.8,.2,1) both',
+      email: s.email, pass: s.pass, onEmail: e => this.setState({ email: e.target.value, error: s.errField === 'email' ? '' : s.error }), onPass: e => this.setState({ pass: e.target.value, error: s.errField === 'pass' ? '' : s.error }),
+      focusEmail: () => this.setState({ focus: 'email' }), focusPass: () => this.setState({ focus: 'pass' }), blur: () => this.setState({ focus: null }),
+      onKey: e => { const c = e.getModifierState && e.getModifierState('CapsLock'); if (c !== s.caps) this.setState({ caps: c }); if (e.key === 'Enter') submit(); },
+      capsOn: s.caps && s.focus === 'pass',
+      emailBd: errE ? 'var(--crit)' : s.focus === 'email' ? 'var(--primary)' : 'var(--border2)', emailSh: ring(s.focus === 'email' && !errE),
+      passBd: errP ? 'var(--crit)' : s.focus === 'pass' ? 'var(--primary)' : 'var(--border2)', passSh: ring(s.focus === 'pass' && !errP),
+      passType: s.show ? 'text' : 'password', showPass: s.show, hidePass: !s.show, showTitle: s.show ? 'Ocultar senha' : 'Mostrar senha', toggleShow: () => this.setState({ show: !s.show }),
+      toggleRemember: () => this.setState({ remember: !s.remember }), remChk: s.remember ? 'var(--primary)' : 'transparent', remRing: s.remember ? 'none' : 'inset 0 0 0 1.5px var(--border2)', remOp: s.remember ? 1 : 0,
+      hasError: !!s.error, error: s.error,
+      submit, isIdle: s.status === 'idle', isLoading: s.status === 'loading', isDone: s.status === 'done', btnBg: s.status === 'done' ? '#2e9e5b' : 'var(--primary)', firstName,
+      goForgot: () => go('forgot'), goLogin: () => go('login'), goSignup: () => this.setState(p => ({ view: 'signup', par: !p.par, su: p.su || { step: 1, nome: '', email: '', phone: '', pass: '', circ: '', cidade: '', uf: '', congs: [{ name: '', code: '' }, { name: '', code: '' }, { name: '', code: '' }], terms: false, code: '' } })),
+      isSignup: s.view === 'signup', codeRef: this.codeRef,
+      su: (() => {
+        const f = s.su; if (!f) return { f: {}, on: {} };
+        const set = patch => this.setState(p => ({ su: { ...p.su, err: '', ...patch } }));
+        const fmtPhone = v => { const x = v.replace(/\D/g, '').slice(0, 11); if (x.length <= 2) return x.length ? '(' + x : ''; if (x.length <= 7) return '(' + x.slice(0, 2) + ') ' + x.slice(2); return '(' + x.slice(0, 2) + ') ' + x.slice(2, x.length - 4) + '-' + x.slice(-4); };
+        const st = f.step, pw = f.pass, score = (pw.length >= 8) + /[A-Z]/.test(pw) + /\d/.test(pw) + /[^A-Za-z0-9]/.test(pw);
+        const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim());
+        const filled = f.congs.filter(c => c.name.trim());
+        const v1 = f.nome.trim().length > 2 && okEmail && f.phone.replace(/\D/g, '').length >= 10 && pw.length >= 8;
+        const v2 = f.circ.trim().length >= 2 && f.cidade.trim().length >= 2 && f.uf.trim().length === 2 && f.terms;
+        const v4 = f.code.length === 6;
+        const goStep = n => this.setState(p => ({ su: { ...p.su, step: n, err: '' }, par: !p.par }));
+        const T = { 1: ['Cadastre seu circuito', 'Comece pelos seus dados. Você será o coordenador do arranjo de ônibus no circuito.'], 2: ['Dados do circuito', 'Essas informações aparecem nos eventos, listas e convites.'], 3: ['Congregações do circuito', 'Comece pela sua congregação. As demais você pode adicionar agora ou depois.'], 4: ['Confirme seu e-mail', 'Enviamos um código de 6 dígitos para ' + f.email.trim() + '.'], 5: ['Circuito ' + f.circ.trim().toUpperCase() + ' criado', 'Tudo pronto. Agora você pode criar o primeiro evento e convidar as congregações.'] }[st];
+        const next = () => {
+          if (st === 1) { if (!v1) return set({ err: !okEmail && f.email ? 'Informe um e-mail válido' : pw.length && pw.length < 8 ? 'A senha precisa ter pelo menos 8 caracteres' : 'Preencha todos os campos' }); return goStep(2); }
+          if (st === 2) { if (!v2) return set({ err: !f.terms && f.circ && f.cidade && f.uf.length === 2 ? 'Aceite os termos para continuar' : 'Preencha os dados do circuito' }); return goStep(3); }
+          if (st === 3) { if (!f.congs[0].name.trim() || !f.congs[0].code.trim()) return set({ err: 'Informe sua congregação e o código dela' }); if (filled.some(c => !c.code.trim())) return set({ err: 'Informe o código de cada congregação' }); this.setState(p => ({ su: { ...p.su, busy: true } })); setTimeout(() => { this.setState(p => ({ su: { ...p.su, busy: false } })); goStep(4); setTimeout(() => this.codeRef.current && this.codeRef.current.focus(), 80); }, 900); return; }
+          if (st === 4) { if (!v4) return set({ err: 'Digite os 6 dígitos do código' }); this.setState(p => ({ su: { ...p.su, busy: true } })); setTimeout(() => { this.setState(p => ({ su: { ...p.su, busy: false } })); goStep(5); }, 900); return; }
+          window.location.href = 'SUOAC Dashboard v2.dc.html';
+        };
+        return { f, n: Math.min(st, 3), title: T[0], sub: T[1], hasErr: !!f.err, err: f.err || '', busy: !!f.busy, showSteps: st <= 3,
+          s1: st === 1, s2: st === 2, s3: st === 3, s4: st === 4, s5: st === 5, showTerms: st === 2,
+          bars: [1, 2, 3].map(i => ({ w: st > i ? '100%' : st === i ? '50%' : '0%' })),
+          backLabel: st === 1 || st === 5 ? 'Voltar para o login' : st === 4 ? 'Corrigir e-mail' : 'Voltar', back: () => st === 1 || st === 5 ? go('login') : st === 4 ? goStep(1) : goStep(st - 1),
+          on: { nome: e => set({ nome: e.target.value }), email: e => set({ email: e.target.value }), phone: e => set({ phone: fmtPhone(e.target.value) }), pass: e => set({ pass: e.target.value }), circ: e => set({ circ: e.target.value.toUpperCase() }), cidade: e => set({ cidade: e.target.value }), uf: e => set({ uf: e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2) }), code: e => set({ code: e.target.value.replace(/\D/g, '').slice(0, 6) }) },
+          strength: [0, 1, 2, 3].map(i => ({ c: i < score ? (score <= 1 ? 'var(--crit)' : score === 2 ? '#f5b700' : 'var(--primary)') : 'var(--border)' })), strengthLabel: !pw ? 'Use letras maiúsculas, números e símbolos' : ['Senha fraca', 'Senha fraca', 'Senha razoável', 'Senha forte', 'Senha muito forte'][score],
+          congs: f.congs.map((c, i) => ({ name: c.name, code: c.code, own: i === 0, firstOther: i === 1, ph: i === 0 ? 'Nome da sua congregação' : 'Nome da congregação', rmVis: i === 0 ? 'hidden' : 'visible', onName: e => set({ congs: f.congs.map((x, j) => j === i ? { ...x, name: e.target.value } : x) }), onCode: e => set({ congs: f.congs.map((x, j) => j === i ? { ...x, code: e.target.value.replace(/\D/g, '').slice(0, 8) } : x) }), remove: () => i > 0 && set({ congs: f.congs.filter((_, j) => j !== i) }) })),
+          addCong: () => set({ congs: f.congs.concat([{ name: '', code: '' }]) }), skip: () => { if (!f.congs[0].name.trim() || !f.congs[0].code.trim()) return set({ err: 'Informe sua congregação e o código dela' }); this.setState(p => ({ su: { ...p.su, err: '', congs: [p.su.congs[0]] } })); setTimeout(next, 0); },
+          toggleTerms: () => set({ terms: !f.terms }), tChk: f.terms ? 'var(--primary)' : 'transparent', tRing: f.terms ? 'none' : 'inset 0 0 0 1.5px var(--border2)', tOp: f.terms ? 1 : 0,
+          focusCode: () => this.codeRef.current && this.codeRef.current.focus(),
+          boxes: Array.from({ length: 6 }, (_, i) => { const cur = i === f.code.length; return { v: f.code[i] || '', bd: f.code[i] ? 'var(--primary)' : cur ? 'var(--primary)' : 'var(--border2)', sh: cur ? '0 0 0 4px var(--primary-s)' : 'none' }; }),
+          resendLabel: f.resent ? 'Código reenviado' : 'Reenviar código', resend: () => set({ resent: true }),
+          summary: [{ k: 'Coordenador', v: f.nome.trim() }, { k: 'Circuito', v: f.circ.trim().toUpperCase() + ' · ' + f.cidade.trim() + '/' + f.uf }, { k: 'Sua congregação', v: f.congs[0].name.trim() + ' · ' + f.congs[0].code }, { k: 'Congregações', v: filled.length + (filled.length === 1 ? ' cadastrada' : ' cadastradas') }, { k: 'Próximo passo', v: 'Criar o primeiro evento' }],
+          okOp: (st === 1 && !v1) || (st === 2 && !v2) || (st === 4 && !v4) ? 0.5 : 1,
+          cta: f.busy ? (st === 3 ? 'Criando circuito…' : 'Verificando…') : st === 3 ? 'Criar circuito' : st === 4 ? 'Confirmar' : st === 5 ? 'Ir para o painel' : 'Continuar',
+          next };
+      })(),
+      notSent: !s.sent, sent: s.sent, resetOp: emailOk ? 1 : 0.45, sendReset: () => { if (!emailOk) return this.setState({ error: 'Informe um e-mail válido', errField: 'email' }); this.setState({ sent: true }); },
+    };
+  }
+}
+</script>
+</body>
+</html>

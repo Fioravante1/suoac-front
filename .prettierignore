@@ -13,3 +13,6 @@ next-env.d.ts
 yarn.lock
 package-lock.json
 pnpm-lock.yaml
+
+# Handoff de design: artefatos originais, nao formatar (sao a fonte da verdade do redesign)
+docs/design_handoff_suoac_redesign/
