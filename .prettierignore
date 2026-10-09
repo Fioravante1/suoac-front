@@ -16,3 +16,7 @@ pnpm-lock.yaml
 
 # Handoff de design: artefatos originais, nao formatar (sao a fonte da verdade do redesign)
 docs/design_handoff_suoac_redesign/
+
+# Relatorios do Playwright
+test-results/
+playwright-report/
