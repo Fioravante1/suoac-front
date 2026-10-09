@@ -23,8 +23,13 @@ mudam no `AGENTS.md` durante a transição.
 | P5  | A primeira fatia é a **tela de Login**.                                                                                                                              | É a fatia mais isolada do sistema: nenhuma outra tela depende dela, e ela não depende do shell. Serve para exercitar toda a mecânica (flag, tokens, tema escuro, corte) com risco mínimo. |
 
 > P4 não é só preferência: na tela de login **não existe usuário identificado**, então targeting por
-> usuário é tecnicamente impossível ali. Ambiente + override de sessão é o único mecanismo que
-> funciona na Fatia 1.
+> usuário é tecnicamente impossível ali.
+>
+> A redação original desta premissa previa conferir cada fatia em produção, antes dos demais
+> usuários, usando o override de sessão do Vercel Toolbar. **Isso foi abandonado em 09/10/2026**: a
+> CSP do projeto (`default-src 'self'`) bloqueia `vercel.live`, e abrir a política por conveniência
+> de QA custa mais do que vale. Decisão do coordenador: validar em staging basta — o sistema tem
+> poucos usuários e staging tem dados representativos. Ver SUC-19.
 
 ---
 
@@ -208,15 +213,20 @@ Se uma mutation precisa se comportar diferente nas duas versões, isso é sinal 
 estar em `entities`/`features` compartilhado, não duplicada atrás de um toggle. O ponto de decisão
 ideal por fatia é **um só**: o arquivo de rota.
 
-### 4.4 Testar em produção sem expor a todos
+### 4.4 Onde cada fatia é validada
 
-O Vercel Toolbar expõe o Flags Explorer, que lê as flags por `/.well-known/vercel/flags` e permite
-sobrescrevê-las. O override vai num cookie `vercel-flag-overrides`, criptografado com `FLAGS_SECRET`
-(JWE), e **só afeta quem o aplicou, no ambiente onde foi aplicado** — não altera o estado da flag em
-produção para os demais.
+Em **staging**, e só ali. A flag é ligada em `staging.suoac.com`, a fatia é exercitada, e só então a
+flag é ligada em produção — para todos de uma vez, com o kill switch disponível.
 
-Isso cobre a necessidade de "ver o novo com dados reais antes de liberar" sem construir targeting
-por usuário. Confirme que `FLAGS_SECRET` está configurado nos dois ambientes.
+Não existe override por sessão. O mecanismo natural seria o Flags Explorer do Vercel Toolbar, que
+sobrescreve flags num cookie criptografado afetando só quem o aplicou; ele é carregado de
+`vercel.live` e a CSP do projeto (`default-src 'self'`) o bloqueia. Liberar esse domínio na CSP —
+ainda que apenas fora de produção — foi avaliado e **recusado** em 09/10/2026: o ganho não paga nem
+o trabalho nem a exceção na política de segurança, dado que staging cobre a necessidade real.
+
+Consequência prática: **staging precisa ter dados representativos**. Se em algum momento staging
+deixar de refletir a realidade — um evento com muitos passageiros, congregações de verdade —, essa
+premissa deixa de se sustentar e o assunto volta à mesa.
 
 ### 4.5 Kill switch
 
