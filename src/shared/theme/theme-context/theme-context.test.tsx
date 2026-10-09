@@ -8,7 +8,7 @@ import {
   renderWithTheme,
   resetThemeEnvironment,
   stubSystemColorScheme,
-} from "../theme-testing";
+} from "@/shared/theme-testing";
 import { useTheme } from "./theme-context";
 
 function ThemeConsumer() {

@@ -2,8 +2,7 @@ import { render, type RenderResult } from "@testing-library/react";
 import { vi } from "vitest";
 import type { ReactElement } from "react";
 
-import { ThemeProvider } from "../theme-context";
-import { THEME_COOKIE_NAME, type ThemePreference } from "../theme-preference";
+import { ThemeProvider, THEME_COOKIE_NAME, type ThemePreference } from "@/shared/theme";
 
 /**
  * Apoio aos testes de tema.

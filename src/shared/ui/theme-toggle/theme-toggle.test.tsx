@@ -1,7 +1,7 @@
 import { screen, fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readAppliedTheme, renderWithTheme, resetThemeEnvironment } from "@/shared/theme/theme-testing";
+import { readAppliedTheme, renderWithTheme, resetThemeEnvironment } from "@/shared/theme-testing";
 
 import { ThemeToggle } from "./theme-toggle";
 

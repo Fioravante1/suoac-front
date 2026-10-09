@@ -3,5 +3,5 @@
 // `server-only` e por isso nao pode ser reexportada aqui — mesmo padrao de
 // `@/shared/auth` e `@/shared/auth/session`.
 export { ThemeProvider, useTheme } from "./theme-context";
-export { THEME_PREFERENCES, parseThemePreference } from "./theme-preference";
+export { THEME_PREFERENCES, THEME_COOKIE_NAME, parseThemePreference } from "./theme-preference";
 export type { ThemePreference, ResolvedTheme } from "./theme-preference";
