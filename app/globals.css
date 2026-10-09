@@ -111,7 +111,27 @@
   --suoac-layout-content-max-width: 75rem;
 
   /* Motion */
-  --suoac-motion-theme: 300ms;
+  --suoac-motion-duration-fast: 180ms;
+  --suoac-motion-duration-base: 200ms;
+  --suoac-motion-duration-medium: 300ms;
+  --suoac-motion-duration-slow: 400ms;
+  --suoac-motion-theme: var(--suoac-motion-duration-medium);
+
+  /*
+   * Curva padrao do design system: aparece 63 vezes no handoff, contra 2 da
+   * segunda colocada. Entradas, saidas e mudancas de estado usam esta.
+   */
+  --suoac-motion-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Leve ultrapassagem, para confirmacoes — o "pulo" do toast e do check. */
+  --suoac-motion-ease-overshoot: cubic-bezier(0.3, 1.5, 0.5, 1);
+
+  /*
+   * Entrada escalonada de listas: cada item atrasa 25ms em relacao ao anterior,
+   * com teto de 400ms no total. Sem o teto, uma lista de 40 passageiros levaria
+   * um segundo inteiro para terminar de aparecer.
+   */
+  --suoac-motion-stagger-step: 25ms;
+  --suoac-motion-stagger-max: 400ms;
 
   /* Component defaults */
   --suoac-button-height: 2.75rem;
@@ -121,6 +141,108 @@
 
   --background: var(--suoac-color-background);
   --foreground: var(--suoac-color-text-primary);
+}
+
+/*
+ * Animacoes compartilhadas pelo design system.
+ *
+ * Declaradas uma unica vez e globalmente: as mesmas entradas se repetem em todas
+ * as telas do redesign, e `@keyframes` dentro de CSS Module seria escopado por
+ * arquivo, recriando a mesma animacao em versoes levemente diferentes.
+ *
+ * Os valores reproduzem `docs/design_handoff_suoac_redesign/*.dc.html`, que e a
+ * especificacao final — `motion.test.ts` falha se divergirem.
+ *
+ * Animacao especifica de uma tela (a timeline do login, a planta do onibus) nasce
+ * na fatia que a usa, no CSS Module dela.
+ */
+
+/* Entrada padrao: dropdowns, popovers, linhas de lista, cards. */
+@keyframes suoac-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes suoac-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Entrada de modal: sobe e cresce a partir de 97%. */
+@keyframes suoac-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+/* Toast inferior central — ja centralizado por translate(-50%). */
+@keyframes suoac-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.96);
+  }
+}
+
+/* Barras de progresso e de grafico. */
+@keyframes suoac-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Poltronas da planta do onibus. */
+@keyframes suoac-seat {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Tracado de graficos de linha. */
+@keyframes suoac-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* Erro de formulario. */
+@keyframes suoac-shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes suoac-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Quem pediu menos movimento ao sistema operacional recebe o resultado final das
+ * animacoes, nao o percurso: as duracoes caem para um valor irrisorio em vez de
+ * as animacoes serem removidas. Remover quebraria entradas declaradas com
+ * `both`/`forwards`, que dependem do estado final do keyframe para ficarem
+ * visiveis.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --suoac-motion-duration-fast: 1ms;
+    --suoac-motion-duration-base: 1ms;
+    --suoac-motion-duration-medium: 1ms;
+    --suoac-motion-duration-slow: 1ms;
+    --suoac-motion-stagger-step: 0ms;
+    --suoac-motion-stagger-max: 0ms;
+  }
 }
 
 /*
