@@ -20,6 +20,8 @@ export default defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "src/**/*.d.ts",
+        // Apoio aos testes, nao codigo de producao.
+        "src/**/*-testing/**",
         "src/app/**/layout.tsx",
         "src/app/**/loading.tsx",
         "src/app/**/error.tsx",
