@@ -22,7 +22,11 @@
   --suoac-color-text-primary: #1e1f24;
   --suoac-color-text-secondary: #667085;
   --suoac-color-text-inverse: #ffffff;
-  --suoac-color-sidebar: #0d2b45;
+  --suoac-color-navy: #0d2b45;
+  --suoac-color-sidebar: var(--suoac-color-navy);
+  --suoac-color-on-primary: #ffffff;
+  --suoac-color-attention-text: #8a6d00;
+  --suoac-color-glass: rgb(255 255 255 / 0.78);
 
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
@@ -83,9 +87,15 @@
   --suoac-shadow-sm: 0 8px 24px rgb(31 110 90 / 0.08);
   --suoac-shadow-md: 0 16px 40px rgb(31 110 90 / 0.12);
   --suoac-shadow-lg: 0 12px 28px rgb(16 24 40 / 0.18), 0 2px 6px rgb(16 24 40 / 0.12);
+  --suoac-shadow-dropdown: 0 24px 60px rgb(13 43 69 / 0.28);
+  --suoac-shadow-menu: 0 18px 40px rgb(13 43 69 / 0.2);
+  --suoac-shadow-modal: 0 40px 100px rgb(10 26 41 / 0.45);
+  --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
+  --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
 
   /* Scrim & overlay */
   --suoac-color-scrim: rgb(16 24 40 / 0.45);
+  --suoac-color-modal-scrim: rgb(10 26 41 / 0.55);
   --suoac-color-overlay: rgb(247 249 248 / 0.72);
   --suoac-overlay-blur: 4px;
 
@@ -110,9 +120,124 @@
   --foreground: var(--suoac-color-text-primary);
 }
 
+/*
+ * Tema escuro.
+ *
+ * A preferencia e persistida em cookie e lida no servidor, que estampa
+ * `data-theme` no <html> antes da resposta sair — por isso nao ha flash de tema
+ * errado. Quando a preferencia e "sistema", o servidor estampa
+ * `data-theme="system"` e a media query abaixo decide, ainda sem JavaScript.
+ *
+ * O tema so vale mediante opt-in explicito: sem atributo nenhum, a pagina fica
+ * clara mesmo com o sistema operacional em escuro. E o que impede telas ainda
+ * nao redesenhadas de serem pintadas em escuro antes de terem contraste
+ * verificado.
+ *
+ * Os dois blocos precisam conter EXATAMENTE as mesmas declaracoes. Editar um e
+ * esquecer o outro faz o tema divergir entre a escolha explicita e a do sistema;
+ * `src/app/styles/theme-tokens.test.ts` falha quando isso acontece.
+ */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --suoac-color-primary: #4fb393;
+  --suoac-color-primary-dark: #7fcfb4;
+  --suoac-color-primary-light: #183229;
+  --suoac-color-on-primary: #0e1413;
+
+  /* Secondary */
+  --suoac-color-info: #82a9ff;
+  --suoac-color-success: #4cc07c;
+  --suoac-color-attention: #f2c14b;
+  --suoac-color-attention-text: #f2c14b;
+  --suoac-color-critical: #f07272;
+  --suoac-color-critical-dark: #f49a9a;
+
+  /* Neutrals */
+  --suoac-color-background: #0e1413;
+  --suoac-color-surface: #151d1b;
+  --suoac-color-surface-muted: #1c2623;
+  --suoac-color-border: #25312e;
+  --suoac-color-border-strong: #34433f;
+  --suoac-color-text-primary: #e9efed;
+  --suoac-color-text-secondary: #9aa8a3;
+  --suoac-color-navy: #0a1a29;
+
+  /* Semantic backgrounds */
+  --suoac-color-info-soft: #18233d;
+  --suoac-color-success-soft: #163121;
+  --suoac-color-attention-soft: #342b10;
+  --suoac-color-critical-soft: #3a1d1d;
+  --suoac-color-neutral-soft: #1c2623;
+  --suoac-color-glass: rgb(21 29 27 / 0.78);
+
+  /* Shadows */
+  --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --suoac-shadow-sm: 0 8px 24px rgb(0 0 0 / 0.25);
+  --suoac-shadow-md: 0 16px 40px rgb(0 0 0 / 0.35);
+  --suoac-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+  --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
+  --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
+  --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+  --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
+  --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+
+  /* Scrim & overlay */
+  --suoac-color-scrim: rgb(0 0 0 / 0.6);
+  --suoac-color-overlay: rgb(14 20 19 / 0.72);
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: light;
+  html[data-theme="system"] {
+    color-scheme: dark;
+
+    /* Brand */
+    --suoac-color-primary: #4fb393;
+    --suoac-color-primary-dark: #7fcfb4;
+    --suoac-color-primary-light: #183229;
+    --suoac-color-on-primary: #0e1413;
+
+    /* Secondary */
+    --suoac-color-info: #82a9ff;
+    --suoac-color-success: #4cc07c;
+    --suoac-color-attention: #f2c14b;
+    --suoac-color-attention-text: #f2c14b;
+    --suoac-color-critical: #f07272;
+    --suoac-color-critical-dark: #f49a9a;
+
+    /* Neutrals */
+    --suoac-color-background: #0e1413;
+    --suoac-color-surface: #151d1b;
+    --suoac-color-surface-muted: #1c2623;
+    --suoac-color-border: #25312e;
+    --suoac-color-border-strong: #34433f;
+    --suoac-color-text-primary: #e9efed;
+    --suoac-color-text-secondary: #9aa8a3;
+    --suoac-color-navy: #0a1a29;
+
+    /* Semantic backgrounds */
+    --suoac-color-info-soft: #18233d;
+    --suoac-color-success-soft: #163121;
+    --suoac-color-attention-soft: #342b10;
+    --suoac-color-critical-soft: #3a1d1d;
+    --suoac-color-neutral-soft: #1c2623;
+    --suoac-color-glass: rgb(21 29 27 / 0.78);
+
+    /* Shadows */
+    --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+    --suoac-shadow-sm: 0 8px 24px rgb(0 0 0 / 0.25);
+    --suoac-shadow-md: 0 16px 40px rgb(0 0 0 / 0.35);
+    --suoac-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+    --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
+    --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
+    --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+    --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
+    --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+
+    /* Scrim & overlay */
+    --suoac-color-scrim: rgb(0 0 0 / 0.6);
+    --suoac-color-overlay: rgb(14 20 19 / 0.72);
   }
 }
 
@@ -148,10 +273,4 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: light;
-  }
 }
