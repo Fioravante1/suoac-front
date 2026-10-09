@@ -13,166 +13,166 @@ import { darkThemeTokens, lightThemeTokens, themeTokens, type ThemeVariant } fro
  */
 const css = readFileSync(resolve(process.cwd(), "app/globals.css"), "utf8");
 
-const SELETOR_CLARO = ":root";
-const SELETOR_ESCURO_EXPLICITO = 'html[data-theme="dark"]';
-const SELETOR_ESCURO_SISTEMA = 'html[data-theme="system"]';
+const LIGHT_SELECTOR = ":root";
+const DARK_SELECTOR = 'html[data-theme="dark"]';
+const SYSTEM_DARK_SELECTOR = 'html[data-theme="system"]';
 
 /**
  * Cores cujo valor e deliberadamente o mesmo nos dois temas. Qualquer outra cor
  * precisa de par escuro — ver `darkThemeTokens`.
  */
-const CORES_IGUAIS_NOS_DOIS_TEMAS = [
+const COLORS_SHARED_BY_BOTH_THEMES = [
   // Branco sobre navy e sobre a cor primaria do tema claro.
   "--suoac-color-text-inverse",
   // O handoff define um unico scrim de modal.
   "--suoac-color-modal-scrim",
 ];
 
-function extrairBloco(seletor: string): string {
-  const inicioSeletor = css.indexOf(`${seletor} {`);
+function extractBlock(selector: string): string {
+  const selectorIndex = css.indexOf(`${selector} {`);
 
-  if (inicioSeletor === -1) {
-    throw new Error(`Seletor nao encontrado em app/globals.css: ${seletor}`);
+  if (selectorIndex === -1) {
+    throw new Error(`Seletor nao encontrado em app/globals.css: ${selector}`);
   }
 
-  const abertura = css.indexOf("{", inicioSeletor);
-  let nivel = 0;
+  const blockStart = css.indexOf("{", selectorIndex);
+  let depth = 0;
 
-  for (let i = abertura; i < css.length; i += 1) {
-    if (css[i] === "{") nivel += 1;
-    if (css[i] === "}") {
-      nivel -= 1;
-      if (nivel === 0) return css.slice(abertura + 1, i);
+  for (let index = blockStart; index < css.length; index += 1) {
+    if (css[index] === "{") depth += 1;
+    if (css[index] === "}") {
+      depth -= 1;
+      if (depth === 0) return css.slice(blockStart + 1, index);
     }
   }
 
-  throw new Error(`Bloco sem fechamento em app/globals.css: ${seletor}`);
+  throw new Error(`Bloco sem fechamento em app/globals.css: ${selector}`);
 }
 
-function extrairDeclaracoes(bloco: string): Map<string, string> {
-  const semComentarios = bloco.replace(/\/\*[\s\S]*?\*\//g, "");
-  const declaracoes = new Map<string, string>();
+function extractDeclarations(block: string): Map<string, string> {
+  const withoutComments = block.replace(/\/\*[\s\S]*?\*\//g, "");
+  const declarations = new Map<string, string>();
 
-  for (const trecho of semComentarios.split(";")) {
-    const par = trecho.match(/(--[\w-]+)\s*:\s*([\s\S]+)/);
-    if (par) declaracoes.set(par[1], par[2].trim().replace(/\s+/g, " "));
+  for (const chunk of withoutComments.split(";")) {
+    const declaration = chunk.match(/(--[\w-]+)\s*:\s*([\s\S]+)/);
+    if (declaration) declarations.set(declaration[1], declaration[2].trim().replace(/\s+/g, " "));
   }
 
-  return declaracoes;
+  return declarations;
 }
 
-const declaracoesClaro = extrairDeclaracoes(extrairBloco(SELETOR_CLARO));
-const declaracoesEscuroExplicito = extrairDeclaracoes(extrairBloco(SELETOR_ESCURO_EXPLICITO));
-const declaracoesEscuroSistema = extrairDeclaracoes(extrairBloco(SELETOR_ESCURO_SISTEMA));
+const lightDeclarations = extractDeclarations(extractBlock(LIGHT_SELECTOR));
+const darkDeclarations = extractDeclarations(extractBlock(DARK_SELECTOR));
+const systemDarkDeclarations = extractDeclarations(extractBlock(SYSTEM_DARK_SELECTOR));
 
 /** Resolve `var(--x)` ate chegar a um valor literal, como o navegador faria. */
-function resolverValor(valor: string, tema: Map<string, string>, visitados = new Set<string>()): string {
-  const referencia = valor.match(/^var\((--[\w-]+)\)$/);
-  if (!referencia) return valor.toLowerCase();
+function resolveValue(value: string, theme: Map<string, string>, visited = new Set<string>()): string {
+  const reference = value.match(/^var\((--[\w-]+)\)$/);
+  if (!reference) return value.toLowerCase();
 
-  const nome = referencia[1];
-  if (visitados.has(nome)) throw new Error(`Ciclo de var() em ${nome}`);
-  visitados.add(nome);
+  const token = reference[1];
+  if (visited.has(token)) throw new Error(`Ciclo de var() em ${token}`);
+  visited.add(token);
 
-  const proximo = tema.get(nome) ?? declaracoesClaro.get(nome);
-  if (proximo === undefined) throw new Error(`Token referenciado mas nao declarado: ${nome}`);
+  const next = theme.get(token) ?? lightDeclarations.get(token);
+  if (next === undefined) throw new Error(`Token referenciado mas nao declarado: ${token}`);
 
-  return resolverValor(proximo, tema, visitados);
+  return resolveValue(next, theme, visited);
 }
 
-function valorNoTema(nome: string, tema: Map<string, string>): string {
-  const declarado = tema.get(nome) ?? declaracoesClaro.get(nome);
-  if (declarado === undefined) throw new Error(`Token nao declarado: ${nome}`);
-  return resolverValor(declarado, tema);
+function valueInTheme(token: string, theme: Map<string, string>): string {
+  const declared = theme.get(token) ?? lightDeclarations.get(token);
+  if (declared === undefined) throw new Error(`Token nao declarado: ${token}`);
+  return resolveValue(declared, theme);
 }
 
-function camelParaKebab(chave: string): string {
-  return chave.replace(/[A-Z]/g, (letra) => `-${letra.toLowerCase()}`);
+function camelToKebab(key: string): string {
+  return key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
-const nomesDeCorDoTemaClaro = [...declaracoesClaro.keys()].filter((nome) => nome.startsWith("--suoac-color-"));
-const nomesDeSombraDoTemaClaro = [...declaracoesClaro.keys()].filter((nome) => nome.startsWith("--suoac-shadow-"));
+const lightColorTokens = [...lightDeclarations.keys()].filter((token) => token.startsWith("--suoac-color-"));
+const lightShadowTokens = [...lightDeclarations.keys()].filter((token) => token.startsWith("--suoac-shadow-"));
 
 describe("tema escuro no globals.css", () => {
-  it("declara os mesmos tokens na escolha explicita e na preferencia do sistema", () => {
-    expect([...declaracoesEscuroSistema.keys()].sort()).toEqual([...declaracoesEscuroExplicito.keys()].sort());
+  it("declara os mesmos tokens na escolha explícita e na preferência do sistema", () => {
+    expect([...systemDarkDeclarations.keys()].sort()).toEqual([...darkDeclarations.keys()].sort());
   });
 
   it("declara os mesmos valores nos dois seletores", () => {
-    expect(Object.fromEntries(declaracoesEscuroSistema)).toEqual(Object.fromEntries(declaracoesEscuroExplicito));
+    expect(Object.fromEntries(systemDarkDeclarations)).toEqual(Object.fromEntries(darkDeclarations));
   });
 
-  it("da par escuro a toda cor do tema claro", () => {
-    const semPar = nomesDeCorDoTemaClaro.filter((nome) => {
-      if (CORES_IGUAIS_NOS_DOIS_TEMAS.includes(nome)) return false;
-      return valorNoTema(nome, declaracoesEscuroExplicito) === valorNoTema(nome, declaracoesClaro);
+  it("dá par escuro a toda cor do tema claro", () => {
+    const withoutDarkPair = lightColorTokens.filter((token) => {
+      if (COLORS_SHARED_BY_BOTH_THEMES.includes(token)) return false;
+      return valueInTheme(token, darkDeclarations) === valueInTheme(token, lightDeclarations);
     });
 
-    expect(semPar).toEqual([]);
+    expect(withoutDarkPair).toEqual([]);
   });
 
-  it("da par escuro a toda sombra do tema claro", () => {
-    const semPar = nomesDeSombraDoTemaClaro.filter(
-      (nome) => valorNoTema(nome, declaracoesEscuroExplicito) === valorNoTema(nome, declaracoesClaro),
+  it("dá par escuro a toda sombra do tema claro", () => {
+    const withoutDarkPair = lightShadowTokens.filter(
+      (token) => valueInTheme(token, darkDeclarations) === valueInTheme(token, lightDeclarations),
     );
 
-    expect(semPar).toEqual([]);
+    expect(withoutDarkPair).toEqual([]);
   });
 
-  it("so aplica o tema escuro mediante opt-in explicito", () => {
-    const seletoresSobPreferenciaDoSistema = [
+  it("só aplica o tema escuro mediante opt-in explícito", () => {
+    const selectorsUnderSystemPreference = [
       ...css.matchAll(/@media \(prefers-color-scheme: dark\) \{\s*([^{]+)\{/g),
-    ].map((ocorrencia) => ocorrencia[1].trim());
+    ].map((occurrence) => occurrence[1].trim());
 
-    expect(seletoresSobPreferenciaDoSistema).toEqual(['html[data-theme="system"]']);
+    expect(selectorsUnderSystemPreference).toEqual([SYSTEM_DARK_SELECTOR]);
   });
 
   it("troca o color-scheme, para que controles nativos acompanhem o tema", () => {
-    expect(extrairBloco(SELETOR_ESCURO_EXPLICITO)).toContain("color-scheme: dark");
-    expect(extrairBloco(SELETOR_ESCURO_SISTEMA)).toContain("color-scheme: dark");
+    expect(extractBlock(DARK_SELECTOR)).toContain("color-scheme: dark");
+    expect(extractBlock(SYSTEM_DARK_SELECTOR)).toContain("color-scheme: dark");
   });
 });
 
 describe("espelho TypeScript dos tokens", () => {
-  const temas: ReadonlyArray<[string, ThemeVariant, Map<string, string>]> = [
-    ["claro", lightThemeTokens, declaracoesClaro],
-    ["escuro", darkThemeTokens, declaracoesEscuroExplicito],
+  const themes: ReadonlyArray<[string, ThemeVariant, Map<string, string>]> = [
+    ["claro", lightThemeTokens, lightDeclarations],
+    ["escuro", darkThemeTokens, darkDeclarations],
   ];
 
-  it.each(temas)("reflete as cores do tema %s declaradas no CSS", (_nome, tokens, declaracoes) => {
-    for (const [chave, valor] of Object.entries(tokens.color)) {
-      expect(valorNoTema(`--suoac-color-${camelParaKebab(chave)}`, declaracoes)).toBe(valor.toLowerCase());
+  it.each(themes)("reflete as cores do tema %s declaradas no CSS", (_name, tokens, declarations) => {
+    for (const [key, value] of Object.entries(tokens.color)) {
+      expect(valueInTheme(`--suoac-color-${camelToKebab(key)}`, declarations)).toBe(value.toLowerCase());
     }
   });
 
-  it.each(temas)("reflete as sombras do tema %s declaradas no CSS", (_nome, tokens, declaracoes) => {
-    for (const [chave, valor] of Object.entries(tokens.shadow)) {
-      expect(valorNoTema(`--suoac-shadow-${camelParaKebab(chave)}`, declaracoes)).toBe(valor.toLowerCase());
+  it.each(themes)("reflete as sombras do tema %s declaradas no CSS", (_name, tokens, declarations) => {
+    for (const [key, value] of Object.entries(tokens.shadow)) {
+      expect(valueInTheme(`--suoac-shadow-${camelToKebab(key)}`, declarations)).toBe(value.toLowerCase());
     }
   });
 
-  it.each(temas)("reflete os estados de evento e pagamento do tema %s", (_nome, tokens, declaracoes) => {
-    for (const [chave, valor] of Object.entries(tokens.event)) {
-      expect(valorNoTema(`--suoac-color-event-${camelParaKebab(chave)}`, declaracoes)).toBe(valor.toLowerCase());
+  it.each(themes)("reflete os estados de evento e pagamento do tema %s", (_name, tokens, declarations) => {
+    for (const [key, value] of Object.entries(tokens.event)) {
+      expect(valueInTheme(`--suoac-color-event-${camelToKebab(key)}`, declarations)).toBe(value.toLowerCase());
     }
 
-    for (const [chave, valor] of Object.entries(tokens.payment)) {
-      expect(valorNoTema(`--suoac-color-payment-${camelParaKebab(chave)}`, declaracoes)).toBe(valor.toLowerCase());
+    for (const [key, value] of Object.entries(tokens.payment)) {
+      expect(valueInTheme(`--suoac-color-payment-${camelToKebab(key)}`, declarations)).toBe(value.toLowerCase());
     }
   });
 
   it("cobre no tema escuro toda cor declarada no CSS", () => {
-    const nomesEsperados = nomesDeCorDoTemaClaro
-      .filter((nome) => !nome.startsWith("--suoac-color-event-") && !nome.startsWith("--suoac-color-payment-"))
+    const expectedTokens = lightColorTokens
+      .filter((token) => !token.startsWith("--suoac-color-event-") && !token.startsWith("--suoac-color-payment-"))
       .sort();
-    const nomesDoEspelho = Object.keys(darkThemeTokens.color)
-      .map((chave) => `--suoac-color-${camelParaKebab(chave)}`)
+    const mirroredTokens = Object.keys(darkThemeTokens.color)
+      .map((key) => `--suoac-color-${camelToKebab(key)}`)
       .sort();
 
-    expect(nomesDoEspelho).toEqual(nomesEsperados);
+    expect(mirroredTokens).toEqual(expectedTokens);
   });
 
-  it("mantem fora do tema escuro o que nao muda entre temas", () => {
+  it("mantém fora do tema escuro o que não muda entre temas", () => {
     expect(themeTokens.typography.fontSize.body).toBe("1rem");
     expect(themeTokens.radius.xl).toBe("20px");
     expect(themeTokens.zIndex.modal).toBe(100);
