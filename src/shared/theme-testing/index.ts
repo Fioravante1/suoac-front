@@ -13,5 +13,6 @@ export {
   extractDeclarationsOf,
   createTokenResolver,
   camelToKebab,
+  extractKeyframes,
 } from "./css-tokens";
 export type { TokenResolver } from "./css-tokens";
