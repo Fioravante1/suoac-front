@@ -14,6 +14,10 @@ export default defineConfig([
     // modules alongside client code. These files import server modules directly.
     files: [
       "src/**/api/*-action.ts",
+      // Mesma razao, para actions organizadas em subdiretorio proprio — o
+      // layout que o AGENTS.md §3 pede quando o modulo tem mais de um arquivo.
+      "src/**/api/**/*-action.ts",
+      "src/**/api/**/*-action.test.ts",
       "src/**/api/*.queries.ts",
       "src/**/api/**/*-query.ts",
       // Proxies server-only consumidos por Route Handlers (ex.: exportação de PDF). Importam
