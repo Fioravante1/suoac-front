@@ -1,5 +1,27 @@
+/**
+ * Cores do painel de apresentacao da tela de entrada.
+ *
+ * Sao as mesmas nos dois temas: o painel e navy com texto branco por decisao de
+ * marca, nao por ser uma superficie clara do app. Ficam num objeto proprio
+ * justamente para serem espalhadas nos dois temas sem duplicar valor — duplicar
+ * seria convidar os dois lados a divergirem.
+ */
+const brandPanelColors = {
+  brandPanel: "#0D2B45",
+  brandPanelPattern: "rgb(255 255 255 / 0.06)",
+  brandPanelTextMuted: "rgb(255 255 255 / 0.68)",
+  brandPanelTextSubtle: "rgb(255 255 255 / 0.55)",
+  brandPanelAccent: "#7FCFB4",
+  brandPanelHighlight: "#4FB393",
+  brandPanelHighlightGlow: "rgb(79 179 147 / 0.15)",
+  brandPanelOnHighlight: "#0A1A29",
+  brandPanelTile: "rgb(255 255 255 / 0.06)",
+  brandPanelTileBorder: "rgb(255 255 255 / 0.12)",
+} as const;
+
 export const themeTokens = {
   color: {
+    ...brandPanelColors,
     primary: "#1F6E5A",
     primaryDark: "#174E40",
     primaryLight: "#E6F4EF",
@@ -46,12 +68,15 @@ export const themeTokens = {
     fontFamily:
       'var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     fontSize: {
+      caption: "0.75rem",
       label: "0.8125rem",
       small: "0.875rem",
       body: "1rem",
+      lead: "1.0625rem",
       h3: "1.25rem",
       h2: "1.5rem",
       h1: "2rem",
+      display: "2.5rem",
     },
     lineHeight: {
       tight: "1.2",
@@ -157,6 +182,8 @@ export interface ThemeVariant {
 
 export const darkThemeTokens: ThemeVariant = {
   color: {
+    // Identicas ao tema claro, de proposito — ver `brandPanelColors`.
+    ...brandPanelColors,
     primary: "#4FB393",
     primaryDark: "#7FCFB4",
     primaryLight: "#183229",
