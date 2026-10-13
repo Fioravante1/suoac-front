@@ -102,11 +102,13 @@ export const themeTokens = {
     12: "3rem",
   },
   radius: {
+    xs: "6px",
     sm: "8px",
     md: "12px",
     lg: "16px",
     xl: "20px",
     pill: "999px",
+    control: "14px",
   },
   shadow: {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
@@ -118,6 +120,7 @@ export const themeTokens = {
     modal: "0 40px 100px rgb(10 26 41 / 0.45)",
     buttonPrimary: "0 6px 16px rgb(31 110 90 / 0.25)",
     buttonPrimaryStrong: "0 10px 24px rgb(31 110 90 / 0.28)",
+    focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
   },
   overlay: {
     blur: "4px",
@@ -152,7 +155,9 @@ export const themeTokens = {
   component: {
     buttonHeight: "2.75rem",
     buttonHeightSm: "2.25rem",
+    buttonHeightLg: "3.375rem",
     inputHeight: "3rem",
+    inputHeightLg: "3.125rem",
     cardPadding: "1.5rem",
   },
 } as const;
@@ -238,6 +243,8 @@ export const darkThemeTokens: ThemeVariant = {
     modal: "0 40px 100px rgb(0 0 0 / 0.6)",
     buttonPrimary: "0 6px 16px rgb(0 0 0 / 0.35)",
     buttonPrimaryStrong: "0 10px 24px rgb(0 0 0 / 0.4)",
+    // Mesma declaracao do tema claro: a cor vem de um token que ja muda.
+    focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
   },
 };
 
