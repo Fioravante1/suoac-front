@@ -546,6 +546,42 @@ Antes de concluir qualquer interface nova, verifique:
 - Nao crie barrel exports globais que exportam tudo sem criterio.
 - Nao use `console.log` em codigo de producao frontend.
 - Evite blocos `if` aninhados ("nested ifs"). Prefira sempre o uso de "early returns" (retorno antecipado) para manter o codigo limpo, legivel e reduzir a complexidade ciclomatica.
+- **Ternario aninhado nao entra no projeto.** Encadear `a ? x : b ? y : z` — em JSX ou fora dele —
+  obriga quem le a descartar cada caso anterior para entender o proximo, e o ultimo so se explica
+  por eliminacao. Em JSX, nomeie cada estado e renderize com `&&`: cada condicao responde por si e
+  se le isoladamente. Fora de JSX, use early returns. Ternario simples, de duas alternativas
+  claras, continua sendo bem-vindo.
+
+```tsx
+// Correto — estados nomeados, cada um se explica sozinho
+function SubmitLabel({ greeting, isSubmitting }: SubmitLabelProps) {
+  const isWelcoming = greeting !== null;
+  const isChecking = isSubmitting && !isWelcoming;
+  const isIdle = !isChecking && !isWelcoming;
+
+  return (
+    <>
+      {isIdle && <span>Entrar</span>}
+      {isChecking && <span>Verificando…</span>}
+      {isWelcoming && <span>Bem-vindo, {greeting}</span>}
+    </>
+  );
+}
+```
+
+```tsx
+// Errado — cadeia de ternarios: o ultimo caso so se entende por eliminacao
+function SubmitLabel({ greeting, isSubmitting }: SubmitLabelProps) {
+  return greeting !== null ? (
+    <span>Bem-vindo, {greeting}</span>
+  ) : isSubmitting ? (
+    <span>Verificando…</span>
+  ) : (
+    <span>Entrar</span>
+  );
+}
+```
+
 - **Identificadores de codigo sao sempre em ingles**: nomes de funcoes, variaveis, parametros,
   tipos, propriedades, constantes e chaves de objeto. O portugues fica para o que e lido por
   pessoas — comentarios, textos de interface, mensagens de erro e descricoes de teste

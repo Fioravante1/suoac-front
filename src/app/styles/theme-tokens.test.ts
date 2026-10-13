@@ -35,6 +35,13 @@ const COLORS_SHARED_BY_BOTH_THEMES = [
 ];
 
 /**
+ * Sombras declaradas em cima de um token de cor, e não de um valor literal: a
+ * declaração é a mesma nos dois temas justamente porque a cor dentro dela já
+ * muda sozinha. Repetir a declaração no bloco escuro não mudaria nada.
+ */
+const SHADOWS_BUILT_ON_COLOR_TOKENS = ["--suoac-shadow-focus-ring"];
+
+/**
  * Famílias de cor que são as mesmas nos dois temas por decisão de design, e não
  * por esquecimento. Hoje só o painel de apresentação da tela de entrada: ele é
  * navy com texto branco independentemente do tema escolhido.
@@ -76,7 +83,9 @@ describe("tema escuro no globals.css", () => {
   });
 
   it("dá par escuro a toda sombra do tema claro", () => {
-    const withoutDarkPair = lightShadowTokens.filter((token) => valueInDark(token) === valueInLight(token));
+    const withoutDarkPair = lightShadowTokens
+      .filter((token) => !SHADOWS_BUILT_ON_COLOR_TOKENS.includes(token))
+      .filter((token) => valueInDark(token) === valueInLight(token));
 
     expect(withoutDarkPair).toEqual([]);
   });

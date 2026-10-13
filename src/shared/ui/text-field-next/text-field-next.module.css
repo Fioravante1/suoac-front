@@ -1,0 +1,96 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  width: 100%;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--suoac-space-3);
+}
+
+.label {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  color: var(--suoac-color-text-primary);
+}
+
+/*
+ * A borda e do contorno, nao do `input`: e o que permite icone e botao dentro
+ * do campo, com o foco acendendo o conjunto inteiro.
+ */
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: var(--suoac-input-height-lg);
+  padding: 0 var(--suoac-space-2) 0 0.875rem;
+  border: 1.5px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-control);
+  background: var(--suoac-color-surface);
+  transition:
+    border-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    box-shadow var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+/*
+ * O foco e desenhado no contorno do campo, e nao como outline do `input`, que
+ * ficaria por dentro da borda e cortado pelo raio.
+ */
+.control:focus-within {
+  border-color: var(--suoac-color-primary);
+  box-shadow: var(--suoac-shadow-focus-ring);
+}
+
+.invalid {
+  border-color: var(--suoac-color-critical);
+}
+
+.invalid:focus-within {
+  border-color: var(--suoac-color-critical);
+  box-shadow: 0 0 0 4px var(--suoac-color-critical-soft);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--suoac-color-text-secondary);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--suoac-font-size-body);
+  color: var(--suoac-color-text-primary);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--suoac-color-text-secondary);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.error,
+.hint {
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.error {
+  color: var(--suoac-color-critical);
+}
+
+.hint {
+  color: var(--suoac-color-attention-text);
+}
