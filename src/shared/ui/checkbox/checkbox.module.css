@@ -1,0 +1,68 @@
+.checkbox {
+  display: flex;
+}
+
+/*
+ * Fora da tela, mas ainda focavel e ainda lido pelo leitor de tela —
+ * `display: none` tiraria o campo do formulario e do teclado.
+ */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  color: var(--suoac-color-text-primary);
+  cursor: pointer;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--suoac-radius-xs);
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--suoac-color-border-strong);
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    box-shadow var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.check {
+  color: var(--suoac-color-on-primary);
+  opacity: 0;
+  transition: opacity var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.input:checked + .label .box {
+  background: var(--suoac-color-primary);
+  box-shadow: none;
+}
+
+.input:checked + .label .check {
+  opacity: 1;
+}
+
+/* O foco mora no input escondido; quem o mostra e a caixa desenhada. */
+.input:focus-visible + .label .box {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+}
+
+.input:disabled + .label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

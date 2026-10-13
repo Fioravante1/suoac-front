@@ -1,0 +1,76 @@
+import { type InputHTMLAttributes, type ReactNode, forwardRef, useId } from "react";
+
+import styles from "./text-field-next.module.css";
+
+export interface TextFieldNextProps extends InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  /** Icone a esquerda, dentro do campo. */
+  icon?: ReactNode;
+  /** Acao alinhada a direita do rotulo — "Esqueci a senha", por exemplo. */
+  labelAction?: ReactNode;
+  /** Controle a direita, dentro do campo. Usado pelo campo de senha. */
+  trailing?: ReactNode;
+  error?: string;
+  /** Aviso discreto abaixo do campo, que nao e erro de validacao. */
+  hint?: ReactNode;
+}
+
+/**
+ * Campo de texto do redesign: borda no contorno do campo, com icone e controles
+ * dentro dele.
+ *
+ * Nasce ao lado de `text-field` em vez de virar uma variante dele porque a
+ * estrutura do DOM e outra — hoje a borda e do proprio `input` e o icone fica
+ * sobreposto. Mudar isso repintaria todas as telas que ainda nao foram
+ * redesenhadas. Os dois convivem ate o corte do legado; ver
+ * `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` §3.2.
+ */
+export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(function TextFieldNext(
+  { label, icon, labelAction, trailing, error, hint, className, id, ...props },
+  ref,
+) {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const messageId = `${inputId}-message`;
+  const message = error ?? hint;
+
+  return (
+    <div className={[styles.field, className].filter(Boolean).join(" ")}>
+      <div className={styles.labelRow}>
+        <label className={styles.label} htmlFor={inputId}>
+          {label}
+        </label>
+        {labelAction}
+      </div>
+
+      <div className={[styles.control, error && styles.invalid].filter(Boolean).join(" ")}>
+        {icon && (
+          <span className={styles.icon} aria-hidden>
+            {icon}
+          </span>
+        )}
+        <input
+          id={inputId}
+          ref={ref}
+          className={styles.input}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={message ? messageId : undefined}
+          {...props}
+        />
+        {trailing}
+      </div>
+
+      {message && (
+        <span
+          id={messageId}
+          className={error ? styles.error : styles.hint}
+          // Erro de validacao interrompe; aviso de contexto (Caps Lock) apenas
+          // informa quando o leitor de tela chegar nele.
+          role={error ? "alert" : undefined}
+        >
+          {message}
+        </span>
+      )}
+    </div>
+  );
+});
