@@ -34,6 +34,19 @@ const COLORS_SHARED_BY_BOTH_THEMES = [
   "--suoac-color-modal-scrim",
 ];
 
+/**
+ * Famílias de cor que são as mesmas nos dois temas por decisão de design, e não
+ * por esquecimento. Hoje só o painel de apresentação da tela de entrada: ele é
+ * navy com texto branco independentemente do tema escolhido.
+ */
+const THEME_AGNOSTIC_COLOR_PREFIXES = ["--suoac-color-brand-panel"];
+
+function isSharedByBothThemes(token: string): boolean {
+  if (COLORS_SHARED_BY_BOTH_THEMES.includes(token)) return true;
+
+  return THEME_AGNOSTIC_COLOR_PREFIXES.some((prefix) => token.startsWith(prefix));
+}
+
 const lightDeclarations = extractDeclarationsOf(css, LIGHT_SELECTOR);
 const darkDeclarations = extractDeclarationsOf(css, DARK_SELECTOR);
 const systemDarkDeclarations = extractDeclarationsOf(css, SYSTEM_DARK_SELECTOR);
@@ -55,7 +68,7 @@ describe("tema escuro no globals.css", () => {
 
   it("dá par escuro a toda cor do tema claro", () => {
     const withoutDarkPair = lightColorTokens.filter((token) => {
-      if (COLORS_SHARED_BY_BOTH_THEMES.includes(token)) return false;
+      if (isSharedByBothThemes(token)) return false;
       return valueInDark(token) === valueInLight(token);
     });
 

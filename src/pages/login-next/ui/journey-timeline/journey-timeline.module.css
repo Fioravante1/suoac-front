@@ -1,0 +1,325 @@
+.timeline {
+  /*
+   * Duracao do ciclo completo da jornada. Nao vem dos tokens de movimento de
+   * proposito: aqueles caem para 1ms sob `prefers-reduced-motion`, o que aqui
+   * nao reduziria o movimento — produziria uma piscada continua. A preferencia
+   * e atendida desligando o loop, no fim deste arquivo.
+   */
+  --timeline-cycle: 10s;
+  --timeline-step-size: 2.75rem;
+  --timeline-line-width: 2px;
+
+  /* Estados do marcador de cada etapa, apagado e aceso. */
+  --timeline-idle-background: var(--suoac-color-brand-panel-tile);
+  --timeline-idle-color: var(--suoac-color-brand-panel-text-subtle);
+  --timeline-idle-ring: inset 0 0 0 1px var(--suoac-color-brand-panel-tile-border);
+  --timeline-active-background: var(--suoac-color-brand-panel-highlight);
+  --timeline-active-color: var(--suoac-color-brand-panel-on-highlight);
+  --timeline-active-ring: 0 0 0 6px var(--suoac-color-brand-panel-highlight-glow);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.kicker {
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-semibold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--suoac-color-brand-panel-accent);
+}
+
+.steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+  list-style: none;
+}
+
+/*
+ * A linha que liga as etapas. Sem trilho de fundo, por decisao do handoff: o
+ * que nao foi percorrido simplesmente nao existe ainda.
+ *
+ * Comeca e termina no centro do primeiro e do ultimo marcador — dai o recuo de
+ * meio marcador no topo e na base.
+ */
+.steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--timeline-step-size) / 2);
+  bottom: calc(var(--timeline-step-size) / 2);
+  left: calc(var(--timeline-step-size) / 2 - var(--timeline-line-width) / 2);
+  width: var(--timeline-line-width);
+  background: var(--suoac-color-brand-panel-highlight);
+  transform-origin: top;
+  animation: timelineLine var(--timeline-cycle) linear infinite;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-4);
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--timeline-step-size);
+  height: var(--timeline-step-size);
+  border-radius: var(--suoac-radius-md);
+  background: var(--timeline-active-background);
+  color: var(--timeline-active-color);
+  box-shadow: var(--timeline-active-ring);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.title {
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.description {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-brand-panel-text-subtle);
+}
+
+/*
+ * O ciclo da jornada.
+ *
+ * Cada etapa acende 18% do ciclo depois da anterior, mas todas apagam juntas no
+ * fim — por isso sao quatro animacoes com percentuais proprios, e nao a mesma
+ * animacao com `animation-delay`: um atraso deslocaria tambem o apagar, e a
+ * jornada terminaria em cascata em vez de reiniciar inteira.
+ *
+ * Os percentuais vem de `docs/design_handoff_suoac_redesign/SUOAC Login.dc.html`.
+ */
+@keyframes timelineLine {
+  0% {
+    transform: scaleY(0);
+  }
+  54%,
+  88% {
+    transform: scaleY(1);
+  }
+  93%,
+  100% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes stepEnter0 {
+  0% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+  3%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  93%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes stepEnter1 {
+  0%,
+  18% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+  21%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  93%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes stepEnter2 {
+  0%,
+  36% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+  39%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  93%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes stepEnter3 {
+  0%,
+  54% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+  57%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  93%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes stepMarker0 {
+  0% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+  3%,
+  88% {
+    background: var(--timeline-active-background);
+    color: var(--timeline-active-color);
+    box-shadow: var(--timeline-active-ring);
+  }
+  93%,
+  100% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+}
+
+@keyframes stepMarker1 {
+  0%,
+  18% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+  21%,
+  88% {
+    background: var(--timeline-active-background);
+    color: var(--timeline-active-color);
+    box-shadow: var(--timeline-active-ring);
+  }
+  93%,
+  100% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+}
+
+@keyframes stepMarker2 {
+  0%,
+  36% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+  39%,
+  88% {
+    background: var(--timeline-active-background);
+    color: var(--timeline-active-color);
+    box-shadow: var(--timeline-active-ring);
+  }
+  93%,
+  100% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+}
+
+@keyframes stepMarker3 {
+  0%,
+  54% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+  57%,
+  88% {
+    background: var(--timeline-active-background);
+    color: var(--timeline-active-color);
+    box-shadow: var(--timeline-active-ring);
+  }
+  93%,
+  100% {
+    background: var(--timeline-idle-background);
+    color: var(--timeline-idle-color);
+    box-shadow: var(--timeline-idle-ring);
+  }
+}
+
+.step:nth-child(1) {
+  animation: stepEnter0 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(1) .icon {
+  animation: stepMarker0 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(2) {
+  animation: stepEnter1 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(2) .icon {
+  animation: stepMarker1 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(3) {
+  animation: stepEnter2 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(3) .icon {
+  animation: stepMarker2 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(4) {
+  animation: stepEnter3 var(--timeline-cycle) ease-out infinite;
+}
+
+.step:nth-child(4) .icon {
+  animation: stepMarker3 var(--timeline-cycle) ease-out infinite;
+}
+
+/*
+ * Quem pediu menos movimento recebe a jornada inteira, parada e completa: e
+ * exatamente o estado base declarado acima. Aqui o loop e removido de fato, e
+ * nao encurtado como nos tokens globais — uma animacao infinita de 10s reduzida
+ * a 1ms seria o oposto de menos movimento.
+ */
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * O `:nth-child(n)` nao e enfeite: sem ele, estas regras perdem para as de
+   * cima, que selecionam cada etapa por posicao e por isso pesam mais. O
+   * resultado seria o loop continuar rodando exatamente para quem pediu que ele
+   * nao rodasse.
+   */
+  .steps::before,
+  .step:nth-child(n),
+  .step:nth-child(n) .icon {
+    animation: none;
+  }
+}
