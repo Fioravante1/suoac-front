@@ -1,3 +1,6 @@
+import { readdirSync } from "node:fs";
+import { join, relative } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -144,5 +147,77 @@ describe("preferência por menos movimento", () => {
   it("zera o escalonamento das listas", () => {
     expect(reducedDeclarations.get("--suoac-motion-stagger-step")).toBe("0ms");
     expect(reducedDeclarations.get("--suoac-motion-stagger-max")).toBe("0ms");
+  });
+});
+
+/**
+ * CSS Modules escopam *nomes de animacao*, nao so nomes de classe. Uma
+ * referencia nua a um keyframe global dentro de um module e reescrita para um
+ * nome escopado por arquivo, que nao corresponde a keyframe nenhum — e a
+ * animacao nao roda, sem erro e sem aviso.
+ *
+ * Nenhum teste de comportamento pega isso: o elemento aparece no estado final e
+ * fica parado. A varredura abaixo e o que torna a falha visivel (SUC-43).
+ */
+function listCssModules(): string[] {
+  return ["src", "app"].flatMap((root) =>
+    readdirSync(root, { recursive: true, encoding: "utf8" })
+      .filter((entry) => entry.endsWith(".module.css"))
+      .map((entry) => join(root, entry)),
+  );
+}
+
+/** Nomes de keyframe do design system citados em `animation`/`animation-name`. */
+function bareKeyframeReferences(css: string): string[] {
+  const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const references: string[] = [];
+
+  for (const [, value] of withoutComments.matchAll(/(?<![-\w])animation(?:-name)?\s*:\s*([^;}]+)/g)) {
+    // `var(--suoac-motion-*)` tambem contem o prefixo e nao e nome de animacao.
+    const withoutVars = value.replace(/var\(\s*--[\w-]+\s*\)/g, "");
+    references.push(...(withoutVars.match(/suoac-[\w-]+/g) ?? []));
+  }
+
+  return references;
+}
+
+const cssModules = listCssModules().map((path) => ({
+  path: relative(process.cwd(), path),
+  css: loadCss(path),
+}));
+
+describe("uso das animações compartilhadas em CSS Modules", () => {
+  it("encontra os CSS Modules do projeto", () => {
+    // Guarda contra a varredura passar por vazio e os testes abaixo virarem
+    // decoração — o modo mais silencioso de um teste deixar de proteger.
+    expect(cssModules.length).toBeGreaterThan(0);
+  });
+
+  it("expõe o nome de cada keyframe como token", () => {
+    // É o token que os modules consomem; faltando um, o uso correto fica
+    // impossível e a referência nua volta a ser a saída natural.
+    const semToken = [...ourKeyframes.keys()].filter(
+      (name) => !globals.includes(`${name.replace("suoac-", "--suoac-animation-")}: ${name};`),
+    );
+
+    expect(semToken).toEqual([]);
+  });
+
+  it("nenhum module referencia keyframe global direto, em vez de pela ponte", () => {
+    const comReferenciaNua = cssModules
+      .map(({ path, css }) => ({ path, references: bareKeyframeReferences(css) }))
+      .filter(({ references }) => references.length > 0);
+
+    // Conserto: trocar por `animation-name: var(--suoac-animation-<nome>)`.
+    // `var()` e opaco para o bundler, entao o nome chega inteiro ao navegador.
+    expect(comReferenciaNua).toEqual([]);
+  });
+
+  it("nenhum module redeclara um keyframe do design system", () => {
+    // A mesma animacao passaria a existir em varias versoes levemente
+    // diferentes, uma por arquivo. Ver `AGENTS.md` §12.
+    const comRedeclaracao = cssModules.filter(({ css }) => /@keyframes\s+suoac-/.test(css)).map(({ path }) => path);
+
+    expect(comRedeclaracao).toEqual([]);
   });
 });
