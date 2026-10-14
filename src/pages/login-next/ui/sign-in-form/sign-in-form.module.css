@@ -42,7 +42,10 @@
 .error {
   background: var(--suoac-color-critical-soft);
   color: var(--suoac-color-critical);
-  animation: suoac-shake var(--suoac-motion-duration-slow) var(--suoac-motion-ease-standard) both;
+  animation-name: var(--suoac-animation-shake);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
 }
 
 .error svg {
@@ -165,8 +168,11 @@
   border: 2.5px solid color-mix(in srgb, currentColor 35%, transparent);
   border-top-color: currentColor;
   border-radius: 50%;
+  animation-name: var(--suoac-animation-spin);
   /* Valor local porque e giro continuo: reduzido a 1ms viraria tremor. */
-  animation: suoac-spin 0.7s linear infinite;
+  animation-duration: 0.7s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 .aside {

@@ -269,6 +269,44 @@
 }
 
 /*
+ * Nomes dos keyframes acima, expostos como token.
+ *
+ * Existem por uma limitacao concreta: CSS Modules escopam *nomes de animacao*,
+ * nao so nomes de classe. Escrever `animation: suoac-spin ...` dentro de um
+ * module faz o bundler reescrever o nome para um escopado por arquivo, que nao
+ * corresponde a keyframe nenhum — e a animacao nao roda, sem erro e sem aviso.
+ * Foi o que aconteceu com o spinner do botao de entrar, o balanco do erro e a
+ * entrada do painel de marca (SUC-43).
+ *
+ * `var()` e opaco para o bundler: ele nao enxerga um identificador na posicao de
+ * nome de animacao, entao nao tem o que reescrever. O valor so e substituido no
+ * navegador, quando ja nao ha escopo nenhum para aplicar.
+ *
+ *   .spinner {
+ *     animation-name: var(--suoac-animation-spin);
+ *     animation-duration: 0.7s;
+ *     animation-timing-function: linear;
+ *     animation-iteration-count: infinite;
+ *   }
+ *
+ * Ficam aqui, e nao junto dos demais tokens, para cada um ser lido ao lado do
+ * keyframe que nomeia. Ha um por keyframe, inclusive para os ainda nao usados:
+ * um conjunto pela metade convidaria a proxima fatia a escrever a referencia nua
+ * e repetir o erro. `src/app/styles/motion.test.ts` falha se isso acontecer.
+ */
+:root {
+  --suoac-animation-rise: suoac-rise;
+  --suoac-animation-fade: suoac-fade;
+  --suoac-animation-modal-in: suoac-modal-in;
+  --suoac-animation-pop: suoac-pop;
+  --suoac-animation-grow: suoac-grow;
+  --suoac-animation-seat: suoac-seat;
+  --suoac-animation-draw: suoac-draw;
+  --suoac-animation-shake: suoac-shake;
+  --suoac-animation-spin: suoac-spin;
+}
+
+/*
  * Quem pediu menos movimento ao sistema operacional recebe o resultado final das
  * animacoes, nao o percurso: as duracoes caem para um valor irrisorio em vez de
  * as animacoes serem removidas. Remover quebraria entradas declaradas com

@@ -53,7 +53,11 @@
 .brand,
 .copy,
 .journey {
-  animation: suoac-rise var(--suoac-motion-duration-slow) var(--suoac-motion-ease-standard) both;
+  /* Pelo token, e nao pelo nome do keyframe: ver `app/globals.css`. */
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
 }
 
 .copy {
