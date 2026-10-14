@@ -51,11 +51,24 @@ ponto mais barato possível de inserir e de remover.
 import { redesignLoginFlag } from "@/shared/feature-flags";
 import { LoginPage } from "@/pages/login";
 import { LoginPage as LoginPageNext } from "@/pages/login-next";
+import { LegacyThemeScope } from "@/shared/theme";
 
 export default async function Page() {
-  return (await redesignLoginFlag()) ? <LoginPageNext /> : <LoginPage />;
+  if (await redesignLoginFlag()) {
+    return <LoginPageNext />;
+  }
+
+  return (
+    <LegacyThemeScope>
+      <LoginPage />
+    </LegacyThemeScope>
+  );
 }
 ```
+
+A contenção de tema (§3.3) entra aqui, no ramo antigo — não no layout do grupo de rotas, que envolve
+as duas versões e travaria no claro também a tela nova. É o que obriga a fachada a ser um `if` com
+retorno antecipado em vez de um ternário: o ramo antigo carrega um wrapper que o novo não tem.
 
 Isso combina dois padrões clássicos de propósito diferente, e vale saber qual é qual:
 
@@ -149,7 +162,7 @@ Estratégia, em três camadas:
    continuam idênticas enquanto o atributo não existir.
 2. **Escopo de contenção no legado.** Enquanto houver tela v1 acessível, cada fachada que ainda
    serve o slice antigo embrulha o conteúdo em um wrapper que **redeclara os tokens claros**
-   (`src/app/styles/legacy-light-scope.css`). Assim, mesmo com o usuário em dark no shell novo, uma
+   (`LegacyThemeScope`, em `src/shared/theme/legacy-theme-scope/`). Assim, mesmo com o usuário em dark no shell novo, uma
    tela antiga se renderiza em claro — feio? Um pouco. Quebrado e ilegível? Não. Esse arquivo nasce
    com data de morte: é deletado junto com o último slice v1.
 3. **Persistência por cookie, não `localStorage`.** O tema é lido no Server Component raiz e o
