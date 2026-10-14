@@ -1,7 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+import { E2E_BASE_URL } from "./support/environment";
+import { overrideFlags } from "./support/feature-flags";
+
 /**
- * Fumaça da tela de entrada.
+ * Fumaça da tela de entrada atual — o lado desligado da fachada de `/login`.
+ *
+ * `REDESIGN_LOGIN` é forçada desligada em vez de deixada no `defaultValue`: o
+ * resultado precisa ser o mesmo no CI, que não tem chave do Vercel Flags, e na
+ * máquina de quem desenvolve, que tem. O lado ligado está em `login-next.spec.ts`.
  *
  * Cobre o que teste unitário não alcança: a página renderizada pelo servidor, o
  * tema estampado antes da primeira pintura e os cabeçalhos de segurança da
@@ -12,6 +19,10 @@ import { expect, test } from "@playwright/test";
  * estratégia de dados para esses fluxos entra na Fatia 1, junto com os testes que
  * precisarem dela.
  */
+test.beforeEach(async ({ context }) => {
+  await overrideFlags(context, { REDESIGN_LOGIN: false });
+});
+
 test.describe("tela de entrada", () => {
   test("carrega e apresenta o formulário", async ({ page }) => {
     await page.goto("/login");
@@ -50,7 +61,7 @@ test.describe("tema", () => {
   });
 
   test("aplica o tema escolhido já na resposta do servidor", async ({ page, context }) => {
-    await context.addCookies([{ name: "suoac-theme", value: "dark", url: "http://127.0.0.1:3100" }]);
+    await context.addCookies([{ name: "suoac-theme", value: "dark", url: E2E_BASE_URL }]);
 
     const response = await page.goto("/login");
     const html = (await response?.text()) ?? "";
@@ -60,7 +71,7 @@ test.describe("tema", () => {
   });
 
   test("contém o tema escuro nas telas ainda não redesenhadas", async ({ page, context }) => {
-    await context.addCookies([{ name: "suoac-theme", value: "dark", url: "http://127.0.0.1:3100" }]);
+    await context.addCookies([{ name: "suoac-theme", value: "dark", url: E2E_BASE_URL }]);
     await page.goto("/login");
 
     const backgroundDoEscopo = await page
@@ -73,9 +84,7 @@ test.describe("tema", () => {
   });
 
   test("descarta valor de cookie que não reconhece", async ({ page, context }) => {
-    await context.addCookies([
-      { name: "suoac-theme", value: '"><script>alert(1)</script>', url: "http://127.0.0.1:3100" },
-    ]);
+    await context.addCookies([{ name: "suoac-theme", value: '"><script>alert(1)</script>', url: E2E_BASE_URL }]);
 
     const response = await page.goto("/login");
     const html = (await response?.text()) ?? "";

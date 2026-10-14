@@ -1,17 +1,18 @@
 import type { ReactNode } from "react";
 
-import { LegacyThemeScope } from "@/shared/theme";
-
 import styles from "./layout.module.css";
 
+/**
+ * Moldura das telas de acesso, comum as duas versoes de `/login`.
+ *
+ * Nao aplica contencao de tema: desde SUC-24 o escopo legado desceu para o ramo
+ * antigo da fachada em `login/page.tsx`, porque daqui ele travaria no claro
+ * tambem a tela redesenhada.
+ */
 export default function AuthLayout({ children }: { children: ReactNode }) {
-  // Temporario: as telas de autenticacao ainda sao v1. O escopo sai quando a
-  // Fatia 1 for cortada. Ver SUC-17.
   return (
-    <LegacyThemeScope>
-      <div className={styles.layout}>
-        <main className={styles.main}>{children}</main>
-      </div>
-    </LegacyThemeScope>
+    <div className={styles.layout}>
+      <main className={styles.main}>{children}</main>
+    </div>
   );
 }
