@@ -1,6 +1,8 @@
 export const routes = {
   home: "/",
   login: "/login",
+  privacy: "/privacidade",
+  help: "/ajuda",
   changePassword: "/change-password",
   dashboard: "/dashboard",
   events: "/events",

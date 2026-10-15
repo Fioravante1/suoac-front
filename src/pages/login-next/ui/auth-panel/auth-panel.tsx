@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { routes } from "@/shared/config";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 import styles from "./auth-panel.module.css";
@@ -39,10 +40,10 @@ export function AuthPanel({ children }: AuthPanelProps) {
 
       <footer className={styles.footer}>
         <span>© {currentYear} SUOAC</span>
-        <Link className={styles.link} href="/privacidade">
+        <Link className={styles.link} href={routes.privacy}>
           Privacidade
         </Link>
-        <Link className={styles.link} href="/ajuda">
+        <Link className={styles.link} href={routes.help}>
           Ajuda
         </Link>
       </footer>
