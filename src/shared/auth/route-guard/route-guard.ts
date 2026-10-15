@@ -6,8 +6,14 @@ import { routes } from "@/shared/config";
 
 import { getSession } from "../session";
 
-/** Rotas acessíveis sem sessão. Todas as demais exigem autenticação. */
-const PUBLIC_ROUTES: readonly string[] = [routes.login];
+/**
+ * Rotas acessíveis sem sessão. Todas as demais exigem autenticação.
+ *
+ * Privacidade e Ajuda entram aqui porque são alcançadas pelo rodapé da tela de
+ * entrada: sem isso o gate as devolveria para `/login`, e o link do rodapé
+ * pareceria quebrado mesmo com a página existindo.
+ */
+const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.help];
 
 /**
  * Gate de autenticação server-side (Next 16 Proxy). Roda antes de a rota ser
