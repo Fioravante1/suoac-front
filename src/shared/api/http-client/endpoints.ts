@@ -4,6 +4,7 @@ export const endpoints = {
     logout: "/auth/logout",
     refresh: "/auth/refresh",
     changePassword: "/auth/change-password",
+    passwordResetRequests: "/auth/password-reset-requests",
   },
   congregations: {
     list: (circuitId: string) => `/circuits/${circuitId}/congregations` as const,
