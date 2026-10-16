@@ -6,7 +6,10 @@ import { renderWithTheme, resetThemeEnvironment } from "@/shared/theme-testing";
 // A tela monta o formulário de verdade — é a composição que este teste cobre.
 // Só a fronteira com o servidor e com o roteador é substituída: a Server Action
 // não roda em jsdom, e o roteador do App Router não existe fora da aplicação.
-vi.mock("../../api", () => ({ signInAction: vi.fn() }));
+vi.mock("../../api", () => ({
+  requestPasswordResetAction: vi.fn(),
+  signInAction: vi.fn(),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),

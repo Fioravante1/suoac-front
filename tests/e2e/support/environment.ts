@@ -9,6 +9,11 @@ export const E2E_PORT = 3100;
 
 export const E2E_BASE_URL = `http://127.0.0.1:${E2E_PORT}`;
 
+/** API local deterministica usada pelas Server Actions durante o E2E. */
+export const E2E_API_PORT = 3101;
+
+export const E2E_API_BASE_URL = `http://127.0.0.1:${E2E_API_PORT}`;
+
 /**
  * Segredo do Flags SDK usado para assinar overrides de flag no E2E.
  *

@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
+import { AuthFlow } from "../auth-flow";
 import { AuthPanel } from "../auth-panel";
 import { BrandPanel } from "../brand-panel";
-import { SignInForm } from "../sign-in-form";
 
 import styles from "./login-page.module.css";
 
@@ -24,7 +24,7 @@ export function LoginPage() {
         {/* O formulario le `returnUrl` e `sessionExpired` da URL, e `useSearchParams`
             exige fronteira de suspense para nao forcar a rota inteira a ser dinamica. */}
         <Suspense>
-          <SignInForm />
+          <AuthFlow />
         </Suspense>
       </AuthPanel>
     </div>
