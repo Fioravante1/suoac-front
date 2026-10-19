@@ -31,7 +31,7 @@ Refs: SUC-
 
 - [ ] `yarn run check` passa
 - [ ] Teste unitario co-localizado para todo artefato novo
-- [ ] E2E para fluxo critico, quando aplicavel (`AGENTS.md` §8)
+- [ ] E2E para fluxo critico, quando aplicavel (`.claude/rules/testes-e2e.md`)
 - [ ] Conferido nos temas claro e escuro, quando houver mudanca visual
 - [ ] Card atualizado no Jira: comentario com o que foi entregue e estado correto
 - [ ] Commits no padrao Conventional Commits, com `Refs: SUC-XX` e **sem** trailer de atribuicao a IA
