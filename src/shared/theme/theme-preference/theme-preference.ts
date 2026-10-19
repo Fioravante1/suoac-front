@@ -4,7 +4,8 @@
  * `system` segue `prefers-color-scheme` do sistema operacional. A **ausencia** de
  * preferencia e um quarto estado, distinto de `system`: enquanto houver telas nao
  * redesenhadas, quem nunca escolheu um tema recebe o claro, mesmo com o sistema
- * operacional em escuro. Ver `app/globals.css` e `AGENTS.md` §12.
+ * operacional em escuro. Ver `app/globals.css` e
+ * `.claude/rules/tema-claro-e-escuro.md`.
  */
 export const THEME_PREFERENCES = ["light", "dark", "system"] as const;
 
