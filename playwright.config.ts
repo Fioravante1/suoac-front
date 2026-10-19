@@ -41,7 +41,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        // Largura minima do redesign. Ver AGENTS.md §6.
+        // Largura minima do redesign. Ver .claude/rules/ui-e-design-system.md.
         viewport: { width: 1280, height: 900 },
       },
     },

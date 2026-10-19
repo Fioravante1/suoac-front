@@ -215,7 +215,7 @@ describe("uso das animações compartilhadas em CSS Modules", () => {
 
   it("nenhum module redeclara um keyframe do design system", () => {
     // A mesma animacao passaria a existir em varias versoes levemente
-    // diferentes, uma por arquivo. Ver `AGENTS.md` §12.
+    // diferentes, uma por arquivo. Ver `.claude/rules/animacao.md`.
     const comRedeclaracao = cssModules.filter(({ css }) => /@keyframes\s+suoac-/.test(css)).map(({ path }) => path);
 
     expect(comRedeclaracao).toEqual([]);

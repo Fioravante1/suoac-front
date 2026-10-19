@@ -341,8 +341,8 @@ teste unitário co-localizado obrigatório para todo artefato novo.
 O que o redesign acrescenta como risco: **regressão visual e de comportamento em telas que ninguém
 está olhando**, porque a atenção está na fatia da vez. Teste unitário não pega isso.
 
-**Decisão tomada em 09/10/2026: Playwright é obrigatório** (card SUC-40, `AGENTS.md` §8). A opção 1
-abaixo fica como registro do que foi avaliado.
+**Decisão tomada em 09/10/2026: Playwright é obrigatório** (card SUC-40,
+`.claude/rules/testes-e2e.md`). A opção 1 abaixo fica como registro do que foi avaliado.
 
 Três opções, em ordem de custo:
 
@@ -389,9 +389,9 @@ Sequência fixa, repetida em cada fatia:
 
 1. **Contrato de API** acordado e implementado em staging (quando houver dependência).
 2. **Branch curta a partir de `develop`**, uma por card, no padrão `tipo/suc-XX-descricao-curta`
-   (`AGENTS.md` §11). Branch longa de redesign é exatamente o que o Branch by Abstraction existe
-   para evitar; se a fatia não cabe em PRs de poucos dias, ela está grande demais e deve ser
-   subdividida.
+   (`.claude/rules/compartilhado/branches-e-prs.md`). Branch longa de redesign é exatamente o que o
+   Branch by Abstraction existe para evitar; se a fatia não cabe em PRs de poucos dias, ela está
+   grande demais e deve ser subdividida.
 3. **PR 1 — slice novo sem fachada.** O código `-next` entra no repositório sem estar ligado a
    nenhuma rota. Inerte, revisável, com testes.
 4. **PR 2 — flag + fachada.** A rota passa a escolher. Flag desligada por padrão
