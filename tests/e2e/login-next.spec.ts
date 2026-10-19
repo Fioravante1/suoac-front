@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { E2E_BASE_URL } from "./support/environment";
+import { E2E_API_BASE_URL, E2E_BASE_URL } from "./support/environment";
 import { overrideFlags } from "./support/feature-flags";
 
 /**
@@ -36,6 +36,25 @@ test.describe("fachada de /login com o redesign ligado", () => {
     // a fronteira de suspense que a tela nova usa para ler os search params.
     await expect(page).toHaveURL(`${E2E_BASE_URL}/login?returnUrl=%2Fdashboard`);
     await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  });
+
+  test("solicita a recuperação de senha e confirma o prazo do link", async ({ page, request }) => {
+    await request.delete(`${E2E_API_BASE_URL}/__requests`);
+    await page.goto("/login");
+
+    await page.getByRole("button", { name: "Esqueci a senha" }).click();
+    await expect(page.getByRole("heading", { name: "Recuperar senha" })).toBeVisible();
+    await page.getByLabel("E-mail").fill("coordenador@circuito.org");
+    await page.getByRole("button", { name: "Enviar link" }).click();
+
+    await expect(page.getByRole("heading", { name: "Confira seu e-mail" })).toBeVisible();
+    await expect(page.getByRole("status")).toContainText("O link será válido por 1 hora.");
+
+    const recordedRequests = await request.get(`${E2E_API_BASE_URL}/__requests`);
+    await expect(recordedRequests).toBeOK();
+    await expect(recordedRequests.json()).resolves.toEqual({
+      passwordResetRequests: [{ email: "coordenador@circuito.org" }],
+    });
   });
 
   test("acompanha o tema escuro escolhido", async ({ page, context }) => {
