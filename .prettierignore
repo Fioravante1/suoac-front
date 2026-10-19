@@ -1,5 +1,4 @@
 .next
-.agents
 build
 coverage
 dist
@@ -13,6 +12,9 @@ next-env.d.ts
 yarn.lock
 package-lock.json
 pnpm-lock.yaml
+
+# Skills de IA: documentacao de terceiros recebida como referencia, nao formatar
+.claude/skills/
 
 # Handoff de design: artefatos originais, nao formatar (sao a fonte da verdade do redesign)
 docs/design_handoff_suoac_redesign/
