@@ -52,6 +52,12 @@ function isRedirectRejection(error: unknown): boolean {
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   /** Token recusado no submit — o link morreu entre abrir a tela e enviar. */
   const [rejectedToken, setRejectedToken] = useState<Exclude<TokenState, "valid"> | null>(null);
+  /*
+   * Guardado separado de `isSubmitting`: o envio termina quando a action
+   * responde, mas a navegacao para a confirmacao comeca depois disso e o
+   * formulario continua na tela enquanto ela acontece.
+   */
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { serverError, clearServerError, showServerError } = useServerError();
   /*
    * O formulario sai do DOM quando o token e recusado no envio, levando junto o
@@ -91,6 +97,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const passwordsMatch = hasConfirmation && newPassword === confirmPassword;
   const passwordsDiverge = hasConfirmation && !passwordsMatch;
   const isReady = isPasswordCompliant(newPassword) && passwordsMatch;
+  /*
+   * Fechado desde o clique ate a tela trocar. Reabrir durante a navegacao
+   * custaria caro: um segundo envio reenviaria o token ja consumido, o backend
+   * responderia `409` e "Este link ja foi usado" tomaria o lugar da
+   * confirmacao, na cara de quem acabou de redefinir a senha.
+   */
+  const isBusy = isSubmitting || isRedirecting;
 
   function resolveMatchStatus() {
     if (passwordsMatch) return "valid" as const;
@@ -116,7 +129,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       result = await resetPasswordAction({ token, ...values });
     } catch (error) {
       // Sucesso: a action redirecionou e a navegacao ja esta em curso.
-      if (isRedirectRejection(error)) return;
+      if (isRedirectRejection(error)) {
+        setIsRedirecting(true);
+        return;
+      }
 
       /*
        * Falha antes de a action responder — conexao caida, deploy no meio da
@@ -173,7 +189,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           placeholder={`Mínimo de ${PASSWORD_MIN_LENGTH} caracteres`}
           icon={<Lock size={18} strokeWidth={1.9} />}
           error={errors.newPassword?.message}
-          disabled={isSubmitting}
+          disabled={isBusy}
           autoFocus
           {...register("newPassword")}
         />
@@ -193,7 +209,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
          * repetiria o que ja esta dito acima.
          */
         status={matchStatus}
-        disabled={isSubmitting}
+        disabled={isBusy}
         /*
          * A regiao viva fica sempre montada, mudando so o texto: leitor de tela
          * nao anuncia regiao que entra no DOM ja com conteudo, e o primeiro
@@ -229,9 +245,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </span>
       </p>
 
-      <button type="submit" className={styles.submit} disabled={isSubmitting} data-ready={isReady}>
-        {isSubmitting && <Spinner className={styles.spinner} size="small" />}
-        {isSubmitting ? "Salvando…" : "Salvar nova senha"}
+      <button type="submit" className={styles.submit} disabled={isBusy} data-ready={isReady}>
+        {isBusy && <Spinner className={styles.spinner} size="small" />}
+        {isBusy ? "Salvando…" : "Salvar nova senha"}
       </button>
 
       <Link href={routes.login} className={styles.back}>

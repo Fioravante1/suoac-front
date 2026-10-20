@@ -14,6 +14,16 @@ const { ResetPasswordForm } = await import("./reset-password-form");
 const TOKEN = "token-do-link";
 const SENHA = "NovaSenha123";
 
+/**
+ * `redirect` na action chega ao cliente como rejeicao, depois de o roteador ja
+ * ter aplicado a navegacao. E assim que o sucesso se manifesta aqui.
+ */
+function rejeicaoDeRedirect() {
+  return Object.assign(new Error("NEXT_REDIRECT"), {
+    digest: "NEXT_REDIRECT;replace;/reset-password?status=sucesso;303;",
+  });
+}
+
 function preencher(senha = SENHA, confirmacao = senha) {
   fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: senha } });
   fireEvent.change(screen.getByLabelText("Confirme a nova senha"), { target: { value: confirmacao } });
@@ -132,14 +142,8 @@ describe("ResetPasswordForm", () => {
   });
 
   it("não propaga a rejeição do redirect no caminho de sucesso", async () => {
-    /*
-     * `redirect` na action chega ao cliente como rejeicao depois de a navegacao
-     * ja ter acontecido. Repropagada, vira `unhandledrejection` no navegador.
-     */
-    const redirectError = Object.assign(new Error("NEXT_REDIRECT"), {
-      digest: "NEXT_REDIRECT;replace;/reset-password?status=sucesso;303;",
-    });
-    resetPasswordAction.mockRejectedValue(redirectError);
+    // Repropagada, a rejeicao vira `unhandledrejection` no navegador.
+    resetPasswordAction.mockRejectedValue(rejeicaoDeRedirect());
 
     const naoTratadas: unknown[] = [];
     const capturar = (event: PromiseRejectionEvent) => naoTratadas.push(event.reason);
@@ -221,6 +225,32 @@ describe("ResetPasswordForm", () => {
 
     liberar({ status: "error", message: "Falha de rede." });
     await waitFor(() => expect(screen.getByRole("button", { name: "Salvar nova senha" })).toBeEnabled());
+  });
+
+  it("mantém o envio fechado durante a navegação para a confirmação", async () => {
+    /*
+     * O sucesso sai da action como rejeicao de `redirect`, e o React Hook Form
+     * limpa `isSubmitting` ao sair do submit — mas a navegacao continua em
+     * curso. Reabrir o botao aqui permitiria um segundo envio do token ja
+     * consumido, que o backend recusa com `409`: "Este link ja foi usado"
+     * tomaria o lugar da confirmacao.
+     */
+    resetPasswordAction.mockRejectedValue(rejeicaoDeRedirect());
+
+    render(<ResetPasswordForm token={TOKEN} />);
+    preencher();
+    enviar();
+
+    await waitFor(() => expect(resetPasswordAction).toHaveBeenCalledOnce());
+
+    // O nome acessivel inclui o rotulo do spinner, por isso o regex.
+    const botao = await screen.findByRole("button", { name: /Salvando/ });
+    expect(botao).toBeDisabled();
+
+    fireEvent.click(botao);
+
+    expect(resetPasswordAction).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("heading", { name: "Este link já foi usado" })).not.toBeInTheDocument();
   });
 
   it("avisa quando a action nem chega a responder", async () => {
