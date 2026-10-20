@@ -10,16 +10,15 @@ interface AuthPanelProps {
   /**
    * Tela de acesso ativa — entrar, recuperar senha, convite ou autocadastro.
    *
-   * Chega vazia por enquanto: as telas sao os cards seguintes da fatia. A moldura
-   * ja esta pronta para recebe-las, inclusive a animacao de troca, que roda
-   * sozinha porque trocar de tela desmonta uma e monta outra.
+   * A animacao de troca roda sozinha, porque trocar de tela desmonta uma e
+   * monta outra.
    */
   children?: ReactNode;
 }
 
 /**
- * Metade direita da tela de entrada: alternancia de tema, a tela de acesso
- * ativa e o rodape institucional.
+ * Metade direita das telas de acesso: alternancia de tema, a tela ativa e o
+ * rodape institucional.
  *
  * Diferente do painel de apresentacao, esta coluna acompanha o tema escolhido.
  */
