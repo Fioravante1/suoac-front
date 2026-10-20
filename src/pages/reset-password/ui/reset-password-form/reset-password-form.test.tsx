@@ -131,6 +131,31 @@ describe("ResetPasswordForm", () => {
     expect(resetPasswordAction).not.toHaveBeenCalled();
   });
 
+  it("não propaga a rejeição do redirect no caminho de sucesso", async () => {
+    /*
+     * `redirect` na action chega ao cliente como rejeicao depois de a navegacao
+     * ja ter acontecido. Repropagada, vira `unhandledrejection` no navegador.
+     */
+    const redirectError = Object.assign(new Error("NEXT_REDIRECT"), {
+      digest: "NEXT_REDIRECT;replace;/reset-password?status=sucesso;303;",
+    });
+    resetPasswordAction.mockRejectedValue(redirectError);
+
+    const naoTratadas: unknown[] = [];
+    const capturar = (event: PromiseRejectionEvent) => naoTratadas.push(event.reason);
+    window.addEventListener("unhandledrejection", capturar);
+
+    render(<ResetPasswordForm token={TOKEN} />);
+    preencher();
+    enviar();
+
+    await waitFor(() => expect(resetPasswordAction).toHaveBeenCalled());
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    window.removeEventListener("unhandledrejection", capturar);
+
+    expect(naoTratadas).toHaveLength(0);
+  });
+
   it("barra senha fora da política antes de chamar o servidor", async () => {
     render(<ResetPasswordForm token={TOKEN} />);
     preencher("senhalonga");
