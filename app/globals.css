@@ -210,6 +210,20 @@
   }
 }
 
+/*
+ * Troca de tela e troca de etapa: a que chega desliza da direita.
+ *
+ * Nasceu local no `auth-panel` e subiu para ca quando o autocadastro (SUC-28)
+ * passou a precisar dela na troca de etapas — dois consumidores fazem a
+ * animacao ser do design system, nao da tela.
+ */
+@keyframes suoac-swap {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
 @keyframes suoac-fade {
   from {
     opacity: 0;
@@ -300,6 +314,7 @@
  */
 :root {
   --suoac-animation-rise: suoac-rise;
+  --suoac-animation-swap: suoac-swap;
   --suoac-animation-fade: suoac-fade;
   --suoac-animation-modal-in: suoac-modal-in;
   --suoac-animation-pop: suoac-pop;

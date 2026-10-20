@@ -42,6 +42,7 @@ type PrototypeName = keyof typeof prototypeKeyframes;
  */
 const KEYFRAMES_FROM_HANDOFF: ReadonlyArray<[string, string, PrototypeName]> = [
   ["suoac-rise", "rise", "dashboard"],
+  ["suoac-swap", "swap", "login"],
   ["suoac-fade", "fade", "dashboard"],
   ["suoac-modal-in", "popC2", "dashboard"],
   ["suoac-pop", "pop", "dashboard"],
