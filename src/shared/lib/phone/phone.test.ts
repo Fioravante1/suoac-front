@@ -44,6 +44,22 @@ describe("formatPhone", () => {
     expect(formatPhone("tel: (11) 97753-0630")).toBe("(11) 97753-0630");
   });
 
+  it.each([
+    ["+55 (11) 97753-0630", "(11) 97753-0630"],
+    ["5511977530630", "(11) 97753-0630"],
+    ["551133334444", "(11) 3333-4444"],
+  ])("deve descartar o código do país em %s", (input, expected) => {
+    // Número copiado do WhatsApp vem com `+55`. Mantê-lo faria o corte em onze
+    // dígitos produzir `(55) 11977-5306` — outro telefone, válido na aparência
+    // e gravado sem ninguém perceber.
+    expect(formatPhone(input)).toBe(expected);
+  });
+
+  it("não deve confundir o DDD 55 com código do país", () => {
+    // Santa Maria é DDD 55: com onze dígitos, o `55` da frente é área, não país.
+    expect(formatPhone("55977530630")).toBe("(55) 97753-0630");
+  });
+
   it("deve permitir apagar até o fim", () => {
     // Apagar o último dígito não pode deixar a pontuação órfã para trás.
     expect(formatPhone("(1")).toBe("(1");

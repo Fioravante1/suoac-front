@@ -12,6 +12,29 @@ export function phoneDigits(value: string): string {
   return value.replace(/\D/g, "");
 }
 
+/** Código do país, que vem colado em número copiado do WhatsApp. */
+const COUNTRY_CODE = "55";
+
+/**
+ * Tira o `55` da frente de um número que veio com código do país.
+ *
+ * Sem isto, `+55 (11) 97753-0630` perde os quatro últimos dígitos ao ser
+ * cortado em onze e vira `(55) 11977-5306` — um telefone diferente, que passa
+ * na validação e é gravado sem ninguém perceber. O campo é o do WhatsApp, onde
+ * número copiado carrega `+55` com frequência.
+ *
+ * Só vale para 12 ou 13 dígitos começando em `55`: um celular nacional tem 11,
+ * então não há como confundir com DDD 55 (Santa Maria), que teria 10 ou 11.
+ */
+function stripCountryCode(digits: string): string {
+  const hasCountryCode =
+    digits.startsWith(COUNTRY_CODE) &&
+    digits.length > MOBILE_DIGITS &&
+    digits.length <= COUNTRY_CODE.length + MOBILE_DIGITS;
+
+  return hasCountryCode ? digits.slice(COUNTRY_CODE.length) : digits;
+}
+
 /** Dígitos antes do hífen, depois do DDD: cinco no celular, quatro no fixo. */
 function prefixLength(digitCount: number): number {
   return digitCount === MOBILE_DIGITS ? 7 : 6;
@@ -33,7 +56,7 @@ function prefixLength(digitCount: number): number {
  * `(11) 97-7530` no meio da digitação, com o separador pulando a cada tecla.
  */
 export function formatPhone(value: string): string {
-  const digits = phoneDigits(value).slice(0, MOBILE_DIGITS);
+  const digits = stripCountryCode(phoneDigits(value)).slice(0, MOBILE_DIGITS);
 
   if (digits.length === 0) {
     return "";
