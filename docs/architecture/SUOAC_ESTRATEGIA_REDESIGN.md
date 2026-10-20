@@ -309,19 +309,39 @@ mas a existência da dependência já é conhecida agora:
 
 **Fatia 1 — Login** (único detalhado aqui, por ser a próxima)
 
-| Necessidade              | Hoje                               | Falta                                                        |
-| ------------------------ | ---------------------------------- | ------------------------------------------------------------ |
-| Entrar                   | `POST /auth/login`                 | —                                                            |
-| Esqueci a senha          | —                                  | solicitar link + redefinir com token                         |
-| Aceite de convite        | `entities/invitation` existe vazio | validar token do convite e concluir cadastro                 |
-| Autocadastro de circuito | —                                  | criar coordenador + circuito + congregações em uma transação |
-| Confirmação de e-mail    | —                                  | enviar/validar código de 6 dígitos, com reenvio              |
-| "Manter conectado"       | sessão por cookie HttpOnly         | duração de sessão estendida                                  |
+| Necessidade              | Hoje                                                             | Falta                                        |
+| ------------------------ | ---------------------------------------------------------------- | -------------------------------------------- |
+| Entrar                   | `POST /auth/login`                                               | —                                            |
+| Esqueci a senha          | `password-reset-requests` / `-verifications` / `password-resets` | — (SUC-35)                                   |
+| Aceite de convite        | `entities/invitation` existe vazio                               | validar token do convite e concluir cadastro |
+| Autocadastro de circuito | `POST /auth/circuit-signups` + `/confirmations`                  | — (SUC-37)                                   |
+| Confirmação de e-mail    | código de 6 dígitos, dentro do autocadastro                      | — (SUC-37)                                   |
+| "Manter conectado"       | sessão por cookie HttpOnly                                       | duração de sessão estendida                  |
 
 O autocadastro é a peça mais pesada: cria usuário, circuito e N congregações de uma vez, com a
-primeira congregação obrigatoriamente a do próprio coordenador. Vale decidir cedo se é **um
-endpoint transacional** ou uma sequência de chamadas com estado intermediário — a diferença aparece
-na UI (o que acontece se o usuário abandonar na etapa 3).
+primeira congregação obrigatoriamente a do próprio coordenador.
+
+**Decisão tomada em 20/10/2026 (SUC-37): rascunho no servidor com consolidação atômica.** Não é o
+endpoint transacional único que esta seção recomendava, nem a sequência com estado intermediário que
+ela descartava — é uma terceira forma, e o que a forçou foi a confirmação de e-mail por código. Em
+uma chamada só, ou o circuito nasce antes de alguém provar que o e-mail é seu, ocupando um código de
+circuito que ninguém confirmou, ou o payload inteiro — senha inclusa — volta pelo cliente na segunda
+chamada.
+
+Como ficou: `POST /auth/circuit-signups` valida tudo e grava **uma linha** de rascunho, com a senha
+já em Argon2 e o hash do código; `POST /auth/circuit-signups/confirmations` recebe e-mail e código e
+consolida circuito, congregações e coordenador numa transação, devolvendo sessão autenticada.
+
+O que isso define para a UI, que era a pergunta desta seção: **as três etapas não enviam nada.** O
+payload vai inteiro ao concluir a etapa 3. Abandonar antes disso não deixa rastro no servidor;
+abandonar na confirmação deixa um rascunho que expira em 30 minutos e é purgado, sem reservar
+código nenhum. Recarregar a página no meio perde o preenchimento — não há rascunho para retomar, e o
+comportamento definido é avisar antes de sair e voltar à etapa 1.
+
+Uma consequência que o desenho não previa: o erro de **código de circuito já em uso** só aparece ao
+concluir a etapa 3, porque a unicidade é do servidor. A resposta `409` traz o campo em `field`
+(`coordinator.email`, `circuit.code`, `circuit.name`, `congregations.N.code`), e a tela precisa saber
+voltar para a etapa que contém aquele campo.
 
 **Demais fatias:** ônibus e poltronas (modelo de dados novo, inclusive `legs[dia] = {bus, seat}` por
 passageiro), importação de planilha com deduplicação por RG, notificações, busca global,
