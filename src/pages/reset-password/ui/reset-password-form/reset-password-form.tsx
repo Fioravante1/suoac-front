@@ -11,6 +11,7 @@ import {
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   isPasswordCompliant,
+  isRedirectRejection,
   usePasswordTruncationNotice,
   useServerError,
 } from "@/shared/lib";
@@ -35,25 +36,6 @@ interface ResetPasswordFormProps {
 }
 
 const SUBMIT_FAILED = "Não foi possível redefinir a senha agora. Tente novamente.";
-
-/**
- * `redirect` numa Server Action chega ao cliente como **rejeicao**, depois de
- * o roteador ja ter aplicado a navegacao.
- *
- * Sem reconhece-la, o `handleSubmit` do React Hook Form a repropaga e ela vira
- * `unhandledrejection` no navegador: invisivel para quem usa a tela, mas um
- * alarme falso em todo sucesso para quem coleta erro de cliente.
- *
- * O digest e `NEXT_REDIRECT;<tipo>;<destino>;<status>;` — basta o prefixo, e
- * assim nao se importa modulo interno do Next.
- */
-function isRedirectRejection(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("digest" in error)) return false;
-
-  const { digest } = error as { digest: unknown };
-
-  return typeof digest === "string" && digest.startsWith("NEXT_REDIRECT");
-}
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   /** Token recusado no submit — o link morreu entre abrir a tela e enviar. */

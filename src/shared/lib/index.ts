@@ -17,6 +17,7 @@ export {
 } from "./deadline";
 export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
+export { isRedirectRejection } from "./is-redirect-rejection";
 export { calcPercentage } from "./number";
 export {
   PASSWORD_MAX_LENGTH,

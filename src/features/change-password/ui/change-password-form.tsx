@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, KeyRound, Loader2 } from "lucide-react";
 
-import { PASSWORD_MAX_LENGTH, useServerError, usePasswordTruncationNotice } from "@/shared/lib";
+import { PASSWORD_MAX_LENGTH, isRedirectRejection, useServerError, usePasswordTruncationNotice } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { PasswordField } from "@/shared/ui/password-field";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
@@ -13,30 +13,6 @@ import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
 import { changePasswordSchema, type ChangePasswordFormValues } from "../model/change-password-schema";
 import { changePasswordAction } from "../api/change-password-action";
 import styles from "./change-password-form.module.css";
-
-/**
- * `redirect` numa Server Action chega ao cliente como **rejeicao**, depois de
- * o roteador ja ter aplicado a navegacao.
- *
- * Sem reconhece-la, o `handleSubmit` do React Hook Form a repropaga e ela vira
- * `unhandledrejection` no navegador: invisivel para quem usa a tela, mas um
- * alarme falso em toda troca de senha bem-sucedida para quem coleta erro de
- * cliente.
- *
- * O digest e `NEXT_REDIRECT;<tipo>;<destino>;<status>;` — basta o prefixo, e
- * assim nao se importa modulo interno do Next.
- *
- * Duplicado da tela de redefinicao por link de proposito: `features` nao
- * importa de `pages`, e promover o guarda para `shared` e refatoracao de camada
- * compartilhada, que nao cabe num PR de correcao.
- */
-function isRedirectRejection(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("digest" in error)) return false;
-
-  const { digest } = error as { digest: unknown };
-
-  return typeof digest === "string" && digest.startsWith("NEXT_REDIRECT");
-}
 
 const GENERIC_ERROR = "Não foi possível alterar a senha. Tente novamente.";
 
@@ -162,7 +138,13 @@ export function ChangePasswordForm() {
         {...register("confirmPassword")}
       />
 
-      <Button type="submit" fullWidth disabled={isBusy}>
+      {/*
+        O rotulo cede lugar ao spinner, que e so icone: sem `aria-label` o botao
+        fica sem nome acessivel justamente enquanto algo acontece. O texto nao
+        volta ao lado do icone para nao mudar o desenho de uma tela que ainda
+        nao foi redesenhada.
+      */}
+      <Button type="submit" fullWidth disabled={isBusy} aria-label={isBusy ? "Salvando a nova senha" : undefined}>
         {isBusy ? <Loader2 className={styles.spinner} size={20} /> : "Definir nova senha"}
       </Button>
     </form>
