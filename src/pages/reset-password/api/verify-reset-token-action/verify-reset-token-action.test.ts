@@ -18,7 +18,12 @@ beforeEach(() => {
 });
 
 describe("verifyResetTokenAction", () => {
-  it("envia o token no corpo, nunca na query string", async () => {
+  it("envia o token no corpo, nunca na query string, e sem a sessão do navegador", async () => {
+    /*
+     * `anonymous` nao e detalhe: esta funcao roda em render de Server
+     * Component, onde escrever cookie e proibido, e levar a sessao poria a
+     * renovacao no caminho de um `401`.
+     */
     httpClient.mockResolvedValue(undefined);
 
     const state = await verifyResetTokenAction(TOKEN);
@@ -26,6 +31,7 @@ describe("verifyResetTokenAction", () => {
     expect(httpClient).toHaveBeenCalledWith(endpoints.auth.passwordResetVerifications, {
       method: "POST",
       body: { token: TOKEN },
+      anonymous: true,
     });
     expect(state).toBe("valid");
   });

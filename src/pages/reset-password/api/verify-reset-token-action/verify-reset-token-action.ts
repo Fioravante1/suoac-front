@@ -1,8 +1,13 @@
 /*
  * `server-only`, nao `"use server"`: o unico chamador e a propria pagina, que e
- * Server Component. Como Server Action, isto viraria um endpoint POST publico e
- * sem limite de tentativas, consultavel pelo navegador — um oraculo gratuito
- * para sondar tokens contra uma API que talvez nem seja alcancavel de fora.
+ * Server Component. Como Server Action, isto viraria mais uma superficie
+ * POST alcancavel pelo navegador, sem nenhum ganho — ninguem no cliente chama.
+ *
+ * Nao se engane sobre o alcance disso: a propria rota ja revela o estado do
+ * token, porque `GET /reset-password?token=…` responde com a tela do estado e
+ * o guard a deixa passar sem sessao. Quem quiser sondar token nao precisa
+ * desta funcao. O que limita a sondagem e o tamanho do token e, se vier a ser
+ * preciso, um limite de tentativas no backend — nao a forma deste modulo.
  */
 import "server-only";
 
@@ -30,6 +35,17 @@ export async function verifyResetTokenAction(token: string): Promise<TokenState>
     await httpClient<void>(endpoints.auth.passwordResetVerifications, {
       method: "POST",
       body: { token },
+      /*
+       * O endpoint e publico e esta funcao roda em render de Server Component,
+       * onde escrever cookie e proibido. Sem `anonymous`, um `401` levaria o
+       * cliente a renovar a sessao — e o `ReadonlyRequestCookiesError` que o
+       * Next lanca cairia no `catch` abaixo como "unavailable", mandando
+       * recarregar a pagina numa falha que nenhum recarregamento resolve,
+       * porque o cookie velho continua la. Quem chega por este link pode muito
+       * bem estar num navegador com a sessao de outra pessoa — e justamente o
+       * caso que motivou liberar a rota no guard.
+       */
+      anonymous: true,
     });
 
     return "valid";

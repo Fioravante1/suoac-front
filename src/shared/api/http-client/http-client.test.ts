@@ -226,6 +226,37 @@ describe("httpClient", () => {
     expect(mockRefreshSession).not.toHaveBeenCalled();
     expect(mockDeleteSession).not.toHaveBeenCalled();
   });
+
+  it("anonymous → nao le a sessao nem envia Authorization", async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 204 });
+
+    await httpClient("/auth/password-reset-verifications", { method: "POST", body: { token: "t" }, anonymous: true });
+
+    expect(mockGetAccessToken).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith("https://api.test.com/auth/password-reset-verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: "t" }),
+    });
+  });
+
+  it("anonymous com 401 → lanca HttpError sem renovar nem mexer em cookie", async () => {
+    // O ponto do caso: renovar escreve cookie, e em render de Server Component
+    // isso lanca erro de cookie somente-leitura — que nao e `HttpError` e
+    // chegaria ao chamador como falha sem veredito.
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: () => Promise.resolve({ message: "Unauthorized" }),
+    });
+
+    await expect(httpClient("/auth/password-reset-verifications", { anonymous: true })).rejects.toMatchObject({
+      status: 401,
+      message: "Unauthorized",
+    });
+    expect(mockRefreshSession).not.toHaveBeenCalled();
+    expect(mockDeleteSession).not.toHaveBeenCalled();
+  });
 });
 
 describe("httpClientRaw", () => {
@@ -279,5 +310,19 @@ describe("httpClientRaw", () => {
     await expect(httpClientRaw("/export.pdf")).rejects.toBeInstanceOf(HttpError);
     expect(mockRefreshSession).not.toHaveBeenCalled();
     expect(mockDeleteSession).toHaveBeenCalledOnce();
+  });
+
+  it("anonymous com 401 → retorna o Response cru, sem encerrar sessao nenhuma", async () => {
+    // Requisicao anonima nao tem sessao para expirar; o 401 e so mais um status
+    // de erro, repassado ao chamador como os demais.
+    const response = { ok: false, status: 401 };
+    fetchMock.mockResolvedValue(response);
+
+    const result = await httpClientRaw("/public.pdf", { anonymous: true });
+
+    expect(result).toBe(response);
+    expect(mockGetAccessToken).not.toHaveBeenCalled();
+    expect(mockRefreshSession).not.toHaveBeenCalled();
+    expect(mockDeleteSession).not.toHaveBeenCalled();
   });
 });
