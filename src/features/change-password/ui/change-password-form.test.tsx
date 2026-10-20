@@ -3,6 +3,16 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 import { ChangePasswordForm } from "./change-password-form";
 
+/**
+ * `redirect` na action chega ao cliente como rejeicao, depois de o roteador ja
+ * ter aplicado a navegacao. E assim que o sucesso se manifesta aqui.
+ */
+function rejeicaoDeRedirect() {
+  return Object.assign(new Error("NEXT_REDIRECT"), {
+    digest: "NEXT_REDIRECT;replace;/dashboard;303;",
+  });
+}
+
 vi.mock("../api/change-password-action", () => ({
   changePasswordAction: vi.fn(),
 }));
@@ -152,6 +162,51 @@ describe("ChangePasswordForm", () => {
       expect(newPassword).not.toBeDisabled();
       expect(confirmPassword).not.toBeDisabled();
     });
+  });
+
+  it("não propaga a rejeição do redirect no caminho de sucesso", async () => {
+    // Repropagada, a rejeicao vira `unhandledrejection` no navegador: invisivel
+    // na tela, alarme falso em toda troca de senha bem-sucedida.
+    changePasswordActionMock.mockRejectedValue(rejeicaoDeRedirect());
+
+    const naoTratadas: unknown[] = [];
+    const capturar = (event: PromiseRejectionEvent) => naoTratadas.push(event.reason);
+    window.addEventListener("unhandledrejection", capturar);
+
+    render(<ChangePasswordForm />);
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
+
+    await waitFor(() => expect(changePasswordActionMock).toHaveBeenCalledOnce());
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    window.removeEventListener("unhandledrejection", capturar);
+
+    expect(naoTratadas).toHaveLength(0);
+  });
+
+  it("mantém o envio fechado durante a navegação para o painel", async () => {
+    /*
+     * O React Hook Form limpa `isSubmitting` ao sair do submit, mas a navegacao
+     * continua em curso. Reabrir o botao permitiria um segundo envio com a
+     * senha atual que acabou de deixar de valer: a API responderia `401` e
+     * "Senha atual incorreta." apareceria sobre uma troca bem-sucedida.
+     */
+    changePasswordActionMock.mockRejectedValue(rejeicaoDeRedirect());
+
+    render(<ChangePasswordForm />);
+    fillValidForm();
+
+    const botao = screen.getByRole("button", { name: /Definir nova senha/i });
+    fireEvent.click(botao);
+
+    await waitFor(() => expect(changePasswordActionMock).toHaveBeenCalledOnce());
+    // O botao perde o nome acessivel enquanto carrega — o rotulo cede lugar ao
+    // spinner, que nao tem texto —, por isso a referencia guardada antes.
+    await waitFor(() => expect(botao).toBeDisabled());
+
+    fireEvent.click(botao);
+
+    expect(changePasswordActionMock).toHaveBeenCalledOnce();
   });
 
   it("exibe o erro do servidor em banner quando a action retorna erro genérico", async () => {
