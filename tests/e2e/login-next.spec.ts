@@ -93,6 +93,72 @@ test.describe("fachada de /login com o redesign ligado", () => {
   });
 });
 
+/**
+ * Autocadastro de circuito, a estrutura em etapas (SUC-28).
+ *
+ * O teste unitario ja cobre navegacao, validacao por etapa e preservacao do
+ * preenchimento. O que so existe aqui e o fluxo real: um formulario que
+ * atravessa tres etapas numa rota servida pelo servidor, com a flag ligada, e
+ * um campo que continua preenchido depois de o bloco ter sido desmontado e
+ * remontado pelo React de verdade — nao pelo jsdom.
+ */
+test.describe("autocadastro de circuito em etapas", () => {
+  test.beforeEach(async ({ context, page }) => {
+    await overrideFlags(context, { REDESIGN_LOGIN: true });
+    await page.goto("/login");
+    await page.getByRole("button", { name: /Seu circuito ainda não usa o SUOAC/i }).click();
+  });
+
+  test("abre pelo atalho da tela de entrada e volta para ela", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: "Cadastre seu circuito" })).toBeVisible();
+    await expect(page.getByText("Etapa 1 de 3")).toBeVisible();
+
+    await page.getByRole("button", { name: "Voltar para o login" }).click();
+
+    await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  });
+
+  test("atravessa as tres etapas e preserva o que foi digitado ao voltar", async ({ page }) => {
+    await page.getByLabel("Nome completo").fill("João Silva");
+    await page.getByLabel("E-mail").fill("joao@example.com");
+    await page.getByLabel("Celular (WhatsApp)").fill("(19) 99999-9999");
+    await page.getByLabel("Crie uma senha").fill("Senha123");
+    await page.getByRole("button", { name: "Continuar" }).click();
+
+    await expect(page.getByRole("heading", { name: "Dados do circuito" })).toBeVisible();
+    await page.getByRole("textbox", { name: "Circuito", exact: true }).fill("SP-17");
+    await page.getByRole("textbox", { name: "Cidade", exact: true }).fill("Campinas");
+    await page.getByRole("textbox", { name: "UF", exact: true }).fill("SP");
+    /*
+     * Clique no rotulo, nao `.check()` no campo: o `Checkbox` do design system
+     * mantem o `input` real invisivel e desenha a caixa ao lado, entao o
+     * Playwright recusa interagir com o campo — e e no rotulo que o usuario
+     * clica de verdade.
+     */
+    await page.getByText(/Li e aceito os termos/).click();
+    await expect(page.getByLabel(/Li e aceito os termos/)).toBeChecked();
+    await page.getByRole("button", { name: "Continuar" }).click();
+
+    await expect(page.getByRole("heading", { name: "Congregações do circuito" })).toBeVisible();
+    await expect(page.getByText("Etapa 3 de 3")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Criar circuito" })).toBeVisible();
+
+    // Duas voltas, atravessando a etapa 2: o formulario e um so, e o estado nao
+    // mora nos campos que saem de tela.
+    await page.getByRole("button", { name: "Voltar" }).click();
+    await expect(page.getByRole("textbox", { name: "Circuito", exact: true })).toHaveValue("SP-17");
+    await page.getByRole("button", { name: "Voltar" }).click();
+    await expect(page.getByLabel("E-mail")).toHaveValue("joao@example.com");
+  });
+
+  test("não avança com a etapa invalida", async ({ page }) => {
+    await page.getByRole("button", { name: "Continuar" }).click();
+
+    await expect(page.getByText("Informe seu nome completo.")).toBeVisible();
+    await expect(page.getByText("Etapa 1 de 3")).toBeVisible();
+  });
+});
+
 test.describe("reversibilidade da fachada", () => {
   test("devolve a tela antiga ao desligar a flag", async ({ page, context }) => {
     await overrideFlags(context, { REDESIGN_LOGIN: false });

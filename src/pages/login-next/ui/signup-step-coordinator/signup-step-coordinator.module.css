@@ -1,0 +1,5 @@
+.passwordGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}

@@ -35,14 +35,16 @@
  * de novo.
  */
 .view > * {
-  animation: swap var(--suoac-motion-duration-slow) var(--suoac-motion-ease-standard) both;
-}
-
-@keyframes swap {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
+  /*
+   * Pelo token, nunca pelo nome: dentro de um CSS Module o bundler reescreve
+   * nomes de animacao, e a animacao silenciosamente nao roda (SUC-43). O
+   * keyframe era local aqui e subiu para o design system quando a troca de
+   * etapas do autocadastro passou a precisar dele.
+   */
+  animation-name: var(--suoac-animation-swap);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
 }
 
 .footer {

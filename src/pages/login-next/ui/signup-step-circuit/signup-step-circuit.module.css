@@ -1,0 +1,19 @@
+.location {
+  display: grid;
+  /* O campo de UF tem largura fixa: duas letras não precisam de mais. */
+  grid-template-columns: minmax(0, 1fr) 6rem;
+  gap: var(--suoac-space-3);
+  align-items: start;
+}
+
+.terms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.termsError {
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+}
