@@ -7,6 +7,8 @@ export const endpoints = {
     passwordResetRequests: "/auth/password-reset-requests",
     passwordResetVerifications: "/auth/password-reset-verifications",
     passwordResets: "/auth/password-resets",
+    circuitSignups: "/auth/circuit-signups",
+    circuitSignupConfirmations: "/auth/circuit-signups/confirmations",
   },
   congregations: {
     list: (circuitId: string) => `/circuits/${circuitId}/congregations` as const,
