@@ -5,6 +5,8 @@ export const endpoints = {
     refresh: "/auth/refresh",
     changePassword: "/auth/change-password",
     passwordResetRequests: "/auth/password-reset-requests",
+    passwordResetVerifications: "/auth/password-reset-verifications",
+    passwordResets: "/auth/password-resets",
   },
   congregations: {
     list: (circuitId: string) => `/circuits/${circuitId}/congregations` as const,
