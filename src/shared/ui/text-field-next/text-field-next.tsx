@@ -41,7 +41,14 @@ export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(fu
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const messageId = `${inputId}-message`;
+  const statusId = `${inputId}-status`;
   const message = error ?? hint;
+  /*
+   * Sem mensagem abaixo do campo, quem explica o veredito e o texto ao lado do
+   * rotulo. Liga-lo e o que evita o campo anunciar "invalido" e mais nada para
+   * quem volta nele depois de a regiao viva ja ter falado.
+   */
+  const describedBy = message ? messageId : status && labelAction ? statusId : undefined;
 
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
@@ -49,7 +56,11 @@ export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(fu
         <label className={styles.label} htmlFor={inputId}>
           {label}
         </label>
-        {labelAction}
+        {labelAction && (
+          <span id={statusId} className={styles.labelActionSlot}>
+            {labelAction}
+          </span>
+        )}
       </div>
 
       <div
@@ -71,7 +82,7 @@ export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(fu
           ref={ref}
           className={styles.input}
           aria-invalid={error || status === "invalid" ? true : undefined}
-          aria-describedby={message ? messageId : undefined}
+          aria-describedby={describedBy}
           {...props}
         />
         {trailing}

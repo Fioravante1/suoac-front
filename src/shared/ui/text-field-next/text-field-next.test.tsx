@@ -66,6 +66,29 @@ describe("TextFieldNext", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("descreve o campo pelo texto do rótulo quando o veredito não tem mensagem abaixo", () => {
+    /*
+     * Com `status` e sem mensagem, quem explica o veredito e o texto ao lado do
+     * rotulo. Sem a ligacao, quem volta ao campo depois de a regiao viva ja ter
+     * falado ouviria "invalido" e mais nada.
+     */
+    render(
+      <TextFieldNext label="Confirme a senha" status="invalid" labelAction={<span>As senhas não coincidem</span>} />,
+    );
+
+    const input = screen.getByLabelText("Confirme a senha");
+    const descricao = document.getElementById(input.getAttribute("aria-describedby") ?? "");
+
+    expect(descricao).toHaveTextContent("As senhas não coincidem");
+  });
+
+  it("não descreve o campo pela ação do rótulo quando não há veredito", () => {
+    // "Esqueci a senha" e um atalho, nao uma descricao do campo.
+    render(<TextFieldNext label="Senha" labelAction={<button type="button">Esqueci a senha</button>} />);
+
+    expect(screen.getByLabelText("Senha")).not.toHaveAttribute("aria-describedby");
+  });
+
   it("deixa o erro com mensagem prevalecer sobre o veredito de acerto", () => {
     render(<TextFieldNext label="Confirme a senha" status="valid" error="As senhas não coincidem." />);
 
