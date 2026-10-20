@@ -25,6 +25,10 @@
   --suoac-color-navy: #0d2b45;
   --suoac-color-sidebar: var(--suoac-color-navy);
   --suoac-color-on-primary: #ffffff;
+  /* Conteudo desenhado sobre o verde de sucesso — o visto dentro do disco de
+     requisito cumprido. Tem par escuro: o verde do tema escuro e claro demais
+     para carregar branco (2,30:1, abaixo do minimo de 3:1 para objeto grafico). */
+  --suoac-color-on-success: #ffffff;
   --suoac-color-attention-text: #8a6d00;
   --suoac-color-glass: rgb(255 255 255 / 0.78);
 
@@ -349,6 +353,7 @@ html[data-theme="dark"] {
   --suoac-color-primary-dark: #7fcfb4;
   --suoac-color-primary-light: #183229;
   --suoac-color-on-primary: #0e1413;
+  --suoac-color-on-success: #0e1413;
 
   /* Secondary */
   --suoac-color-info: #82a9ff;
@@ -401,6 +406,7 @@ html[data-theme="dark"] {
     --suoac-color-primary-dark: #7fcfb4;
     --suoac-color-primary-light: #183229;
     --suoac-color-on-primary: #0e1413;
+    --suoac-color-on-success: #0e1413;
 
     /* Secondary */
     --suoac-color-info: #82a9ff;

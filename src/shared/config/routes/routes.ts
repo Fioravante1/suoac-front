@@ -4,6 +4,7 @@ export const routes = {
   privacy: "/privacidade",
   help: "/ajuda",
   changePassword: "/change-password",
+  resetPassword: "/reset-password",
   dashboard: "/dashboard",
   events: "/events",
   eventDetail: (id: string) => `/events/${id}`,

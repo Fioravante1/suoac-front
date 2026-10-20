@@ -20,6 +20,17 @@ interface HttpClientOptions {
   method?: HttpMethod;
   body?: Record<string, unknown>;
   headers?: Record<string, string>;
+  /**
+   * Endpoint publico: nao le o token da sessao, nao o envia e nao tenta renovar
+   * em `401`.
+   *
+   * Nao e so economia de cabecalho. A renovacao escreve cookie, e escrever
+   * cookie e permitido apenas em Server Action e Route Handler — num Server
+   * Component, o Next lanca `ReadonlyRequestCookiesError`, que nao e
+   * `HttpError` e chega ao chamador como falha sem veredito. Endpoint publico
+   * chamado em render precisa ficar fora dessa maquinaria.
+   */
+  anonymous?: boolean;
 }
 
 async function performRequest(path: string, options: HttpClientOptions, token: string | null): Promise<Response> {
@@ -64,13 +75,16 @@ async function parseErrorMessage(response: Response): Promise<string> {
  *
  * - sucesso/erros não-401 → retorna o `Response` cru (o chamador repassa status + corpo);
  * - 401 com token → tenta refresh e refaz a requisição;
- * - 401 sem token ou refresh falho → encerra a sessão e lança `HttpError(401, SESSION_EXPIRED_MESSAGE)`.
+ * - 401 sem token ou refresh falho → encerra a sessão e lança `HttpError(401, SESSION_EXPIRED_MESSAGE)`;
+ * - `anonymous` → sem token e sem refresh: o 401 volta cru, como os demais erros.
  */
 export async function httpClientRaw(path: string, options: HttpClientOptions = {}): Promise<Response> {
-  const token = await getAccessToken();
+  const token = options.anonymous ? null : await getAccessToken();
   const response = await performRequest(path, options, token);
 
-  if (response.status !== 401) {
+  // Em requisicao anonima nao ha sessao para expirar: o `401` e so mais um
+  // status de erro, repassado cru como qualquer outro.
+  if (response.status !== 401 || options.anonymous) {
     return response;
   }
 
@@ -90,7 +104,7 @@ export async function httpClientRaw(path: string, options: HttpClientOptions = {
 }
 
 export async function httpClient<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
-  const token = await getAccessToken();
+  const token = options.anonymous ? null : await getAccessToken();
   const response = await performRequest(path, options, token);
 
   if (response.ok) {

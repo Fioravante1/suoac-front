@@ -12,6 +12,13 @@
   gap: var(--suoac-space-3);
 }
 
+/* Invólucro do `labelAction`, para que o texto possa ser referenciado por
+   `aria-describedby`. Não desenha nada: repassa o alinhamento ao filho. */
+.labelActionSlot {
+  display: flex;
+  align-items: center;
+}
+
 .label {
   font-size: var(--suoac-font-size-small);
   font-weight: var(--suoac-font-weight-medium);
@@ -52,6 +59,15 @@
 .invalid:focus-within {
   border-color: var(--suoac-color-critical);
   box-shadow: 0 0 0 4px var(--suoac-color-critical-soft);
+}
+
+.valid {
+  border-color: var(--suoac-color-success);
+}
+
+.valid:focus-within {
+  border-color: var(--suoac-color-success);
+  box-shadow: 0 0 0 4px var(--suoac-color-success-soft);
 }
 
 .icon {

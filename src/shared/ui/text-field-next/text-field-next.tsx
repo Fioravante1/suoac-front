@@ -13,6 +13,15 @@ export interface TextFieldNextProps extends InputHTMLAttributes<HTMLInputElement
   error?: string;
   /** Aviso discreto abaixo do campo, que nao e erro de validacao. */
   hint?: ReactNode;
+  /**
+   * Veredito da borda sem mensagem abaixo do campo.
+   *
+   * Para o campo que so tem como estar certo ou errado em relacao a outro, como
+   * a confirmacao de senha: ali o retorno vale enquanto se digita, e o texto que
+   * o explica fica ao lado do rotulo, nao embaixo. `error` tem precedencia e
+   * continua sendo o caminho de erro de validacao com mensagem.
+   */
+  status?: "valid" | "invalid";
 }
 
 /**
@@ -26,13 +35,20 @@ export interface TextFieldNextProps extends InputHTMLAttributes<HTMLInputElement
  * `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` §3.2.
  */
 export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(function TextFieldNext(
-  { label, icon, labelAction, trailing, error, hint, className, id, ...props },
+  { label, icon, labelAction, trailing, error, hint, status, className, id, ...props },
   ref,
 ) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const messageId = `${inputId}-message`;
+  const statusId = `${inputId}-status`;
   const message = error ?? hint;
+  /*
+   * Sem mensagem abaixo do campo, quem explica o veredito e o texto ao lado do
+   * rotulo. Liga-lo e o que evita o campo anunciar "invalido" e mais nada para
+   * quem volta nele depois de a regiao viva ja ter falado.
+   */
+  const describedBy = message ? messageId : status && labelAction ? statusId : undefined;
 
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
@@ -40,10 +56,22 @@ export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(fu
         <label className={styles.label} htmlFor={inputId}>
           {label}
         </label>
-        {labelAction}
+        {labelAction && (
+          <span id={statusId} className={styles.labelActionSlot}>
+            {labelAction}
+          </span>
+        )}
       </div>
 
-      <div className={[styles.control, error && styles.invalid].filter(Boolean).join(" ")}>
+      <div
+        className={[
+          styles.control,
+          (error || status === "invalid") && styles.invalid,
+          !error && status === "valid" && styles.valid,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {icon && (
           <span className={styles.icon} aria-hidden>
             {icon}
@@ -53,8 +81,8 @@ export const TextFieldNext = forwardRef<HTMLInputElement, TextFieldNextProps>(fu
           id={inputId}
           ref={ref}
           className={styles.input}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={message ? messageId : undefined}
+          aria-invalid={error || status === "invalid" ? true : undefined}
+          aria-describedby={describedBy}
           {...props}
         />
         {trailing}

@@ -74,6 +74,15 @@ Modal central (não drawer). Busca em **registros de eventos anteriores** por no
 Layout dividido: painel escuro `#0d2b45` à esquerda com **timeline** animada das etapas do evento (linha verde progressiva sincronizada com os itens; sem trilho de fundo), formulário à direita (surface).
 - **Login**: e-mail, senha (mostrar/ocultar), lembrar, "Esqueci a senha", erro com shake.
 - **Esqueci a senha**: envio de link + estado de confirmação.
+- **Nova senha** (link do e-mail; no protótipo: `#nova-senha`, prop `startView=reset` ou botão "Abrir link do e-mail (demo)"):
+  - Chip com a conta (e-mail) + contagem regressiva de validade do link (30 min).
+  - Campos "Nova senha" e "Confirme a nova senha" (50px, radius 14, ícone cadeado, mostrar/ocultar).
+  - Medidor de força em 4 segmentos (Fraca `--crit` → Razoável `--attn` → Boa `--primary` → Forte `--succ`).
+  - Requisitos em grade 2×2 marcados em tempo real: 8+ caracteres, maiúscula, número, símbolo.
+  - Confirmação mostra "✓ As senhas coincidem" / "As senhas não coincidem"; borda verde/vermelha.
+  - Checkbox "Sair de todos os outros dispositivos" (marcado por padrão).
+  - CTA "Salvar nova senha" (54px) com spinner; erros no topo com shake. Enter envia.
+  - Sucesso: ícone escudo, "Senha alterada", resumo (conta, outros dispositivos), botão "Entrar no painel" com barra de progresso de 5s e redirecionamento automático.
 - **Recebeu um convite?**: coordenadores de congregação entram pelo link recebido.
 - **Autocadastro do circuito** ("Seu circuito ainda não usa o SUOAC?"), barra de progresso em 3 etapas:
   1. Seus dados: nome, e-mail (validação), celular (máscara `(00) 00000-0000`), senha ≥ 8 com medidor de força (4 barras).
@@ -140,7 +149,7 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 
 ## Arquivos
 - `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
-- `SUOAC Login.dc.html` — login, recuperação, convite e autocadastro do circuito.
+- `SUOAC Login.dc.html` — login, recuperação, nova senha, convite e autocadastro do circuito.
 - `support.js` — runtime necessário apenas para abrir os protótipos no navegador.
 - `assets/` — logos.
-- `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login e cadastro do circuito.
+- `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login, cadastro do circuito e nova senha.
