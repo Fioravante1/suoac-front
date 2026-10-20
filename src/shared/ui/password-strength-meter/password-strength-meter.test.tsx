@@ -11,12 +11,17 @@ describe("PasswordStrengthMeter", () => {
     expect(screen.getByText("0 de 4 requisitos cumpridos.")).toBeInTheDocument();
   });
 
-  it("classifica a senha pelo numero de requisitos cumpridos", () => {
-    const { rerender } = render(<PasswordStrengthMeter value="abc" />);
-    expect(screen.getByText("fraca")).toBeInTheDocument();
+  it.each([
+    ["!", "muito fraca", 0],
+    ["abc", "fraca", 1],
+    ["abcdefgh", "razoável", 2],
+    ["Abcdefgh", "quase lá", 3],
+    ["Abcdefg1", "forte", 4],
+  ])("classifica %s como %s pelo total de requisitos", (password, label, count) => {
+    render(<PasswordStrengthMeter value={password} />);
 
-    rerender(<PasswordStrengthMeter value="Abcdefg1" />);
-    expect(screen.getByText("forte")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(label);
+    expect(screen.getByText(`${count} de 4 requisitos cumpridos.`)).toBeInTheDocument();
   });
 
   it("lista os requisitos pendentes, nao so a nota", () => {

@@ -45,7 +45,7 @@ async function goToCircuitStep() {
 }
 
 function segments() {
-  return screen.getByRole("list", { hidden: true }).querySelectorAll("[data-state]");
+  return screen.getByRole("list", { hidden: true, name: "" }).querySelectorAll("[data-state]");
 }
 
 // ── Test Suite ───────────────────────────────────────────────────
@@ -75,6 +75,23 @@ describe("SignupFlow", () => {
 
       await waitFor(() => expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument());
       expect(screen.getByRole("heading", { name: "Congregações do circuito" })).toBeInTheDocument();
+    });
+
+    it("não deve pular uma etapa quando o avanço é clicado duas vezes", async () => {
+      renderFlow();
+      fillCoordinator();
+      await waitFor(() => expect(screen.getByLabelText("Crie uma senha")).toHaveValue("Senha123"));
+
+      const next = screen.getByRole("button", { name: "Continuar" });
+      fireEvent.click(next);
+      fireEvent.click(next);
+
+      // `trigger` é assíncrono: sem trava, os dois cliques leem o mesmo
+      // `stepIndex` e avançam duas vezes, levando da etapa 1 para a 3 — com a
+      // etapa 2 nunca exibida nem validada, e "Criar circuito" sobre um
+      // formulário inválido.
+      await waitFor(() => expect(screen.getByText(/Etapa \d de 3/)).toBeInTheDocument());
+      expect(screen.getByText(/Etapa \d de 3/).textContent).toBe("Etapa 2 de 3");
     });
 
     it("deve voltar para a etapa anterior", async () => {
@@ -154,6 +171,30 @@ describe("SignupFlow", () => {
   });
 
   describe("validação por etapa", () => {
+    it("deve validar o e-mail durante a digitação e limpar o erro ao corrigir", async () => {
+      renderFlow();
+      type("E-mail", "joao@");
+
+      await waitFor(() => expect(screen.getByText("Informe um e-mail válido.")).toBeInTheDocument());
+
+      type("E-mail", "joao@example.com");
+      await waitFor(() => expect(screen.queryByText("Informe um e-mail válido.")).not.toBeInTheDocument());
+      expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument();
+      expect(screen.queryByText("Informe o circuito.")).not.toBeInTheDocument();
+    });
+
+    it("deve explicar o mínimo de oito caracteres e bloquear o avanço com senha curta", async () => {
+      renderFlow();
+      fillCoordinator();
+      type("Crie uma senha", "Senha1");
+
+      await waitFor(() => expect(screen.getByText("A senha deve conter no mínimo 8 caracteres.")).toBeInTheDocument());
+      clickNext();
+
+      await waitFor(() => expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument());
+      expect(screen.getByLabelText("Crie uma senha")).toHaveAttribute("aria-invalid", "true");
+    });
+
     it("não deve avançar com a etapa 1 vazia", async () => {
       renderFlow();
 

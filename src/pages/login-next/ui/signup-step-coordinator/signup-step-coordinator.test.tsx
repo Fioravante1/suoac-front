@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 
@@ -44,13 +44,37 @@ describe("SignupStepCoordinator", () => {
     fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "Senha123" } });
 
     expect(screen.getByRole("status")).toHaveTextContent("forte");
-    expect(screen.queryByRole("list", { name: "Requisitos da senha" })).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Requisitos da senha" })).toBeInTheDocument();
+  });
+
+  it("deve explicar os requisitos que faltam enquanto a pessoa digita", () => {
+    render(<Harness />);
+
+    fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "senhalonga" } });
+
+    const requirements = screen.getByRole("list", { name: "Requisitos da senha" });
+    expect(within(requirements).getByText(/Uma letra maiúscula/)).toHaveTextContent("pendente");
+    expect(within(requirements).getByText(/Um número/)).toHaveTextContent("pendente");
+    expect(within(requirements).getByText(/Pelo menos 8 caracteres/)).toHaveTextContent("cumprido");
+  });
+
+  it("deve permitir mostrar e ocultar a senha sem alterar seu valor", () => {
+    render(<Harness />);
+    const password = screen.getByLabelText("Crie uma senha");
+    fireEvent.change(password, { target: { value: "Senha123" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Mostrar senha" }));
+    expect(password).toHaveAttribute("type", "text");
+    expect(password).toHaveValue("Senha123");
+
+    fireEvent.click(screen.getByRole("button", { name: "Ocultar senha" }));
+    expect(password).toHaveAttribute("type", "password");
+    expect(password).toHaveValue("Senha123");
   });
 
   it("deve abrir o celular com teclado numérico", () => {
     render(<Harness />);
 
-    // A máscara entra no SUC-29; o teclado certo não depende dela.
     expect(screen.getByLabelText("Celular (WhatsApp)")).toHaveAttribute("inputmode", "tel");
   });
 });

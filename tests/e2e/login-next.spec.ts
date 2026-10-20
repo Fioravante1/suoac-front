@@ -157,6 +157,75 @@ test.describe("autocadastro de circuito em etapas", () => {
     await expect(page.getByText("Informe seu nome completo.")).toBeVisible();
     await expect(page.getByText("Etapa 1 de 3")).toBeVisible();
   });
+
+  test("edita o celular no meio, cola e apaga sem prender o cursor na máscara", async ({ page }) => {
+    const phone = page.getByRole("textbox", { name: "Celular (WhatsApp)", exact: true });
+    await phone.fill("11977530630");
+    await expect(phone).toHaveValue("(11) 97753-0630");
+
+    // Troca um dígito no meio e continua digitando na mesma posição.
+    await phone.evaluate((input: HTMLInputElement) => input.setSelectionRange(6, 7));
+    await phone.pressSequentially("8");
+    await expect(phone).toHaveValue("(11) 98753-0630");
+    expect(await phone.evaluate((input: HTMLInputElement) => input.selectionStart)).toBe(7);
+
+    // Backspace depois do hífen precisa apagar o dígito anterior de verdade.
+    await phone.evaluate((input: HTMLInputElement) => input.setSelectionRange(11, 11));
+    await phone.press("Backspace");
+    await expect(phone).toHaveValue("(11) 9875-0630");
+    expect(await phone.evaluate((input: HTMLInputElement) => input.selectionStart)).toBe(9);
+
+    await phone.press("End");
+    await phone.press("Backspace");
+    await expect(phone).toHaveValue("(11) 9875-063");
+
+    // Cola um número já formatado pela área de transferência real do navegador.
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.evaluate(() => navigator.clipboard.writeText("(19) 99999-9999"));
+    await phone.press("ControlOrMeta+A");
+    await phone.press("ControlOrMeta+V");
+    await expect(phone).toHaveValue("(19) 99999-9999");
+
+    // Delete atravessa o fechamento do DDD e remove o próximo dígito.
+    await phone.evaluate((input: HTMLInputElement) => input.setSelectionRange(3, 3));
+    await phone.press("Delete");
+    await expect(phone).toHaveValue("(19) 9999-9999");
+    await phone.press("End");
+    for (let remaining = 10; remaining > 0; remaining -= 1) await phone.press("Backspace");
+    await expect(phone).toHaveValue("");
+  });
+
+  for (const theme of ["light", "dark"] as const) {
+    test(`orienta a criação da senha e valida sem sair do campo no tema ${theme}`, async ({
+      page,
+      context,
+    }, testInfo) => {
+      await context.addCookies([{ name: "suoac-theme", value: theme, url: E2E_BASE_URL }]);
+      await page.reload();
+      await page.getByRole("button", { name: /Seu circuito ainda não usa o SUOAC/i }).click();
+      const email = page.getByRole("textbox", { name: "E-mail", exact: true });
+      await email.fill("joao@");
+      await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
+      await expect(email).toBeFocused();
+      await email.fill("joao@example.com");
+      await expect(page.getByText("Informe um e-mail válido.")).toBeHidden();
+
+      const password = page.getByLabel("Crie uma senha", { exact: true });
+      await password.fill("Senha1");
+      await expect(page.getByText("A senha deve conter no mínimo 8 caracteres.")).toBeVisible();
+      await expect(page.getByRole("status")).toContainText("quase lá");
+      const requirements = page.getByRole("list", { name: "Requisitos da senha" });
+      await expect(requirements.getByText(/Pelo menos 8 caracteres/)).toContainText("pendente");
+      await password.fill("Senha123");
+      await expect(page.getByRole("status")).toContainText("forte");
+      await expect(requirements.getByText(/Pelo menos 8 caracteres/)).toContainText("cumprido");
+      await page.getByRole("button", { name: "Mostrar senha" }).click();
+      await expect(password).toHaveAttribute("type", "text");
+      await page.getByRole("button", { name: "Ocultar senha" }).click();
+      await expect(password).toHaveAttribute("type", "password");
+      await page.screenshot({ path: testInfo.outputPath(`coordenador-${theme}.png`), fullPage: true });
+    });
+  }
 });
 
 test.describe("reversibilidade da fachada", () => {

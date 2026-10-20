@@ -46,6 +46,8 @@ export function SignupStepCongregations() {
         <TextFieldNext
           label="Código"
           placeholder="Código"
+          /* O schema recusa acima de 20; barrar aqui evita digitar para nada. */
+          maxLength={20}
           error={ownCongregationErrors?.code?.message}
           disabled={isSubmitting}
           {...register("congregations.0.code")}

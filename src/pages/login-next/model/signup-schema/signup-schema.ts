@@ -52,17 +52,28 @@ const circuitSchema = z.object({
     .max(CIRCUIT_MAX_LENGTH, `O circuito pode ter até ${CIRCUIT_MAX_LENGTH} caracteres.`)
     .transform((value) => value.toUpperCase()),
   city: z.string().trim().min(2, "Informe a cidade.").max(100, "A cidade pode ter até 100 caracteres."),
+  /* Normalizada como o identificador do circuito: a API só aceita `[A-Z]{2}`. */
   state: z
     .string()
     .trim()
     .length(2, "A UF tem duas letras.")
-    .regex(/^[A-Za-z]{2}$/, "A UF tem duas letras."),
+    .regex(/^[A-Za-z]{2}$/, "A UF tem duas letras.")
+    .transform((value) => value.toUpperCase()),
 });
 
 /** Uma linha da etapa 3. */
 const congregationSchema = z.object({
   name: z.string().trim().max(150, "O nome pode ter até 150 caracteres."),
-  code: z.string().trim().max(20, "O código pode ter até 20 caracteres."),
+  /*
+   * Normalizado em maiúsculas, como o identificador do circuito: `CODE_PATTERN`
+   * só aceita `[A-Z0-9]`, e sem a transformação quem digitasse `sp17-central`
+   * levava "use letras, números e hífen" — que é exatamente o que tinha feito.
+   */
+  code: z
+    .string()
+    .trim()
+    .max(20, "O código pode ter até 20 caracteres.")
+    .transform((value) => value.toUpperCase()),
 });
 
 /**
@@ -105,7 +116,20 @@ const congregationsSchema = z
     if (duplicated) {
       // A API responde `422` para isto. Barrar aqui poupa uma das poucas
       // tentativas que o limite por e-mail concede.
-      ctx.addIssue({ code: "custom", message: `O código ${duplicated} aparece duas vezes.` });
+      /*
+       * Com caminho da linha repetida, e não solto na raiz: sem `path`, o erro
+       * cai em `congregations`, a tela lê `errors.congregations?.[index]` e
+       * nada aparece — o avanço simplesmente para, sem dizer por quê.
+       */
+      const duplicatedIndex = congregations.findIndex(
+        (item, index) => item.code === duplicated && codes.indexOf(duplicated) !== index,
+      );
+
+      ctx.addIssue({
+        code: "custom",
+        path: [duplicatedIndex, "code"],
+        message: `O código ${duplicated} aparece duas vezes.`,
+      });
     }
   });
 

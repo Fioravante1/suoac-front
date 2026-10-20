@@ -98,6 +98,12 @@ describe("signupSchema", () => {
       expect(failedPaths(values)).toContain("circuit.name");
     });
 
+    it("deve guardar a UF em maiúsculas", () => {
+      const values = buildValues({ circuit: { ...buildValues().circuit, state: "sp" } });
+
+      expect(signupSchema.parse(values).circuit.state).toBe("SP");
+    });
+
     it("deve exigir UF de duas letras", () => {
       const values = buildValues({ circuit: { ...buildValues().circuit, state: "SAO" } });
 
@@ -140,6 +146,34 @@ describe("signupSchema", () => {
       });
 
       expect(failedPaths(values)).toContain("congregations.1.code");
+    });
+
+    it("deve aceitar código digitado em minúsculas", () => {
+      const values = buildValues({ congregations: [{ name: "Central", code: "sp17-central" }] });
+      const result = signupSchema.safeParse(values);
+
+      // O padrão da API só aceita maiúsculas; recusar aqui mandaria o usuário
+      // corrigir algo que a tela deveria normalizar sozinha.
+      expect(result.success).toBe(true);
+      expect(result.success && result.data.congregations[0]?.code).toBe("SP17-CENTRAL");
+    });
+
+    it("deve apontar a linha repetida, não a raiz da lista", () => {
+      const result = signupSchema.safeParse(
+        buildValues({
+          congregations: [
+            { name: "Central", code: "SP17-A" },
+            { name: "Jardim", code: "SP17-A" },
+          ],
+        }),
+      );
+
+      // Erro sem caminho de linha é erro que a tela não consegue mostrar: o
+      // avanço para e o usuário não vê motivo nenhum.
+      expect(result.success).toBe(false);
+      expect(result.success === false && result.error.issues.map((issue) => issue.path.join("."))).toContain(
+        "congregations.1.code",
+      );
     });
 
     it("deve recusar o mesmo código em duas linhas", () => {
