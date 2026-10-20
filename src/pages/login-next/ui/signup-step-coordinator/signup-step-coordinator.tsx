@@ -4,7 +4,12 @@ import { Mail, Phone, User } from "lucide-react";
 import type { KeyboardEvent } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import { PHONE_MASK_MAX_LENGTH, formatPhoneInput } from "@/shared/lib";
+import {
+  PASSWORD_MAX_LENGTH,
+  PHONE_MASK_MAX_LENGTH,
+  formatPhoneInput,
+  usePasswordTruncationNotice,
+} from "@/shared/lib";
 import { PasswordFieldNext } from "@/shared/ui/password-field-next";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
 import { TextFieldNext } from "@/shared/ui/text-field-next";
@@ -27,6 +32,7 @@ export function SignupStepCoordinator() {
 
   const phoneField = register("coordinator.phone");
   const password = useWatch({ control, name: "coordinator.password" });
+  const { truncationNotice, handlePaste } = usePasswordTruncationNotice(password ?? "");
 
   return (
     <>
@@ -78,6 +84,15 @@ export function SignupStepCoordinator() {
           label="Crie uma senha"
           autoComplete="new-password"
           placeholder="Mínimo de 8 caracteres"
+          /*
+           * O teto é do campo, não só do schema: sem ele o medidor chega a
+           * dizer "senha forte" numa senha de 120 caracteres que o avanço vai
+           * recusar. Mesmo par de `maxLength` e aviso de colagem cortada da
+           * redefinição por link.
+           */
+          maxLength={PASSWORD_MAX_LENGTH}
+          notice={truncationNotice}
+          onPaste={handlePaste}
           error={errors.coordinator?.password?.message}
           disabled={isSubmitting}
           {...register("coordinator.password")}
