@@ -1,9 +1,10 @@
 "use client";
 
 import { Mail, Phone, User } from "lucide-react";
+import type { KeyboardEvent } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import { PHONE_MASK_MAX_LENGTH, formatPhone } from "@/shared/lib";
+import { PHONE_MASK_MAX_LENGTH, formatPhoneInput } from "@/shared/lib";
 import { PasswordFieldNext } from "@/shared/ui/password-field-next";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
 import { TextFieldNext } from "@/shared/ui/text-field-next";
@@ -52,6 +53,7 @@ export function SignupStepCoordinator() {
 
       <TextFieldNext
         label="Celular (WhatsApp)"
+        type="tel"
         inputMode="tel"
         autoComplete="tel"
         placeholder="(19) 99999-9999"
@@ -60,14 +62,12 @@ export function SignupStepCoordinator() {
         error={errors.coordinator?.phone?.message}
         disabled={isSubmitting}
         {...phoneField}
+        onKeyDown={selectPhoneDigitToDelete}
         onChange={(event) => {
-          /*
-           * Formata no caminho entre a tecla e o formulário: o que o campo
-           * mostra e o que o React Hook Form guarda são o mesmo valor
-           * mascarado. O schema valida contando dígitos, então a máscara não
-           * muda o que é aceito, e o envio normaliza para dígitos.
-           */
-          event.target.value = formatPhone(event.target.value);
+          const input = event.currentTarget;
+          const formatted = formatPhoneInput(input.value, input.selectionStart ?? input.value.length);
+          input.value = formatted.value;
+          input.setSelectionRange(formatted.caret, formatted.caret);
 
           return phoneField.onChange(event);
         }}
@@ -82,8 +82,29 @@ export function SignupStepCoordinator() {
           disabled={isSubmitting}
           {...register("coordinator.password")}
         />
-        <PasswordStrengthMeter value={password} barsOnly />
+        <PasswordStrengthMeter value={password} />
       </div>
     </>
   );
+}
+
+/** Ao apagar um separador, inclui o dígito vizinho na exclusão nativa. */
+function selectPhoneDigitToDelete(event: KeyboardEvent<HTMLInputElement>) {
+  const input = event.currentTarget;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+
+  if (start === null || start !== end || event.altKey || event.ctrlKey || event.metaKey) return;
+
+  if (event.key === "Backspace") {
+    let previous = start - 1;
+    while (previous >= 0 && !/\d/.test(input.value.charAt(previous))) previous -= 1;
+    input.setSelectionRange(Math.max(0, previous), start);
+  }
+
+  if (event.key === "Delete") {
+    let next = start;
+    while (next < input.value.length && !/\d/.test(input.value.charAt(next))) next += 1;
+    input.setSelectionRange(start, Math.min(input.value.length, next + 1));
+  }
 }

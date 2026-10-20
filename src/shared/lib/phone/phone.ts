@@ -54,6 +54,24 @@ export function formatPhone(value: string): string {
   return `(${areaCode}) ${digits.slice(2, pivot)}-${digits.slice(pivot)}`;
 }
 
+/** Mantém o cursor junto ao dígito editado, mesmo quando a máscara muda. */
+export function formatPhoneInput(value: string, caret: number): { value: string; caret: number } {
+  const formatted = formatPhone(value);
+  const digitsBeforeCaret = Math.min(phoneDigits(value.slice(0, caret)).length, MOBILE_DIGITS);
+
+  if (digitsBeforeCaret === 0) {
+    return { value: formatted, caret: 0 };
+  }
+
+  let seen = 0;
+  const position = Array.from(formatted).findIndex((character) => {
+    seen += /\d/.test(character) ? 1 : 0;
+    return seen === digitsBeforeCaret;
+  });
+
+  return { value: formatted, caret: position + 1 };
+}
+
 /** Número de telefone completo, fixo ou celular, com DDD. */
 export function isCompletePhone(value: string): boolean {
   const digits = phoneDigits(value).length;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatPhone, isCompletePhone, phoneDigits } from "./phone";
+import { formatPhone, formatPhoneInput, isCompletePhone, phoneDigits } from "./phone";
 
 describe("formatPhone", () => {
   it("deve formatar um celular completo", () => {
@@ -41,7 +41,7 @@ describe("formatPhone", () => {
   });
 
   it("deve ignorar letras e símbolos colados", () => {
-    expect(formatPhone("tel: +55 (11) 97753-0630")).toBe("(55) 11977-5306");
+    expect(formatPhone("tel: (11) 97753-0630")).toBe("(11) 97753-0630");
   });
 
   it("deve permitir apagar até o fim", () => {
@@ -59,6 +59,19 @@ describe("phoneDigits", () => {
 
   it("deve devolver vazio quando não há dígito", () => {
     expect(phoneDigits("(")).toBe("");
+  });
+});
+
+describe("formatPhoneInput", () => {
+  it.each([
+    ["11977530630", 11, "(11) 97753-0630", 15],
+    ["(11) 97753-0630", 7, "(11) 97753-0630", 7],
+    ["(11) 9753-0630", 7, "(11) 9753-0630", 7],
+    ["(11) 9773-0630", 8, "(11) 9773-0630", 8],
+    ["(1) 97753-0630", 2, "(19) 7753-0630", 2],
+    ["(", 1, "", 0],
+  ])("mantém o cursor ao formatar %s na posição %i", (value, caret, expectedValue, expectedCaret) => {
+    expect(formatPhoneInput(value, caret)).toEqual({ value: expectedValue, caret: expectedCaret });
   });
 });
 

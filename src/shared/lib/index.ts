@@ -19,7 +19,7 @@ export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
 export { isRedirectRejection } from "./is-redirect-rejection";
 export { calcPercentage } from "./number";
-export { PHONE_MASK_MAX_LENGTH, formatPhone, isCompletePhone, phoneDigits } from "./phone";
+export { PHONE_MASK_MAX_LENGTH, formatPhone, formatPhoneInput, isCompletePhone, phoneDigits } from "./phone";
 export {
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
