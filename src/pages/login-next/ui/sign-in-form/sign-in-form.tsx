@@ -23,7 +23,11 @@ interface SignInFormProps {
    * de prometer uma navegacao que nao acontece.
    */
   onForgotPassword?: () => void;
-  /** Abre o autocadastro de circuito. Chega em SUC-28, pela mesma razao. */
+  /**
+   * Abre o autocadastro de circuito. Segue opcional porque o controle precisa
+   * aparecer desabilitado, e nao sumir, quando quem monta a tela nao oferece a
+   * navegacao — mesma razao do controle de recuperacao.
+   */
   onSignUp?: () => void;
 }
 
