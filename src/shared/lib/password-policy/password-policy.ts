@@ -45,6 +45,16 @@ export const PASSWORD_MIN_LENGTH_MESSAGE = `A senha deve conter no mínimo ${PAS
 
 export const PASSWORD_MAX_LENGTH_MESSAGE = `A senha deve ter no máximo ${PASSWORD_MAX_LENGTH} caracteres.`;
 
+/**
+ * Colagem cortada pelo `maxLength` do campo.
+ *
+ * O teto protege o medidor, mas corta em silencio: senha de gerenciador maior
+ * que o teto entra truncada nos dois campos, coincide com ela mesma e e aceita
+ * — e o gerenciador continua guardando a original, que nao serve mais para
+ * entrar. O aviso e o que torna o corte visivel no instante em que acontece.
+ */
+export const PASSWORD_TRUNCATED_MESSAGE = `A senha colada foi cortada em ${PASSWORD_MAX_LENGTH} caracteres, o máximo aceito. Confira antes de salvar.`;
+
 /** Quantos requisitos a senha cumpre — e o numero de barras acesas no medidor. */
 export function countMetRequirements(value: string): number {
   return PASSWORD_REQUIREMENTS.filter((requirement) => requirement.test(value)).length;

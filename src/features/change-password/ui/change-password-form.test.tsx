@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
+import { PASSWORD_MAX_LENGTH, PASSWORD_TRUNCATED_MESSAGE } from "@/shared/lib";
+
 import { ChangePasswordForm } from "./change-password-form";
 
 /**
@@ -207,6 +209,31 @@ describe("ChangePasswordForm", () => {
     fireEvent.click(botao);
 
     expect(changePasswordActionMock).toHaveBeenCalledOnce();
+  });
+
+  it("avisa quando a colagem é cortada pelo teto", () => {
+    /*
+     * Senha de gerenciador maior que o teto entra truncada nos dois campos,
+     * coincide com ela mesma e e aceita — e o gerenciador segue guardando a
+     * original, que nao entra mais.
+     */
+    render(<ChangePasswordForm />);
+
+    const novaSenha = screen.getByLabelText("Nova senha");
+    fireEvent.paste(novaSenha, { clipboardData: { getData: () => "a".repeat(PASSWORD_MAX_LENGTH + 28) } });
+    fireEvent.change(novaSenha, { target: { value: "a".repeat(PASSWORD_MAX_LENGTH) } });
+
+    expect(screen.getByText(PASSWORD_TRUNCATED_MESSAGE)).toBeInTheDocument();
+  });
+
+  it("não avisa nada quando a colagem cabe no campo", () => {
+    render(<ChangePasswordForm />);
+
+    const novaSenha = screen.getByLabelText("Nova senha");
+    fireEvent.paste(novaSenha, { clipboardData: { getData: () => "NovaSenha123" } });
+    fireEvent.change(novaSenha, { target: { value: "NovaSenha123" } });
+
+    expect(screen.queryByText(PASSWORD_TRUNCATED_MESSAGE)).not.toBeInTheDocument();
   });
 
   it("exibe o erro do servidor em banner quando a action retorna erro genérico", async () => {

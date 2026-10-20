@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, KeyRound, Loader2 } from "lucide-react";
 
-import { PASSWORD_MAX_LENGTH, useServerError } from "@/shared/lib";
+import { PASSWORD_MAX_LENGTH, useServerError, usePasswordTruncationNotice } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { PasswordField } from "@/shared/ui/password-field";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
@@ -65,6 +65,7 @@ export function ChangePasswordForm() {
   // `watch`, e o projeto inteiro ja segue este padrao. O campo nasce sem valor
   // padrao, por isso o `??`.
   const newPassword = useWatch({ control, name: "newPassword" }) ?? "";
+  const { truncationNotice, handlePaste } = usePasswordTruncationNotice(newPassword);
   const isBusy = isSubmitting || isRedirecting;
 
   const onSubmit = async (data: ChangePasswordFormValues) => {
@@ -139,8 +140,14 @@ export function ChangePasswordForm() {
           error={errors.newPassword?.message}
           startIcon={<KeyRound size={20} />}
           disabled={isBusy}
+          onPaste={handlePaste}
           {...register("newPassword")}
         />
+        {truncationNotice && (
+          <p className={styles.hint} role="status">
+            {truncationNotice}
+          </p>
+        )}
         <PasswordStrengthMeter value={newPassword} />
       </div>
 

@@ -5,6 +5,7 @@ export {
   PASSWORD_MIN_LENGTH,
   PASSWORD_MIN_LENGTH_MESSAGE,
   PASSWORD_REQUIREMENTS,
+  PASSWORD_TRUNCATED_MESSAGE,
   countMetRequirements,
   isPasswordCompliant,
 } from "./password-policy";
