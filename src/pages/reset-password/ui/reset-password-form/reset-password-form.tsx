@@ -7,7 +7,14 @@ import { Check, CircleAlert, Lock, MonitorSmartphone } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { routes } from "@/shared/config";
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, isPasswordCompliant, useServerError } from "@/shared/lib";
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  isPasswordCompliant,
+  isRedirectRejection,
+  usePasswordTruncationNotice,
+  useServerError,
+} from "@/shared/lib";
 import { PasswordFieldNext } from "@/shared/ui/password-field-next";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
 import { Spinner } from "@/shared/ui/spinner";
@@ -29,25 +36,6 @@ interface ResetPasswordFormProps {
 }
 
 const SUBMIT_FAILED = "Não foi possível redefinir a senha agora. Tente novamente.";
-
-/**
- * `redirect` numa Server Action chega ao cliente como **rejeicao**, depois de
- * o roteador ja ter aplicado a navegacao.
- *
- * Sem reconhece-la, o `handleSubmit` do React Hook Form a repropaga e ela vira
- * `unhandledrejection` no navegador: invisivel para quem usa a tela, mas um
- * alarme falso em todo sucesso para quem coleta erro de cliente.
- *
- * O digest e `NEXT_REDIRECT;<tipo>;<destino>;<status>;` — basta o prefixo, e
- * assim nao se importa modulo interno do Next.
- */
-function isRedirectRejection(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("digest" in error)) return false;
-
-  const { digest } = error as { digest: unknown };
-
-  return typeof digest === "string" && digest.startsWith("NEXT_REDIRECT");
-}
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   /** Token recusado no submit — o link morreu entre abrir a tela e enviar. */
@@ -87,6 +75,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   // `watch`, e o projeto inteiro ja segue este padrao.
   const newPassword = useWatch({ control, name: "newPassword" }) ?? "";
   const confirmPassword = useWatch({ control, name: "confirmPassword" }) ?? "";
+  const { truncationNotice, handlePaste } = usePasswordTruncationNotice(newPassword);
 
   /*
    * A coincidencia e avaliada enquanto se digita, e nao so no submit: descobrir
@@ -189,8 +178,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           placeholder={`Mínimo de ${PASSWORD_MIN_LENGTH} caracteres`}
           icon={<Lock size={18} strokeWidth={1.9} />}
           error={errors.newPassword?.message}
+          /* O corte da colagem nao e erro de validacao: informa, nao interrompe. */
+          notice={truncationNotice}
           disabled={isBusy}
           autoFocus
+          onPaste={handlePaste}
           {...register("newPassword")}
         />
         <PasswordStrengthMeter value={newPassword} />

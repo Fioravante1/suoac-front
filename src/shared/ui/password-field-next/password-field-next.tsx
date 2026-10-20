@@ -9,6 +9,13 @@ import styles from "./password-field-next.module.css";
 
 type PasswordFieldNextProps = Omit<TextFieldNextProps, "type" | "trailing" | "icon" | "hint"> & {
   icon?: TextFieldNextProps["icon"];
+  /**
+   * Aviso da tela abaixo do campo, para o que o componente nao tem como saber
+   * — colagem cortada pelo teto, por exemplo. Cede ao erro de validacao e tem
+   * precedencia sobre o Caps Lock: quem avisa de consequencia ja acontecida
+   * fala antes de quem avisa de tecla ligada.
+   */
+  notice?: string;
 };
 
 const CAPS_LOCK_WARNING = "Caps Lock está ativado";
@@ -23,7 +30,7 @@ const CAPS_LOCK_WARNING = "Caps Lock está ativado";
  * disso no navegador.
  */
 export const PasswordFieldNext = forwardRef(function PasswordFieldNext(
-  { onKeyDown, onKeyUp, error, ...props }: PasswordFieldNextProps,
+  { onKeyDown, onKeyUp, error, notice, ...props }: PasswordFieldNextProps,
   ref: Ref<HTMLInputElement>,
 ) {
   const [visible, setVisible] = useState(false);
@@ -35,15 +42,25 @@ export const PasswordFieldNext = forwardRef(function PasswordFieldNext(
     setCapsLockOn(event.getModifierState("CapsLock"));
   }
 
+  /*
+   * Um texto por vez embaixo do campo: dois competiriam. O erro e o que precisa
+   * ser resolvido, por isso vem primeiro; o aviso da tela vem antes do Caps
+   * Lock porque fala de algo que ja aconteceu com o que foi digitado.
+   */
+  function resolveHint() {
+    if (error) return undefined;
+    if (notice) return notice;
+    if (capsLockOn) return CAPS_LOCK_WARNING;
+    return undefined;
+  }
+
   return (
     <TextFieldNext
       {...props}
       ref={ref}
       error={error}
       type={visible ? "text" : "password"}
-      // O aviso cede lugar ao erro: dois textos embaixo do campo competiriam, e
-      // o erro e o que o usuario precisa resolver primeiro.
-      hint={capsLockOn && !error ? CAPS_LOCK_WARNING : undefined}
+      hint={resolveHint()}
       onKeyDown={(event) => {
         trackCapsLock(event);
         onKeyDown?.(event);

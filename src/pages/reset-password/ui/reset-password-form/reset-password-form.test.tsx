@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PASSWORD_MAX_LENGTH, PASSWORD_TRUNCATED_MESSAGE } from "@/shared/lib";
+
 import type { ResetPasswordResult } from "../../api";
 
 const resetPasswordAction = vi.fn<(input: unknown) => Promise<ResetPasswordResult>>();
@@ -167,6 +169,21 @@ describe("ResetPasswordForm", () => {
 
     expect(await screen.findByText(/ao menos uma letra maiúscula/)).toBeInTheDocument();
     expect(resetPasswordAction).not.toHaveBeenCalled();
+  });
+
+  it("avisa quando a colagem é cortada pelo teto", () => {
+    /*
+     * Senha de gerenciador maior que o teto entra truncada nos dois campos,
+     * coincide com ela mesma e e aceita — e o gerenciador segue guardando a
+     * original, que nao entra mais. O corte precisa aparecer na hora.
+     */
+    render(<ResetPasswordForm token={TOKEN} />);
+
+    const novaSenha = screen.getByLabelText("Nova senha");
+    fireEvent.paste(novaSenha, { clipboardData: { getData: () => "a".repeat(PASSWORD_MAX_LENGTH + 28) } });
+    fireEvent.change(novaSenha, { target: { value: "a".repeat(PASSWORD_MAX_LENGTH) } });
+
+    expect(screen.getByText(PASSWORD_TRUNCATED_MESSAGE)).toBeInTheDocument();
   });
 
   it("mostra o medidor de força enquanto a senha é digitada", () => {

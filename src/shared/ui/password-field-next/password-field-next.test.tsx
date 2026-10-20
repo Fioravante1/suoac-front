@@ -68,4 +68,29 @@ describe("PasswordFieldNext", () => {
 
     expect(pressed).toBe("Enter");
   });
+
+  it("mostra o aviso da tela abaixo do campo", () => {
+    render(<PasswordFieldNext label="Nova senha" notice="A senha colada foi cortada." />);
+
+    expect(screen.getByText("A senha colada foi cortada.")).toBeInTheDocument();
+  });
+
+  it("deixa o aviso da tela passar na frente do Caps Lock", () => {
+    // Um texto por vez embaixo do campo. O aviso da tela fala de algo que ja
+    // aconteceu com o que foi digitado; o Caps Lock, de uma tecla ligada.
+    render(<PasswordFieldNext label="Nova senha" notice="A senha colada foi cortada." />);
+
+    const campo = screen.getByLabelText("Nova senha");
+    fireEvent.keyDown(campo, { key: "A", getModifierState: () => true });
+
+    expect(screen.getByText("A senha colada foi cortada.")).toBeInTheDocument();
+    expect(screen.queryByText("Caps Lock está ativado")).not.toBeInTheDocument();
+  });
+
+  it("deixa o erro de validação passar na frente do aviso da tela", () => {
+    render(<PasswordFieldNext label="Nova senha" notice="A senha colada foi cortada." error="Senha muito curta." />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Senha muito curta.");
+    expect(screen.queryByText("A senha colada foi cortada.")).not.toBeInTheDocument();
+  });
 });

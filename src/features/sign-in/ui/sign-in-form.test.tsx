@@ -133,6 +133,20 @@ describe("SignInForm", () => {
     });
   });
 
+  it("mantem o botao com nome acessivel enquanto entra", async () => {
+    // O rotulo cede lugar a um spinner sem texto: sem nome, quem usa leitor de
+    // tela encontra um botao anonimo exatamente enquanto algo acontece.
+    signInActionMock.mockImplementation(() => new Promise(() => {}));
+
+    render(<SignInForm />);
+
+    fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: "user@example.com" } });
+    fireEvent.change(screen.getByLabelText("Senha"), { target: { value: "Senha@123" } });
+    fireEvent.click(screen.getByRole("button", { name: /Entrar/i }));
+
+    expect(await screen.findByRole("button", { name: "Entrando" })).toBeDisabled();
+  });
+
   it("exibe banner informativo quando sessionExpired=true", () => {
     mockSearchParams.set("sessionExpired", "true");
 
