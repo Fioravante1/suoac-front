@@ -11,6 +11,7 @@ import { changePasswordAction } from "../api/change-password-action";
 
 const changePasswordActionMock = vi.mocked(changePasswordAction);
 
+/** Cumpre a politica inteira: 8+ caracteres, maiuscula, minuscula e numero. */
 function fillValidForm() {
   fireEvent.change(screen.getByLabelText("Senha atual"), { target: { value: "80275@Suoac" } });
   fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "NovaSenhaForte123" } });
@@ -29,6 +30,46 @@ describe("ChangePasswordForm", () => {
     expect(screen.getByLabelText("Nova senha")).toBeInTheDocument();
     expect(screen.getByLabelText("Confirmar nova senha")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Definir nova senha/i })).toBeInTheDocument();
+  });
+
+  it("recusa inline a senha que o servidor recusaria, sem chamar a action", async () => {
+    /*
+     * O defeito do SUC-59: `senhalonga` cumpre o minimo de caracteres, passava
+     * pela validacao do cliente e tomava `400` do servidor — no primeiro acesso
+     * de quem entra no sistema, depois de digitar a senha duas vezes.
+     */
+    render(<ChangePasswordForm />);
+
+    fireEvent.change(screen.getByLabelText("Senha atual"), { target: { value: "80275@Suoac" } });
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalonga" } });
+    fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "senhalonga" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
+
+    expect(await screen.findByText(/ao menos uma letra maiúscula/i)).toBeInTheDocument();
+    expect(changePasswordActionMock).not.toHaveBeenCalled();
+  });
+
+  it("mostra o que falta na senha enquanto ela é digitada", () => {
+    render(<ChangePasswordForm />);
+
+    expect(screen.getByText("Use letras maiúsculas, minúsculas e números")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalonga" } });
+
+    expect(screen.getByText("razoável")).toBeInTheDocument();
+    expect(screen.getByText(/Uma letra maiúscula/)).toHaveTextContent("pendente");
+    expect(screen.getByText(/Uma letra minúscula/)).toHaveTextContent("cumprido");
+  });
+
+  it("limita a digitação ao teto aceito pela API", () => {
+    // Sem o teto, o medidor acenderia as quatro barras numa senha de 100+
+    // caracteres que o formulario recusa, dizendo "forte" para o que nao passa.
+    render(<ChangePasswordForm />);
+
+    expect(screen.getByLabelText("Senha atual")).toHaveAttribute("maxlength", "100");
+    expect(screen.getByLabelText("Nova senha")).toHaveAttribute("maxlength", "100");
+    expect(screen.getByLabelText("Confirmar nova senha")).toHaveAttribute("maxlength", "100");
   });
 
   it("não chama a action e exibe erros ao submeter vazio", async () => {

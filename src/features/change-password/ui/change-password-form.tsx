@@ -1,12 +1,13 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, KeyRound, Loader2 } from "lucide-react";
 
-import { useServerError } from "@/shared/lib";
+import { PASSWORD_MAX_LENGTH, useServerError } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { PasswordField } from "@/shared/ui/password-field";
+import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
 
 import { changePasswordSchema, type ChangePasswordFormValues } from "../model/change-password-schema";
 import { changePasswordAction } from "../api/change-password-action";
@@ -19,10 +20,16 @@ export function ChangePasswordForm() {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
   });
+
+  // `useWatch` em vez de `watch()`: o React Compiler nao memoiza o retorno de
+  // `watch`, e o projeto inteiro ja segue este padrao. O campo nasce sem valor
+  // padrao, por isso o `??`.
+  const newPassword = useWatch({ control, name: "newPassword" }) ?? "";
 
   const onSubmit = async (data: ChangePasswordFormValues) => {
     clearServerError();
@@ -57,6 +64,7 @@ export function ChangePasswordForm() {
           label="Senha atual"
           placeholder="••••••••"
           autoComplete="current-password"
+          maxLength={PASSWORD_MAX_LENGTH}
           autoFocus
           error={errors.currentPassword?.message}
           startIcon={<Lock size={20} />}
@@ -66,20 +74,31 @@ export function ChangePasswordForm() {
         <p className={styles.hint}>É a mesma senha que você usou para entrar agora.</p>
       </div>
 
-      <PasswordField
-        label="Nova senha"
-        placeholder="Mínimo de 8 caracteres"
-        autoComplete="new-password"
-        error={errors.newPassword?.message}
-        startIcon={<KeyRound size={20} />}
-        disabled={isSubmitting}
-        {...register("newPassword")}
-      />
+      {/*
+        O medidor fica junto do campo, no mesmo grupo: ele responde ao que esta
+        sendo digitado ali. Sem ele, quem nao cumpre a politica so descobre o
+        que falta ao submeter — e esta e a primeira tela de quem entra no
+        sistema.
+      */}
+      <div className={styles.fieldGroup}>
+        <PasswordField
+          label="Nova senha"
+          placeholder="Mínimo de 8 caracteres"
+          autoComplete="new-password"
+          maxLength={PASSWORD_MAX_LENGTH}
+          error={errors.newPassword?.message}
+          startIcon={<KeyRound size={20} />}
+          disabled={isSubmitting}
+          {...register("newPassword")}
+        />
+        <PasswordStrengthMeter value={newPassword} />
+      </div>
 
       <PasswordField
         label="Confirmar nova senha"
         placeholder="••••••••"
         autoComplete="new-password"
+        maxLength={PASSWORD_MAX_LENGTH}
         error={errors.confirmPassword?.message}
         startIcon={<KeyRound size={20} />}
         disabled={isSubmitting}
