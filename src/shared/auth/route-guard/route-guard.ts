@@ -16,9 +16,23 @@ import { getSession } from "../session";
 const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.help];
 
 /**
+ * Rotas abertas por link com token, acessiveis **com ou sem sessao**.
+ *
+ * Nao entram em `PUBLIC_ROUTES` porque rota publica, com sessao valida, e
+ * redirecionada para o painel — e aqui isso quebraria o link. O caso que decide:
+ * computador compartilhado, onde a sessao aberta pode ser de outra pessoa; mandar
+ * para o painel dela, em vez de deixar redefinir a senha, erra duas vezes.
+ *
+ * Tambem vale para quem tem troca de senha obrigatoria pendente: redefinir pelo
+ * link resolve a pendencia, entao prende-lo na tela de troca seria um beco.
+ */
+const TOKEN_LINK_ROUTES: readonly string[] = [routes.resetPassword];
+
+/**
  * Gate de autenticação server-side (Next 16 Proxy). Roda antes de a rota ser
  * renderizada e centraliza os redirects de acesso:
  *
+ * - rota aberta por link com token → passa, com ou sem sessão;
  * - não autenticado em rota privada → `/login` (preservando `returnUrl`);
  * - autenticado com troca de senha obrigatória pendente → `/change-password`;
  * - autenticado na tela de login → `/dashboard`.
@@ -30,6 +44,11 @@ const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.h
  */
 export async function routeGuard(req: NextRequest): Promise<NextResponse> {
   const { pathname, search } = req.nextUrl;
+
+  if (TOKEN_LINK_ROUTES.includes(pathname)) {
+    return NextResponse.next();
+  }
+
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
   const isChangePasswordRoute = pathname === routes.changePassword;
   const session = await getSession();
