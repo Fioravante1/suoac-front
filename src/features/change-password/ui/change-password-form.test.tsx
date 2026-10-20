@@ -236,6 +236,18 @@ describe("ChangePasswordForm", () => {
     expect(screen.queryByText(PASSWORD_TRUNCATED_MESSAGE)).not.toBeInTheDocument();
   });
 
+  it("mantém o botão com nome acessível enquanto salva", async () => {
+    // O rotulo cede lugar a um spinner sem texto: sem nome, quem usa leitor de
+    // tela encontra um botao anonimo exatamente enquanto algo acontece.
+    changePasswordActionMock.mockImplementation(() => new Promise(() => {}));
+
+    render(<ChangePasswordForm />);
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
+
+    expect(await screen.findByRole("button", { name: "Salvando a nova senha" })).toBeDisabled();
+  });
+
   it("exibe o erro do servidor em banner quando a action retorna erro genérico", async () => {
     changePasswordActionMock.mockResolvedValue({ error: "Não foi possível alterar a senha. Tente novamente." });
 
