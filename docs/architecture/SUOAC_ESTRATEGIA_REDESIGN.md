@@ -338,10 +338,11 @@ abandonar na confirmação deixa um rascunho que expira em 30 minutos e é purga
 código nenhum. Recarregar a página no meio perde o preenchimento — não há rascunho para retomar, e o
 comportamento definido é avisar antes de sair e voltar à etapa 1.
 
-Uma consequência que o desenho não previa: o erro de **código de circuito já em uso** só aparece ao
-concluir a etapa 3, porque a unicidade é do servidor. A resposta `409` traz o campo em `field`
-(`coordinator.email`, `circuit.code`, `circuit.name`, `congregations.N.code`), e a tela precisa saber
-voltar para a etapa que contém aquele campo.
+Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
+etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa
+`circuit.name`; não existe um código e um nome descritivo separados. A resposta `409` traz o campo em
+`field` (`coordinator.email`, `circuit.name`, `congregations.N.code`), e a tela precisa saber voltar
+para a etapa que contém aquele campo.
 
 **Demais fatias:** ônibus e poltronas (modelo de dados novo, inclusive `legs[dia] = {bus, seat}` por
 passageiro), importação de planilha com deduplicação por RG, notificações, busca global,
