@@ -222,4 +222,31 @@ describe("ResetPasswordForm", () => {
     liberar({ status: "error", message: "Falha de rede." });
     await waitFor(() => expect(screen.getByRole("button", { name: "Salvar nova senha" })).toBeEnabled());
   });
+
+  it("avisa quando a action nem chega a responder", async () => {
+    /*
+     * Conexao caida ou deploy no meio da requisicao: nao ha resultado para
+     * interpretar. Sem tratar, a rejeicao morre como `unhandledrejection` e a
+     * tela fica muda — o botao volta ao normal sem dizer se a senha mudou.
+     */
+    resetPasswordAction.mockRejectedValue(new Error("Failed to fetch"));
+
+    const naoTratadas: unknown[] = [];
+    const capturar = (event: PromiseRejectionEvent) => naoTratadas.push(event.reason);
+    window.addEventListener("unhandledrejection", capturar);
+
+    render(<ResetPasswordForm token={TOKEN} />);
+    preencher();
+    enviar();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível redefinir a senha agora. Tente novamente.",
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    window.removeEventListener("unhandledrejection", capturar);
+
+    expect(naoTratadas).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "Salvar nova senha" })).toBeEnabled();
+  });
 });

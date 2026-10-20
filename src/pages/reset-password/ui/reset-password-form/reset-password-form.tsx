@@ -118,7 +118,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       // Sucesso: a action redirecionou e a navegacao ja esta em curso.
       if (isRedirectRejection(error)) return;
 
-      throw error;
+      /*
+       * Falha antes de a action responder — conexao caida, deploy no meio da
+       * requisicao. Nao ha `result` para interpretar, e relancar aqui deixaria
+       * a tela muda: o `handleSubmit` repropaga, a rejeicao morre como
+       * `unhandledrejection` e quem usa ve o botao voltar ao normal sem
+       * nenhuma mensagem, sem saber se a senha mudou.
+       */
+      showServerError(null, SUBMIT_FAILED);
+      return;
     }
 
     if (result.status === "token-rejected") {
