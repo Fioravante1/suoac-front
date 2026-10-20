@@ -338,6 +338,11 @@ abandonar na confirmação deixa um rascunho que expira em 30 minutos e é purga
 código nenhum. Recarregar a página no meio perde o preenchimento — não há rascunho para retomar, e o
 comportamento definido é avisar antes de sair e voltar à etapa 1.
 
+**Etapa 1 (SUC-29):** a validação do formulário ocorre durante a digitação; o avanço continua
+validando somente a etapa atual. O medidor compartilhado exibe as quatro barras e os requisitos
+cumpridos/pendentes. A máscara de telefone mantém o cursor pela posição dos dígitos e permite
+excluir através dos separadores com Backspace/Delete; o valor permanece no React Hook Form.
+
 Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
 etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa
 `circuit.name`; não existe um código e um nome descritivo separados. A resposta `409` traz o campo em
