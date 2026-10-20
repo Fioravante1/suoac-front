@@ -53,6 +53,26 @@ describe("TextFieldNext", () => {
     expect(screen.getByRole("button", { name: "Mostrar senha" })).toBeInTheDocument();
   });
 
+  it("marca a borda pelo veredito, sem acrescentar mensagem abaixo do campo", () => {
+    // O texto que explica o veredito fica ao lado do rótulo — ver a confirmação
+    // de senha da tela de redefinição.
+    const { rerender } = render(<TextFieldNext label="Confirme a senha" status="valid" />);
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Confirme a senha")).not.toHaveAttribute("aria-invalid");
+
+    rerender(<TextFieldNext label="Confirme a senha" status="invalid" />);
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("deixa o erro com mensagem prevalecer sobre o veredito de acerto", () => {
+    render(<TextFieldNext label="Confirme a senha" status="valid" error="As senhas não coincidem." />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("As senhas não coincidem.");
+    expect(screen.getByLabelText("Confirme a senha")).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("esconde o ícone decorativo de tecnologias assistivas", () => {
     const { container } = render(<TextFieldNext label="E-mail" icon={<svg />} />);
 

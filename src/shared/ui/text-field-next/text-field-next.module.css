@@ -54,6 +54,15 @@
   box-shadow: 0 0 0 4px var(--suoac-color-critical-soft);
 }
 
+.valid {
+  border-color: var(--suoac-color-success);
+}
+
+.valid:focus-within {
+  border-color: var(--suoac-color-success);
+  box-shadow: 0 0 0 4px var(--suoac-color-success-soft);
+}
+
 .icon {
   display: grid;
   place-items: center;
