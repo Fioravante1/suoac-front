@@ -108,7 +108,26 @@ describe("ResetPasswordForm", () => {
     preencher(SENHA, "OutraSenha123");
     enviar();
 
-    expect(await screen.findByText("As senhas não coincidem.")).toBeInTheDocument();
+    expect(await screen.findByText("As senhas não coincidem")).toBeInTheDocument();
+    expect(resetPasswordAction).not.toHaveBeenCalled();
+  });
+
+  it("diz uma vez só que as senhas divergem", async () => {
+    // O indicador ao lado do rotulo ja cobre a divergencia; repetir embaixo do
+    // campo e o ruido que o `status` foi criado para evitar.
+    render(<ResetPasswordForm token={TOKEN} />);
+    preencher(SENHA, "OutraSenha123");
+    fireEvent.blur(screen.getByLabelText("Confirme a nova senha"));
+
+    await waitFor(() => expect(screen.getAllByText(/As senhas não coincidem/)).toHaveLength(1));
+  });
+
+  it("cobre a confirmação em branco, que o indicador não alcança", async () => {
+    render(<ResetPasswordForm token={TOKEN} />);
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: SENHA } });
+    enviar();
+
+    expect(await screen.findByText("Confirme a nova senha.")).toBeInTheDocument();
     expect(resetPasswordAction).not.toHaveBeenCalled();
   });
 

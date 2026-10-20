@@ -81,6 +81,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   const matchStatus = resolveMatchStatus();
 
+  /*
+   * Embaixo do campo entra so o que o indicador ao lado do rotulo nao cobre: a
+   * confirmacao em branco. A divergencia ja esta dita la em cima, e repetir
+   * seria o ruido que o `status` foi criado para evitar.
+   */
+  const confirmationError = hasConfirmation ? undefined : errors.confirmPassword?.message;
+
   async function onSubmit(values: ResetPasswordFormValues) {
     clearServerError();
 
@@ -143,7 +150,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         maxLength={PASSWORD_MAX_LENGTH}
         placeholder="Repita a nova senha"
         icon={<Lock size={18} strokeWidth={1.9} />}
-        error={errors.confirmPassword?.message}
+        error={confirmationError}
         /*
          * A borda acompanha o indicador ao lado do rotulo — verde ao coincidir,
          * vermelha ao divergir —, sem mensagem propria embaixo do campo, que
