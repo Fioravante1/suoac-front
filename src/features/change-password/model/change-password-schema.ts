@@ -1,15 +1,26 @@
 import { z } from "zod";
 
+/*
+ * Importado do modulo, nao do barril `@/shared/lib`: este schema e usado pela
+ * Server Action, e o barril reexporta hooks `"use client"` (`useServerError`,
+ * `useModal`, `usePagination`) — o build falha ao ver hook de cliente alcancado
+ * pelo grafo do servidor. Mesmo motivo do schema da redefinicao por link.
+ */
+import { PASSWORD_MAX_LENGTH, PASSWORD_MAX_LENGTH_MESSAGE, newPasswordSchema } from "@/shared/lib/password-policy";
+
 export const changePasswordSchema = z
   .object({
     currentPassword: z
       .string()
       .min(1, "Informe sua senha atual.")
-      .max(100, "A senha deve ter no máximo 100 caracteres."),
-    newPassword: z
-      .string()
-      .min(8, "A nova senha deve conter no mínimo 8 caracteres.")
-      .max(100, "A senha deve ter no máximo 100 caracteres."),
+      .max(PASSWORD_MAX_LENGTH, PASSWORD_MAX_LENGTH_MESSAGE),
+    /*
+     * A politica vem de `shared/lib`, que espelha o `PASSWORD_COMPLEXITY_REGEX`
+     * do backend. Validar menos aqui e o defeito do SUC-59: `senhalonga`
+     * passava, a requisicao saia e o servidor respondia `400` — depois de a
+     * pessoa digitar a senha duas vezes, no primeiro acesso dela ao sistema.
+     */
+    newPassword: newPasswordSchema,
     confirmPassword: z.string().min(1, "Confirme a nova senha."),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
