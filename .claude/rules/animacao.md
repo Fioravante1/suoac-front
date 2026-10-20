@@ -8,8 +8,9 @@ paths:
 # Animacao
 
 - Use os `@keyframes` globais do design system, prefixados com `suoac-`: `suoac-rise` (entradas),
-  `suoac-fade`, `suoac-modal-in`, `suoac-pop` (toast), `suoac-grow` (barras), `suoac-seat`
-  (poltronas), `suoac-draw` (graficos), `suoac-shake` (erro) e `suoac-spin`.
+  `suoac-swap` (troca de tela e de etapa: desliza da direita), `suoac-fade`, `suoac-modal-in`,
+  `suoac-pop` (toast), `suoac-grow` (barras), `suoac-seat` (poltronas), `suoac-draw` (graficos),
+  `suoac-shake` (erro) e `suoac-spin`.
 - Duracao e curva vem dos tokens `--suoac-motion-*`. A curva padrao e
   `--suoac-motion-ease-standard`; qualquer outra precisa de motivo.
 - Listas entram escalonadas: 25ms por item (`--suoac-motion-stagger-step`), com teto de 400ms
