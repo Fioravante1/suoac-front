@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar animações e transições em **/*.module.css, app/globals.css ou src/app/styles/**
 paths:
   - "**/*.module.css"
   - "app/globals.css"

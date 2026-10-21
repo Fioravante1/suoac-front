@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar arquivos em src/**, app/** ou pages/** (arquitetura Feature-Sliced Design obrigatória)
 paths:
   - "src/**"
   - "app/**"

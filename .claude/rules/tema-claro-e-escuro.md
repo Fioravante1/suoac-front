@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar estilos e tokens de tema em **/*.module.css, app/globals.css, src/app/styles/** ou app/**/*.tsx
 paths:
   - "**/*.module.css"
   - "app/globals.css"

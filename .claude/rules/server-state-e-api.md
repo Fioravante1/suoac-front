@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar segmentos api/ e model/, src/shared/api/** ou src/shared/lib/** (TanStack Query, Server Actions, cliente HTTP e DTOs)
 paths:
   - "src/**/api/**"
   - "src/**/model/**"

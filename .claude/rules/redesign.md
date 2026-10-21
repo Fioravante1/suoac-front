@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: Estratégia de redesign incremental em curso, coexistência de slices (-next) e feature flags REDESIGN_*
+---
+
 # Redesign em andamento
 
 O sistema esta sendo redesenhado de forma incremental, com a aplicacao atual em producao o tempo

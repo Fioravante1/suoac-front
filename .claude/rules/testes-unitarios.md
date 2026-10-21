@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar testes unitários em **/*.test.{ts,tsx}, tests/setup/** ou src/**/*-testing/**
 paths:
   - "**/*.test.{ts,tsx}"
   - "tests/setup/**"
