@@ -3,13 +3,9 @@
 import { endpoints, httpClientRaw } from "@/shared/api/http-client";
 import { phoneDigits } from "@/shared/lib/phone";
 
-import { signupSchema, type SignupFormValues } from "../../model";
+import { readSignupConflicts, signupSchema, type SignupConflict, type SignupFormValues } from "../../model";
 
-/** Conflito apontado pela API: o caminho do campo e a mensagem para a tela. */
-export interface SignupConflict {
-  field: string;
-  message: string;
-}
+export type { SignupConflict } from "../../model";
 
 export type SubmitCircuitSignupResult =
   | { status: "success"; email: string }
@@ -19,12 +15,6 @@ const GENERIC_ERROR = "Não foi possível criar o circuito agora. Verifique sua 
 const INVALID_DATA_ERROR = "Alguns dados estão inválidos. Confira as etapas e tente novamente.";
 const RATE_LIMIT_ERROR = "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.";
 const CONFLICT_ERROR = "Alguns dados já estão em uso. Confira os campos destacados.";
-
-interface ErrorBody {
-  message?: unknown;
-  field?: unknown;
-  fields?: unknown;
-}
 
 /**
  * Envia o autocadastro inteiro, ao concluir a etapa 3.
@@ -76,42 +66,17 @@ async function toFailure(response: Response): Promise<SubmitCircuitSignupResult>
   if (response.status === 400) return failure(INVALID_DATA_ERROR);
   if (response.status !== 409 && response.status !== 422) return failure(GENERIC_ERROR);
 
-  const conflicts = readConflicts(await readErrorBody(response));
+  const conflicts = readSignupConflicts(await readErrorBody(response));
 
   if (conflicts.length === 0) return failure(GENERIC_ERROR);
 
   return failure(CONFLICT_ERROR, conflicts);
 }
 
-async function readErrorBody(response: Response): Promise<ErrorBody> {
+async function readErrorBody(response: Response): Promise<unknown> {
   try {
-    return (await response.json()) as ErrorBody;
+    return await response.json();
   } catch {
-    return {};
+    return null;
   }
-}
-
-/**
- * A API manda a lista completa em `fields` (`409`) e só o primeiro em `field`
- * (`422`, e leitores antigos do `409`). A lista tem precedência; `field` com
- * `message` é o plano B.
- */
-function readConflicts(body: ErrorBody): SignupConflict[] {
-  if (Array.isArray(body.fields)) {
-    return body.fields.filter(isConflict);
-  }
-
-  if (typeof body.field === "string" && typeof body.message === "string") {
-    return [{ field: body.field, message: body.message }];
-  }
-
-  return [];
-}
-
-function isConflict(value: unknown): value is SignupConflict {
-  if (typeof value !== "object" || value === null) return false;
-
-  const candidate = value as Partial<SignupConflict>;
-
-  return typeof candidate.field === "string" && typeof candidate.message === "string";
 }
