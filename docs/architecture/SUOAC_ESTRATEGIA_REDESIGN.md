@@ -343,6 +343,13 @@ validando somente a etapa atual. O medidor compartilhado exibe as quatro barras 
 cumpridos/pendentes. A máscara de telefone mantém o cursor pela posição dos dígitos e permite
 excluir através dos separadores com Backspace/Delete; o valor permanece no React Hook Form.
 
+**Etapa 2 (SUC-30):** Circuito e UF são convertidos em maiúsculas no valor real do campo, preservando
+cursor e seleção durante a edição. O identificador continua livre de máscara rígida (aceita `SP-019 A`),
+com o teto transitório de 20 caracteres do contrato. Cidade e UF têm validação inline; o privilégio
+fixo é informativo e o checkbox nasce desmarcado, com erro acessível quando falta aceite. Os links de
+consulta abrem em outra aba para preservar o preenchimento. `/privacidade` tem conteúdo provisório
+(SUC-45); `/termos` é destino futuro, com publicação pendente no SUC-63 antes da liberação do autocadastro.
+
 Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
 etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa
 `circuit.name`; não existe um código e um nome descritivo separados. A resposta `409` traz o campo em

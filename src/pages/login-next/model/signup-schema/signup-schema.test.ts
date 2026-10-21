@@ -111,6 +111,25 @@ describe("signupSchema", () => {
     });
   });
 
+  describe("localização", () => {
+    it.each(["", " ", "S", "SAO", "12", "S1", "ÁB"])("deve recusar UF inválida: %s", (state) => {
+      expect(failedPaths(buildValues({ circuit: { name: "SP-019 A", city: "Campinas", state } }))).toContain(
+        "circuit.state",
+      );
+    });
+
+    it.each(["", " ", "A", "a".repeat(101)])("deve recusar cidade vazia, curta ou longa: %s", (city) => {
+      expect(failedPaths(buildValues({ circuit: { name: "SP-019 A", city, state: "SP" } }))).toContain("circuit.city");
+    });
+
+    it("deve aceitar cidade com acento e remover espaços das extremidades", () => {
+      const result = signupSchema.parse(
+        buildValues({ circuit: { name: " sp-019 a ", city: " São Paulo ", state: "sp" } }),
+      );
+      expect(result.circuit).toEqual({ name: "SP-019 A", city: "São Paulo", state: "SP" });
+    });
+  });
+
   describe("termos", () => {
     it("deve recusar o cadastro sem aceite", () => {
       expect(failedPaths(buildValues({ acceptedTerms: false }))).toContain("acceptedTerms");

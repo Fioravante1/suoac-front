@@ -196,6 +196,66 @@ test.describe("autocadastro de circuito em etapas", () => {
   });
 
   for (const theme of ["light", "dark"] as const) {
+    test(`edita o circuito sem deslocar o cursor e exige aceite no tema ${theme}`, async ({
+      page,
+      context,
+    }, testInfo) => {
+      await context.addCookies([{ name: "suoac-theme", value: theme, url: E2E_BASE_URL }]);
+      await page.reload();
+      await page.getByRole("button", { name: /Seu circuito ainda não usa o SUOAC/i }).click();
+      await page.getByLabel("Nome completo").fill("João Silva");
+      await page.getByLabel("E-mail").fill("joao@example.com");
+      await page.getByLabel("Celular (WhatsApp)").fill("19999999999");
+      await page.getByLabel("Crie uma senha").fill("Senha123");
+      await page.getByRole("button", { name: "Continuar" }).click();
+
+      const circuit = page.getByRole("textbox", { name: "Circuito", exact: true });
+      await circuit.fill("sp-019 a");
+      await expect(circuit).toHaveValue("SP-019 A");
+      await circuit.evaluate((input: HTMLInputElement) => input.setSelectionRange(3, 4));
+      await circuit.pressSequentially("b");
+      await expect(circuit).toHaveValue("SP-B19 A");
+      expect(await circuit.evaluate((input: HTMLInputElement) => input.selectionStart)).toBe(4);
+      await circuit.press("Backspace");
+      await expect(circuit).toHaveValue("SP-19 A");
+      expect(await circuit.evaluate((input: HTMLInputElement) => input.selectionStart)).toBe(3);
+      await circuit.pressSequentially("0");
+      await expect(circuit).toHaveValue("SP-019 A");
+
+      const city = page.getByRole("textbox", { name: "Cidade", exact: true });
+      await city.fill("São Paulo");
+      const state = page.getByRole("textbox", { name: "UF", exact: true });
+      await state.fill("s1");
+      await expect(page.getByText("A UF tem duas letras.")).toBeVisible();
+      await state.fill("sp");
+      await expect(state).toHaveValue("SP");
+      await expect(page.getByText("A UF tem duas letras.")).toBeHidden();
+      await expect(page.getByRole("group", { name: "Seu privilégio" })).toContainText(
+        "Coordenador do arranjo de ônibus no circuito",
+      );
+      await page.getByRole("button", { name: "Continuar" }).click();
+      await expect(page.getByText("Aceite os termos para continuar.")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Dados do circuito" })).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath(`circuito-${theme}.png`), fullPage: true });
+
+      // Consultar a política em outra aba mantém os dados e não constitui aceite.
+      const popupPromise = page.waitForEvent("popup");
+      await page.getByRole("link", { name: "política de privacidade" }).click();
+      const popup = await popupPromise;
+      await expect(popup.getByRole("heading", { name: "Privacidade", exact: true })).toBeVisible();
+      await popup.close();
+      await expect(circuit).toHaveValue("SP-019 A");
+      await expect(page.getByRole("checkbox")).not.toBeChecked();
+      await page.getByText(/Li e aceito os termos/).click();
+      await page.getByRole("button", { name: "Continuar" }).click();
+      await expect(page.getByRole("heading", { name: "Congregações do circuito" })).toBeVisible();
+      await page.getByRole("button", { name: "Voltar", exact: true }).click();
+      await expect(circuit).toHaveValue("SP-019 A");
+      await expect(city).toHaveValue("São Paulo");
+      await expect(state).toHaveValue("SP");
+      await expect(page.getByRole("checkbox")).toBeChecked();
+    });
+
     test(`orienta a criação da senha e valida sem sair do campo no tema ${theme}`, async ({
       page,
       context,

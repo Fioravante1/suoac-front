@@ -31,8 +31,8 @@ const ABANDON_WARNING = "Você tem um cadastro em andamento. Se sair agora, os d
  * trás — por isso o chassi vem antes do acabamento.
  *
  * Os campos já são os definitivos, com a validação definitiva; o que falta é o
- * acabamento das etapas seguintes: chip do privilégio fixo (SUC-30) e linhas
- * de congregação que se adicionam e removem (SUC-31).
+ * acabamento da etapa seguinte: linhas de congregação que se adicionam e
+ * removem, com envio final e tratamento dos conflitos da API (SUC-31).
  *
  * Nada é enviado antes do fim: a API guarda um rascunho só quando a etapa 3 é
  * concluída, e é o código de 6 dígitos que consolida o cadastro (SUC-37). Como
