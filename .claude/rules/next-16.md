@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar arquivos de rota do App Router (page.tsx, layout.tsx, route.ts, template.tsx, not-found.tsx, error.tsx), middleware.ts ou next.config.ts
 paths:
   - "**/page.tsx"
   - "**/layout.tsx"

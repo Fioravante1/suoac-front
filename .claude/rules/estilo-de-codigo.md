@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar código TypeScript/React em src/**/*.{ts,tsx}, app/**/*.{ts,tsx} ou tests/**/*.{ts,tsx}
 paths:
   - "src/**/*.{ts,tsx}"
   - "app/**/*.{ts,tsx}"

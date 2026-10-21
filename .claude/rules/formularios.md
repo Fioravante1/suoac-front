@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar formulários ou schemas nos segmentos src/**/ui/** e src/**/model/** (React Hook Form + Zod)
 paths:
   - "src/**/ui/**"
   - "src/**/model/**"

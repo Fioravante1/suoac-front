@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar componentes de UI, CSS Modules ou tokens em src/**/ui/**, src/shared/ui/**, app/**/*.tsx, **/*.module.css, app/globals.css ou src/app/styles/**
 paths:
   - "src/**/ui/**"
   - "src/shared/ui/**"

@@ -1,4 +1,6 @@
 ---
+trigger: model_decision
+description: Quando criar ou editar testes E2E com Playwright em tests/e2e/** ou playwright.config.ts
 paths:
   - "tests/e2e/**"
   - "playwright.config.ts"

@@ -8,8 +8,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # SUOAC Frontend — regras para agentes de IA
 
-Este arquivo e a porta de entrada. As regras detalhadas vivem em `.claude/rules/` e entram em
-contexto conforme o caminho do arquivo que esta sendo tocado — ver o indice abaixo.
+Este arquivo e a porta de entrada. As regras detalhadas vivem em `.claude/rules/` (referenciadas
+tambem por `.agents/rules.json` para o Gemini / Antigravity) — ver o indice abaixo.
+
+**Obrigatorio para agentes sem injecao automatica de `.claude/rules/` (como OpenAI Codex e Gemini
+CLI):** antes de planejar ou editar qualquer arquivo, **leia explicitamente com sua ferramenta de
+leitura** as regras sempre ativas (`.claude/rules/redesign.md` e `.claude/rules/compartilhado/*.md`)
+e os arquivos de `.claude/rules/` correspondentes aos caminhos listados nas tabelas da secao 2.
 
 ---
 
@@ -44,10 +49,12 @@ Antes de implementar qualquer funcionalidade, leia a documentacao relevante em `
 
 ## 2. Onde as regras vivem
 
-Cada arquivo abaixo declara no proprio frontmatter os caminhos que o ativam. Mexer em CSS nao carrega
-as regras de teste; mexer em teste nao carrega o design system.
+Cada arquivo em `.claude/rules/` declara no proprio frontmatter os caminhos (`paths:`) e gatilhos
+(`trigger:` / `description:`) que o ativam. Mexer em CSS nao carrega as regras de teste; mexer em
+teste nao carrega o design system. Se o seu runtime nao injeta `.claude/rules/` automaticamente,
+**abra e leia** os arquivos aplicaveis antes de escrever codigo:
 
-| Regra                    | Vale para                                                                                                 |
+| Regra (`.claude/rules/`) | Vale para                                                                                                 |
 | ------------------------ | --------------------------------------------------------------------------------------------------------- |
 | `arquitetura-fsd.md`     | `src/**`, `app/**`, `pages/**`                                                                            |
 | `next-16.md`             | arquivos de rota do App Router (`page.tsx`, `layout.tsx`, `route.ts`…), `middleware.ts`, `next.config.ts` |
@@ -61,10 +68,21 @@ as regras de teste; mexer em teste nao carrega o design system.
 | `testes-e2e.md`          | `tests/e2e/**`, `playwright.config.ts`                                                                    |
 | `redesign.md`            | sempre — e a estrategia em curso                                                                          |
 
-O subdiretorio `compartilhado/` vem do repositorio `suoac-ai` por `git subtree` e traz o que vale
-igual no backend e no frontend: commits, Jira, branches e PRs, postura do agente, idioma do codigo e
-veto a aninhamento. **Nao edite esses arquivos aqui** — a fonte e `suoac-ai/rules/`, e a proxima
-sincronizacao sobrescreve qualquer mudanca local.
+O subdiretorio `.claude/rules/compartilhado/` vem do repositorio `suoac-ai` por `git subtree` e traz
+o que vale igual no backend e no frontend. **Nao edite esses arquivos aqui** — a fonte e
+`suoac-ai/rules/`, e a proxima sincronizacao sobrescreve qualquer mudanca local:
+
+| Regra (`.claude/rules/compartilhado/`) | Vale para                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `postura-do-agente.md`                 | sempre — decisoes sao do usuario, dependencias pendentes e verificacao obrigatoria            |
+| `jira.md`                              | sempre — rastreamento obrigatorio de cards no projeto `SUC`                                   |
+| `branches-e-prs.md`                    | sempre — nome de branch, template de PR e regra de so commitar quando pedido explicitamente   |
+| `commits.md`                           | sempre — Conventional Commits em portugues, organizacao por significado, sem trailer de IA    |
+| `idioma-do-codigo.md`                  | `**/*.{ts,tsx}`, `**/*.{js,mjs,cjs}` — identificadores em ingles, textos humanos em portugues |
+| `aninhamento-e-ternarios.md`           | `**/*.{ts,tsx}` — early returns obrigatorios, proibido `if` ou ternario aninhado              |
+
+Para feature flags (`flags/next`, `@vercel/flags-core`), consulte tambem a skill em
+`.claude/skills/flags-sdk/SKILL.md` (espelhada em `.agents/skills/flags-sdk/SKILL.md`).
 
 ---
 
