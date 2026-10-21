@@ -3,22 +3,34 @@
 import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CircleAlert } from "lucide-react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, type Path } from "react-hook-form";
 
 import { useServerError } from "@/shared/lib";
 import { Spinner } from "@/shared/ui/spinner";
 
+import { submitCircuitSignupAction, type SubmitCircuitSignupResult } from "../../api";
 import { SignupStepCircuit } from "../signup-step-circuit";
 import { SignupStepCongregations } from "../signup-step-congregations";
 import { SignupStepCoordinator } from "../signup-step-coordinator";
 
-import { SIGNUP_STEPS, SIGNUP_STEP_COUNT, signupDefaultValues, signupSchema, type SignupFormValues } from "../../model";
+import {
+  SIGNUP_STEPS,
+  SIGNUP_STEP_COUNT,
+  dropBlankCongregations,
+  isSignupFieldPath,
+  resolveSignupFieldStep,
+  signupDefaultValues,
+  signupSchema,
+  type SignupFormValues,
+} from "../../model";
 
 import styles from "./signup-flow.module.css";
 
 interface SignupFlowProps {
   /** Sai do autocadastro e volta para a tela de entrada. */
   onBack: () => void;
+  /** Chamado com o e-mail do coordenador quando a API aceita o cadastro e manda o código. */
+  onSubmitted: (email: string) => void;
 }
 
 const ABANDON_WARNING = "Você tem um cadastro em andamento. Se sair agora, os dados preenchidos serão perdidos.";
@@ -30,16 +42,16 @@ const ABANDON_WARNING = "Você tem um cadastro em andamento. Se sair agora, os d
  * independentes dariam três fontes de verdade e um problema de navegação para
  * trás — por isso o chassi vem antes do acabamento.
  *
- * Os campos já são os definitivos, com a validação definitiva; o que falta é o
- * acabamento da etapa seguinte: linhas de congregação que se adicionam e
- * removem, com envio final e tratamento dos conflitos da API (SUC-31).
+ * Os campos são os definitivos, com a validação definitiva. A etapa 3 adiciona
+ * e remove linhas de congregação e, ao concluir, envia o cadastro inteiro
+ * (SUC-31): conflito da API vira erro no campo certo, com volta à etapa dele.
  *
  * Nada é enviado antes do fim: a API guarda um rascunho só quando a etapa 3 é
  * concluída, e é o código de 6 dígitos que consolida o cadastro (SUC-37). Como
  * consequência, **recarregar a página perde o preenchimento** — não há rascunho
  * no servidor para retomar. O aviso de saída existe por isso.
  */
-export function SignupFlow({ onBack }: SignupFlowProps) {
+export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
   /*
    * A etapa é estado de controle da tela, não valor de campo, então vive em
    * `useState`. Todo valor que o usuário digita fica em React Hook Form — é o
@@ -49,7 +61,9 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const advancingRef = useRef(false);
-  const { serverError, clearServerError } = useServerError();
+  const { serverError, clearServerError, showServerError } = useServerError();
+  // Campo a focar quando a etapa que o contém terminar de montar.
+  const pendingFocusRef = useRef<Path<SignupFormValues> | null>(null);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -65,6 +79,10 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
 
   const {
     formState: { isSubmitting, isDirty },
+    getValues,
+    setError,
+    setFocus,
+    setValue,
     trigger,
   } = form;
 
@@ -107,11 +125,46 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
     return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
   }, [isDirty]);
 
+  /*
+   * Foco no primeiro campo em conflito. Quando o conflito está em outra etapa,
+   * o campo só existe depois que ela monta, então o foco espera a troca.
+   */
+  useEffect(() => {
+    const field = pendingFocusRef.current;
+
+    if (!field) {
+      return;
+    }
+
+    pendingFocusRef.current = null;
+    setFocus(field);
+  }, [stepIndex, setFocus]);
+
   if (!step) {
     return null;
   }
 
-  async function goToNextStep() {
+  /*
+   * Linha em branco é só uma linha aberta e não usada: sai antes de validar e
+   * de enviar, para o índice do erro da API ser o da tela.
+   */
+  function pruneCongregations(onlyOwnCongregation: boolean) {
+    const congregations = getValues("congregations");
+    const kept = onlyOwnCongregation ? congregations.slice(0, 1) : dropBlankCongregations(congregations);
+
+    if (kept.length === congregations.length) {
+      return;
+    }
+
+    setValue("congregations", kept);
+  }
+
+  /**
+   * `onlyOwnCongregation` é o "Adicionar as outras depois": descarta as linhas
+   * adicionais, preenchidas ou não, e conclui só com a congregação do
+   * coordenador.
+   */
+  async function goToNextStep({ onlyOwnCongregation = false } = {}) {
     /*
      * Trava síncrona contra o clique repetido. `trigger` é assíncrono, e dois
      * cliques dentro da mesma espera leem o mesmo `stepIndex` e avançam duas
@@ -132,6 +185,10 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
     try {
       clearServerError();
 
+      if (isLastStep) {
+        pruneCongregations(onlyOwnCongregation);
+      }
+
       // Valida só os campos desta etapa: o formulário inteiro reprovaria por
       // campos que o usuário ainda não viu.
       const isStepValid = await trigger(step.fields.slice(), { shouldFocus: true });
@@ -141,8 +198,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
       }
 
       if (isLastStep) {
-        // O envio para `POST /auth/circuit-signups` chega no SUC-31, junto da
-        // etapa que o dispara. Até lá o fluxo valida as três etapas e para aqui.
+        await submitSignup();
         return;
       }
 
@@ -151,6 +207,49 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
       advancingRef.current = false;
       setIsAdvancing(false);
     }
+  }
+
+  async function submitSignup() {
+    const result = await submitCircuitSignupAction(getValues());
+
+    if (result.status === "success") {
+      onSubmitted(result.email);
+      return;
+    }
+
+    showFailure(result);
+  }
+
+  /**
+   * Conflito de campo vira erro no próprio campo, e o fluxo volta para a etapa
+   * que tem o primeiro deles — o usuário corrige onde o erro está, e não numa
+   * tela que não o mostra. O que não aponta campo (limite de tentativas, falha
+   * da API) fica no aviso geral, que aparece em qualquer etapa.
+   */
+  function showFailure(result: Extract<SubmitCircuitSignupResult, { status: "error" }>) {
+    const fieldConflicts = result.conflicts.flatMap(({ field, message }) =>
+      isSignupFieldPath(field) ? [{ field, message }] : [],
+    );
+    const otherConflict = result.conflicts.find((conflict) => !isSignupFieldPath(conflict.field));
+
+    fieldConflicts.forEach(({ field, message }) => setError(field, { type: "server", message }));
+
+    showServerError(otherConflict?.message ?? result.message);
+
+    const first = fieldConflicts[0];
+    const targetStep = first ? resolveSignupFieldStep(first.field) : null;
+
+    if (!first || targetStep === null) {
+      return;
+    }
+
+    if (targetStep === stepIndex) {
+      setFocus(first.field);
+      return;
+    }
+
+    pendingFocusRef.current = first.field;
+    setStepIndex(targetStep);
   }
 
   function goToPreviousStep() {
@@ -223,6 +322,17 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
             {isBusy && <Spinner className={styles.spinner} size="small" />}
             {isBusy ? step.busyCta : step.cta}
           </button>
+
+          {isCongregationsStep && (
+            <button
+              type="button"
+              className={styles.skip}
+              onClick={() => void goToNextStep({ onlyOwnCongregation: true })}
+              disabled={isBusy}
+            >
+              Adicionar as outras depois
+            </button>
+          )}
         </form>
       </section>
     </FormProvider>
