@@ -28,7 +28,7 @@ export {
   countMetRequirements,
   isPasswordCompliant,
 } from "./password-policy";
-export { getInitials, getGreetingByTime, pluralize } from "./string";
+export { getInitials, getGreetingByTime, pluralize, uppercaseInput } from "./string";
 export { useDebouncedValue } from "./use-debounced-value";
 export { useModal } from "./use-modal";
 export { usePagination } from "./use-pagination";

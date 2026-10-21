@@ -2,6 +2,8 @@ export const routes = {
   home: "/",
   login: "/login",
   privacy: "/privacidade",
+  // Página e conteúdo pendentes no SUC-63; destino do aceite no autocadastro.
+  terms: "/termos",
   help: "/ajuda",
   changePassword: "/change-password",
   resetPassword: "/reset-password",
