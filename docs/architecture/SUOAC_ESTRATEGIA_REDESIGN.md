@@ -350,6 +350,20 @@ fixo é informativo e o checkbox nasce desmarcado, com erro acessível quando fa
 consulta abrem em outra aba para preservar o preenchimento. `/privacidade` tem conteúdo provisório
 (SUC-45); `/termos` é destino futuro, com publicação pendente no SUC-63 antes da liberação do autocadastro.
 
+**Etapa 3 (SUC-31):** lista de congregações com `useFieldArray`; a primeira linha é a do coordenador,
+obrigatória e não removível, e a chave de cada linha é o `id` do array (remover do meio não embaralha
+valores). Linhas adicionais em branco saem do formulário antes da validação final
+(`dropBlankCongregations`), para o `N` de `congregations.N.code` da API apontar a linha da tela.
+"Adicionar as outras depois" descarta as linhas adicionais e conclui só com a do coordenador. O teto
+na tela é de 40 linhas.
+
+O envio (`submitCircuitSignupAction`) acontece ao concluir a etapa 3. `POST /auth/circuit-signups`
+responde `202` sem corpo, por isso a Server Action usa `httpClientRaw` e `anonymous`. Os conflitos
+voltam em `fields` (`409`) ou `field` (`422`); cada um vira erro no campo, e o fluxo volta à etapa do
+primeiro. Caminho que não é de campo (por exemplo `congregations` sem índice, devolvido só na
+consolidação) vai para o aviso geral. O sucesso leva a uma tela provisória "Confira seu e-mail",
+que a confirmação por código (SUC-32) substitui.
+
 Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
 etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa
 `circuit.name`; não existe um código e um nome descritivo separados. A resposta `409` traz o campo em
