@@ -1,13 +1,26 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const submitCircuitSignupAction = vi.hoisted(() => vi.fn());
+
+vi.mock("../../api", () => ({
+  submitCircuitSignupAction: (...args: unknown[]) => submitCircuitSignupAction(...args),
+}));
 
 import { SignupFlow } from "./signup-flow";
+
+beforeEach(() => {
+  // Sucesso por padrão: os testes que não tratam do envio só precisam que ele não falhe.
+  submitCircuitSignupAction.mockReset();
+  submitCircuitSignupAction.mockResolvedValue({ status: "success", email: "joao@example.com" });
+});
 
 // ── Helpers ──────────────────────────────────────────────────────
 function renderFlow() {
   const onBack = vi.fn();
-  render(<SignupFlow onBack={onBack} />);
-  return { onBack };
+  const onSubmitted = vi.fn();
+  render(<SignupFlow onBack={onBack} onSubmitted={onSubmitted} />);
+  return { onBack, onSubmitted };
 }
 
 function type(label: string | RegExp, value: string) {
@@ -327,6 +340,223 @@ describe("SignupFlow", () => {
       await waitFor(() => expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument());
 
       expect(screen.getByRole("button", { name: "Criar circuito" })).toBeInTheDocument();
+    });
+  });
+
+  describe("etapa 3", () => {
+    async function goToCongregationsStep() {
+      await goToCircuitStep();
+      fillCircuit();
+      clickNext();
+      await waitFor(() => expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument());
+    }
+
+    it("deve oferecer 'Adicionar as outras depois' só na etapa 3", async () => {
+      renderFlow();
+      expect(screen.queryByRole("button", { name: "Adicionar as outras depois" })).not.toBeInTheDocument();
+
+      await goToCongregationsStep();
+
+      expect(screen.getByRole("button", { name: "Adicionar as outras depois" })).toBeInTheDocument();
+    });
+
+    it("deve exigir a congregação do coordenador mesmo ao escolher 'Adicionar as outras depois'", async () => {
+      renderFlow();
+      await goToCongregationsStep();
+
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar as outras depois" }));
+
+      await waitFor(() => expect(screen.getByText("Informe o nome da sua congregação.")).toBeInTheDocument());
+    });
+
+    it("deve descartar as linhas adicionais ao escolher 'Adicionar as outras depois'", async () => {
+      renderFlow();
+      await goToCongregationsStep();
+      type("Congregação", "Jardim Paulista");
+      type("Código", "31245");
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar congregação" }));
+      type("Congregação 2", "Taquaral");
+
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar as outras depois" }));
+
+      await waitFor(() => expect(screen.queryByLabelText("Congregação 2")).not.toBeInTheDocument());
+      expect(screen.getByLabelText("Congregação")).toHaveValue("Jardim Paulista");
+    });
+
+    it("deve remover as linhas em branco ao concluir", async () => {
+      renderFlow();
+      await goToCongregationsStep();
+      type("Congregação", "Jardim Paulista");
+      type("Código", "31245");
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar congregação" }));
+
+      clickNext();
+
+      await waitFor(() => expect(screen.queryByLabelText("Congregação 2")).not.toBeInTheDocument());
+    });
+  });
+
+  describe("envio", () => {
+    async function goToCongregationsStepFilled() {
+      await goToCircuitStep();
+      fillCircuit();
+      clickNext();
+      await waitFor(() => expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument());
+      type("Congregação", "Jardim Paulista");
+      type("Código", "31245");
+    }
+
+    it("deve enviar o formulário inteiro ao concluir a etapa 3 e avisar quem o chamou", async () => {
+      submitCircuitSignupAction.mockResolvedValue({ status: "success", email: "joao@example.com" });
+      const { onSubmitted } = renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+
+      await waitFor(() => expect(onSubmitted).toHaveBeenCalledWith("joao@example.com"));
+      expect(submitCircuitSignupAction).toHaveBeenCalledTimes(1);
+      expect(submitCircuitSignupAction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          coordinator: expect.objectContaining({ email: "joao@example.com" }),
+          circuit: { name: "SP-17", city: "Campinas", state: "SP" },
+          congregations: [{ name: "Jardim Paulista", code: "31245" }],
+        }),
+      );
+    });
+
+    it("não deve enviar quando a etapa 3 é inválida", async () => {
+      renderFlow();
+      await goToCircuitStep();
+      fillCircuit();
+      clickNext();
+      await waitFor(() => expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument());
+
+      clickNext();
+
+      await waitFor(() => expect(screen.getByText("Informe o nome da sua congregação.")).toBeInTheDocument());
+      expect(submitCircuitSignupAction).not.toHaveBeenCalled();
+    });
+
+    it("deve enviar só a congregação do coordenador com 'Adicionar as outras depois'", async () => {
+      submitCircuitSignupAction.mockResolvedValue({ status: "success", email: "joao@example.com" });
+      renderFlow();
+      await goToCongregationsStepFilled();
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar congregação" }));
+      type("Congregação 2", "Taquaral");
+      type("Código da congregação 2", "31877");
+
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar as outras depois" }));
+
+      await waitFor(() => expect(submitCircuitSignupAction).toHaveBeenCalledTimes(1));
+      expect(submitCircuitSignupAction).toHaveBeenCalledWith(
+        expect.objectContaining({ congregations: [{ name: "Jardim Paulista", code: "31245" }] }),
+      );
+    });
+
+    it("deve voltar à etapa 1 com o erro no e-mail já cadastrado", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Alguns dados já estão em uso. Confira os campos destacados.",
+        conflicts: [{ field: "coordinator.email", message: "Este e-mail ja esta cadastrado" }],
+      });
+      const { onSubmitted } = renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+
+      await waitFor(() => expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument());
+      expect(screen.getByText("Este e-mail ja esta cadastrado")).toBeInTheDocument();
+      expect(screen.getByLabelText("E-mail")).toBeInvalid();
+      expect(screen.getByText("Alguns dados já estão em uso. Confira os campos destacados.")).toBeInTheDocument();
+      expect(onSubmitted).not.toHaveBeenCalled();
+    });
+
+    it("deve voltar à etapa 2 com o erro no circuito já em uso e manter o preenchimento", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Alguns dados já estão em uso. Confira os campos destacados.",
+        conflicts: [{ field: "circuit.name", message: "Este circuito ja esta em uso" }],
+      });
+      renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+
+      await waitFor(() => expect(screen.getByText("Etapa 2 de 3")).toBeInTheDocument());
+      expect(screen.getByText("Este circuito ja esta em uso")).toBeInTheDocument();
+      expect(screen.getByLabelText("Circuito")).toHaveValue("SP-17");
+    });
+
+    it("deve ir para a etapa do primeiro erro quando há conflitos em etapas diferentes", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Alguns dados já estão em uso. Confira os campos destacados.",
+        conflicts: [
+          { field: "circuit.name", message: "Este circuito ja esta em uso" },
+          { field: "coordinator.email", message: "Este e-mail ja esta cadastrado" },
+        ],
+      });
+      renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+
+      await waitFor(() => expect(screen.getByText("Etapa 2 de 3")).toBeInTheDocument());
+      clickBack();
+      await waitFor(() => expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument());
+      expect(screen.getByText("Este e-mail ja esta cadastrado")).toBeInTheDocument();
+    });
+
+    it("deve ficar na etapa 3 e apontar a linha do código de congregação em uso", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Alguns dados já estão em uso. Confira os campos destacados.",
+        conflicts: [{ field: "congregations.1.code", message: "O codigo 31877 ja esta em uso por outra congregacao" }],
+      });
+      renderFlow();
+      await goToCongregationsStepFilled();
+      fireEvent.click(screen.getByRole("button", { name: "Adicionar congregação" }));
+      type("Congregação 2", "Taquaral");
+      type("Código da congregação 2", "31877");
+
+      clickNext();
+
+      await waitFor(() =>
+        expect(screen.getByText("O codigo 31877 ja esta em uso por outra congregacao")).toBeInTheDocument(),
+      );
+      expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument();
+      expect(screen.getByLabelText("Código da congregação 2")).toBeInvalid();
+      expect(screen.getByLabelText("Código")).toBeValid();
+    });
+
+    it("deve mostrar o erro geral, sem trocar de etapa, quando a falha não aponta campo", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.",
+        conflicts: [],
+      });
+      renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+
+      await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Muitas tentativas em pouco tempo"));
+      expect(screen.getByText("Etapa 3 de 3")).toBeInTheDocument();
+      expect(screen.getByLabelText("Congregação")).toHaveValue("Jardim Paulista");
+    });
+
+    it("deve permitir reenviar depois de uma falha", async () => {
+      submitCircuitSignupAction
+        .mockResolvedValueOnce({ status: "error", message: "Não foi possível criar o circuito.", conflicts: [] })
+        .mockResolvedValueOnce({ status: "success", email: "joao@example.com" });
+      const { onSubmitted } = renderFlow();
+      await goToCongregationsStepFilled();
+
+      clickNext();
+      await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+      clickNext();
+
+      await waitFor(() => expect(onSubmitted).toHaveBeenCalledWith("joao@example.com"));
     });
   });
 });

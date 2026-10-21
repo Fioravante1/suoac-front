@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { SIGNUP_STEPS, SIGNUP_STEP_COUNT, signupDefaultValues, signupSchema } from "./signup-schema";
+import {
+  SIGNUP_STEPS,
+  SIGNUP_STEP_COUNT,
+  dropBlankCongregations,
+  signupDefaultValues,
+  signupSchema,
+} from "./signup-schema";
 
 // ── Helpers ──────────────────────────────────────────────────────
 function buildValues(overrides: Record<string, unknown> = {}) {
@@ -237,5 +243,34 @@ describe("SIGNUP_STEPS", () => {
   it("deve chamar a última etapa de criação, não de continuação", () => {
     expect(SIGNUP_STEPS[2]?.cta).toBe("Criar circuito");
     expect(SIGNUP_STEPS[0]?.cta).toBe("Continuar");
+  });
+});
+
+describe("dropBlankCongregations", () => {
+  it("deve tirar as linhas adicionais em branco e manter a ordem das demais", () => {
+    const rows = [
+      { name: "Central", code: "SP17" },
+      { name: "", code: "" },
+      { name: "Taquaral", code: "SP18" },
+      { name: "  ", code: " " },
+    ];
+
+    expect(dropBlankCongregations(rows)).toEqual([
+      { name: "Central", code: "SP17" },
+      { name: "Taquaral", code: "SP18" },
+    ]);
+  });
+
+  it("deve manter a primeira linha mesmo em branco, para a validação recusá-la", () => {
+    expect(dropBlankCongregations([{ name: "", code: "" }])).toEqual([{ name: "", code: "" }]);
+  });
+
+  it("deve manter a linha só com o nome, para a validação apontar o código", () => {
+    const rows = [
+      { name: "Central", code: "SP17" },
+      { name: "Taquaral", code: "" },
+    ];
+
+    expect(dropBlankCongregations(rows)).toEqual(rows);
   });
 });

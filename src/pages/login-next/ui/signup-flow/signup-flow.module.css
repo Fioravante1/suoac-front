@@ -192,3 +192,29 @@
   border-color: color-mix(in srgb, currentColor 35%, transparent);
   border-top-color: currentColor;
 }
+
+.skip {
+  align-self: center;
+  padding: var(--suoac-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--suoac-color-text-secondary);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  cursor: pointer;
+}
+
+.skip:hover:not(:disabled) {
+  color: var(--suoac-color-primary);
+}
+
+.skip:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 3px;
+}
+
+.skip:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}

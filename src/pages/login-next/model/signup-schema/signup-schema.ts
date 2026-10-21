@@ -215,3 +215,20 @@ export const signupDefaultValues: SignupFormValues = {
   acceptedTerms: false,
   congregations: [{ name: "", code: "" }],
 };
+
+type CongregationRow = SignupFormValues["congregations"][number];
+
+/**
+ * Tira as linhas adicionais que o usuário abriu e não preencheu.
+ *
+ * A primeira linha nunca sai — é a congregação do coordenador, e se estiver em
+ * branco quem recusa é a validação, não esta função. Roda **antes** do envio,
+ * sobre o próprio formulário, e não sobre o payload: a API devolve o conflito
+ * como `congregations.N.code`, e esse `N` só aponta a linha certa na tela se a
+ * lista enviada for a mesma que o usuário está vendo.
+ */
+export function dropBlankCongregations(congregations: readonly CongregationRow[]): CongregationRow[] {
+  return congregations.filter(
+    (congregation, index) => index === 0 || congregation.name.trim() !== "" || congregation.code.trim() !== "",
+  );
+}
