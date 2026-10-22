@@ -373,6 +373,12 @@ recuo com `Backspace`, navegação por setas e auto-submissão ao colar os 6 dí
 `createSession` no `201`, diferencia `400` (código inválido) de `410` (código expirado, liberando o
 reenvio imediato) e devolve conflito tardio de consolidação (`409` com `field`) à etapa do campo.
 
+**Tela de sucesso e entrada no painel (SUC-33):** confirmada a consolidação (`201`), o `SignupFlow`
+entra na fase final (`SignupStepSuccess`), exibindo o resumo normalizado do cadastro (`buildSignupSummary`:
+coordenador, circuito com cidade/UF, congregação própria com código, total de congregações cadastradas
+e próximo passo), ocultando o botão superior de voltar e desativando o aviso `beforeunload`. O botão
+"Ir para o painel" navega para `/dashboard` já autenticado.
+
 Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
 etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa
 `circuit.name`; não existe um código e um nome descritivo separados. A resposta `409` traz o campo em
