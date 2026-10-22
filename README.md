@@ -11,7 +11,7 @@ operacional, controle de eventos, passageiros, pagamentos e dashboards.
 
 - Node.js `v24.x`
 - Yarn `v1.x`
-- Next.js `16.2.6` com App Router
+- Next.js `16.4.2` com App Router
 - React `19.2.4`
 - TypeScript com `strict: true`
 - TanStack Query para server state
