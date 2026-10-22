@@ -21,12 +21,36 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
 ];
 
+/**
+ * A rota de redefinicao carrega o token no proprio endereco.
+ *
+ * O link chega por e-mail montado pelo backend como
+ * `${FRONTEND_URL}/reset-password?token=…`, entao o token na URL e parte do
+ * contrato e nao da para mover para outro lugar. O que da para fazer e impedir
+ * que ele saia da pagina: com `strict-origin-when-cross-origin`, requisicao
+ * **de mesma origem** leva a URL inteira no `Referer` — e toda imagem e todo
+ * chunk de `/_next/static` que a pagina carrega e de mesma origem. O token
+ * entraria no log de acesso do proprio servidor.
+ *
+ * `no-referrer` corta isso. Nada na tela depende de `Referer`: a protecao de
+ * CSRF das Server Actions compara `Origin`, nao `Referer`.
+ */
+const resetPasswordHeaders = [{ key: "Referrer-Policy", value: "no-referrer" }];
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      /*
+       * Depois da regra geral de proposito: quando duas regras casam o mesmo
+       * caminho e a mesma chave, a ultima vence.
+       */
+      {
+        source: "/reset-password",
+        headers: resetPasswordHeaders,
       },
     ];
   },

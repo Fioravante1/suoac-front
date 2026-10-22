@@ -73,6 +73,37 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn architecture:check
 
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      API_BASE_URL: https://placeholder.invalid
+      SESSION_SECRET: e2e-session-secret-sem-valor-real
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Cache dos navegadores do Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      # Rodado sempre: com o cache quente o download e pulado, mas as libs de
+      # sistema que o navegador precisa nao sao cacheaveis.
+      - name: Instalar navegador
+        run: yarn playwright install --with-deps chromium
+      - run: yarn test:e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
   build:
     name: Production Build
     runs-on: ubuntu-latest

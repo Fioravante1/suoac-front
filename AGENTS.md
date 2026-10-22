@@ -6,9 +6,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
-# SUOAC Frontend — Regras para AI Agents
+# SUOAC Frontend — regras para agentes de IA
 
-Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio frontend.
+Este arquivo e a porta de entrada. As regras detalhadas vivem em `.claude/rules/` (referenciadas
+tambem por `.agents/rules.json` para o Gemini / Antigravity) — ver o indice abaixo.
+
+**Obrigatorio para agentes sem injecao automatica de `.claude/rules/` (como OpenAI Codex e Gemini
+CLI):** antes de planejar ou editar qualquer arquivo, **leia explicitamente com sua ferramenta de
+leitura** as regras sempre ativas (`.claude/rules/redesign.md` e `.claude/rules/compartilhado/*.md`)
+e os arquivos de `.claude/rules/` correspondentes aos caminhos listados nas tabelas da secao 2.
 
 ---
 
@@ -16,7 +22,7 @@ Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio 
 
 - **Runtime**: Node.js `v24.x`
 - **Package manager**: Yarn `v1.x` (`yarn.lock` e a fonte de verdade)
-- **Framework**: Next.js `16.2.6` com App Router
+- **Framework**: Next.js `16.4.2` com App Router
 - **React**: `19.2.4`
 - **Linguagem**: TypeScript com `strict: true`
 - **Server state**: TanStack Query `@tanstack/react-query`
@@ -33,6 +39,7 @@ Estas instrucoes se aplicam a qualquer assistente trabalhando neste repositorio 
   - `docs/design/SUOAC — Identidade Visual Oficial.md` — identidade visual, UX e design system
   - `docs/design/Design System Overview.png` — referencia visual
   - `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` — arquitetura frontend obrigatoria
+  - `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` — estrategia do redesign incremental em curso
   - `docs/architecture/SUOAC_AUTENTICACAO.md` — fluxo de autenticacao
   - `docs/integration/` — guias de integracao com APIs externas
 
@@ -40,575 +47,46 @@ Antes de implementar qualquer funcionalidade, leia a documentacao relevante em `
 
 ---
 
-## 2. Next.js 16
+## 2. Onde as regras vivem
 
-Este projeto usa uma versao de Next.js com mudancas relevantes. Nao assuma APIs, convencoes ou
-estrutura com base apenas em memoria.
+Cada arquivo em `.claude/rules/` declara no proprio frontmatter os caminhos (`paths:`) e gatilhos
+(`trigger:` / `description:`) que o ativam. Mexer em CSS nao carrega as regras de teste; mexer em
+teste nao carrega o design system. Se o seu runtime nao injeta `.claude/rules/` automaticamente,
+**abra e leia** os arquivos aplicaveis antes de escrever codigo:
 
-Regras:
+| Regra (`.claude/rules/`) | Vale para                                                                                                 |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `arquitetura-fsd.md`     | `src/**`, `app/**`, `pages/**`                                                                            |
+| `next-16.md`             | arquivos de rota do App Router (`page.tsx`, `layout.tsx`, `route.ts`…), `middleware.ts`, `next.config.ts` |
+| `server-state-e-api.md`  | segmentos `api/` e `model/`, `shared/api`, `shared/lib`                                                   |
+| `formularios.md`         | segmentos `ui/` e `model/`                                                                                |
+| `ui-e-design-system.md`  | `ui/`, `shared/ui`, CSS Modules, tokens                                                                   |
+| `tema-claro-e-escuro.md` | CSS Modules, `globals.css`, tokens                                                                        |
+| `animacao.md`            | CSS Modules, `globals.css`, tokens                                                                        |
+| `estilo-de-codigo.md`    | `**/*.{ts,tsx}`                                                                                           |
+| `testes-unitarios.md`    | `**/*.test.{ts,tsx}`, setup, modulos `*-testing/`                                                         |
+| `testes-e2e.md`          | `tests/e2e/**`, `playwright.config.ts`                                                                    |
+| `redesign.md`            | sempre — e a estrategia em curso                                                                          |
 
-- Antes de alterar arquivos do App Router, leia a documentacao local em `node_modules/next/dist/docs/`.
-- O App Router fisico fica em `/app`, nao em `src/app`.
-- A camada FSD `app` fica em `src/app`.
-- O diretorio `/pages` existe apenas como placeholder para evitar uso acidental do Pages Router.
-- Arquivos em `/app` devem ser finos: conectar rotas/layouts do Next a pages/providers FSD.
-- Componentes sao Server Components por padrao. Use `"use client"` apenas em fronteiras que exigem estado, efeitos, event handlers, browser APIs ou providers client-side.
-- Nao marque paginas/layouts inteiros como Client Components se apenas uma parte interativa precisa disso.
+O subdiretorio `.claude/rules/compartilhado/` vem do repositorio `suoac-ai` por `git subtree` e traz
+o que vale igual no backend e no frontend. **Nao edite esses arquivos aqui** — a fonte e
+`suoac-ai/rules/`, e a proxima sincronizacao sobrescreve qualquer mudanca local:
 
-Exemplo correto:
+| Regra (`.claude/rules/compartilhado/`) | Vale para                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `postura-do-agente.md`                 | sempre — decisoes sao do usuario, dependencias pendentes e verificacao obrigatoria            |
+| `jira.md`                              | sempre — rastreamento obrigatorio de cards no projeto `SUC`                                   |
+| `branches-e-prs.md`                    | sempre — nome de branch, template de PR e regra de so commitar quando pedido explicitamente   |
+| `commits.md`                           | sempre — Conventional Commits em portugues, organizacao por significado, sem trailer de IA    |
+| `idioma-do-codigo.md`                  | `**/*.{ts,tsx}`, `**/*.{js,mjs,cjs}` — identificadores em ingles, textos humanos em portugues |
+| `aninhamento-e-ternarios.md`           | `**/*.{ts,tsx}` — early returns obrigatorios, proibido `if` ou ternario aninhado              |
 
-```tsx
-// app/page.tsx
-export { default } from "@/pages/home";
-```
-
----
-
-## 3. Arquitetura e Organizacao (Feature-Sliced Design)
-
-A arquitetura obrigatoria esta documentada em:
-
-```text
-docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md
-```
-
-### Estrutura de Diretórios
-
-```text
-app/                  # Next.js App Router
-pages/                # placeholder do Pages Router legado; nao colocar rotas aqui
-src/
-  app/                # FSD App layer: providers, config, bootstrap, tokens globais
-  pages/              # FSD Pages layer: telas de produto
-  widgets/            # blocos grandes e autocontidos de UI
-  features/           # acoes de usuario com valor de negocio
-  entities/           # conceitos de dominio
-  shared/             # base tecnica e UI generica
-```
-
-### Regra de Dependencia
-
-Uma camada so pode importar camadas abaixo dela:
-
-```text
-app
-pages
-widgets
-features
-entities
-shared
-```
-
-Permitido:
-
-```ts
-// features -> entities/shared
-import { queryKeys } from "@/shared/api";
-import { EventStatusChip } from "@/entities/event";
-```
-
-Proibido:
-
-```ts
-// shared nunca importa dominio
-import { EventStatusChip } from "@/entities/event";
-```
-
-### Public API
-
-Cada slice deve expor API publica via `index.ts`.
-
-Codigo externo ao slice deve importar pela Public API:
-
-```ts
-import { HomePage } from "@/pages/home";
-import { createQueryClient } from "@/shared/api";
-```
-
-Evite bypass:
-
-```ts
-// Errado fora do proprio slice
-import { createQueryClient } from "@/shared/api/query-client";
-```
-
-Codigo interno do proprio slice deve usar import relativo.
-
-### Organizacao interna de segmentos
-
-Dentro de qualquer segmento (`api`, `auth`, `ui`, `lib`, `model`, `config`), em qualquer camada
-(`shared`, `entities`, `features`, `widgets`, `pages`, `app`), cada modulo deve ter seu proprio
-subdiretorio com arquivos co-localizados e um `index.ts` como public API do modulo.
-
-Nao deixe arquivos soltos na raiz de um segmento. Agrupe por responsabilidade.
-
-Estrutura correta:
-
-```text
-shared/api/
-  http-client/
-    http-client.ts
-    http-client.test.ts
-    index.ts
-  query-client/
-    query-client.ts
-    query-keys.ts
-    index.ts
-  index.ts
-
-features/sign-in/api/
-  sign-in-action/
-    sign-in-action.ts
-    sign-in.dto.ts
-    index.ts
-  sign-out-action/
-    sign-out-action.ts
-    index.ts
-  index.ts
-```
-
-Errado:
-
-```text
-shared/api/
-  http-client.ts
-  http-client.test.ts
-  query-client.ts
-  query-keys.ts
-  types.ts
-  index.ts
-```
-
-Excecoes:
-
-- Quando um segmento possui apenas um arquivo alem do `index.ts`, o subdiretorio e desnecessario.
-  O arquivo pode ficar direto no segmento.
-- `shared/ui` nao deve ter `index.ts` na raiz. Como tende a crescer com muitos componentes, um
-  barrel re-exportando todos prejudica tree-shaking. Imports devem apontar para o subdiretorio do
-  componente: `import { Button } from "@/shared/ui/button"`.
-
-### Cross-imports
-
-Slices da mesma camada nao devem importar uns aos outros.
-
-Proibido:
-
-```text
-features/register-payment -> features/enroll-passenger
-entities/passenger -> entities/congregation
-widgets/event-overview -> widgets/financial-summary
-```
-
-Se a composicao for necessaria, mova para uma camada superior.
+Para feature flags (`flags/next`, `@vercel/flags-core`), consulte tambem a skill em
+`.claude/skills/flags-sdk/SKILL.md` (espelhada em `.agents/skills/flags-sdk/SKILL.md`).
 
 ---
 
-## 4. Validação Arquitetural
-
-O projeto possui duas protecoes:
-
-- **ESLint + `eslint-plugin-boundaries`**: acusa violacoes no editor e em `yarn lint`.
-- **Steiger**: valida FSD completo em `yarn architecture:check`.
-
-Regras atuais:
-
-- `shared` nao pode importar `entities`, `features`, `widgets`, `pages` ou `app`.
-- `entities` so pode importar `shared`.
-- `features` pode importar `entities` e `shared`.
-- `widgets` pode importar `features`, `entities` e `shared`.
-- `pages` pode importar `widgets`, `features`, `entities` e `shared`.
-- `app` pode importar todas as camadas abaixo.
-
-Nunca resolva uma violacao arquitetural com `eslint-disable` sem justificativa tecnica forte e
-documentada. A solucao padrao e mover o codigo para a camada correta ou expor uma Public API
-adequada.
-
-Observacao: a regra `fsd/insignificant-slice` esta temporariamente desligada no Steiger porque os
-slices foram scaffoldados antes da implementacao real.
-
----
-
-## 5. Server State, API e DTOs
-
-### TanStack Query
-
-- Query client central: `src/shared/api/query-client.ts`
-- Provider: `src/app/providers/query-provider.tsx`
-- Imports externos devem usar `src/shared/api/index.ts`
-
-Quando queries reais forem criadas:
-
-- Queries reutilizaveis por entidade ficam em `entities/{entity}/api`.
-- Mutations ficam perto do caso de uso em `features/{feature}/api`.
-- Infra comum fica em `shared/api`.
-
-Exemplos:
-
-```text
-entities/event/api/event.queries.ts
-features/register-payment/api/register-payment.mutation.ts
-shared/api/query-client.ts
-```
-
-### Invalidacao de cache e atualizacao do Dashboard
-
-- Toda mutation deve invalidar as queries cujo dado ela alterou. Apos `mutateAsync`/`mutate` com
-  sucesso, chame `queryClient.invalidateQueries({ queryKey: queryKeys.X })` para cada conjunto de
-  dados afetado. Nao confie em `staleTime` para "consertar sozinho": com `refetchOnWindowFocus`
-  desligado e `staleTime` de 60s, dados em cache permanecem defasados ate o usuario recarregar.
-- **O Dashboard agrega dados produzidos em outras telas** (inscricoes, pagamentos, dias, etc.). Por
-  isso vale a regra obrigatoria: **sempre que uma acao em qualquer lugar do sistema alterar um dado
-  que o Dashboard exibe ou agrega, a mutation correspondente deve invalidar `queryKeys.dashboard.all`**
-  (alem das queries diretas da propria tela).
-- Isso inclui, no minimo: inscrever/remover passageiro em evento, editar dias da inscricao, registrar
-  ou remover pagamento, e qualquer mudanca em valores financeiros, contagens ou status que componham
-  os cards/graficos do Dashboard. Na duvida sobre se um dado aparece no Dashboard, invalide.
-- O Dashboard normalmente esta fora de tela no momento da acao. `invalidateQueries` marca a query
-  como stale e o refetch acontece ao remontar (quando o usuario volta), entao a invalidacao funciona
-  mesmo sem a tela montada — nao tente "atualizar na mao" nem forcar navegacao.
-- Centralize as invalidacoes de uma feature em uma unica funcao `invalidateQueries()` local e
-  reutilize-a em todos os `onSuccess` daquela feature, para nao esquecer nenhum conjunto de dados.
-
-```ts
-// Exemplo: mutation que afeta a tela atual E o Dashboard
-function invalidateQueries() {
-  queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
-  queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(event.id) });
-  // Obrigatorio: o Dashboard agrega contagens/valores das inscricoes.
-  queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-}
-```
-
-### Paginacao
-
-- Listas paginadas devem usar `usePagination` de `@/shared/lib` em vez de `useState(1)` local para controlar pagina. Use `setPage` como handler de `Pagination` e `reset()` quando filtros, busca ou contexto da lista precisarem voltar para a primeira pagina.
-
-### Formatadores reutilizaveis
-
-- Formatadores genericos e reutilizaveis devem ficar em bibliotecas focadas dentro de `shared/lib`, como `shared/lib/date` e `shared/lib/currency`, e ser consumidos via `@/shared/lib`. Nao duplique `Intl.DateTimeFormat` ou `Intl.NumberFormat` em pages, widgets, features ou entities quando o formato for compartilhado.
-
-### HTTP Client
-
-- O cliente HTTP fica em `src/shared/api/http-client/`.
-- Paths de API sao valores de dominio e devem ser centralizados em `endpoints.ts`, nunca usados
-  como strings soltas no codigo. Novos endpoints devem ser adicionados ao objeto `endpoints`.
-
-```ts
-// Correto
-import { httpClient, endpoints } from "@/shared/api/http-client";
-await httpClient(endpoints.auth.login, { method: "POST", body });
-
-// Errado
-await httpClient("/auth/login", { method: "POST", body });
-```
-
-- Metodos HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) sao um conjunto fixo e padrao do
-  protocolo. Devem ser usados como string literal diretamente, sem constantes ou enums. O tipo
-  `HttpMethod` no client ja restringe os valores aceitos em compilacao.
-
-```ts
-// Correto — string literal restrita pelo tipo HttpMethod
-await httpClient(endpoints.auth.login, { method: "POST", body });
-
-// Errado — nao criar objetos/enums para metodos HTTP
-HttpMethod.POST; // desnecessario
-```
-
-### DTOs, Models e Valores de Dominio
-
-- DTO e a forma do backend.
-- Model e a forma usada no frontend.
-- DTOs e mappers devem ficar perto do request que os consome.
-- Nao espalhe tipos de backend por componentes.
-- Nao crie `shared/types`.
-- Valores de dominio fechados devem ter uma unica fonte de verdade na entidade dona do conceito,
-  normalmente em `entities/{entity}/model`, e devem ser expostos pela Public API da entidade.
-- Status, tipos, estados, papeis especificos de dominio, labels e variantes visuais derivadas desses
-  valores nao devem ficar como strings soltas em pages, features, widgets ou testes. Crie constantes
-  tipadas como `EVENT_STATUSES`, `EVENT_TYPES`, `EVENT_STATUS_LABELS` e `EVENT_STATUS_BADGE_VARIANTS`
-  no model da entidade correspondente.
-- Use essas constantes em schemas Zod, DTO mappers, Server Actions, componentes e testes. Assim, o
-  contrato do dominio fica centralizado e mudancas futuras nao exigem procurar literais espalhados.
-- Excecao: metodos HTTP continuam sendo string literals diretamente, conforme regra da secao HTTP
-  Client. Eles pertencem ao protocolo, nao ao dominio SUOAC.
-
-### Formularios
-
-- Use React Hook Form + Zod + `zodResolver`.
-- Qualquer UI que colete e submeta dados do usuario deve ser modelada como formulario com React Hook Form, mesmo quando for simples (ex.: selecao de checkboxes em modal). Evite `useState` para armazenar valores de campos submetidos; reserve `useState` para estado visual ou de controle que nao faz parte do payload.
-- Formularios com React Hook Form devem ser Client Components e declarar `"use client"`.
-- Schema especifico de uma feature fica em `features/{feature}/model`.
-- Schema de uma page simples fica em `pages/{page}/model`.
-- Schema de entidade reutilizavel fica em `entities/{entity}/model`.
-- Nao crie pasta global `schemas`.
-- Nao coloque regras reutilizaveis diretamente no componente.
-- Derive tipos com `z.infer` sempre que possivel.
-- Erros de servidor em formularios, modais e fluxos de submissao devem usar `useServerError` de `@/shared/lib` em vez de `useState<string | null>(null)` local para `serverError`. Use `clearServerError()` antes de reenviar ou fechar e `showServerError(error, fallbackMessage?)` para exibir a falha com fallback humano.
-
-Exemplo de organizacao:
-
-```text
-src/features/register-payment/
-  ui/register-payment-form.tsx
-  model/register-payment-schema.ts
-  api/register-payment.mutation.ts
-```
-
----
-
-## 6. UI, Design System e UX
-
-Baseie UI e copy visual nos documentos:
-
-- `docs/design/SUOAC — Identidade Visual Oficial.md`
-- `docs/design/Design System Overview.png`
-
-**Antes de construir qualquer interface, leia esses dois documentos.** Eles sao a fonte de verdade
-para cores, tipografia, espacamento, radius, iconografia e tom visual.
-
-### Mentalidade de construcao
-
-Toda interface deve ser construida com mentalidade de UX senior. Nao basta funcionar — deve ser
-bonita, clara, intuitiva e agradavel de usar. O SUOAC e um sistema operacional real usado por
-coordenadores; a interface deve transmitir organizacao, confianca e modernidade.
-
-Referencia visual: Material 3, Linear, Stripe, Notion, Google Workspace.
-
-Principios obrigatorios:
-
-- **Mobile-first**: todo layout comeca pelo mobile e expande para desktop.
-- **Minimalismo funcional**: cada elemento deve ter proposito. Remova o que nao agrega.
-- **Espacamento generoso**: usar a escala oficial (4, 8, 12, 16, 20, 24, 32, 40, 48px). Nunca
-  comprimir conteudo. Ar entre elementos transmite clareza.
-- **Hierarquia visual clara**: titulos, subtitulos, labels e body devem seguir a escala tipografica
-  do design system (H1 32px/700, H2 24px/700, H3 20px/600, Body 16px/400, Small 14px/400,
-  Labels 13px/600).
-- **Cards como unidade base**: o sistema e fortemente baseado em cards (fundo branco, radius 20px,
-  sombra leve, padding generoso). Prefira cards a tabelas brutas sempre que o conteudo permitir.
-- **Cores semanticas**: use a paleta oficial para comunicar significado. Verde = sucesso/ativo,
-  amarelo = atencao/parcial, vermelho = erro/pendente, azul = informacao/link. Nunca use cor
-  apenas como decoracao.
-
-### Experiencia do usuario
-
-O objetivo e uso rapido, com poucos cliques e baixa carga cognitiva. Sempre que construir uma
-interface, pergunte: "como posso tornar isso mais facil e agradavel para o usuario?"
-
-Padroes obrigatorios:
-
-- **Empty states**: nunca deixe uma tela vazia sem orientacao. Quando uma lista, tabela ou secao
-  nao tem dados, exiba um empty state com icone relevante (Lucide, outline), mensagem explicativa
-  e, quando aplicavel, uma acao primaria (ex: botao "Criar primeiro evento"). O empty state deve
-  orientar o usuario sobre o que fazer, nao apenas dizer "nenhum resultado".
-- **Feedback instantaneo**: toda acao do usuario deve ter resposta visual imediata. Botoes devem
-  mostrar estado de loading ao submeter. Formularios devem exibir validacao inline conforme o
-  usuario digita (nao apenas no submit). Acoes concluidas devem confirmar sucesso com toast ou
-  mensagem visual.
-- **Estados de erro com recuperacao**: mensagens de erro devem ser humanas e indicar como resolver.
-  Evite textos tecnicos ("Error 500"). Prefira "Nao foi possivel salvar. Verifique sua conexao e
-  tente novamente." Sempre ofereça um caminho de recuperacao (botao de retry, link para suporte).
-- **Confirmacao para acoes destrutivas**: exclusoes e acoes irreversiveis devem exigir confirmacao
-  via dialog. O dialog deve descrever claramente a consequencia e usar botao vermelho para a acao
-  destrutiva.
-- **Transicoes e micro-interacoes**: use transicoes CSS suaves (150–250ms) para hover, focus,
-  abertura de modais e mudancas de estado. Evite transicoes longas ou chamativas. O objetivo e
-  fluidez, nao espetaculo.
-- **Hover e focus visiveis**: todo elemento interativo deve ter estados hover e focus distintos.
-  Focus deve ser visivel para acessibilidade (outline ou ring). Hover deve ser sutil (mudanca de
-  background ou opacidade).
-- **Areas de toque generosas**: no mobile, botoes e alvos de toque devem ter no minimo 44x44px.
-  Inputs devem ser grandes e mobile-friendly. Evite alvos de toque pequenos ou proximos demais.
-- **Informacao progressiva**: nao sobrecarregue o usuario com tudo de uma vez. Use expansoes,
-  tooltips, popovers ou secoes colapsaveis para informacoes secundarias. Mostre o essencial
-  primeiro e permita aprofundar sob demanda.
-
-### Organizacao tecnica
-
-- Componentes genericos ficam em `shared/ui`.
-- Componentes com regra/semantica de dominio ficam em `entities`, `features` ou `widgets`.
-- Nao use `components/`, `hooks/`, `utils/`, `services/` como pastas genericas na raiz.
-- Use linguagem do dominio SUOAC nos componentes de dominio.
-- Evite landing page quando a solicitacao for criar funcionalidade do sistema.
-- A estrategia de estilo padrao e CSS Modules + CSS Custom Properties.
-- Nao adicione `styled-components` sem nova decisao arquitetural explicita.
-- Estilos de componente devem ficar co-localizados em `*.module.css`.
-- Nao espalhe valores visuais soltos em componentes ou CSS Modules (`#1f6e5a`, `24px`, sombras,
-  radius, z-index, alturas de controles, etc.) quando eles representarem uma decisao de design.
-- Se um valor visual for reutilizavel, semantico ou parte do design system, crie/atualize o token
-  correspondente em `app/globals.css` e em `src/app/styles/theme-tokens.ts`.
-- CSS Modules devem consumir tokens via `var(--suoac-...)` sempre que possivel.
-- Valores locais so sao aceitaveis quando forem especificos de layout daquele componente e nao
-  tiverem significado reutilizavel no design system.
-
-Tokens atuais ficam em:
-
-```text
-app/globals.css
-src/app/styles/theme-tokens.ts
-```
-
-### Iconografia
-
-- Biblioteca padrao: Lucide Icons (estilo outline, minimalista).
-- Icones complementam texto e ajudam na escaneabilidade. Use em botoes de acao, headers de cards,
-  empty states, itens de navegacao e badges de status.
-- Nao use icones decorativos sem significado. Cada icone deve reforcar a compreensao do elemento.
-- Nao use emojis na interface do sistema. Prefira sempre icones Lucide.
-
-### Padrao de feedback de carregamento
-
-- **Skeleton** (`shared/ui/skeleton`): usar para carregamento de paginas, listas, tabelas e blocos
-  de conteudo. O Skeleton mostra placeholders animados no formato aproximado do conteudo que sera
-  exibido, transmitindo progresso sem layout shift.
-- **Spinner** (`shared/ui/spinner`): usar apenas em acoes pontuais e inline, como botoes de salvar,
-  enviar formulario ou confirmar exclusao. Nao usar Spinner como indicador de carregamento de
-  pagina inteira.
-
-Exemplos corretos:
-
-```tsx
-// Carregamento de lista — Skeleton
-{
-  isLoading && <SkeletonTableRows rows={5} />;
-}
-
-// Botao de salvar — Spinner
-<Button disabled={isPending}>{isPending ? <Spinner size="small" /> : "Salvar"}</Button>;
-```
-
-### Tabelas de dados
-
-- Tabelas que renderizam listas de dados devem usar `DataTable` de `shared/ui/data-table`, nunca
-  montar `TableHeader`/`TableRow`/`TableHead`/`TableCell` manualmente.
-- Defina as colunas com `ColumnDef<T>[]` de forma declarativa. Cada coluna tem `id`, `header`,
-  `cell(item)` e, opcionalmente, `visible`, `headerClassName` e `cellClassName`.
-- Use `visible` para colunas condicionais em vez de `{condition && <TableHead>}`.
-- Os primitivos de `shared/ui/table` (`Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`,
-  `TableCell`, `TableWrapper`) existem como base interna. Codigo de produto deve consumir
-  `DataTable`, nao os primitivos diretamente.
-
-```tsx
-// Correto — declarativo via DataTable
-import { DataTable, type ColumnDef } from "@/shared/ui/data-table";
-
-const columns: ColumnDef<Item>[] = [
-  { id: "name", header: "Nome", cell: (item) => item.name },
-  { id: "status", header: "Status", cell: (item) => <Badge>{item.status}</Badge> },
-  { id: "extras", header: "Extras", cell: (item) => item.extras, visible: showExtras },
-];
-
-<DataTable columns={columns} data={items} getRowKey={(item) => item.id} />;
-```
-
-```tsx
-// Errado — montar primitivos manualmente em codigo de produto
-<TableHeader>
-  <TableRow>
-    <TableHead>Nome</TableHead>
-    <TableHead>Status</TableHead>
-  </TableRow>
-</TableHeader>
-```
-
-### Checklist visual
-
-Antes de concluir qualquer interface nova, verifique:
-
-- [ ] Segue a paleta de cores e tokens do design system?
-- [ ] Tipografia respeita a hierarquia (H1/H2/H3/Body/Small/Labels)?
-- [ ] Espacamento usa a escala oficial (4–48px)?
-- [ ] Border radius usa a escala oficial (8, 12, 16, 20px)?
-- [ ] Tem empty state quando a lista/tabela pode estar vazia?
-- [ ] Tem feedback de loading (Skeleton ou Spinner conforme o caso)?
-- [ ] Tem feedback de sucesso e erro para acoes do usuario?
-- [ ] Acoes destrutivas pedem confirmacao?
-- [ ] Estados hover e focus sao visiveis?
-- [ ] Funciona bem no mobile (areas de toque, layout responsivo)?
-- [ ] Icones sao Lucide, outline, e reforçam o significado?
-
----
-
-## 7. Estilo de Codigo, Tipagem e Lint
-
-- TypeScript em strict mode.
-- Nao use `any`.
-- Prefira `import type` para imports apenas de tipo.
-- Funcoes exportadas com logica relevante devem ter retorno claro/inferivel; se a inferencia ficar
-  ambigua, anote explicitamente.
-- Nao deixe imports, variaveis ou parametros sem uso.
-- Nao crie barrel exports globais que exportam tudo sem criterio.
-- Nao use `console.log` em codigo de producao frontend.
-- Evite blocos `if` aninhados ("nested ifs"). Prefira sempre o uso de "early returns" (retorno antecipado) para manter o codigo limpo, legivel e reduzir a complexidade ciclomatica.
-- Use nomes em kebab-case para arquivos e pastas.
-- Componentes e tipos usam PascalCase.
-- Hooks usam camelCase com prefixo `use`.
-
-### Prettier
-
-O padrao real do projeto esta em `.prettierrc.json`.
-
-Nao gere codigo fora desse padrao. Rode `yarn format` quando necessario.
-
----
-
-## 8. Testes
-
-O projeto esta configurado inicialmente apenas com testes unitarios.
-
-- Framework: Vitest.
-- DOM/testing: React Testing Library + jsdom.
-- Setup global: `tests/setup/vitest.setup.ts`.
-- Testes devem ser co-localizados com o arquivo testado.
-- Padrao de nome: `*.test.ts` ou `*.test.tsx`.
-
-Exemplo:
-
-```text
-src/pages/home/ui/home-page.tsx
-src/pages/home/ui/home-page.test.tsx
-```
-
-Regras:
-
-- **Todo artefato novo deve ter teste unitario co-localizado**, sem excecao:
-  - **Componentes** (`*.tsx`): renderizacao, props, estados visuais e interacoes.
-  - **Hooks** (`use*.ts`): comportamento do estado inicial, transicoes e valores retornados.
-  - **Funcoes utilitarias e servicos** (`*.ts`): casos normais, bordas e erros esperados.
-- Testes devem descrever comportamento esperado em portugues quando forem de negocio.
-- Nao use `.skip` para esconder teste quebrado.
-- Nao adicione testes de integracao ou E2E sem decisao explicita. Eles foram deixados fora por
-  enquanto para reduzir complexidade inicial.
-
-Scripts:
-
-```bash
-yarn test          # watch mode do Vitest
-yarn test:unit     # vitest run
-yarn test:coverage # coverage com V8
-```
-
-### Simulacao de eventos de usuario
-
-O projeto **nao possui** `@testing-library/user-event` instalado. Use as alternativas abaixo:
-
-- **`fireEvent`** (importado de `@testing-library/react`): suficiente para cliques, submits e
-  eventos DOM simples. Preferir em testes de componentes genericos.
-- **`userEvent`**: instalar apenas se houver necessidade real de simular digitacao realista,
-  tabulacao ou sequencias complexas de teclado. Nao instalar por padrao.
-
-```ts
-// Correto — fireEvent para cliques simples
-import { render, screen, fireEvent } from "@testing-library/react";
-
-fireEvent.click(screen.getByRole("button", { name: "Salvar" }));
-
-// Errado — nao importar user-event sem o pacote instalado
-import userEvent from "@testing-library/user-event";
-```
-
----
-
-## 9. Scripts Obrigatorios
+## 3. Scripts obrigatorios
 
 Antes de finalizar mudancas de codigo, rode:
 
@@ -640,53 +118,20 @@ Observacao: em Yarn v1, `yarn check` pode chamar um comando interno do Yarn. Pre
 
 ---
 
-## 9. Padrão de Commits (Conventional Commits)
-
-- Use mensagens no formato: `tipo(escopo opcional): descrição breve no imperativo`, em português.
-- Tipos permitidos: `feat`, `fix`, `chore`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `style`, `revert`
-- Utilize `!` para mudanças incompatíveis e/ou adicione `BREAKING CHANGE:` no corpo
-- Cabeçalho até 50 caracteres; corpo e rodapé com linhas até 72 caracteres
-- Escreva a descrição no imperativo e em português
-- `escopo` é opcional e em `kebab-case` (ex.: `user-form`, `segments-api`)
-
-### Exemplos
-
-```
-feat(segments-table): adicionar coluna de permissões por segmento
-
-Adicionar exibição das permissões do usuário diretamente na tabela de
-segmentos para melhorar a visibilidade do acesso.
-```
-
-```
-fix(login): corrigir redirecionamento após autenticação
-
-Ajustar rota de retorno para `/app/home` quando o provider retornar
-`redirectTo` vazio.
-```
-
-```
-refactor(user-service)!: unificar métodos de busca por id e email
-
-BREAKING CHANGE: `getByEmail` removido; usar `getByIdOrEmail`.
-Atualizar chamadas nas features de cadastro e perfis.
-```
-
----
-
-## 11. Fluxo de Trabalho para AI Assistant
+## 4. Fluxo de trabalho
 
 Quando solicitado para implementar uma funcionalidade:
 
-1. Leia os documentos relevantes em `docs/`.
-2. Se tocar Next.js, consulte `node_modules/next/dist/docs/`.
-3. Defina a camada FSD correta antes de criar arquivos.
-4. Exponha apenas o necessario via `index.ts`.
-5. Preserve a regra de dependencia entre camadas.
-6. Adicione teste unitario co-localizado para logica nova.
-7. Atualize `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` se a arquitetura mudar.
-8. Atualize `README.md` se mudar setup, dependencias, scripts ou instrucoes.
-9. Rode `yarn run check` antes de concluir.
+1. Localize (ou crie) o card no Jira e mova para `Em andamento` — ver `compartilhado/jira.md`.
+2. Leia os documentos relevantes em `docs/`.
+3. Se tocar Next.js, consulte `node_modules/next/dist/docs/`.
+4. Defina a camada FSD correta antes de criar arquivos, e exponha apenas o necessario via `index.ts`.
+5. Adicione teste unitario co-localizado para todo artefato novo.
+6. Atualize `docs/architecture/SUOAC_ARQUITETURA_FRONTEND_FSD.md` se a arquitetura mudar, e o
+   `README.md` se mudar setup, dependencias, scripts ou instrucoes.
+7. Rode `yarn run check` antes de concluir.
+8. Comente no card o que foi entregue e atualize o estado dele.
 
 Nao implemente atalhos que enfraquecam type safety, lint, arquitetura ou testes. Se uma regra
-parecer inadequada, explique o motivo e proponha ajuste explicito em vez de contornar localmente.
+parecer inadequada, explique o motivo e proponha o ajuste explicito no arquivo de regra em vez de
+contornar localmente.

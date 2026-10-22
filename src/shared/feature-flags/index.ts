@@ -1,1 +1,1 @@
-export { showPendingMenuItemsFlag } from "./feature-flags";
+export { showPendingMenuItemsFlag, redesignFlag, redesignLoginFlag } from "./feature-flags";

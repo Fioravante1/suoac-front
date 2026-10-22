@@ -1,0 +1,15 @@
+/*
+ * Duas colunas, sem ponto de quebra: o redesign e desktop-first e o handoff tem
+ * largura minima de 1280px (premissa P2 da estrategia). O recorte mobile vira
+ * fase propria, depois do corte do legado.
+ *
+ * A coluna da direita tem minimo de 480px para que o formulario de 400px caiba
+ * com respiro; o que sobra fica com a apresentacao.
+ */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(30rem, 1fr);
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+}

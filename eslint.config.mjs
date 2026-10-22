@@ -76,6 +76,8 @@ const eslintConfig = defineConfig([
     "dist/**",
     "node_modules/**",
     "*.tsbuildinfo",
+    // Handoff de design: prototipos originais, nao sao codigo de producao.
+    "docs/design_handoff_suoac_redesign/**",
   ]),
 ]);
 

@@ -1,11 +1,36 @@
+/**
+ * Cores do painel de apresentacao da tela de entrada.
+ *
+ * Sao as mesmas nos dois temas: o painel e navy com texto branco por decisao de
+ * marca, nao por ser uma superficie clara do app. Ficam num objeto proprio
+ * justamente para serem espalhadas nos dois temas sem duplicar valor — duplicar
+ * seria convidar os dois lados a divergirem.
+ */
+const brandPanelColors = {
+  brandPanel: "#0D2B45",
+  brandPanelPattern: "rgb(255 255 255 / 0.06)",
+  brandPanelTextMuted: "rgb(255 255 255 / 0.68)",
+  brandPanelTextSubtle: "rgb(255 255 255 / 0.55)",
+  brandPanelAccent: "#7FCFB4",
+  brandPanelHighlight: "#4FB393",
+  brandPanelHighlightGlow: "rgb(79 179 147 / 0.15)",
+  brandPanelOnHighlight: "#0A1A29",
+  brandPanelTile: "rgb(255 255 255 / 0.06)",
+  brandPanelTileBorder: "rgb(255 255 255 / 0.12)",
+} as const;
+
 export const themeTokens = {
   color: {
+    ...brandPanelColors,
     primary: "#1F6E5A",
     primaryDark: "#174E40",
     primaryLight: "#E6F4EF",
+    onPrimary: "#FFFFFF",
+    onSuccess: "#FFFFFF",
     info: "#2F6FED",
     success: "#2E9E5B",
     attention: "#F5B700",
+    attentionText: "#8A6D00",
     critical: "#D64545",
     criticalDark: "#B53232",
     background: "#F7F9F8",
@@ -16,13 +41,16 @@ export const themeTokens = {
     textPrimary: "#1E1F24",
     textSecondary: "#667085",
     textInverse: "#FFFFFF",
+    navy: "#0D2B45",
     sidebar: "#0D2B45",
     infoSoft: "#E8F0FF",
     successSoft: "#E7F6EE",
     attentionSoft: "#FFF4CF",
     criticalSoft: "#FDECEC",
     neutralSoft: "#F1F3F3",
+    glass: "rgb(255 255 255 / 0.78)",
     scrim: "rgb(16 24 40 / 0.45)",
+    modalScrim: "rgb(10 26 41 / 0.55)",
     overlay: "rgb(247 249 248 / 0.72)",
   },
   event: {
@@ -41,12 +69,15 @@ export const themeTokens = {
     fontFamily:
       'var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     fontSize: {
+      caption: "0.75rem",
       label: "0.8125rem",
       small: "0.875rem",
       body: "1rem",
+      lead: "1.0625rem",
       h3: "1.25rem",
       h2: "1.5rem",
       h1: "2rem",
+      display: "2.5rem",
     },
     lineHeight: {
       tight: "1.2",
@@ -72,20 +103,44 @@ export const themeTokens = {
     12: "3rem",
   },
   radius: {
+    xs: "6px",
     sm: "8px",
     md: "12px",
     lg: "16px",
     xl: "20px",
     pill: "999px",
+    control: "14px",
   },
   shadow: {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
     sm: "0 8px 24px rgb(31 110 90 / 0.08)",
     md: "0 16px 40px rgb(31 110 90 / 0.12)",
     lg: "0 12px 28px rgb(16 24 40 / 0.18), 0 2px 6px rgb(16 24 40 / 0.12)",
+    dropdown: "0 24px 60px rgb(13 43 69 / 0.28)",
+    menu: "0 18px 40px rgb(13 43 69 / 0.2)",
+    modal: "0 40px 100px rgb(10 26 41 / 0.45)",
+    buttonPrimary: "0 6px 16px rgb(31 110 90 / 0.25)",
+    buttonPrimaryStrong: "0 10px 24px rgb(31 110 90 / 0.28)",
+    focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
   },
   overlay: {
     blur: "4px",
+  },
+  motion: {
+    duration: {
+      fast: "180ms",
+      base: "200ms",
+      medium: "300ms",
+      slow: "400ms",
+    },
+    ease: {
+      standard: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      overshoot: "cubic-bezier(0.3, 1.5, 0.5, 1)",
+    },
+    stagger: {
+      step: "25ms",
+      max: "400ms",
+    },
   },
   zIndex: {
     dropdown: 50,
@@ -101,9 +156,107 @@ export const themeTokens = {
   component: {
     buttonHeight: "2.75rem",
     buttonHeightSm: "2.25rem",
+    buttonHeightLg: "3.375rem",
     inputHeight: "3rem",
+    inputHeightLg: "3.125rem",
     cardPadding: "1.5rem",
   },
 } as const;
 
 export type ThemeTokens = typeof themeTokens;
+
+/**
+ * Valores que mudam entre tema claro e escuro.
+ *
+ * O tema escuro altera apenas cores e sombras — tipografia, espacamento, raio e
+ * z-index sao os mesmos nos dois temas, e por isso nao se repetem aqui.
+ *
+ * Os tipos abaixo exigem a lista COMPLETA de cores e sombras: esquecer um token
+ * ao adicionar outro quebra a compilacao em vez de produzir, em producao, um
+ * elemento pintado com a cor do tema claro sobre fundo escuro.
+ */
+type ThemeColorTokens = Record<keyof ThemeTokens["color"], string>;
+type ThemeShadowTokens = Record<keyof ThemeTokens["shadow"], string>;
+type ThemeStateTokens<Group extends "event" | "payment"> = Record<keyof ThemeTokens[Group], string>;
+
+export interface ThemeVariant {
+  color: ThemeColorTokens;
+  event: ThemeStateTokens<"event">;
+  payment: ThemeStateTokens<"payment">;
+  shadow: ThemeShadowTokens;
+}
+
+export const darkThemeTokens: ThemeVariant = {
+  color: {
+    // Identicas ao tema claro, de proposito — ver `brandPanelColors`.
+    ...brandPanelColors,
+    primary: "#4FB393",
+    primaryDark: "#7FCFB4",
+    primaryLight: "#183229",
+    onPrimary: "#0E1413",
+    onSuccess: "#0E1413",
+    info: "#82A9FF",
+    success: "#4CC07C",
+    attention: "#F2C14B",
+    attentionText: "#F2C14B",
+    critical: "#F07272",
+    criticalDark: "#F49A9A",
+    background: "#0E1413",
+    surface: "#151D1B",
+    surfaceMuted: "#1C2623",
+    border: "#25312E",
+    borderStrong: "#34433F",
+    textPrimary: "#E9EFED",
+    textSecondary: "#9AA8A3",
+    // Branco nos dois temas: usado sobre navy e sobre a cor primaria do tema claro.
+    textInverse: "#FFFFFF",
+    navy: "#0A1A29",
+    sidebar: "#0A1A29",
+    infoSoft: "#18233D",
+    successSoft: "#163121",
+    attentionSoft: "#342B10",
+    criticalSoft: "#3A1D1D",
+    neutralSoft: "#1C2623",
+    glass: "rgb(21 29 27 / 0.78)",
+    scrim: "rgb(0 0 0 / 0.6)",
+    // O handoff define um unico scrim de modal, igual nos dois temas.
+    modalScrim: "rgb(10 26 41 / 0.55)",
+    overlay: "rgb(14 20 19 / 0.72)",
+  },
+  event: {
+    open: "#4FB393",
+    closed: "#F2C14B",
+    finished: "#0A1A29",
+    draft: "#9AA8A3",
+  },
+  payment: {
+    paid: "#4CC07C",
+    partial: "#F2C14B",
+    pending: "#F07272",
+    exempt: "#82A9FF",
+  },
+  shadow: {
+    xs: "0 1px 2px rgb(0 0 0 / 0.3)",
+    sm: "0 8px 24px rgb(0 0 0 / 0.25)",
+    md: "0 16px 40px rgb(0 0 0 / 0.35)",
+    lg: "0 12px 28px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4)",
+    dropdown: "0 24px 60px rgb(0 0 0 / 0.5)",
+    menu: "0 18px 40px rgb(0 0 0 / 0.45)",
+    modal: "0 40px 100px rgb(0 0 0 / 0.6)",
+    buttonPrimary: "0 6px 16px rgb(0 0 0 / 0.35)",
+    buttonPrimaryStrong: "0 10px 24px rgb(0 0 0 / 0.4)",
+    // Mesma declaracao do tema claro: a cor vem de um token que ja muda.
+    focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
+  },
+};
+
+/**
+ * Tokens do tema claro no mesmo formato de `darkThemeTokens`, para quem precisa
+ * comparar ou iterar os dois temas lado a lado.
+ */
+export const lightThemeTokens: ThemeVariant = {
+  color: themeTokens.color,
+  event: themeTokens.event,
+  payment: themeTokens.payment,
+  shadow: themeTokens.shadow,
+};

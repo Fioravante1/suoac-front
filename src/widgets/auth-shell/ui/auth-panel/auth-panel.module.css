@@ -1,0 +1,70 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: var(--suoac-space-8) var(--suoac-space-10);
+  color: var(--suoac-color-text-primary);
+  background: var(--suoac-color-background);
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.viewport {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: var(--suoac-space-6) 0;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  width: 100%;
+  max-width: 25rem;
+}
+
+/*
+ * Troca entre as telas de acesso: a que chega desliza da direita.
+ *
+ * A animacao fica no filho direto, e nao no proprio viewport, porque e o filho
+ * que e remontado ao trocar de tela — e remontar e o que faz a animacao rodar
+ * de novo.
+ */
+.view > * {
+  /*
+   * Pelo token, nunca pelo nome: dentro de um CSS Module o bundler reescreve
+   * nomes de animacao, e a animacao silenciosamente nao roda (SUC-43). O
+   * keyframe era local aqui e subiu para o design system quando a troca de
+   * etapas do autocadastro passou a precisar dele.
+   */
+  animation-name: var(--suoac-animation-swap);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: 1.125rem;
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}
+
+.link {
+  transition: color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.link:hover {
+  color: var(--suoac-color-text-primary);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--suoac-radius-sm);
+}

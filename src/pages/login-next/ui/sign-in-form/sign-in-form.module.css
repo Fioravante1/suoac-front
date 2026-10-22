@@ -1,0 +1,264 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.title {
+  font-size: var(--suoac-font-size-h1);
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  line-height: var(--suoac-line-height-body);
+  color: var(--suoac-color-text-secondary);
+}
+
+.notice,
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: var(--suoac-space-3) 0.875rem;
+  border-radius: var(--suoac-radius-md);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.notice {
+  background: var(--suoac-color-info-soft);
+  color: var(--suoac-color-info);
+}
+
+.error {
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+  animation-name: var(--suoac-animation-shake);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.error svg {
+  flex-shrink: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.inlineLink {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+  color: var(--suoac-color-primary);
+  cursor: pointer;
+}
+
+.inlineLink:hover:not(:disabled) {
+  color: var(--suoac-color-primary-dark);
+}
+
+.inlineLink:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--suoac-radius-xs);
+}
+
+.inlineLink:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/*
+ * Altura fixa e conteudo centralizado: os tres estados (entrar, verificando,
+ * bem-vindo) tem larguras bem diferentes, e sem isso o botao pularia a cada
+ * troca, justamente no momento em que o usuario esta olhando para ele.
+ */
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--suoac-button-height-lg);
+  border: 0;
+  border-radius: var(--suoac-radius-control);
+  background: var(--suoac-color-primary);
+  box-shadow: var(--suoac-shadow-button-primary-strong);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  color: var(--suoac-color-on-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    transform var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--suoac-color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  cursor: default;
+}
+
+/* Verde de sucesso: a entrada deu certo e a saida da tela ja comecou. */
+.submitDone {
+  background: var(--suoac-color-success);
+}
+
+.submitLabel,
+.submitLabelDone {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.submitLabelDone {
+  animation: successPop var(--suoac-motion-duration-medium) var(--suoac-motion-ease-overshoot) both;
+}
+
+/*
+ * O "pulo" do check de sucesso, especifico desta tela.
+ *
+ * Nao e o `suoac-pop` do design system: aquele e o toast inferior, que ja vem
+ * centralizado por `translate(-50%)` e aqui jogaria o rotulo para fora do
+ * botao. Os dois protótipos declaram animacoes diferentes com o mesmo nome, e
+ * `motion.test.ts` registra justamente essa armadilha.
+ */
+@keyframes successPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.spinner {
+  width: 1.125rem;
+  height: 1.125rem;
+  /*
+   * Deriva da cor do proprio botao em vez de fixar branco: o anel acompanha
+   * `--suoac-color-on-primary` nos dois temas.
+   */
+  border: 2.5px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation-name: var(--suoac-animation-spin);
+  /* Valor local porque e giro continuo: reduzido a 1ms viraria tremor. */
+  animation-duration: 0.7s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-control);
+  overflow: hidden;
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  padding: 0.875rem var(--suoac-space-4);
+}
+
+.inviteTitle {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.inviteText {
+  font-size: var(--suoac-font-size-label);
+  line-height: var(--suoac-line-height-body);
+  color: var(--suoac-color-text-secondary);
+}
+
+.signUp {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding: 0.875rem var(--suoac-space-4);
+  border: 0;
+  border-top: 1px solid var(--suoac-color-border);
+  background: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.signUp:hover:not(:disabled) {
+  background: var(--suoac-color-primary-light);
+}
+
+.signUp:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: -2px;
+}
+
+.signUp:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.signUpIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--suoac-radius-sm);
+  background: var(--suoac-color-primary);
+  color: var(--suoac-color-on-primary);
+}
+
+.signUpText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  flex: 1;
+}
+
+.signUpTitle {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.signUpSubtitle {
+  font-size: var(--suoac-font-size-label);
+  color: var(--suoac-color-text-secondary);
+}
+
+.signUpChevron {
+  flex-shrink: 0;
+  color: var(--suoac-color-primary);
+}

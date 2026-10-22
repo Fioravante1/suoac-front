@@ -86,7 +86,13 @@ export function SignInForm() {
         </a>
       </div>
 
-      <Button type="submit" fullWidth disabled={isSubmitting}>
+      {/*
+        O rotulo cede lugar ao spinner, que e so icone: sem `aria-label` o botao
+        fica sem nome acessivel justamente enquanto algo acontece. O texto nao
+        volta ao lado do icone para nao mudar o desenho de uma tela que ainda
+        nao foi redesenhada.
+      */}
+      <Button type="submit" fullWidth disabled={isSubmitting} aria-label={isSubmitting ? "Entrando" : undefined}>
         {isSubmitting ? <Loader2 className={styles.spinner} size={20} /> : "Entrar"}
       </Button>
     </form>

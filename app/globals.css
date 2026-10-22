@@ -22,7 +22,36 @@
   --suoac-color-text-primary: #1e1f24;
   --suoac-color-text-secondary: #667085;
   --suoac-color-text-inverse: #ffffff;
-  --suoac-color-sidebar: #0d2b45;
+  --suoac-color-navy: #0d2b45;
+  --suoac-color-sidebar: var(--suoac-color-navy);
+  --suoac-color-on-primary: #ffffff;
+  /* Conteudo desenhado sobre o verde de sucesso — o visto dentro do disco de
+     requisito cumprido. Tem par escuro: o verde do tema escuro e claro demais
+     para carregar branco (2,30:1, abaixo do minimo de 3:1 para objeto grafico). */
+  --suoac-color-on-success: #ffffff;
+  --suoac-color-attention-text: #8a6d00;
+  --suoac-color-glass: rgb(255 255 255 / 0.78);
+
+  /*
+   * Painel de apresentacao — a metade navy da tela de entrada.
+   *
+   * Nao sao tokens de tema: o painel e a identidade da marca e fica navy com
+   * texto branco nos dois temas, exatamente como o handoff especifica. Por isso
+   * nao tem par escuro, e `theme-tokens.test.ts` os conhece como excecao.
+   *
+   * O verde daqui tambem nao e `--suoac-color-primary`: e o verde claro que o
+   * handoff usa sobre navy, legivel sobre fundo escuro nos dois temas.
+   */
+  --suoac-color-brand-panel: #0d2b45;
+  --suoac-color-brand-panel-pattern: rgb(255 255 255 / 0.06);
+  --suoac-color-brand-panel-text-muted: rgb(255 255 255 / 0.68);
+  --suoac-color-brand-panel-text-subtle: rgb(255 255 255 / 0.55);
+  --suoac-color-brand-panel-accent: #7fcfb4;
+  --suoac-color-brand-panel-highlight: #4fb393;
+  --suoac-color-brand-panel-highlight-glow: rgb(79 179 147 / 0.15);
+  --suoac-color-brand-panel-on-highlight: #0a1a29;
+  --suoac-color-brand-panel-tile: rgb(255 255 255 / 0.06);
+  --suoac-color-brand-panel-tile-border: rgb(255 255 255 / 0.12);
 
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
@@ -46,12 +75,18 @@
   /* Typography */
   --suoac-font-family-sans:
     var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* 12px: rotulos de secao em caixa alta e textos auxiliares do handoff. */
+  --suoac-font-size-caption: 0.75rem;
   --suoac-font-size-label: 0.8125rem;
   --suoac-font-size-small: 0.875rem;
   --suoac-font-size-body: 1rem;
+  /* 17px: paragrafo de destaque, um degrau acima do corpo. */
+  --suoac-font-size-lead: 1.0625rem;
   --suoac-font-size-h3: 1.25rem;
   --suoac-font-size-h2: 1.5rem;
   --suoac-font-size-h1: 2rem;
+  /* 40px: titulos de abertura, maiores que o H1 de dentro do app. */
+  --suoac-font-size-display: 2.5rem;
   --suoac-line-height-tight: 1.2;
   --suoac-line-height-heading: 1.25;
   --suoac-line-height-body: 1.5;
@@ -72,20 +107,36 @@
   --suoac-space-12: 3rem;
 
   /* Radius */
+  /* 6px: caixas de selecao. */
+  --suoac-radius-xs: 0.375rem;
   --suoac-radius-sm: 0.5rem;
   --suoac-radius-md: 0.75rem;
   --suoac-radius-lg: 1rem;
   --suoac-radius-xl: 1.25rem;
   --suoac-radius-pill: 999px;
+  /* 14px: campos e botoes altos do redesign, entre o md e o lg da escala. */
+  --suoac-radius-control: 0.875rem;
 
   /* Shadows */
   --suoac-shadow-xs: 0 1px 2px rgb(16 24 40 / 0.06);
   --suoac-shadow-sm: 0 8px 24px rgb(31 110 90 / 0.08);
   --suoac-shadow-md: 0 16px 40px rgb(31 110 90 / 0.12);
   --suoac-shadow-lg: 0 12px 28px rgb(16 24 40 / 0.18), 0 2px 6px rgb(16 24 40 / 0.12);
+  --suoac-shadow-dropdown: 0 24px 60px rgb(13 43 69 / 0.28);
+  --suoac-shadow-menu: 0 18px 40px rgb(13 43 69 / 0.2);
+  --suoac-shadow-modal: 0 40px 100px rgb(10 26 41 / 0.45);
+  --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
+  --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
+  /*
+   * Anel de foco dos campos. Nao tem par escuro porque nao precisa: a cor sai de
+   * `--suoac-color-primary-light`, que ja muda de tema. Esta e a unica sombra
+   * nessa situacao, e `theme-tokens.test.ts` a conhece pelo nome.
+   */
+  --suoac-shadow-focus-ring: 0 0 0 4px var(--suoac-color-primary-light);
 
   /* Scrim & overlay */
   --suoac-color-scrim: rgb(16 24 40 / 0.45);
+  --suoac-color-modal-scrim: rgb(10 26 41 / 0.55);
   --suoac-color-overlay: rgb(247 249 248 / 0.72);
   --suoac-overlay-blur: 4px;
 
@@ -100,19 +151,318 @@
   --suoac-layout-sidebar-width: 17rem;
   --suoac-layout-content-max-width: 75rem;
 
+  /* Motion */
+  --suoac-motion-duration-fast: 180ms;
+  --suoac-motion-duration-base: 200ms;
+  --suoac-motion-duration-medium: 300ms;
+  --suoac-motion-duration-slow: 400ms;
+  --suoac-motion-theme: var(--suoac-motion-duration-medium);
+
+  /*
+   * Curva padrao do design system: aparece 63 vezes no handoff, contra 2 da
+   * segunda colocada. Entradas, saidas e mudancas de estado usam esta.
+   */
+  --suoac-motion-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Leve ultrapassagem, para confirmacoes — o "pulo" do toast e do check. */
+  --suoac-motion-ease-overshoot: cubic-bezier(0.3, 1.5, 0.5, 1);
+
+  /*
+   * Entrada escalonada de listas: cada item atrasa 25ms em relacao ao anterior,
+   * com teto de 400ms no total. Sem o teto, uma lista de 40 passageiros levaria
+   * um segundo inteiro para terminar de aparecer.
+   */
+  --suoac-motion-stagger-step: 25ms;
+  --suoac-motion-stagger-max: 400ms;
+
   /* Component defaults */
   --suoac-button-height: 2.75rem;
   --suoac-button-height-sm: 2.25rem;
+  /* 54px: botao de acao principal das telas de acesso. */
+  --suoac-button-height-lg: 3.375rem;
   --suoac-input-height: 3rem;
+  /* 50px: campos das telas de acesso. */
+  --suoac-input-height-lg: 3.125rem;
   --suoac-card-padding: var(--suoac-space-6);
 
   --background: var(--suoac-color-background);
   --foreground: var(--suoac-color-text-primary);
 }
 
-@media (prefers-color-scheme: dark) {
+/*
+ * Animacoes compartilhadas pelo design system.
+ *
+ * Declaradas uma unica vez e globalmente: as mesmas entradas se repetem em todas
+ * as telas do redesign, e `@keyframes` dentro de CSS Module seria escopado por
+ * arquivo, recriando a mesma animacao em versoes levemente diferentes.
+ *
+ * Os valores reproduzem `docs/design_handoff_suoac_redesign/*.dc.html`, que e a
+ * especificacao final — `motion.test.ts` falha se divergirem.
+ *
+ * Animacao especifica de uma tela (a timeline do login, a planta do onibus) nasce
+ * na fatia que a usa, no CSS Module dela.
+ */
+
+/* Entrada padrao: dropdowns, popovers, linhas de lista, cards. */
+@keyframes suoac-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/*
+ * Troca de tela e troca de etapa: a que chega desliza da direita.
+ *
+ * Nasceu local no `auth-panel` e subiu para ca quando o autocadastro (SUC-28)
+ * passou a precisar dela na troca de etapas — dois consumidores fazem a
+ * animacao ser do design system, nao da tela.
+ */
+@keyframes suoac-swap {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@keyframes suoac-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Entrada de modal: sobe e cresce a partir de 97%. */
+@keyframes suoac-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+/* Toast inferior central — ja centralizado por translate(-50%). */
+@keyframes suoac-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.96);
+  }
+}
+
+/* Barras de progresso e de grafico. */
+@keyframes suoac-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Poltronas da planta do onibus. */
+@keyframes suoac-seat {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Tracado de graficos de linha. */
+@keyframes suoac-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* Erro de formulario. */
+@keyframes suoac-shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes suoac-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Nomes dos keyframes acima, expostos como token.
+ *
+ * Existem por uma limitacao concreta: CSS Modules escopam *nomes de animacao*,
+ * nao so nomes de classe. Escrever `animation: suoac-spin ...` dentro de um
+ * module faz o bundler reescrever o nome para um escopado por arquivo, que nao
+ * corresponde a keyframe nenhum — e a animacao nao roda, sem erro e sem aviso.
+ * Foi o que aconteceu com o spinner do botao de entrar, o balanco do erro e a
+ * entrada do painel de marca (SUC-43).
+ *
+ * `var()` e opaco para o bundler: ele nao enxerga um identificador na posicao de
+ * nome de animacao, entao nao tem o que reescrever. O valor so e substituido no
+ * navegador, quando ja nao ha escopo nenhum para aplicar.
+ *
+ *   .spinner {
+ *     animation-name: var(--suoac-animation-spin);
+ *     animation-duration: 0.7s;
+ *     animation-timing-function: linear;
+ *     animation-iteration-count: infinite;
+ *   }
+ *
+ * Ficam aqui, e nao junto dos demais tokens, para cada um ser lido ao lado do
+ * keyframe que nomeia. Ha um por keyframe, inclusive para os ainda nao usados:
+ * um conjunto pela metade convidaria a proxima fatia a escrever a referencia nua
+ * e repetir o erro. `src/app/styles/motion.test.ts` falha se isso acontecer.
+ */
+:root {
+  --suoac-animation-rise: suoac-rise;
+  --suoac-animation-swap: suoac-swap;
+  --suoac-animation-fade: suoac-fade;
+  --suoac-animation-modal-in: suoac-modal-in;
+  --suoac-animation-pop: suoac-pop;
+  --suoac-animation-grow: suoac-grow;
+  --suoac-animation-seat: suoac-seat;
+  --suoac-animation-draw: suoac-draw;
+  --suoac-animation-shake: suoac-shake;
+  --suoac-animation-spin: suoac-spin;
+}
+
+/*
+ * Quem pediu menos movimento ao sistema operacional recebe o resultado final das
+ * animacoes, nao o percurso: as duracoes caem para um valor irrisorio em vez de
+ * as animacoes serem removidas. Remover quebraria entradas declaradas com
+ * `both`/`forwards`, que dependem do estado final do keyframe para ficarem
+ * visiveis.
+ */
+@media (prefers-reduced-motion: reduce) {
   :root {
-    color-scheme: light;
+    --suoac-motion-duration-fast: 1ms;
+    --suoac-motion-duration-base: 1ms;
+    --suoac-motion-duration-medium: 1ms;
+    --suoac-motion-duration-slow: 1ms;
+    --suoac-motion-stagger-step: 0ms;
+    --suoac-motion-stagger-max: 0ms;
+  }
+}
+
+/*
+ * Tema escuro.
+ *
+ * A preferencia e persistida em cookie e lida no servidor, que estampa
+ * `data-theme` no <html> antes da resposta sair — por isso nao ha flash de tema
+ * errado. Quando a preferencia e "sistema", o servidor estampa
+ * `data-theme="system"` e a media query abaixo decide, ainda sem JavaScript.
+ *
+ * O tema so vale mediante opt-in explicito: sem atributo nenhum, a pagina fica
+ * clara mesmo com o sistema operacional em escuro. E o que impede telas ainda
+ * nao redesenhadas de serem pintadas em escuro antes de terem contraste
+ * verificado.
+ *
+ * Os dois blocos precisam conter EXATAMENTE as mesmas declaracoes. Editar um e
+ * esquecer o outro faz o tema divergir entre a escolha explicita e a do sistema;
+ * `src/app/styles/theme-tokens.test.ts` falha quando isso acontece.
+ */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --suoac-color-primary: #4fb393;
+  --suoac-color-primary-dark: #7fcfb4;
+  --suoac-color-primary-light: #183229;
+  --suoac-color-on-primary: #0e1413;
+  --suoac-color-on-success: #0e1413;
+
+  /* Secondary */
+  --suoac-color-info: #82a9ff;
+  --suoac-color-success: #4cc07c;
+  --suoac-color-attention: #f2c14b;
+  --suoac-color-attention-text: #f2c14b;
+  --suoac-color-critical: #f07272;
+  --suoac-color-critical-dark: #f49a9a;
+
+  /* Neutrals */
+  --suoac-color-background: #0e1413;
+  --suoac-color-surface: #151d1b;
+  --suoac-color-surface-muted: #1c2623;
+  --suoac-color-border: #25312e;
+  --suoac-color-border-strong: #34433f;
+  --suoac-color-text-primary: #e9efed;
+  --suoac-color-text-secondary: #9aa8a3;
+  --suoac-color-navy: #0a1a29;
+
+  /* Semantic backgrounds */
+  --suoac-color-info-soft: #18233d;
+  --suoac-color-success-soft: #163121;
+  --suoac-color-attention-soft: #342b10;
+  --suoac-color-critical-soft: #3a1d1d;
+  --suoac-color-neutral-soft: #1c2623;
+  --suoac-color-glass: rgb(21 29 27 / 0.78);
+
+  /* Shadows */
+  --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --suoac-shadow-sm: 0 8px 24px rgb(0 0 0 / 0.25);
+  --suoac-shadow-md: 0 16px 40px rgb(0 0 0 / 0.35);
+  --suoac-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+  --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
+  --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
+  --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+  --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
+  --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+
+  /* Scrim & overlay */
+  --suoac-color-scrim: rgb(0 0 0 / 0.6);
+  --suoac-color-overlay: rgb(14 20 19 / 0.72);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] {
+    color-scheme: dark;
+
+    /* Brand */
+    --suoac-color-primary: #4fb393;
+    --suoac-color-primary-dark: #7fcfb4;
+    --suoac-color-primary-light: #183229;
+    --suoac-color-on-primary: #0e1413;
+    --suoac-color-on-success: #0e1413;
+
+    /* Secondary */
+    --suoac-color-info: #82a9ff;
+    --suoac-color-success: #4cc07c;
+    --suoac-color-attention: #f2c14b;
+    --suoac-color-attention-text: #f2c14b;
+    --suoac-color-critical: #f07272;
+    --suoac-color-critical-dark: #f49a9a;
+
+    /* Neutrals */
+    --suoac-color-background: #0e1413;
+    --suoac-color-surface: #151d1b;
+    --suoac-color-surface-muted: #1c2623;
+    --suoac-color-border: #25312e;
+    --suoac-color-border-strong: #34433f;
+    --suoac-color-text-primary: #e9efed;
+    --suoac-color-text-secondary: #9aa8a3;
+    --suoac-color-navy: #0a1a29;
+
+    /* Semantic backgrounds */
+    --suoac-color-info-soft: #18233d;
+    --suoac-color-success-soft: #163121;
+    --suoac-color-attention-soft: #342b10;
+    --suoac-color-critical-soft: #3a1d1d;
+    --suoac-color-neutral-soft: #1c2623;
+    --suoac-color-glass: rgb(21 29 27 / 0.78);
+
+    /* Shadows */
+    --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+    --suoac-shadow-sm: 0 8px 24px rgb(0 0 0 / 0.25);
+    --suoac-shadow-md: 0 16px 40px rgb(0 0 0 / 0.35);
+    --suoac-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+    --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
+    --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
+    --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+    --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
+    --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+
+    /* Scrim & overlay */
+    --suoac-color-scrim: rgb(0 0 0 / 0.6);
+    --suoac-color-overlay: rgb(14 20 19 / 0.72);
   }
 }
 
@@ -128,6 +478,9 @@ body {
 
 body {
   min-height: 100%;
+  transition:
+    background-color var(--suoac-motion-theme) ease,
+    color var(--suoac-motion-theme) ease;
   display: flex;
   flex-direction: column;
   color: var(--foreground);
@@ -150,8 +503,9 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: light;
+/* Quem pediu menos movimento ao sistema operacional nao recebe a transicao de tema. */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
   }
 }

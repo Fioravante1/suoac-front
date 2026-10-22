@@ -38,10 +38,69 @@ function booleanFlag({ defaultValue = false, ...config }: BooleanFlagConfig) {
 }
 
 /**
+ * Flags do redesign.
+ *
+ * Sao flags de release: existem para serem removidas. Cada uma cobre uma fatia do
+ * redesign (ver `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md`), e o PR que cria
+ * a flag cria tambem o card que a remove.
+ *
+ * Os tipos abaixo nao sao decorativos — obrigam, em tempo de compilacao, o
+ * prefixo `REDESIGN_` e a existencia do card de remocao. E o que impede uma flag
+ * temporaria de nascer sem data de morte.
+ *
+ * Regra de governanca: no maximo **duas** flags `REDESIGN_*` ligadas em producao
+ * sem corte pendente. Na terceira, a prioridade passa a ser cortar, nao construir.
+ */
+interface RedesignFlagConfig {
+  key: `REDESIGN_${string}`;
+  description: string;
+  /** Fatia a que pertence, como aparece no Jira. Ex.: "Fatia 1 — Login". */
+  slice: string;
+  /** Card que remove esta flag junto com o codigo antigo. */
+  removalCard: `SUC-${number}`;
+}
+
+/**
+ * Monta a descricao exibida no painel de flags da Vercel.
+ *
+ * Quem abre o painel — inclusive meses depois — precisa saber de imediato que a
+ * flag e temporaria e qual card a remove, sem recorrer ao codigo.
+ */
+export function buildRedesignFlagDescription({
+  description,
+  slice,
+  removalCard,
+}: Omit<RedesignFlagConfig, "key">): string {
+  return `[${slice}] ${description} Temporária — remover em ${removalCard}.`;
+}
+
+/** Cria uma flag de redesign ja no padrao de governanca. */
+export function redesignFlag({ key, ...config }: RedesignFlagConfig) {
+  return booleanFlag({ key, description: buildRedesignFlagDescription(config) });
+}
+
+/**
  * Exibe itens de menu cujas paginas ainda nao foram implementadas (ex.: Financeiro
  * e Configuracoes). Oculto por padrao caso a flag nao possa ser avaliada.
+ *
+ * Nao e flag de redesign: nao tem prazo nem card de remocao.
  */
 export const showPendingMenuItemsFlag = booleanFlag({
   key: "SHOW_PENDING_MENU_ITEMS",
   description: "Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações).",
+});
+
+/**
+ * Serve a tela de entrada redesenhada (`src/pages/login-next`) em `/login`.
+ *
+ * CRIADA EM 14/10/2026 — TEMPORARIA. Removida em SUC-34, junto com o slice
+ * `src/pages/login`, a fachada da rota e a contencao de tema das telas de acesso.
+ *
+ * Desligada devolve a tela atual sem deploy: e o kill switch da fatia.
+ */
+export const redesignLoginFlag = redesignFlag({
+  key: "REDESIGN_LOGIN",
+  description: "Serve a tela de login redesenhada.",
+  slice: "Fatia 1 — Login",
+  removalCard: "SUC-34",
 });

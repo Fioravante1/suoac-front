@@ -1,0 +1,54 @@
+.toggle {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.toggle:hover {
+  border-color: var(--suoac-color-border-strong);
+  background: var(--suoac-color-surface-muted);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+}
+
+/*
+ * Qual icone aparece depende do tema vigente, e a regra espelha exatamente a de
+ * `app/globals.css`: o sol convida a ir para o claro, logo aparece no escuro.
+ */
+.sun {
+  display: none;
+}
+
+.moon {
+  display: block;
+}
+
+:global(html[data-theme="dark"]) .sun {
+  display: block;
+}
+
+:global(html[data-theme="dark"]) .moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html[data-theme="system"]) .sun {
+    display: block;
+  }
+
+  :global(html[data-theme="system"]) .moon {
+    display: none;
+  }
+}
