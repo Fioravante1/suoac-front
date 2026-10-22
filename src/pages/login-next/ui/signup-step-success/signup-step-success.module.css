@@ -1,0 +1,106 @@
+.container,
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  gap: var(--suoac-space-6);
+}
+
+.header {
+  gap: var(--suoac-space-2);
+  animation-name: var(--suoac-animation-swap);
+  animation-duration: var(--suoac-motion-duration-medium);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: var(--suoac-line-height-body);
+  text-wrap: pretty;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 1.125rem;
+  border-radius: var(--suoac-radius-lg);
+  background: var(--suoac-color-surface-muted);
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--suoac-space-3);
+  font-size: var(--suoac-font-size-small);
+}
+
+.summaryKey {
+  color: var(--suoac-color-text-secondary);
+}
+
+.summaryValue {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-weight: var(--suoac-font-weight-semibold);
+  text-align: right;
+}
+
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  height: var(--suoac-button-height-lg);
+  border: 0;
+  border-radius: var(--suoac-radius-control);
+  background: var(--suoac-color-primary);
+  box-shadow: var(--suoac-shadow-button-primary-strong);
+  color: var(--suoac-color-on-primary);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    transform var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--suoac-color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.spinner {
+  border-color: color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
+}
