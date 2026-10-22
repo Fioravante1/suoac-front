@@ -468,7 +468,7 @@ describe("SignupFlow", () => {
       expect(screen.getByLabelText("E-mail")).toHaveFocus();
     });
 
-    it("deve confirmar o código de 6 dígitos e redirecionar ao painel quando a API responde 201", async () => {
+    it("deve confirmar o código de 6 dígitos, exibir o resumo de sucesso e navegar ao painel ao clicar em 'Ir para o painel'", async () => {
       confirmCircuitSignupAction.mockResolvedValue({ status: "success" });
       renderFlow();
       await goToConfirmationStep();
@@ -484,6 +484,21 @@ describe("SignupFlow", () => {
           code: "123456",
         }),
       );
+
+      await waitFor(() => expect(screen.getByRole("heading", { name: "Circuito SP-17 criado" })).toBeInTheDocument());
+      expect(screen.getByText("João Silva")).toBeInTheDocument();
+      expect(screen.getByText("SP-17 · Campinas/SP")).toBeInTheDocument();
+      expect(screen.getByText("Jardim Paulista · 31245")).toBeInTheDocument();
+      expect(screen.getByText("1 cadastrada")).toBeInTheDocument();
+      expect(screen.getByText("Criar o primeiro evento")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Voltar|Corrigir e-mail/ })).not.toBeInTheDocument();
+      expect(routerPush).not.toHaveBeenCalled();
+
+      const unloadEvent = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(unloadEvent);
+      expect(unloadEvent.defaultPrevented).toBe(false);
+
+      fireEvent.click(screen.getByRole("button", { name: "Ir para o painel" }));
       expect(routerPush).toHaveBeenCalledWith("/dashboard");
     });
 

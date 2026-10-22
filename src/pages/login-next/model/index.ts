@@ -14,10 +14,11 @@ export type { SignupConfirmationValues } from "./signup-confirmation-schema";
 export {
   SIGNUP_STEPS,
   SIGNUP_STEP_COUNT,
+  buildSignupSummary,
   dropBlankCongregations,
   signupDefaultValues,
   signupSchema,
 } from "./signup-schema";
-export type { SignupFormValues } from "./signup-schema";
+export type { SignupFormValues, SignupSummary, SignupSummaryRow } from "./signup-schema";
 export { isSignupFieldPath, readSignupConflicts, resolveSignupFieldStep } from "./signup-field";
 export type { SignupConflict } from "./signup-field";

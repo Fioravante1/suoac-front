@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   SIGNUP_STEPS,
   SIGNUP_STEP_COUNT,
+  buildSignupSummary,
   dropBlankCongregations,
   signupDefaultValues,
   signupSchema,
@@ -272,5 +273,53 @@ describe("dropBlankCongregations", () => {
     ];
 
     expect(dropBlankCongregations(rows)).toEqual(rows);
+  });
+});
+
+describe("buildSignupSummary", () => {
+  it("deve montar o resumo normalizando circuito, UF e código da congregação própria", () => {
+    const summary = buildSignupSummary({
+      coordinator: {
+        name: "  João Silva  ",
+        email: "joao@example.com",
+        phone: "(19) 99999-9999",
+        password: "Senha@123",
+      },
+      circuit: { name: " sp-17 ", city: " Campinas ", state: "sp" },
+      acceptedTerms: true,
+      congregations: [{ name: " Central ", code: " sp17-central " }],
+    });
+
+    expect(summary).toEqual({
+      circuitName: "SP-17",
+      rows: [
+        { label: "Coordenador", value: "João Silva" },
+        { label: "Circuito", value: "SP-17 · Campinas/SP" },
+        { label: "Sua congregação", value: "Central · SP17-CENTRAL" },
+        { label: "Congregações", value: "1 cadastrada" },
+        { label: "Próximo passo", value: "Criar o primeiro evento" },
+      ],
+    });
+  });
+
+  it("deve exibir o plural na contagem de congregações e ignorar linhas adicionais em branco", () => {
+    const summary = buildSignupSummary({
+      coordinator: {
+        name: "João Silva",
+        email: "joao@example.com",
+        phone: "(19) 99999-9999",
+        password: "Senha@123",
+      },
+      circuit: { name: "SP-17", city: "Campinas", state: "SP" },
+      acceptedTerms: true,
+      congregations: [
+        { name: "Central", code: "10540" },
+        { name: "Taquaral", code: "10541" },
+        { name: "", code: "" },
+        { name: "Cambuí", code: "10542" },
+      ],
+    });
+
+    expect(summary.rows).toContainEqual({ label: "Congregações", value: "3 cadastradas" });
   });
 });
