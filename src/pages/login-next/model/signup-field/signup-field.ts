@@ -2,6 +2,18 @@ import type { Path } from "react-hook-form";
 
 import type { SignupFormValues } from "../signup-schema";
 
+/** Conflito apontado pela API: o caminho do campo e a mensagem para a tela. */
+export interface SignupConflict {
+  field: string;
+  message: string;
+}
+
+interface ConflictBody {
+  message?: unknown;
+  field?: unknown;
+  fields?: unknown;
+}
+
 /**
  * Campos do formulário de autocadastro que a API sabe apontar em um conflito.
  *
@@ -27,4 +39,35 @@ export function resolveSignupFieldStep(field: string): number | null {
   const group = field.split(".")[0] as keyof typeof STEP_BY_GROUP;
 
   return STEP_BY_GROUP[group];
+}
+
+/**
+ * Extrai a lista de conflitos do corpo de erro (`409` ou `422`) da API.
+ *
+ * A API manda a lista completa em `fields` (`409` da criação do rascunho) e só
+ * o primeiro em `field` (`422`, e o `409` de colisão na consolidação). A lista
+ * tem precedência; `field` com `message` é o plano B.
+ */
+export function readSignupConflicts(body: unknown): SignupConflict[] {
+  if (typeof body !== "object" || body === null) return [];
+
+  const candidate = body as ConflictBody;
+
+  if (Array.isArray(candidate.fields)) {
+    return candidate.fields.filter(isSignupConflict);
+  }
+
+  if (typeof candidate.field === "string" && typeof candidate.message === "string") {
+    return [{ field: candidate.field, message: candidate.message }];
+  }
+
+  return [];
+}
+
+function isSignupConflict(value: unknown): value is SignupConflict {
+  if (typeof value !== "object" || value === null) return false;
+
+  const candidate = value as Partial<SignupConflict>;
+
+  return typeof candidate.field === "string" && typeof candidate.message === "string";
 }

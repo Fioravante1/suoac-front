@@ -1,10 +1,17 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const submitCircuitSignupAction = vi.hoisted(() => vi.fn());
+const confirmCircuitSignupAction = vi.hoisted(() => vi.fn());
+const routerPush = vi.hoisted(() => vi.fn());
 
 vi.mock("../../api", () => ({
+  confirmCircuitSignupAction: (...args: unknown[]) => confirmCircuitSignupAction(...args),
   submitCircuitSignupAction: (...args: unknown[]) => submitCircuitSignupAction(...args),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: routerPush }),
 }));
 
 import { SignupFlow } from "./signup-flow";
@@ -13,14 +20,20 @@ beforeEach(() => {
   // Sucesso por padrão: os testes que não tratam do envio só precisam que ele não falhe.
   submitCircuitSignupAction.mockReset();
   submitCircuitSignupAction.mockResolvedValue({ status: "success", email: "joao@example.com" });
+  confirmCircuitSignupAction.mockReset();
+  confirmCircuitSignupAction.mockResolvedValue({ status: "success" });
+  routerPush.mockReset();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 // ── Helpers ──────────────────────────────────────────────────────
 function renderFlow() {
   const onBack = vi.fn();
-  const onSubmitted = vi.fn();
-  render(<SignupFlow onBack={onBack} onSubmitted={onSubmitted} />);
-  return { onBack, onSubmitted };
+  render(<SignupFlow onBack={onBack} />);
+  return { onBack };
 }
 
 function type(label: string | RegExp, value: string) {
@@ -32,7 +45,7 @@ function clickNext() {
 }
 
 function clickBack() {
-  fireEvent.click(screen.getByRole("button", { name: /^Voltar/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^(Voltar|Corrigir e-mail)/ }));
 }
 
 /** Preenche a etapa 1 com valores que a validação aceita. */
@@ -370,6 +383,11 @@ describe("SignupFlow", () => {
     });
 
     it("deve descartar as linhas adicionais ao escolher 'Adicionar as outras depois'", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Falha temporária",
+        conflicts: [],
+      });
       renderFlow();
       await goToCongregationsStep();
       type("Congregação", "Jardim Paulista");
@@ -384,6 +402,11 @@ describe("SignupFlow", () => {
     });
 
     it("deve remover as linhas em branco ao concluir", async () => {
+      submitCircuitSignupAction.mockResolvedValue({
+        status: "error",
+        message: "Falha temporária",
+        conflicts: [],
+      });
       renderFlow();
       await goToCongregationsStep();
       type("Congregação", "Jardim Paulista");
@@ -396,7 +419,7 @@ describe("SignupFlow", () => {
     });
   });
 
-  describe("envio", () => {
+  describe("envio e confirmação por código", () => {
     async function goToCongregationsStepFilled() {
       await goToCircuitStep();
       fillCircuit();
@@ -406,14 +429,23 @@ describe("SignupFlow", () => {
       type("Código", "31245");
     }
 
-    it("deve enviar o formulário inteiro ao concluir a etapa 3 e avisar quem o chamou", async () => {
+    async function goToConfirmationStep() {
+      await goToCongregationsStepFilled();
+      clickNext();
+      await waitFor(() => expect(screen.getByRole("heading", { name: "Confirme seu e-mail" })).toBeInTheDocument());
+    }
+
+    it("deve avançar para a tela de confirmação de código após concluir a etapa 3, ocultando a barra de etapas", async () => {
       submitCircuitSignupAction.mockResolvedValue({ status: "success", email: "joao@example.com" });
-      const { onSubmitted } = renderFlow();
+      renderFlow();
       await goToCongregationsStepFilled();
 
       clickNext();
 
-      await waitFor(() => expect(onSubmitted).toHaveBeenCalledWith("joao@example.com"));
+      await waitFor(() => expect(screen.getByRole("heading", { name: "Confirme seu e-mail" })).toBeInTheDocument());
+      expect(screen.getByText("joao@example.com")).toBeInTheDocument();
+      expect(screen.queryByText(/Etapa \d de 3/)).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Corrigir e-mail" })).toBeInTheDocument();
       expect(submitCircuitSignupAction).toHaveBeenCalledTimes(1);
       expect(submitCircuitSignupAction).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -422,6 +454,124 @@ describe("SignupFlow", () => {
           congregations: [{ name: "Jardim Paulista", code: "31245" }],
         }),
       );
+    });
+
+    it("deve voltar para a etapa 1 preservando os dados preenchidos ao clicar em 'Corrigir e-mail'", async () => {
+      renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.click(screen.getByRole("button", { name: "Corrigir e-mail" }));
+
+      await waitFor(() => expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument());
+      expect(screen.getByLabelText("Nome completo")).toHaveValue("João Silva");
+      expect(screen.getByLabelText("E-mail")).toHaveValue("joao@example.com");
+      expect(screen.getByLabelText("E-mail")).toHaveFocus();
+    });
+
+    it("deve confirmar o código de 6 dígitos e redirecionar ao painel quando a API responde 201", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({ status: "success" });
+      renderFlow();
+      await goToConfirmationStep();
+
+      const firstBox = screen.getByLabelText("Dígito 1 de 6");
+      fireEvent.paste(firstBox, {
+        clipboardData: { getData: () => "123456" },
+      });
+
+      await waitFor(() =>
+        expect(confirmCircuitSignupAction).toHaveBeenCalledWith({
+          email: "joao@example.com",
+          code: "123456",
+        }),
+      );
+      expect(routerPush).toHaveBeenCalledWith("/dashboard");
+    });
+
+    it("deve exibir mensagem específica para código inválido (400) e destacar as caixas", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({
+        status: "invalid-code",
+        message: "Código inválido. Confira os 6 dígitos enviados para o seu e-mail e tente novamente.",
+      });
+      renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.paste(screen.getByLabelText("Dígito 1 de 6"), {
+        clipboardData: { getData: () => "000000" },
+      });
+
+      await waitFor(() =>
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "Código inválido. Confira os 6 dígitos enviados para o seu e-mail e tente novamente.",
+        ),
+      );
+      expect(screen.getByLabelText("Dígito 1 de 6")).toHaveAttribute("aria-invalid", "true");
+    });
+
+    it("deve exibir mensagem específica para código expirado (410) e liberar o reenvio", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({
+        status: "expired-code",
+        message:
+          'Este código expirou. Clique em "Reenviar código" para receber um novo ou revise os dados do cadastro.',
+      });
+      renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.paste(screen.getByLabelText("Dígito 1 de 6"), {
+        clipboardData: { getData: () => "123456" },
+      });
+
+      await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(/Este código expirou/));
+      expect(screen.getByRole("button", { name: "Reenviar código" })).toBeEnabled();
+    });
+
+    it("deve voltar para a etapa do campo em conflito se a consolidação devolver 409 com field", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({
+        status: "conflict",
+        message: "Alguns dados já estão em uso. Confira os campos destacados.",
+        conflicts: [{ field: "circuit.name", message: "Este circuito ja esta em uso" }],
+      });
+      renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.paste(screen.getByLabelText("Dígito 1 de 6"), {
+        clipboardData: { getData: () => "123456" },
+      });
+
+      await waitFor(() => expect(screen.getByText("Etapa 2 de 3")).toBeInTheDocument());
+      expect(screen.getByText("Este circuito ja esta em uso")).toBeInTheDocument();
+    });
+
+    it("deve voltar para a tela de entrada quando o rascunho já foi confirmado (409 already-confirmed)", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({ status: "already-confirmed" });
+      const { onBack } = renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.paste(screen.getByLabelText("Dígito 1 de 6"), {
+        clipboardData: { getData: () => "123456" },
+      });
+
+      await waitFor(() => expect(onBack).toHaveBeenCalledTimes(1));
+    });
+
+    it("deve reenviar o rascunho preservado ao clicar em 'Reenviar código'", async () => {
+      confirmCircuitSignupAction.mockResolvedValue({
+        status: "expired-code",
+        message: "Este código expirou.",
+      });
+      renderFlow();
+      await goToConfirmationStep();
+
+      fireEvent.paste(screen.getByLabelText("Dígito 1 de 6"), {
+        clipboardData: { getData: () => "123456" },
+      });
+      await waitFor(() => expect(screen.getByRole("button", { name: "Reenviar código" })).toBeEnabled());
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Reenviar código" }));
+      });
+
+      expect(submitCircuitSignupAction).toHaveBeenCalledTimes(2);
+      expect(screen.getByRole("status")).toHaveTextContent("Novo código enviado.");
     });
 
     it("não deve enviar quando a etapa 3 é inválida", async () => {
@@ -459,7 +609,7 @@ describe("SignupFlow", () => {
         message: "Alguns dados já estão em uso. Confira os campos destacados.",
         conflicts: [{ field: "coordinator.email", message: "Este e-mail ja esta cadastrado" }],
       });
-      const { onSubmitted } = renderFlow();
+      renderFlow();
       await goToCongregationsStepFilled();
 
       clickNext();
@@ -468,7 +618,7 @@ describe("SignupFlow", () => {
       expect(screen.getByText("Este e-mail ja esta cadastrado")).toBeInTheDocument();
       expect(screen.getByLabelText("E-mail")).toBeInvalid();
       expect(screen.getByText("Alguns dados já estão em uso. Confira os campos destacados.")).toBeInTheDocument();
-      expect(onSubmitted).not.toHaveBeenCalled();
+      expect(screen.queryByRole("heading", { name: "Confirme seu e-mail" })).not.toBeInTheDocument();
     });
 
     it("deve voltar à etapa 2 com o erro no circuito já em uso e manter o preenchimento", async () => {
@@ -549,14 +699,14 @@ describe("SignupFlow", () => {
       submitCircuitSignupAction
         .mockResolvedValueOnce({ status: "error", message: "Não foi possível criar o circuito.", conflicts: [] })
         .mockResolvedValueOnce({ status: "success", email: "joao@example.com" });
-      const { onSubmitted } = renderFlow();
+      renderFlow();
       await goToCongregationsStepFilled();
 
       clickNext();
       await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
       clickNext();
 
-      await waitFor(() => expect(onSubmitted).toHaveBeenCalledWith("joao@example.com"));
+      await waitFor(() => expect(screen.getByRole("heading", { name: "Confirme seu e-mail" })).toBeInTheDocument());
     });
   });
 });

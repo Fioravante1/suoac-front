@@ -361,8 +361,17 @@ O envio (`submitCircuitSignupAction`) acontece ao concluir a etapa 3. `POST /aut
 responde `202` sem corpo, por isso a Server Action usa `httpClientRaw` e `anonymous`. Os conflitos
 voltam em `fields` (`409`) ou `field` (`422`); cada um vira erro no campo, e o fluxo volta à etapa do
 primeiro. Caminho que não é de campo (por exemplo `congregations` sem índice, devolvido só na
-consolidação) vai para o aviso geral. O sucesso leva a uma tela provisória "Confira seu e-mail",
-que a confirmação por código (SUC-32) substitui.
+consolidação) vai para o aviso geral.
+
+**Confirmação de e-mail por código (SUC-32):** o sucesso da etapa 3 avança dentro do próprio
+`SignupFlow` para a etapa de confirmação (`SignupStepConfirmation`), mantendo o formulário de três
+etapas montado em memória para que "Corrigir e-mail" volte à etapa 1 sem perder o preenchimento e
+"Reenviar código" reenvie o mesmo payload a `POST /auth/circuit-signups` após o cooldown de 60s. O
+grupo de 6 dígitos usa 6 `<input>` reais dentro de `<fieldset>`/`<legend>`, com avanço automático,
+recuo com `Backspace`, navegação por setas e auto-submissão ao colar os 6 dígitos. A confirmação
+(`confirmCircuitSignupAction`, `POST /auth/circuit-signups/confirmations`) abre a sessão via
+`createSession` no `201`, diferencia `400` (código inválido) de `410` (código expirado, liberando o
+reenvio imediato) e devolve conflito tardio de consolidação (`409` com `field`) à etapa do campo.
 
 Uma consequência que o desenho não previa: o erro de **circuito já em uso** só aparece ao concluir a
 etapa 3, porque a unicidade é do servidor. O identificador exibido como Circuito (ex.: `SP-17`) ocupa

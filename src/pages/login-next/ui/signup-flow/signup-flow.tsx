@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CircleAlert } from "lucide-react";
 import { FormProvider, useForm, type Path } from "react-hook-form";
 
+import { routes } from "@/shared/config";
 import { useServerError } from "@/shared/lib";
 import { Spinner } from "@/shared/ui/spinner";
 
-import { submitCircuitSignupAction, type SubmitCircuitSignupResult } from "../../api";
+import { confirmCircuitSignupAction, submitCircuitSignupAction, type SignupConflict } from "../../api";
 import { SignupStepCircuit } from "../signup-step-circuit";
+import { SignupStepConfirmation } from "../signup-step-confirmation";
 import { SignupStepCongregations } from "../signup-step-congregations";
 import { SignupStepCoordinator } from "../signup-step-coordinator";
 
@@ -29,29 +32,25 @@ import styles from "./signup-flow.module.css";
 interface SignupFlowProps {
   /** Sai do autocadastro e volta para a tela de entrada. */
   onBack: () => void;
-  /** Chamado com o e-mail do coordenador quando a API aceita o cadastro e manda o código. */
-  onSubmitted: (email: string) => void;
 }
 
 const ABANDON_WARNING = "Você tem um cadastro em andamento. Se sair agora, os dados preenchidos serão perdidos.";
 
 /**
- * Autocadastro de circuito: o chassi das três etapas.
+ * Autocadastro de circuito: as três etapas de preenchimento e a confirmação por
+ * código de 6 dígitos.
  *
  * As etapas compartilham **um** formulário e **um** estado. Três formulários
  * independentes dariam três fontes de verdade e um problema de navegação para
- * trás — por isso o chassi vem antes do acabamento.
+ * trás — e manter o formulário vivo durante a confirmação permite voltar à
+ * etapa 1 em "Corrigir e-mail" ou reenviar o rascunho sem redigitar nada.
  *
- * Os campos são os definitivos, com a validação definitiva. A etapa 3 adiciona
- * e remove linhas de congregação e, ao concluir, envia o cadastro inteiro
- * (SUC-31): conflito da API vira erro no campo certo, com volta à etapa dele.
- *
- * Nada é enviado antes do fim: a API guarda um rascunho só quando a etapa 3 é
- * concluída, e é o código de 6 dígitos que consolida o cadastro (SUC-37). Como
- * consequência, **recarregar a página perde o preenchimento** — não há rascunho
- * no servidor para retomar. O aviso de saída existe por isso.
+ * Nada é enviado antes do fim da etapa 3: a API guarda um rascunho quando ela é
+ * concluída (SUC-31), e o código de 6 dígitos consolida o cadastro e já abre a
+ * sessão (SUC-32 / SUC-37).
  */
-export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
+export function SignupFlow({ onBack }: SignupFlowProps) {
+  const router = useRouter();
   /*
    * A etapa é estado de controle da tela, não valor de campo, então vive em
    * `useState`. Todo valor que o usuário digita fica em React Hook Form — é o
@@ -59,8 +58,16 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
    * etapas que saem de tela são desmontados e o formulário continua de pé.
    */
   const [stepIndex, setStepIndex] = useState(0);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isServerCodeInvalid, setIsServerCodeInvalid] = useState(false);
+  const [isServerCodeExpired, setIsServerCodeExpired] = useState(false);
+
   const advancingRef = useRef(false);
+  const confirmingRef = useRef(false);
   const { serverError, clearServerError, showServerError } = useServerError();
   // Campo a focar quando a etapa que o contém terminar de montar.
   const pendingFocusRef = useRef<Path<SignupFormValues> | null>(null);
@@ -91,7 +98,8 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
    * o conjunto —, então `isSubmitting` fica sempre falso e não serve sozinho
    * para travar os botões nem para acender o rótulo de ocupado.
    */
-  const isBusy = isSubmitting || isAdvancing;
+  const isBusy = isSubmitting || isAdvancing || isConfirming || isResending || isRedirecting;
+  const isConfirmationPhase = confirmationEmail !== null;
 
   const step = SIGNUP_STEPS[stepIndex];
   const isFirstStep = stepIndex === 0;
@@ -111,7 +119,7 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
    * diferença entre perder o cadastro sem aviso e ser avisado.
    */
   useEffect(() => {
-    if (!isDirty) {
+    if (!isDirty || isRedirecting) {
       return;
     }
 
@@ -123,13 +131,18 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
     window.addEventListener("beforeunload", warnBeforeLeaving);
 
     return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
-  }, [isDirty]);
+  }, [isDirty, isRedirecting]);
 
   /*
-   * Foco no primeiro campo em conflito. Quando o conflito está em outra etapa,
-   * o campo só existe depois que ela monta, então o foco espera a troca.
+   * Foco no primeiro campo em conflito (ou no e-mail ao clicar em "Corrigir
+   * e-mail"). Quando o campo está em outra etapa ou fora da confirmação, ele só
+   * existe depois que a etapa monta, então o foco espera a troca.
    */
   useEffect(() => {
+    if (isConfirmationPhase) {
+      return;
+    }
+
     const field = pendingFocusRef.current;
 
     if (!field) {
@@ -138,10 +151,16 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
 
     pendingFocusRef.current = null;
     setFocus(field);
-  }, [stepIndex, setFocus]);
+  }, [stepIndex, isConfirmationPhase, setFocus]);
 
   if (!step) {
     return null;
+  }
+
+  function clearConfirmationError() {
+    clearServerError();
+    setIsServerCodeInvalid(false);
+    setIsServerCodeExpired(false);
   }
 
   /*
@@ -183,7 +202,7 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
     setIsAdvancing(true);
 
     try {
-      clearServerError();
+      clearConfirmationError();
 
       if (isLastStep) {
         pruneCongregations(onlyOwnCongregation);
@@ -213,11 +232,84 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
     const result = await submitCircuitSignupAction(getValues());
 
     if (result.status === "success") {
-      onSubmitted(result.email);
+      clearConfirmationError();
+      setConfirmationEmail(result.email);
       return;
     }
 
-    showFailure(result);
+    showFailure(result.message, result.conflicts);
+  }
+
+  async function handleResendCode(): Promise<boolean> {
+    if (advancingRef.current || confirmingRef.current) {
+      return false;
+    }
+
+    advancingRef.current = true;
+    setIsResending(true);
+
+    try {
+      clearConfirmationError();
+      const result = await submitCircuitSignupAction(getValues());
+
+      if (result.status === "success") {
+        setConfirmationEmail(result.email);
+        return true;
+      }
+
+      showFailure(result.message, result.conflicts);
+      return false;
+    } finally {
+      advancingRef.current = false;
+      setIsResending(false);
+    }
+  }
+
+  async function handleConfirmCode(code: string) {
+    if (!confirmationEmail || confirmingRef.current || advancingRef.current) {
+      return;
+    }
+
+    confirmingRef.current = true;
+    setIsConfirming(true);
+
+    try {
+      clearConfirmationError();
+      const result = await confirmCircuitSignupAction({ email: confirmationEmail, code });
+
+      if (result.status === "success") {
+        setIsRedirecting(true);
+        router.push(routes.dashboard);
+        return;
+      }
+
+      if (result.status === "already-confirmed") {
+        onBack();
+        return;
+      }
+
+      if (result.status === "invalid-code") {
+        setIsServerCodeInvalid(true);
+        showServerError(result.message);
+        return;
+      }
+
+      if (result.status === "expired-code") {
+        setIsServerCodeExpired(true);
+        showServerError(result.message);
+        return;
+      }
+
+      if (result.status === "conflict") {
+        showFailure(result.message, result.conflicts);
+        return;
+      }
+
+      showServerError(result.message);
+    } finally {
+      confirmingRef.current = false;
+      setIsConfirming(false);
+    }
   }
 
   /**
@@ -226,15 +318,21 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
    * tela que não o mostra. O que não aponta campo (limite de tentativas, falha
    * da API) fica no aviso geral, que aparece em qualquer etapa.
    */
-  function showFailure(result: Extract<SubmitCircuitSignupResult, { status: "error" }>) {
-    const fieldConflicts = result.conflicts.flatMap(({ field, message }) =>
-      isSignupFieldPath(field) ? [{ field, message }] : [],
+  function showFailure(message: string, conflicts: SignupConflict[]) {
+    const fieldConflicts = conflicts.flatMap(({ field, message: fieldMessage }) =>
+      isSignupFieldPath(field) ? [{ field, message: fieldMessage }] : [],
     );
-    const otherConflict = result.conflicts.find((conflict) => !isSignupFieldPath(conflict.field));
+    const otherConflict = conflicts.find((conflict) => !isSignupFieldPath(conflict.field));
 
-    fieldConflicts.forEach(({ field, message }) => setError(field, { type: "server", message }));
+    fieldConflicts.forEach(({ field, message: fieldMessage }) =>
+      setError(field, { type: "server", message: fieldMessage }),
+    );
 
-    showServerError(otherConflict?.message ?? result.message);
+    showServerError(otherConflict?.message ?? message);
+
+    if (conflicts.length > 0) {
+      setConfirmationEmail(null);
+    }
 
     const first = fieldConflicts[0];
     const targetStep = first ? resolveSignupFieldStep(first.field) : null;
@@ -243,7 +341,7 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
       return;
     }
 
-    if (targetStep === stepIndex) {
+    if (targetStep === stepIndex && !isConfirmationPhase) {
       setFocus(first.field);
       return;
     }
@@ -253,7 +351,14 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
   }
 
   function goToPreviousStep() {
-    clearServerError();
+    clearConfirmationError();
+
+    if (isConfirmationPhase) {
+      pendingFocusRef.current = "coordinator.email";
+      setConfirmationEmail(null);
+      setStepIndex(0);
+      return;
+    }
 
     if (isFirstStep) {
       onBack();
@@ -263,7 +368,7 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
     setStepIndex((current) => current - 1);
   }
 
-  const backLabel = isFirstStep ? "Voltar para o login" : "Voltar";
+  const backLabel = resolveBackLabel(isConfirmationPhase, isFirstStep);
 
   return (
     <FormProvider {...form}>
@@ -273,70 +378,96 @@ export function SignupFlow({ onBack, onSubmitted }: SignupFlowProps) {
             <ArrowLeft size={16} strokeWidth={2} aria-hidden />
             {backLabel}
           </button>
-          <span className={styles.counter}>
-            Etapa {stepIndex + 1} de {SIGNUP_STEP_COUNT}
-          </span>
+          {!isConfirmationPhase && (
+            <span className={styles.counter}>
+              Etapa {stepIndex + 1} de {SIGNUP_STEP_COUNT}
+            </span>
+          )}
         </div>
 
-        <ol className={styles.progress} aria-hidden>
-          {SIGNUP_STEPS.map((item, index) => (
-            <li key={item.title} className={styles.track}>
-              <span className={styles.fill} data-state={resolveSegmentState(index, stepIndex)} />
-            </li>
-          ))}
-        </ol>
+        {!isConfirmationPhase && (
+          <ol className={styles.progress} aria-hidden>
+            {SIGNUP_STEPS.map((item, index) => (
+              <li key={item.title} className={styles.track}>
+                <span className={styles.fill} data-state={resolveSegmentState(index, stepIndex)} />
+              </li>
+            ))}
+          </ol>
+        )}
 
-        <form
-          className={styles.form}
-          onSubmit={(event) => {
-            event.preventDefault();
-            void goToNextStep();
-          }}
-          noValidate
-        >
-          {/*
-           * `key` por etapa em cabeçalho e campos: sem ela o React reaproveita
-           * os nós, e a animação de troca não roda porque nada remontou.
-           */}
-          <header key={`header-${stepIndex}`} className={styles.header}>
-            <h2 id="signup-title" className={styles.title}>
-              {step.title}
-            </h2>
-            <p className={styles.subtitle}>{step.subtitle}</p>
-          </header>
+        {isConfirmationPhase && (
+          <SignupStepConfirmation
+            email={confirmationEmail}
+            serverError={serverError}
+            isServerCodeInvalid={isServerCodeInvalid}
+            isServerCodeExpired={isServerCodeExpired}
+            isConfirming={isConfirming || isRedirecting}
+            isResending={isResending}
+            onClearError={clearConfirmationError}
+            onConfirm={handleConfirmCode}
+            onResend={handleResendCode}
+          />
+        )}
 
-          {serverError && (
-            <p key={serverError} className={styles.error} role="alert">
-              <CircleAlert size={17} strokeWidth={2} aria-hidden />
-              {serverError}
-            </p>
-          )}
+        {!isConfirmationPhase && (
+          <form
+            className={styles.form}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void goToNextStep();
+            }}
+            noValidate
+          >
+            {/*
+             * `key` por etapa em cabeçalho e campos: sem ela o React reaproveita
+             * os nós, e a animação de troca não roda porque nada remontou.
+             */}
+            <header key={`header-${stepIndex}`} className={styles.header}>
+              <h2 id="signup-title" className={styles.title}>
+                {step.title}
+              </h2>
+              <p className={styles.subtitle}>{step.subtitle}</p>
+            </header>
 
-          <div key={`step-${stepIndex}`} className={styles.step}>
-            {isCoordinatorStep && <SignupStepCoordinator />}
-            {isCircuitStep && <SignupStepCircuit />}
-            {isCongregationsStep && <SignupStepCongregations />}
-          </div>
+            {serverError && (
+              <p key={serverError} className={styles.error} role="alert">
+                <CircleAlert size={17} strokeWidth={2} aria-hidden />
+                {serverError}
+              </p>
+            )}
 
-          <button type="submit" className={styles.submit} disabled={isBusy}>
-            {isBusy && <Spinner className={styles.spinner} size="small" />}
-            {isBusy ? step.busyCta : step.cta}
-          </button>
+            <div key={`step-${stepIndex}`} className={styles.step}>
+              {isCoordinatorStep && <SignupStepCoordinator />}
+              {isCircuitStep && <SignupStepCircuit />}
+              {isCongregationsStep && <SignupStepCongregations />}
+            </div>
 
-          {isCongregationsStep && (
-            <button
-              type="button"
-              className={styles.skip}
-              onClick={() => void goToNextStep({ onlyOwnCongregation: true })}
-              disabled={isBusy}
-            >
-              Adicionar as outras depois
+            <button type="submit" className={styles.submit} disabled={isBusy}>
+              {isBusy && <Spinner className={styles.spinner} size="small" />}
+              {isBusy ? step.busyCta : step.cta}
             </button>
-          )}
-        </form>
+
+            {isCongregationsStep && (
+              <button
+                type="button"
+                className={styles.skip}
+                onClick={() => void goToNextStep({ onlyOwnCongregation: true })}
+                disabled={isBusy}
+              >
+                Adicionar as outras depois
+              </button>
+            )}
+          </form>
+        )}
       </section>
     </FormProvider>
   );
+}
+
+function resolveBackLabel(isConfirmationPhase: boolean, isFirstStep: boolean): string {
+  if (isConfirmationPhase) return "Corrigir e-mail";
+  if (isFirstStep) return "Voltar para o login";
+  return "Voltar";
 }
 
 /**
