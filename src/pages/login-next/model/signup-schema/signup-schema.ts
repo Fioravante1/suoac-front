@@ -232,3 +232,41 @@ export function dropBlankCongregations(congregations: readonly CongregationRow[]
     (congregation, index) => index === 0 || congregation.name.trim() !== "" || congregation.code.trim() !== "",
   );
 }
+
+export interface SignupSummaryRow {
+  label: string;
+  value: string;
+}
+
+export interface SignupSummary {
+  circuitName: string;
+  rows: readonly SignupSummaryRow[];
+}
+
+/**
+ * Monta o resumo exibido na etapa final de sucesso do autocadastro (SUC-33),
+ * normalizando os valores do formulário no mesmo formato persistido pela API.
+ */
+export function buildSignupSummary(values: SignupFormValues): SignupSummary {
+  const coordinatorName = values.coordinator.name.trim();
+  const circuitName = values.circuit.name.trim().toUpperCase();
+  const circuitCity = values.circuit.city.trim();
+  const circuitState = values.circuit.state.trim().toUpperCase();
+
+  const filledCongregations = dropBlankCongregations(values.congregations);
+  const ownCongregation = filledCongregations[0] ?? { name: "", code: "" };
+  const ownCongregationLabel = `${ownCongregation.name.trim()} · ${ownCongregation.code.trim().toUpperCase()}`;
+  const congregationCount = filledCongregations.length;
+  const congregationCountLabel = `${congregationCount} ${congregationCount === 1 ? "cadastrada" : "cadastradas"}`;
+
+  return {
+    circuitName,
+    rows: [
+      { label: "Coordenador", value: coordinatorName },
+      { label: "Circuito", value: `${circuitName} · ${circuitCity}/${circuitState}` },
+      { label: "Sua congregação", value: ownCongregationLabel },
+      { label: "Congregações", value: congregationCountLabel },
+      { label: "Próximo passo", value: "Criar o primeiro evento" },
+    ],
+  };
+}

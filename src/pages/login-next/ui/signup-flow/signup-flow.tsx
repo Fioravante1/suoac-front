@@ -15,16 +15,19 @@ import { SignupStepCircuit } from "../signup-step-circuit";
 import { SignupStepConfirmation } from "../signup-step-confirmation";
 import { SignupStepCongregations } from "../signup-step-congregations";
 import { SignupStepCoordinator } from "../signup-step-coordinator";
+import { SignupStepSuccess } from "../signup-step-success";
 
 import {
   SIGNUP_STEPS,
   SIGNUP_STEP_COUNT,
+  buildSignupSummary,
   dropBlankCongregations,
   isSignupFieldPath,
   resolveSignupFieldStep,
   signupDefaultValues,
   signupSchema,
   type SignupFormValues,
+  type SignupSummary,
 } from "../../model";
 
 import styles from "./signup-flow.module.css";
@@ -59,6 +62,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
    */
   const [stepIndex, setStepIndex] = useState(0);
   const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
+  const [completedSummary, setCompletedSummary] = useState<SignupSummary | null>(null);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -99,7 +103,9 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
    * para travar os botões nem para acender o rótulo de ocupado.
    */
   const isBusy = isSubmitting || isAdvancing || isConfirming || isResending || isRedirecting;
-  const isConfirmationPhase = confirmationEmail !== null;
+  const isSuccessPhase = completedSummary !== null;
+  const isConfirmationPhase = !isSuccessPhase && confirmationEmail !== null;
+  const isFormPhase = !isSuccessPhase && !isConfirmationPhase;
 
   const step = SIGNUP_STEPS[stepIndex];
   const isFirstStep = stepIndex === 0;
@@ -117,9 +123,12 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
    * Recarregar ou fechar a aba com dados preenchidos perde tudo. O navegador
    * não deixa escolher o texto do diálogo, mas deixa pedir a confirmação — é a
    * diferença entre perder o cadastro sem aviso e ser avisado.
+   *
+   * Consolidado o cadastro (`isSuccessPhase`), tudo já está salvo no servidor e
+   * sair da aba não perde nada.
    */
   useEffect(() => {
-    if (!isDirty || isRedirecting) {
+    if (!isDirty || isSuccessPhase || isRedirecting) {
       return;
     }
 
@@ -131,7 +140,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
     window.addEventListener("beforeunload", warnBeforeLeaving);
 
     return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
-  }, [isDirty, isRedirecting]);
+  }, [isDirty, isSuccessPhase, isRedirecting]);
 
   /*
    * Foco no primeiro campo em conflito (ou no e-mail ao clicar em "Corrigir
@@ -139,7 +148,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
    * existe depois que a etapa monta, então o foco espera a troca.
    */
   useEffect(() => {
-    if (isConfirmationPhase) {
+    if (!isFormPhase) {
       return;
     }
 
@@ -151,7 +160,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
 
     pendingFocusRef.current = null;
     setFocus(field);
-  }, [stepIndex, isConfirmationPhase, setFocus]);
+  }, [stepIndex, isFormPhase, setFocus]);
 
   if (!step) {
     return null;
@@ -278,8 +287,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
       const result = await confirmCircuitSignupAction({ email: confirmationEmail, code });
 
       if (result.status === "success") {
-        setIsRedirecting(true);
-        router.push(routes.dashboard);
+        setCompletedSummary(buildSignupSummary(getValues()));
         return;
       }
 
@@ -312,6 +320,15 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
     }
   }
 
+  function handleEnterDashboard() {
+    if (isRedirecting) {
+      return;
+    }
+
+    setIsRedirecting(true);
+    router.push(routes.dashboard);
+  }
+
   /**
    * Conflito de campo vira erro no próprio campo, e o fluxo volta para a etapa
    * que tem o primeiro deles — o usuário corrige onde o erro está, e não numa
@@ -341,7 +358,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
       return;
     }
 
-    if (targetStep === stepIndex && !isConfirmationPhase) {
+    if (targetStep === stepIndex && isFormPhase) {
       setFocus(first.field);
       return;
     }
@@ -373,19 +390,21 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
   return (
     <FormProvider {...form}>
       <section className={styles.screen} aria-labelledby="signup-title">
-        <div className={styles.topbar}>
-          <button type="button" className={styles.back} onClick={goToPreviousStep} disabled={isBusy}>
-            <ArrowLeft size={16} strokeWidth={2} aria-hidden />
-            {backLabel}
-          </button>
-          {!isConfirmationPhase && (
-            <span className={styles.counter}>
-              Etapa {stepIndex + 1} de {SIGNUP_STEP_COUNT}
-            </span>
-          )}
-        </div>
+        {!isSuccessPhase && (
+          <div className={styles.topbar}>
+            <button type="button" className={styles.back} onClick={goToPreviousStep} disabled={isBusy}>
+              <ArrowLeft size={16} strokeWidth={2} aria-hidden />
+              {backLabel}
+            </button>
+            {isFormPhase && (
+              <span className={styles.counter}>
+                Etapa {stepIndex + 1} de {SIGNUP_STEP_COUNT}
+              </span>
+            )}
+          </div>
+        )}
 
-        {!isConfirmationPhase && (
+        {isFormPhase && (
           <ol className={styles.progress} aria-hidden>
             {SIGNUP_STEPS.map((item, index) => (
               <li key={item.title} className={styles.track}>
@@ -395,13 +414,21 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
           </ol>
         )}
 
+        {isSuccessPhase && (
+          <SignupStepSuccess
+            summary={completedSummary}
+            isEnteringDashboard={isRedirecting}
+            onEnterDashboard={handleEnterDashboard}
+          />
+        )}
+
         {isConfirmationPhase && (
           <SignupStepConfirmation
             email={confirmationEmail}
             serverError={serverError}
             isServerCodeInvalid={isServerCodeInvalid}
             isServerCodeExpired={isServerCodeExpired}
-            isConfirming={isConfirming || isRedirecting}
+            isConfirming={isConfirming}
             isResending={isResending}
             onClearError={clearConfirmationError}
             onConfirm={handleConfirmCode}
@@ -409,7 +436,7 @@ export function SignupFlow({ onBack }: SignupFlowProps) {
           />
         )}
 
-        {!isConfirmationPhase && (
+        {isFormPhase && (
           <form
             className={styles.form}
             onSubmit={(event) => {
