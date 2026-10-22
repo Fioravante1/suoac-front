@@ -22,7 +22,7 @@ e os arquivos de `.claude/rules/` correspondentes aos caminhos listados nas tabe
 
 - **Runtime**: Node.js `v24.x`
 - **Package manager**: Yarn `v1.x` (`yarn.lock` e a fonte de verdade)
-- **Framework**: Next.js `16.2.6` com App Router
+- **Framework**: Next.js `16.4.2` com App Router
 - **React**: `19.2.4`
 - **Linguagem**: TypeScript com `strict: true`
 - **Server state**: TanStack Query `@tanstack/react-query`
