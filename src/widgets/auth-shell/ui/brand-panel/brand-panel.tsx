@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { BrandPanelFrame } from "../brand-panel-frame";
 import { JourneyTimeline } from "../journey-timeline";
 
 import styles from "./brand-panel.module.css";
@@ -13,26 +14,21 @@ import styles from "./brand-panel.module.css";
  */
 export function BrandPanel() {
   return (
-    <aside className={styles.panel}>
-      <span className={styles.ringOuter} aria-hidden />
-      <span className={styles.ringInner} aria-hidden />
-
-      <div className={styles.content}>
-        <div className={styles.brand}>
-          {/* O nome ao lado ja identifica a marca; a imagem e decorativa. */}
-          <Image src="/logo-mark-dark.png" alt="" width={42} height={42} className={styles.logo} priority />
-          <span className={styles.wordmark}>SUOAC</span>
-        </div>
-
-        <div className={styles.copy}>
-          <h1 className={styles.headline}>Coordenação inteligente para o arranjo de ônibus.</h1>
-          <p className={styles.tagline}>
-            Mais que um sistema, uma ferramenta para pensar, coordenar e organizar cada viagem.
-          </p>
-        </div>
-
-        <JourneyTimeline className={styles.journey} />
+    <BrandPanelFrame>
+      <div className={styles.brand}>
+        {/* O nome ao lado ja identifica a marca; a imagem e decorativa. */}
+        <Image src="/logo-mark-dark.png" alt="" width={42} height={42} className={styles.logo} priority />
+        <span className={styles.wordmark}>SUOAC</span>
       </div>
-    </aside>
+
+      <div className={styles.copy}>
+        <h1 className={styles.headline}>Coordenação inteligente para o arranjo de ônibus.</h1>
+        <p className={styles.tagline}>
+          Mais que um sistema, uma ferramenta para pensar, coordenar e organizar cada viagem.
+        </p>
+      </div>
+
+      <JourneyTimeline className={styles.journey} />
+    </BrandPanelFrame>
   );
 }

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getInitials, getGreetingByTime, pluralize } from "./string";
+import { getFirstName, getInitials, getGreetingByTime, pluralize } from "./string";
 
 describe("pluralize", () => {
   it("retorna singular quando count e 1", () => {
@@ -76,5 +76,23 @@ describe("getGreetingByTime", () => {
     vi.setSystemTime(new Date(2025, 0, 1, 12, 0, 0));
 
     expect(getGreetingByTime()).toBe("Boa tarde");
+  });
+});
+
+describe("getFirstName", () => {
+  it("devolve o primeiro nome de um nome completo", () => {
+    expect(getFirstName("Marcos Oliveira")).toBe("Marcos");
+  });
+
+  it("ignora espaços nas pontas e repetidos", () => {
+    expect(getFirstName("  Ana   Beatriz Souza ")).toBe("Ana");
+  });
+
+  it("devolve o próprio nome quando há só um", () => {
+    expect(getFirstName("Rafael")).toBe("Rafael");
+  });
+
+  it("devolve vazio para nome em branco", () => {
+    expect(getFirstName("   ")).toBe("");
   });
 });

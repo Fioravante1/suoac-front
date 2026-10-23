@@ -101,3 +101,35 @@ export function isCompletePhone(value: string): boolean {
 
   return digits >= LANDLINE_DIGITS && digits <= MOBILE_DIGITS;
 }
+
+/** Teclas que apagam um caractere e que a mascara precisa estender sobre os separadores. */
+export type PhoneDeletionKey = "Backspace" | "Delete";
+
+export function isPhoneDeletionKey(key: string): key is PhoneDeletionKey {
+  return key === "Backspace" || key === "Delete";
+}
+
+/**
+ * Trecho que `Backspace` ou `Delete` deve apagar, com o cursor em `caret`,
+ * incluindo o digito vizinho quando o que esta ao lado e um separador.
+ *
+ * Sem isto, apagar sobre o hifen so move o cursor: a mascara o recoloca no
+ * lugar, e quem digita sente o campo travado. Devolve `[inicio, fim]`, para
+ * virar a selecao antes de a exclusao nativa acontecer.
+ */
+export function phoneDeletionRange(value: string, caret: number, key: PhoneDeletionKey): [number, number] {
+  if (key === "Backspace") {
+    // O ultimo digito antes do cursor; sem nenhum, a exclusao vai ate o inicio.
+    const previousDigit = value.slice(0, caret).search(/\d\D*$/);
+
+    return [Math.max(previousDigit, 0), caret];
+  }
+
+  const nextDigit = value.slice(caret).search(/\d/);
+
+  if (nextDigit === -1) {
+    return [caret, value.length];
+  }
+
+  return [caret, caret + nextDigit + 1];
+}

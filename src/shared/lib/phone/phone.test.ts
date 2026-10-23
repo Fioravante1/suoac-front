@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { formatPhone, formatPhoneInput, isCompletePhone, phoneDigits } from "./phone";
+import {
+  formatPhone,
+  formatPhoneInput,
+  isCompletePhone,
+  isPhoneDeletionKey,
+  phoneDeletionRange,
+  phoneDigits,
+} from "./phone";
 
 describe("formatPhone", () => {
   it("deve formatar um celular completo", () => {
@@ -99,5 +106,56 @@ describe("isCompletePhone", () => {
     ["", false],
   ])("deve dizer se %s está completo", (value, expected) => {
     expect(isCompletePhone(value)).toBe(expected);
+  });
+});
+
+describe("isPhoneDeletionKey", () => {
+  it.each(["Backspace", "Delete"])("reconhece %s", (key) => {
+    expect(isPhoneDeletionKey(key)).toBe(true);
+  });
+
+  it.each(["Enter", "a", "ArrowLeft", ""])("ignora %s", (key) => {
+    expect(isPhoneDeletionKey(key)).toBe(false);
+  });
+});
+
+describe("phoneDeletionRange", () => {
+  // "(19) 99654-3210": o hifen esta na posicao 10, e o espaco na 4.
+
+  it("apaga so o caractere anterior quando ele é um dígito", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 15, "Backspace")).toEqual([14, 15]);
+  });
+
+  it("com Backspace logo depois do hífen, leva o dígito antes dele", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 11, "Backspace")).toEqual([9, 11]);
+  });
+
+  it("com Backspace logo depois do espaço, leva o dígito antes dele", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 5, "Backspace")).toEqual([2, 5]);
+  });
+
+  it("com Backspace sem nenhum dígito antes do cursor, vai até o início", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 1, "Backspace")).toEqual([0, 1]);
+  });
+
+  it("apaga só o caractere seguinte com Delete quando ele é um dígito", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 6, "Delete")).toEqual([6, 7]);
+  });
+
+  it("com Delete logo antes do hífen, leva o dígito depois dele", () => {
+    expect(phoneDeletionRange("(19) 99654-3210", 10, "Delete")).toEqual([10, 12]);
+  });
+
+  it("com Delete sem nenhum dígito depois do cursor, vai até o fim", () => {
+    expect(phoneDeletionRange("(19) 99654-", 11, "Delete")).toEqual([11, 11]);
+  });
+
+  it("com Delete sobre os separadores finais, vai até o fim do texto", () => {
+    expect(phoneDeletionRange("(19) ", 4, "Delete")).toEqual([4, 5]);
+  });
+
+  it("trata campo vazio sem estourar", () => {
+    expect(phoneDeletionRange("", 0, "Backspace")).toEqual([0, 0]);
+    expect(phoneDeletionRange("", 0, "Delete")).toEqual([0, 0]);
   });
 });

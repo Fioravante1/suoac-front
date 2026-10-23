@@ -609,7 +609,7 @@ button{font-family:inherit}
 <span style="width:56px;height:56px;border-radius:16px;background:{{ cg.sel.avBg }};color:{{ cg.sel.avFg }};display:grid;place-items:center;font:600 19px Geist;flex-shrink:0">{{ cg.sel.ini }}</span>
 <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
 <div style="display:flex;align-items:center;gap:10px"><span style="font:600 24px/1.15 Geist;letter-spacing:-0.015em">{{ cg.sel.name }}</span><span style="padding:3px 10px;border-radius:999px;font:500 12px Geist;background:{{ cg.sel.sBg }};color:{{ cg.sel.sFg }}">{{ cg.sel.status }}</span><span style="padding:3px 8px;border-radius:7px;font:500 12px Geist;background:var(--muted);color:var(--text2);font-variant-numeric:tabular-nums">Cód. {{ cg.sel.code }}</span></div>
-<span style="display:flex;align-items:center;gap:8px;font:400 14px Geist;color:var(--text2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Coordenador: {{ cg.sel.resp }} · {{ cg.sel.phone }}</span>
+<span style="display:flex;align-items:center;gap:8px;font:400 14px Geist;color:var(--text2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Coord. do arranjo de ônibus: {{ cg.sel.resp }} · {{ cg.sel.phone }}</span>
 <sc-if value="{{ cg.sel.hasAsst }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px;font:400 14px Geist;color:var(--text2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Assistente: {{ cg.sel.asst }}{{ cg.sel.asstPhone }}</span></sc-if>
 <span style="font:400 13px Geist;color:{{ cg.sel.noteC }}">{{ cg.sel.note }}</span>
 </div>
@@ -1082,29 +1082,13 @@ button{font-family:inherit}
 <label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Coordenador do arranjo de ônibus na congregação</span><input value="{{ nc.resp }}" onChange="{{ nc.onResp }}" placeholder="Nome completo" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary)"></label>
 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px">
 <label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Celular (WhatsApp)</span><input value="{{ nc.phone }}" onChange="{{ nc.onPhone }}" inputMode="tel" placeholder="(19) 99999-9999" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;font-variant-numeric:tabular-nums" style-focus="border-color:var(--primary)"></label>
-<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">E-mail do coordenador</span><input value="{{ nc.email }}" onChange="{{ nc.onEmail }}" inputMode="email" placeholder="nome@exemplo.com" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">E-mail do coordenador do arranjo</span><input value="{{ nc.email }}" onChange="{{ nc.onEmail }}" inputMode="email" placeholder="nome@exemplo.com" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary)"></label>
 </div>
 
-<sc-if value="{{ nc.noAsst }}" hint-placeholder-val="{{ true }}">
-<button onClick="{{ nc.addAsst }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 8px;border:1px dashed var(--border2);border-radius:10px;background:transparent;color:var(--primary);font:500 14px Geist;cursor:pointer;transition:all .2s" style-hover="border-color:var(--primary);background:var(--primary-s)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>Adicionar assistente<span style="font:400 13px Geist;color:var(--text2)">opcional</span></button>
-</sc-if>
-<sc-if value="{{ nc.hasAsst }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:14px;background:var(--bg);border:1px solid var(--border);animation:rise .25s cubic-bezier(.2,.8,.2,1) both">
-<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:baseline;gap:8px"><span style="font:600 14px Geist">Assistente</span><span style="font:400 13px Geist;color:var(--text2)">opcional</span></span><button onClick="{{ nc.removeAsst }}" style="height:28px;padding:0 8px;border:0;border-radius:7px;background:transparent;color:var(--text2);font:500 13px Geist;cursor:pointer" style-hover="background:var(--muted);color:var(--crit)">Remover</button></div>
-<input ref="{{ ncAsstRef }}" value="{{ nc.asst }}" onChange="{{ nc.onAsst }}" placeholder="Nome do assistente" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary)">
-<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px">
-<input value="{{ nc.asstPhone }}" onChange="{{ nc.onAsstPhone }}" inputMode="tel" placeholder="Celular (WhatsApp)" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;font-variant-numeric:tabular-nums" style-focus="border-color:var(--primary)">
-<input value="{{ nc.asstEmail }}" onChange="{{ nc.onAsstEmail }}" inputMode="email" placeholder="E-mail do assistente" style="width:100%;box-sizing:border-box;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary)">
-</div>
-<button onClick="{{ nc.toggleAsstInv }}" style="display:flex;align-items:center;gap:10px;padding:2px 0;border:0;background:transparent;color:var(--text);text-align:left;cursor:pointer">
-<span style="width:18px;height:18px;border-radius:5px;background:{{ nc.aInvChk }};box-shadow:{{ nc.aInvRing }};display:grid;place-items:center;flex-shrink:0;transition:all .2s"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ nc.aInvOp }}"><path d="M20 6 9 17l-5-5"></path></svg></span>
-<span style="font:500 14px Geist">Enviar convite de acesso ao assistente</span>
-</button>
-</div>
-</sc-if>
+<div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;background:var(--muted);font:400 13px/1.45 Geist;color:var(--text2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg><span>O assistente é escolhido pelo coordenador do arranjo de ônibus na congregação, depois que ele aceitar o convite.</span></div>
 <button onClick="{{ nc.toggleInvite }}" style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:1.5px solid {{ nc.invBd }};border-radius:14px;background:{{ nc.invBg }};color:var(--text);text-align:left;cursor:pointer;transition:all .2s">
 <span style="width:20px;height:20px;margin-top:1px;border-radius:6px;background:{{ nc.invChk }};box-shadow:{{ nc.invRing }};display:grid;place-items:center;flex-shrink:0;transition:all .2s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ nc.invOp }}"><path d="M20 6 9 17l-5-5"></path></svg></span>
-<span style="display:flex;flex-direction:column;gap:3px"><span style="font:600 14px Geist">Enviar convite de acesso ao coordenador</span><span style="font:400 13px/1.45 Geist;color:var(--text2)">{{ nc.inviteTxt }}</span></span>
+<span style="display:flex;flex-direction:column;gap:3px"><span style="font:600 14px Geist">Enviar convite de acesso ao coordenador do arranjo</span><span style="font:400 13px/1.45 Geist;color:var(--text2)">{{ nc.inviteTxt }}</span></span>
 </button>
 </div>
 <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 28px;border-top:1px solid var(--border);background:var(--bg)">
@@ -2067,7 +2051,7 @@ class Component extends DCLogic {
         const P = FT.P, brl = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
         const TYPES = [
           ['embarque', 'Lista de embarque', 'Por ônibus e dia, com poltrona', 'M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3M7 18h0M16 18h0'],
-          ['cong', 'Lista da congregação', 'Para o coordenador local conferir', 'M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5'],
+          ['cong', 'Lista da congregação', 'Para o coordenador do arranjo na congregação conferir', 'M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5'],
           ['aberto', 'Pagamentos em aberto', 'Quem ainda deve e quanto', 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],
           ['fin', 'Relatório financeiro', 'Resumo por congregação', 'M3 3v18h18M7 15l4-4 3 3 6-6'],
           ['etiquetas', 'Etiquetas de poltrona', 'Para colar nos assentos', 'M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8zM7 7h.01'],
@@ -2079,7 +2063,7 @@ class Component extends DCLogic {
         const SDn = ['Sexta', 'Sábado', 'Domingo'], SD = ['Sex', 'Sáb', 'Dom'];
         const swap = patch => this.setState(p => ({ ...patch, lxPar: !p.lxPar }));
         const PB = { Pago: '#2e9e5b', Parcial: '#8a6d00', Pendente: '#d64545', Isento: '#2f6fed' };
-        let doc = { pages: 1 }, isTable = true, isLabels = false, waLines = [], waTo = 'Grupo dos coordenadores', waSub = 'Circuito SP-17';
+        let doc = { pages: 1 }, isTable = true, isLabels = false, waLines = [], waTo = 'Coordenadores do arranjo de ônibus', waSub = 'Circuito SP-17';
         const L = (al, t, w, c) => ({ al: al || 'left', t: String(t), w: w || 400, c: c || '#1e1f24' });
         if (type === 'embarque' || type === 'etiquetas') {
           const riders = P.filter(x => x.legs[di] && x.legs[di].bus === bi).sort((a, b) => a.legs[di].seat - b.legs[di].seat);
@@ -2099,7 +2083,7 @@ class Component extends DCLogic {
             : [L('left', x.name, 500), L('left', x.cong, 400, '#475467'), L('left', x.status, 600, PB[x.status]), L('right', brl(x.total - x.paid), 600, '#d64545')] }));
           const sum = list.reduce((a, x) => a + x.total - x.paid, 0);
           doc = { title: type === 'cong' ? 'Lista da congregação' : 'Pagamentos em aberto', sub: type === 'cong' || s.lxCong ? cong : 'Todas as congregações', meta: list.length + ' passageiros' + (type === 'aberto' ? ' · ' + brl(sum) + ' em aberto' : ''), head, cols: colT, rows, more: list.length > 22 ? '+ ' + (list.length - 22) + ' na continuação' : 'Fim da lista', pages: Math.max(1, Math.ceil(list.length / 22)) };
-          waTo = type === 'cong' || s.lxCong ? 'Coord. ' + cong : 'Grupo dos coordenadores'; waSub = type === 'cong' || s.lxCong ? 'Congregação ' + cong : 'Circuito SP-17';
+          waTo = type === 'cong' || s.lxCong ? 'Coord. arranjo · ' + cong : 'Coordenadores do arranjo de ônibus'; waSub = type === 'cong' || s.lxCong ? 'Congregação ' + cong : 'Circuito SP-17';
           waLines = type === 'aberto' ? ['*Pagamentos em aberto' + (s.lxCong ? ' · ' + cong : '') + '*', 'Prazo: 19/10', ''].concat(list.slice(0, 10).map(x => '• ' + x.name + ' — ' + brl(x.total - x.paid))).concat(list.length > 10 ? ['… e mais ' + (list.length - 10)] : [], ['', 'Total: ' + brl(sum)]) : ['*Lista · ' + cong + '*', list.length + ' passageiros', ''].concat(list.slice(0, 12).map((x, k) => (k + 1) + '. ' + x.name)).concat(list.length > 12 ? ['… e mais ' + (list.length - 12)] : []);
         } else if (type === 'fin') {
           const rows = d.congs.filter(c => c.n).map((c, k) => { const ps = P.filter(x => x.cong === c.name), e = ps.reduce((a, x) => a + x.total, 0), r = ps.reduce((a, x) => a + x.paid, 0); return { bg: k % 2 ? '#fafbfa' : '#fff', cells: [L('left', c.name, 500), L('right', c.n, 400, '#475467'), L('right', brl(e), 400, '#475467'), L('right', brl(r), 600, '#2e9e5b'), L('right', brl(e - r), 600, e - r ? '#d64545' : '#475467')] }; });

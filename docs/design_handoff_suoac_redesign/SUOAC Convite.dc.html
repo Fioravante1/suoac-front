@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0d2b45;font-family:Geist,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1f6e5a;text-decoration:none}a:hover{color:#174e40}
+button,input{font-family:inherit}
+[data-art]{--succ:#2e9e5b;--succ-s:#e7f6ee;--attn:#f5b700;--attn-t:#8a6d00;--bg:#f7f9f8;--surface:#fff;--muted:#f1f5f3;--border:#e3e8e6;--border2:#cfd8d4;--text:#1e1f24;--text2:#667085;--primary:#1f6e5a;--primary-d:#174e40;--primary-s:#e6f4ef;--crit:#d64545;--crit-s:#fdecec;--on-primary:#fff}
+[data-art][data-theme="dark"]{--succ:#4cc07c;--succ-s:#163121;--attn:#f2c14b;--attn-t:#f2c14b;--bg:#0e1413;--surface:#151d1b;--muted:#1c2623;--border:#25312e;--border2:#34433f;--text:#e9efed;--text2:#9aa8a3;--primary:#4fb393;--primary-d:#7fcfb4;--primary-s:#183229;--crit:#f07272;--crit-s:#3a1d1d;--on-primary:#0e1413}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@keyframes swap{from{opacity:0;transform:translateX(16px)}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.8) rotate(-12deg)}60%{opacity:1;transform:scale(.94) rotate(-4deg)}100%{transform:scale(1) rotate(-4deg)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgb(242 193 75/.55)}70%{box-shadow:0 0 0 10px rgb(242 193 75/0)}100%{box-shadow:0 0 0 0 rgb(242 193 75/0)}}
+</style>
+</helmet>
+<div data-art="1" data-theme="{{ theme }}" style="min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(480px,1fr);background:var(--bg);color:var(--text);font-family:Geist,sans-serif;transition:background-color .3s,color .3s">
+
+<div style="position:relative;display:flex;align-items:center;justify-content:center;padding:56px;background:#0d2b45;background-image:radial-gradient(rgb(255 255 255/.06) 1px,transparent 1px);background-size:22px 22px;color:#fff;overflow:hidden">
+<div style="position:absolute;right:-200px;top:-200px;width:560px;height:560px;border-radius:50%;border:1px solid rgb(255 255 255/.06)"></div>
+<div style="position:absolute;right:-90px;top:-90px;width:340px;height:340px;border-radius:50%;border:1px solid rgb(255 255 255/.05)"></div>
+<div style="position:relative;width:100%;max-width:460px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;align-items:center;gap:12px;animation:rise .6s ease both">
+<img src="assets/logo-mark-dark.png" alt="SUOAC" style="width:42px;height:42px;border-radius:12px">
+<span style="font:700 22px Geist;letter-spacing:.06em">SUOAC</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;animation:rise .6s .08s ease both">
+<span style="font:600 12px Geist;letter-spacing:.12em;text-transform:uppercase;color:#7fcfb4">Convite</span>
+<h1 style="margin:0;font:600 38px/1.15 Geist;font-size:clamp(28px,2.8vw,38px);letter-spacing:-0.025em;text-wrap:balance">{{ inv.inviter }} convidou você para o arranjo de ônibus.</h1>
+</div>
+
+<div style="position:relative;display:flex;flex-direction:column;border-radius:22px;background:rgb(255 255 255/.05);box-shadow:inset 0 0 0 1px rgb(255 255 255/.1);overflow:hidden;animation:rise .6s .16s ease both">
+<div style="display:flex;flex-direction:column;gap:6px;padding:22px 24px 20px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font:500 12px Geist;letter-spacing:.08em;text-transform:uppercase;color:rgb(255 255 255/.5)">Privilégio</span><span style="flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:{{ inv.badgeBg }};color:{{ inv.badgeFg }};font:600 12px Geist;letter-spacing:.02em;box-shadow:{{ inv.badgeRing }};animation:{{ inv.badgeAnim }}"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;animation:{{ inv.dotAnim }}"></span>{{ inv.badge }}</span></div>
+<span style="font:600 19px/1.35 Geist;text-wrap:balance">{{ inv.role }}</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px dashed rgb(255 255 255/.16)">
+<div style="display:flex;flex-direction:column;gap:4px;padding:16px 24px;border-right:1px dashed rgb(255 255 255/.16)"><span style="font:500 12px Geist;color:rgb(255 255 255/.5)">Congregação</span><span style="font:600 16px Geist">{{ inv.cong }}</span><span style="font:400 13px Geist;color:rgb(255 255 255/.6);font-variant-numeric:tabular-nums">Código {{ inv.code }}</span></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:16px 24px"><span style="font:500 12px Geist;color:rgb(255 255 255/.5)">Circuito</span><span style="font:600 16px Geist">{{ inv.circ }}</span><span style="font:400 13px Geist;color:rgb(255 255 255/.6)">{{ inv.city }}</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:16px 24px;border-top:1px dashed rgb(255 255 255/.16);background:rgb(0 0 0/.12)">
+<span style="width:38px;height:38px;border-radius:50%;background:#4fb393;color:#0a1a29;display:grid;place-items:center;font:700 13px Geist;flex-shrink:0">MO</span>
+<span style="display:flex;flex-direction:column;gap:1px;min-width:0;flex:1"><span style="font:500 14px Geist">Enviado por {{ inv.inviterFull }}</span><span style="font:400 12px Geist;color:rgb(255 255 255/.55)">Coordenador do arranjo de ônibus no circuito</span></span>
+</div>
+
+
+</div>
+<span style="font:400 13px Geist;color:rgb(255 255 255/.5);animation:rise .6s .24s ease both">{{ inv.validity }}</span>
+</div>
+</div>
+
+<div style="position:relative;display:flex;flex-direction:column;padding:32px 40px">
+<div style="display:flex;justify-content:flex-end">
+<button onClick="{{ toggleTheme }}" title="Alternar tema" style="width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="border-color:var(--border2)">
+<sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+<sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+</button>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 0">
+<div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:24px">
+
+<sc-if value="{{ isForm }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:center;min-height:34px">
+<sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;border:0;border-radius:9px;background:transparent;color:var(--text2);font:500 14px Geist;cursor:pointer" style-hover="background:var(--muted);color:var(--text)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Voltar</button></sc-if>
+<span style="margin-left:auto;font:500 13px Geist;color:var(--text2);font-variant-numeric:tabular-nums;white-space:nowrap">Etapa {{ step }} de 2</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"><sc-for list="{{ bars }}" as="b" hint-placeholder-count="2"><span style="height:4px;border-radius:999px;background:var(--border);overflow:hidden"><span style="display:block;height:100%;width:{{ b.w }};background:var(--primary);transition:width .4s cubic-bezier(.2,.8,.2,1)"></span></span></sc-for></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 30px/1.15 Geist;letter-spacing:-0.025em">{{ title }}</h2><span style="font:400 15px/1.5 Geist;color:var(--text2);text-wrap:pretty">{{ sub }}</span></div>
+<sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}"><div style="padding:11px 14px;border-radius:12px;background:var(--crit-s);color:var(--crit);font:500 14px Geist;animation:shake .4s ease both">{{ err }}</div></sc-if>
+
+<sc-if value="{{ isS1 }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:16px;animation:swap .3s ease both">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Nome completo</span><input value="{{ f.nome }}" onChange="{{ on.nome }}" onKeyDown="{{ onKey }}" placeholder="Seu nome" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid {{ bd.nome }};border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">E-mail</span>
+<div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:13px;background:var(--muted);color:var(--text)">
+<span style="flex:1;min-width:0;font:400 15px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ inv.email }}</span>
+<span style="display:flex;align-items:center;gap:5px;font:500 12px Geist;color:var(--succ);white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Verificado pelo convite</span>
+</div>
+<span style="font:400 12px Geist;color:var(--text2)">Será seu login. Para trocar, peça ao coordenador do arranjo de ônibus no circuito.</span>
+</div>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Celular (WhatsApp)</span><input value="{{ f.phone }}" onChange="{{ on.phone }}" onKeyDown="{{ onKey }}" inputMode="tel" placeholder="(19) 99999-9999" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid {{ bd.phone }};border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;font-variant-numeric:tabular-nums" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+</div>
+</sc-if>
+
+<sc-if value="{{ isS2 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;animation:swap .3s ease both">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Senha</span>
+<div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 6px 0 14px;border:1.5px solid {{ bd.p1 }};border-radius:14px;background:var(--surface);box-shadow:{{ sh.p1 }};transition:border-color .2s,box-shadow .2s">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<input value="{{ f.p1 }}" onChange="{{ on.p1 }}" onFocus="{{ focus1 }}" onBlur="{{ blur }}" onKeyDown="{{ onKey }}" type="{{ pType }}" placeholder="Crie sua senha" autoComplete="new-password" style="flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none">
+<button onClick="{{ togglePass }}" title="{{ passTitle }}" style="width:38px;height:38px;border:0;border-radius:10px;background:transparent;color:var(--text2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--muted);color:var(--text)"><sc-if value="{{ showPass }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A10 10 0 0 1 12 4c6.5 0 10 8 10 8a17 17 0 0 1-2.2 3.2M6.6 6.6A17 17 0 0 0 2 12s3.5 8 10 8a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M2 2l20 20"></path></svg></sc-if><sc-if value="{{ hidePass }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></sc-if></button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px"><sc-for list="{{ strength }}" as="b" hint-placeholder-count="4"><span style="height:4px;border-radius:999px;background:var(--border);overflow:hidden"><span style="display:block;height:100%;width:{{ b.w }};background:{{ b.c }};transition:width .35s cubic-bezier(.2,.8,.2,1),background .25s"></span></span></sc-for></div>
+<span style="font:500 12px Geist;color:{{ lvlC }}">{{ lvl }}</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:14px 16px;border-radius:14px;background:var(--muted)">
+<sc-for list="{{ rules }}" as="r" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:8px;font:400 13px Geist;color:{{ r.fg }};transition:color .25s"><span style="width:18px;height:18px;border-radius:50%;background:{{ r.bg }};box-shadow:{{ r.ring }};display:grid;place-items:center;flex-shrink:0;transition:all .25s"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ r.op }}"><path d="M20 6 9 17l-5-5"></path></svg></span>{{ r.label }}</span></sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font:500 14px Geist">Confirme a senha</span><sc-if value="{{ showMatch }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px Geist;color:{{ matchC }};animation:rise .2s ease both">{{ matchLabel }}</span></sc-if></div>
+<input value="{{ f.p2 }}" onChange="{{ on.p2 }}" onKeyDown="{{ onKey }}" type="{{ pType }}" placeholder="Repita a senha" autoComplete="new-password" style="width:100%;box-sizing:border-box;height:50px;padding:0 14px;border:1.5px solid {{ bd.p2 }};border-radius:14px;background:var(--surface);color:var(--text);font:400 16px Geist;outline:none;transition:border-color .2s" style-focus="box-shadow:0 0 0 4px var(--primary-s)">
+</div>
+<button onClick="{{ toggleTerms }}" style="display:flex;align-items:flex-start;gap:10px;padding:0;border:0;background:transparent;color:var(--text);cursor:pointer;text-align:left"><span style="width:20px;height:20px;margin-top:1px;border-radius:6px;background:{{ tChk }};box-shadow:{{ tRing }};display:grid;place-items:center;flex-shrink:0;transition:all .2s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ tOp }}"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="font:400 14px/1.45 Geist;color:var(--text2)">Li e aceito os <a href="#" style="color:var(--primary);font-weight:500">termos de uso</a> e a <a href="#" style="color:var(--primary);font-weight:500">política de privacidade</a></span></button>
+</div>
+</sc-if>
+
+<button onClick="{{ next }}" style="height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 16px Geist;cursor:pointer;box-shadow:0 10px 24px rgb(31 110 90/.28);opacity:{{ okOp }};transition:all .2s" style-hover="background:var(--primary-d)"><sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:50%;border:2.5px solid rgb(255 255 255/.35);border-top-color:#fff;animation:spin .7s linear infinite"></span></sc-if>{{ cta }}</button>
+<sc-if value="{{ isS1 }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;justify-content:center;gap:6px;font:400 14px Geist;color:var(--text2)">Não é você?<button onClick="{{ goDecline }}" style="border:0;background:transparent;padding:0;color:var(--primary);font:500 14px Geist;cursor:pointer">Recusar convite</button></div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDecline }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:22px;animation:swap .3s ease both">
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 28px/1.15 Geist;letter-spacing:-0.02em">Recusar convite?</h2><span style="font:400 15px/1.5 Geist;color:var(--text2);text-wrap:pretty">{{ inv.inviter }} será avisado e poderá convidar outra pessoa para a {{ inv.cong }}.</span></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ reasons }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:12px;height:50px;padding:0 14px;border:1.5px solid {{ r.bd }};border-radius:13px;background:{{ r.bg }};color:var(--text);font:500 15px Geist;cursor:pointer;text-align:left;transition:all .2s"><span style="width:18px;height:18px;border-radius:50%;box-shadow:{{ r.ring }};flex-shrink:0;transition:box-shadow .2s"></span>{{ r.label }}</button></sc-for>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<button onClick="{{ cancelDecline }}" style="height:50px;border:1px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:500 15px Geist;cursor:pointer" style-hover="background:var(--muted)">Voltar</button>
+<button onClick="{{ confirmDecline }}" style="height:50px;border:0;border-radius:13px;background:var(--crit);color:#fff;font:600 15px Geist;cursor:pointer;opacity:{{ decOp }}">Recusar</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEnd }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;animation:rise .4s ease both">
+<span style="width:64px;height:64px;border-radius:20px;background:{{ end.iconBg }};color:{{ end.iconFg }};display:grid;place-items:center;animation:pop .45s cubic-bezier(.3,1.5,.5,1) both">
+<sc-if value="{{ end.ok }}" hint-placeholder-val="{{ true }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+<sc-if value="{{ end.warn }}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></sc-if>
+</span>
+<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font:600 28px/1.15 Geist;letter-spacing:-0.02em">{{ end.title }}</h2><span style="font:400 15px/1.5 Geist;color:var(--text2);text-wrap:pretty">{{ end.msg }}</span></div>
+<sc-if value="{{ end.hasSummary }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;width:100%;box-sizing:border-box;padding:14px 16px;border-radius:14px;background:var(--muted)">
+<sc-for list="{{ end.summary }}" as="r" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;gap:16px;font:400 14px Geist"><span style="color:var(--text2);white-space:nowrap">{{ r.k }}</span><span style="font-weight:600;text-align:right">{{ r.v }}</span></div></sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ end.hasCta }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ end.onCta }}" style="width:100%;height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 16px Geist;cursor:pointer;box-shadow:0 10px 24px rgb(31 110 90/.28)" style-hover="background:var(--primary-d)"><sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:50%;border:2.5px solid rgb(255 255 255/.35);border-top-color:#fff;animation:spin .7s linear infinite"></span></sc-if>{{ end.cta }}</button>
+</sc-if>
+<sc-if value="{{ end.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px Geist;color:var(--text2)">{{ end.note }}</span></sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;inviteState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;valido&quot;,&quot;expirado&quot;],&quot;default&quot;:&quot;valido&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { theme: null, view: null, step: 1, f: null, show: false, focus: null, terms: false, err: '', errK: '', busy: false, reason: null, asked: false };
+  componentDidUpdate(pp) { if (pp.inviteState !== this.props.inviteState) this.setState({ view: null, step: 1, f: null, err: '', busy: false, asked: false, reason: null }); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state, asst = false, expired = (this.props.inviteState ?? 'valido') === 'expirado';
+    const theme = s.theme || this.props.theme || 'light';
+    const P = asst ? { nome: 'Rafael Lima Andrade', email: 'rafael.andrade@email.com', phone: '(19) 98123-4567' } : { nome: 'Ana Beatriz Souza', email: 'ana.souza@email.com', phone: '(19) 99654-3210' };
+    const f = s.f || { ...P, p1: '', p2: '' };
+    const view = s.view || (expired ? 'expired' : 'form');
+    const set = o => this.setState({ err: '', errK: '', ...o });
+    const setF = (k, v) => set({ f: { ...f, [k]: v } });
+    const mask = v => { const d = v.replace(/\D/g, '').slice(0, 11); if (d.length <= 2) return d ? '(' + d : ''; if (d.length <= 7) return '(' + d.slice(0, 2) + ') ' + d.slice(2); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); };
+    const p1 = f.p1, p2 = f.p2;
+    const rules = [['Pelo menos 8 caracteres', p1.length >= 8], ['Uma letra maiúscula', /[A-Z]/.test(p1)], ['Um número', /\d/.test(p1)], ['Um símbolo (!@#…)', /[^A-Za-z0-9]/.test(p1)]];
+    const score = rules.filter(r => r[1]).length, allOk = score === 4, match = p2.length > 0 && p1 === p2;
+    const LV = [['Use letras, números e símbolos', 'var(--text2)'], ['Fraca', 'var(--crit)'], ['Razoável', 'var(--attn-t)'], ['Boa', 'var(--primary)'], ['Forte', 'var(--succ)']][p1 ? Math.max(score, 1) : 0];
+    const barC = score <= 1 ? 'var(--crit)' : score === 2 ? 'var(--attn)' : score === 3 ? 'var(--primary)' : 'var(--succ)';
+    const s1ok = f.nome.trim().split(/\s+/).length >= 2 && f.phone.replace(/\D/g, '').length === 11;
+    const s2ok = allOk && match && s.terms;
+    const roleName = asst ? 'Assistente do coordenador do arranjo de ônibus na congregação' : 'Coordenador do arranjo de ônibus na congregação';
+    const first = f.nome.trim().split(/\s+/)[0] || 'você';
+    const next = () => {
+      if (s.busy) return;
+      if (s.step === 1) {
+        if (f.nome.trim().split(/\s+/).length < 2) return set({ err: 'Informe seu nome completo', errK: 'nome' });
+        if (f.phone.replace(/\D/g, '').length !== 11) return set({ err: 'Celular incompleto. Use DDD + 9 dígitos', errK: 'phone' });
+        return set({ step: 2 });
+      }
+      if (!allOk) return set({ err: 'A senha ainda não atende a todos os requisitos', errK: 'p1' });
+      if (!match) return set({ err: 'As senhas não coincidem', errK: 'p2' });
+      if (!s.terms) return set({ err: 'Aceite os termos para continuar' });
+      set({ busy: true });
+      this._t = setTimeout(() => this.setState({ busy: false, view: 'done' }), 1200);
+    };
+    const accepted = view === 'done', declined = view === 'declined', isExp = view === 'expired';
+    const badge = accepted ? ['Aceito', '#4fb393', '#0a1a29', 'none', 'stamp .55s cubic-bezier(.3,1.4,.5,1) both', 'none']
+      : declined ? ['Recusado', 'rgb(240 114 114/.18)', '#f4a3a3', 'inset 0 0 0 1px rgb(240 114 114/.35)', 'pop .3s ease both', 'none']
+      : isExp ? ['Expirado', 'rgb(255 255 255/.08)', 'rgb(255 255 255/.6)', 'inset 0 0 0 1px rgb(255 255 255/.15)', 'none', 'none']
+      : ['Aguardando você', 'rgb(242 193 75/.15)', '#f2c14b', 'inset 0 0 0 1px rgb(242 193 75/.35)', 'none', 'pulse 2s ease-out infinite'];
+    const REASONS = ['Não sou a pessoa indicada', 'Não posso assumir este privilégio agora', 'Recebi por engano'];
+    const ring = on => on ? '0 0 0 4px var(--primary-s)' : 'none';
+    let end = {};
+    if (accepted) end = { ok: true, warn: false, iconBg: 'var(--primary-s)', iconFg: 'var(--primary)', title: 'Bem-vindo, ' + first + '!', msg: 'Seu acesso está liberado. ' + 'Marcos Oliveira foi avisado de que você aceitou o convite.', hasSummary: true,
+      summary: [{ k: 'Privilégio', v: 'Coordenador do arranjo de ônibus na congregação' }, { k: 'Congregação', v: 'Jardim Paulista · 31245' }, { k: 'Login', v: f.email }], hasCta: true, cta: 'Entrar no painel', onCta: () => { window.location.href = 'SUOAC Dashboard v2.dc.html'; }, hasNote: false };
+    if (declined) end = { ok: true, warn: false, iconBg: 'var(--muted)', iconFg: 'var(--text2)', title: 'Convite recusado', msg: 'Avisamos Marcos Oliveira. Você pode fechar esta página.', hasSummary: false, hasCta: false, hasNote: false };
+    if (isExp) end = s.asked
+      ? { ok: true, warn: false, iconBg: 'var(--primary-s)', iconFg: 'var(--primary)', title: 'Pedido enviado', msg: 'Marcos Oliveira recebeu seu pedido. Um novo link chegará em ' + f.email + '.', hasSummary: false, hasCta: false, hasNote: false }
+      : { ok: false, warn: true, iconBg: 'var(--crit-s)', iconFg: 'var(--crit)', title: 'Este convite expirou', msg: 'Por segurança, os convites valem 7 dias. Peça um novo link ao coordenador do arranjo de ônibus no circuito.', hasSummary: false, hasCta: true, cta: s.busy ? 'Enviando…' : 'Pedir novo convite', hasNote: true, note: 'Enviado para ' + f.email + ' em 14/10/2026',
+        onCta: () => { if (s.busy) return; set({ busy: true }); this._t = setTimeout(() => this.setState({ busy: false, asked: true }), 1000); } };
+    return {
+      theme, isDark: theme === 'dark', isLight: theme !== 'dark', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      inv: { inviter: 'Marcos', inviterFull: 'Marcos Oliveira', role: roleName, cong: 'Jardim Paulista', code: '31245', circ: 'SP-17', city: 'Campinas · SP', email: f.email,
+        badge: badge[0], badgeBg: badge[1], badgeFg: badge[2], badgeRing: badge[3], badgeAnim: badge[4], dotAnim: badge[5],
+        validity: isExp ? 'Convite enviado em 14/10/2026 · expirou em 21/10/2026' : accepted ? 'Convite aceito hoje' : declined ? 'Convite recusado hoje' : 'Convite válido até 30/10/2026' },
+      isForm: view === 'form', isDecline: view === 'decline', isEnd: accepted || declined || isExp, end,
+      step: s.step, isS1: s.step === 1, isS2: s.step === 2, canBack: s.step === 2, back: () => set({ step: 1 }),
+      bars: [1, 2].map(i => ({ w: s.step >= i ? '100%' : '0%' })),
+      title: s.step === 1 ? 'Olá, ' + first + '!' : 'Crie sua senha',
+      sub: s.step === 1 ? 'Confira os dados que o coordenador do arranjo de ônibus no circuito preencheu. Corrija o que for preciso.' : 'Você vai usar o e-mail ' + f.email + ' e esta senha para entrar.',
+      hasErr: !!s.err, err: s.err, f,
+      on: { nome: e => setF('nome', e.target.value), phone: e => setF('phone', mask(e.target.value)), p1: e => setF('p1', e.target.value), p2: e => setF('p2', e.target.value) },
+      bd: { nome: s.errK === 'nome' ? 'var(--crit)' : 'var(--border2)', phone: s.errK === 'phone' ? 'var(--crit)' : 'var(--border2)',
+        p1: s.errK === 'p1' ? 'var(--crit)' : s.focus === 1 ? 'var(--primary)' : 'var(--border2)',
+        p2: s.errK === 'p2' || (p2.length >= p1.length && p2.length > 0 && !match) ? 'var(--crit)' : match ? 'var(--succ)' : 'var(--border2)' },
+      sh: { p1: ring(s.focus === 1 && s.errK !== 'p1') },
+      onKey: e => { if (e.key === 'Enter') next(); }, focus1: () => this.setState({ focus: 1 }), blur: () => this.setState({ focus: null }),
+      pType: s.show ? 'text' : 'password', showPass: s.show, hidePass: !s.show, togglePass: () => this.setState({ show: !s.show }), passTitle: s.show ? 'Ocultar senha' : 'Mostrar senha',
+      strength: [0, 1, 2, 3].map(i => ({ w: i < score ? '100%' : '0%', c: barC })), lvl: LV[0], lvlC: LV[1],
+      rules: rules.map(([label, ok]) => ({ label, fg: ok ? 'var(--text)' : 'var(--text2)', bg: ok ? 'var(--succ)' : 'transparent', ring: ok ? 'none' : 'inset 0 0 0 1.5px var(--border2)', op: ok ? 1 : 0 })),
+      showMatch: p2.length > 0, matchLabel: match ? '✓ As senhas coincidem' : 'As senhas não coincidem', matchC: match ? 'var(--succ)' : 'var(--crit)',
+      toggleTerms: () => set({ terms: !s.terms }), tChk: s.terms ? 'var(--primary)' : 'transparent', tRing: s.terms ? 'none' : 'inset 0 0 0 1.5px var(--border2)', tOp: s.terms ? 1 : 0,
+      busy: s.busy, next, okOp: (s.step === 1 ? s1ok : s2ok) ? 1 : 0.5,
+      cta: s.step === 1 ? 'Continuar' : s.busy ? 'Ativando acesso…' : 'Aceitar convite e entrar',
+      goDecline: () => set({ view: 'decline', reason: null }), cancelDecline: () => set({ view: 'form' }),
+      reasons: REASONS.map((label, i) => ({ label, bd: s.reason === i ? 'var(--crit)' : 'var(--border2)', bg: s.reason === i ? 'var(--crit-s)' : 'var(--surface)', ring: s.reason === i ? 'inset 0 0 0 5px var(--crit)' : 'inset 0 0 0 1.5px var(--border2)', onClick: () => this.setState({ reason: i }) })),
+      decOp: s.reason === null ? 0.45 : 1, confirmDecline: () => { if (s.reason !== null) set({ view: 'declined' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
