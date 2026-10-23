@@ -161,7 +161,7 @@ export function AcceptInvitationFlow({ token, invitation, onDeclined }: AcceptIn
   if (rejection) {
     return (
       <div ref={focusResult} tabIndex={-1} className={styles.result}>
-        <InvitationNotice rejection={rejection} />
+        <InvitationNotice rejection={rejection} token={token} />
       </div>
     );
   }
@@ -208,7 +208,8 @@ export function AcceptInvitationFlow({ token, invitation, onDeclined }: AcceptIn
             {isPassword && "Crie sua senha"}
           </h2>
           <p className={styles.subtitle}>
-            {isDetails && "Confira os dados que o coordenador do circuito preencheu. Corrija o que for preciso."}
+            {isDetails &&
+              "Confira os dados que o coordenador do arranjo de ônibus no circuito preencheu. Corrija o que for preciso."}
             {isPassword && `Você vai usar o e-mail ${invitation.email} e esta senha para entrar.`}
           </p>
         </header>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 
-import { INVITATION_ROLE_SHORT_LABELS, isInvitationRole } from "@/entities/invitation";
+import { INVITATION_ROLE_LABELS, isInvitationRole } from "@/entities/invitation";
 import { routes } from "@/shared/config";
 /*
  * Do modulo, nao do barril `@/shared/lib`: este componente e renderizado no
@@ -22,12 +22,12 @@ interface InvitationWelcomeProps {
  * Confirmacao do aceite: o acesso esta liberado e o convidado segue para o
  * painel.
  *
- * Nao promete que o coordenador do circuito foi avisado, como o desenho diz: o
- * back ainda nao notifica o aceite. Dizer isso seria afirmar um efeito que nao
- * acontece.
+ * Diz que quem convidou foi avisado, como o desenho: desde o SUC-72 o back
+ * envia o e-mail de aceite ao criador do convite (best-effort: se falhar, o
+ * aceite vale do mesmo jeito).
  */
 export function InvitationWelcome({ summary }: InvitationWelcomeProps) {
-  const role = isInvitationRole(summary.role) ? INVITATION_ROLE_SHORT_LABELS[summary.role] : summary.role;
+  const role = isInvitationRole(summary.role) ? INVITATION_ROLE_LABELS[summary.role] : summary.role;
 
   return (
     <section className={styles.confirmation} aria-labelledby="invitation-welcome-title">
@@ -39,7 +39,9 @@ export function InvitationWelcome({ summary }: InvitationWelcomeProps) {
         <h2 id="invitation-welcome-title" className={styles.title}>
           Bem-vindo, {getFirstName(summary.name)}!
         </h2>
-        <p className={styles.subtitle}>Seu acesso está liberado.</p>
+        <p className={styles.subtitle}>
+          Seu acesso está liberado. {summary.invitedBy} foi avisado de que você aceitou o convite.
+        </p>
       </div>
 
       <dl className={styles.summary}>

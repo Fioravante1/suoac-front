@@ -1,9 +1,18 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { RequestRenewalResult } from "../../api";
 import type { InvitationNoticeState } from "../../model";
 
-import { InvitationNotice } from "./invitation-notice";
+const requestRenewalAction = vi.fn<(input: unknown) => Promise<RequestRenewalResult>>();
+
+vi.mock("../../api", () => ({
+  requestRenewalAction: (input: unknown) => requestRenewalAction(input),
+}));
+
+const { InvitationNotice } = await import("./invitation-notice");
+
+const TOKEN = "a".repeat(64);
 
 const DETAILS = {
   email: "maria@example.com",
@@ -13,8 +22,13 @@ const DETAILS = {
 };
 
 function renderNotice(state: InvitationNoticeState, details = null as typeof DETAILS | null) {
-  return render(<InvitationNotice rejection={{ state, details }} />);
+  return render(<InvitationNotice rejection={{ state, details }} token={TOKEN} />);
 }
+
+beforeEach(() => {
+  requestRenewalAction.mockReset();
+  requestRenewalAction.mockResolvedValue({ status: "requested" });
+});
 
 describe("InvitationNotice", () => {
   it.each([
@@ -70,21 +84,83 @@ describe("InvitationNotice", () => {
     expect(screen.queryByRole("button", { name: "Pedir novo convite" })).not.toBeInTheDocument();
   });
 
-  it("não finge que o pedido foi enviado: avisa que ainda não está disponível e indica a quem recorrer", () => {
+  it("pede o novo convite com o token do link e leva a Pedido enviado", async () => {
     renderNotice("expired", DETAILS);
 
     fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("ainda não está disponível");
-    expect(screen.getByRole("alert")).toHaveTextContent("Fale diretamente com Marcos Oliveira");
+    expect(await screen.findByRole("heading", { name: "Pedido enviado" })).toBeInTheDocument();
+    expect(requestRenewalAction).toHaveBeenCalledWith({ token: TOKEN });
+    expect(
+      screen.getByText("Marcos Oliveira recebeu seu pedido. Um novo link chegará em maria@example.com."),
+    ).toBeInTheDocument();
   });
 
-  it("indica quem convidou, de forma genérica, quando o contexto não veio", () => {
+  it("fala de forma genérica em Pedido enviado quando o contexto do convite não veio", async () => {
     renderNotice("expired");
 
     fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Fale diretamente com quem convidou você");
+    expect(await screen.findByText(/Quem convidou você recebeu seu pedido/)).toBeInTheDocument();
+  });
+
+  it("some com o aviso e a saída quando o pedido é enviado, e leva o foco para a confirmação", async () => {
+    renderNotice("expired", DETAILS);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
+
+    const heading = await screen.findByRole("heading", { name: "Pedido enviado" });
+    expect(screen.queryByRole("link", { name: "Ir para a entrada" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Este convite expirou")).not.toBeInTheDocument();
+    expect(heading.closest("[tabindex]")).toHaveFocus();
+  });
+
+  it("trava o botão enquanto o pedido é enviado, para não pedir duas vezes", async () => {
+    let finish: (result: RequestRenewalResult) => void = () => undefined;
+    requestRenewalAction.mockReturnValue(new Promise((resolve) => (finish = resolve)));
+    renderNotice("expired", DETAILS);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
+
+    expect(await screen.findByRole("button", { name: /Enviando/ })).toBeDisabled();
+    finish({ status: "requested" });
+    await screen.findByRole("heading", { name: "Pedido enviado" });
+  });
+
+  it("mantém o aviso e a saída com mensagem quando o serviço falha, para tentar de novo", async () => {
+    requestRenewalAction.mockResolvedValue({ status: "error", message: "Aguarde um pouco e tente de novo." });
+    renderNotice("expired", DETAILS);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Aguarde um pouco e tente de novo.");
+    expect(screen.getByRole("heading", { name: "Este convite expirou" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pedir novo convite" })).toBeEnabled();
+  });
+
+  it("mostra uma mensagem quando a action nem chega a responder", async () => {
+    requestRenewalAction.mockRejectedValue(new Error("Failed to fetch"));
+    renderNotice("expired", DETAILS);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Não foi possível enviar o pedido agora");
+    expect(screen.getByRole("button", { name: "Pedir novo convite" })).toBeEnabled();
+  });
+
+  it.each([
+    ["used", "Este convite já foi usado"],
+    ["declined", "Este convite foi recusado"],
+    ["revoked", "Este convite foi cancelado"],
+    ["email-registered", "Este e-mail já tem uma conta"],
+  ] as const)("troca o aviso pelo estado verdadeiro quando o convite virou %s", async (state, title) => {
+    requestRenewalAction.mockResolvedValue({ status: "rejected", rejection: { state, details: null } });
+    renderNotice("expired", DETAILS);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pedir novo convite" }));
+
+    expect(await screen.findByRole("heading", { name: title })).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Pedir novo convite" })).not.toBeInTheDocument());
   });
 
   it("no e-mail já cadastrado, manda entrar com a senha e fala em outra congregação", () => {

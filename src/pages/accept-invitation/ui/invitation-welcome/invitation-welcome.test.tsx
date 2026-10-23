@@ -27,7 +27,7 @@ describe("InvitationWelcome", () => {
   it("resume privilégio, congregação com código e login", () => {
     render(<InvitationWelcome summary={SUMMARY} />);
 
-    expect(screen.getByText("Coordenador na congregação")).toBeInTheDocument();
+    expect(screen.getByText("Coordenador do arranjo de ônibus na congregação")).toBeInTheDocument();
     expect(screen.getByText("Jardim Paulista · 31245")).toBeInTheDocument();
     expect(screen.getByText("ana.souza@email.com")).toBeInTheDocument();
   });
@@ -38,9 +38,11 @@ describe("InvitationWelcome", () => {
     expect(screen.getByRole("link", { name: "Entrar no painel" })).toHaveAttribute("href", "/dashboard");
   });
 
-  it("não afirma que o coordenador do circuito foi avisado, porque o back não avisa", () => {
+  it("diz que quem convidou foi avisado do aceite, como o desenho", () => {
     render(<InvitationWelcome summary={SUMMARY} />);
 
-    expect(screen.queryByText(/foi avisado/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Seu acesso está liberado. Marcos Oliveira foi avisado de que você aceitou o convite."),
+    ).toBeInTheDocument();
   });
 });
