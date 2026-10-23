@@ -57,7 +57,7 @@ export function InvitationDetailsStep({ email, disabled = false }: InvitationDet
           }
         />
         <span id="invitation-email-help" className={styles.help}>
-          Será seu login. Para trocar, peça ao coordenador do circuito.
+          Será seu login. Para trocar, peça ao coordenador do arranjo de ônibus no circuito.
         </span>
       </div>
 

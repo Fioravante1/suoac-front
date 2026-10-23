@@ -27,7 +27,7 @@ describe("InvitationWelcome", () => {
   it("resume privilégio, congregação com código e login", () => {
     render(<InvitationWelcome summary={SUMMARY} />);
 
-    expect(screen.getByText("Coordenador na congregação")).toBeInTheDocument();
+    expect(screen.getByText("Coordenador do arranjo de ônibus na congregação")).toBeInTheDocument();
     expect(screen.getByText("Jardim Paulista · 31245")).toBeInTheDocument();
     expect(screen.getByText("ana.souza@email.com")).toBeInTheDocument();
   });

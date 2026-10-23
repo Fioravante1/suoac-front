@@ -143,6 +143,14 @@ describe("AcceptInvitationFlow — etapa de dados", () => {
     expect(await screen.findByText("Informe o DDD e o número completo.")).toBeInTheDocument();
   });
 
+  it('diz quem preencheu os dados com o nome completo do privilégio, nunca "coordenador" sozinho', () => {
+    renderFlow();
+
+    expect(
+      screen.getByText(/Confira os dados que o coordenador do arranjo de ônibus no circuito preencheu/),
+    ).toBeInTheDocument();
+  });
+
   it("avança com Enter, em vez de enviar o formulário incompleto", async () => {
     renderFlow();
 

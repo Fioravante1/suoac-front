@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 
-import { INVITATION_ROLE_SHORT_LABELS, isInvitationRole } from "@/entities/invitation";
+import { INVITATION_ROLE_LABELS, isInvitationRole } from "@/entities/invitation";
 import { routes } from "@/shared/config";
 /*
  * Do modulo, nao do barril `@/shared/lib`: este componente e renderizado no
@@ -27,7 +27,7 @@ interface InvitationWelcomeProps {
  * acontece.
  */
 export function InvitationWelcome({ summary }: InvitationWelcomeProps) {
-  const role = isInvitationRole(summary.role) ? INVITATION_ROLE_SHORT_LABELS[summary.role] : summary.role;
+  const role = isInvitationRole(summary.role) ? INVITATION_ROLE_LABELS[summary.role] : summary.role;
 
   return (
     <section className={styles.confirmation} aria-labelledby="invitation-welcome-title">

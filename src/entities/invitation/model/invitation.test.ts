@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  INVITATION_ERROR_CODES,
-  INVITATION_ROLES,
-  INVITATION_ROLE_LABELS,
-  INVITATION_ROLE_SHORT_LABELS,
-  isInvitationRole,
-} from "./invitation";
+import { INVITATION_ERROR_CODES, INVITATION_ROLES, INVITATION_ROLE_LABELS, isInvitationRole } from "./invitation";
 
 describe("isInvitationRole", () => {
   it.each(Object.values(INVITATION_ROLES))("reconhece %s como papel de convite", (role) => {
@@ -24,10 +18,9 @@ describe("isInvitationRole", () => {
 });
 
 describe("rótulos dos papéis", () => {
-  it("têm rótulo completo e curto para cada papel", () => {
+  it('seguem a nomenclatura do handoff: nunca "coordenador" sozinho, que também existe no corpo de anciãos', () => {
     for (const role of Object.values(INVITATION_ROLES)) {
-      expect(INVITATION_ROLE_LABELS[role]).toBeTruthy();
-      expect(INVITATION_ROLE_SHORT_LABELS[role]).toBeTruthy();
+      expect(INVITATION_ROLE_LABELS[role]).toBe("Coordenador do arranjo de ônibus na congregação");
     }
   });
 });

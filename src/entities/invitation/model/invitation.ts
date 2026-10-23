@@ -13,11 +13,6 @@ export const INVITATION_ROLE_LABELS: Record<InvitationRole, string> = {
   CONGREGATION_COORDINATOR: "Coordenador do arranjo de ônibus na congregação",
 };
 
-/** Rotulo curto, para resumos onde o nome inteiro do privilegio nao cabe. */
-export const INVITATION_ROLE_SHORT_LABELS: Record<InvitationRole, string> = {
-  CONGREGATION_COORDINATOR: "Coordenador na congregação",
-};
-
 export function isInvitationRole(value: string): value is InvitationRole {
   return Object.hasOwn(INVITATION_ROLES, value);
 }
