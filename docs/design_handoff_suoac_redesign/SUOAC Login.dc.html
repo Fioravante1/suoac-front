@@ -118,7 +118,7 @@ button,input{font-family:inherit}
 <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:10px;animation:pop .3s cubic-bezier(.3,1.5,.5,1) both"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Bem-vindo, {{ firstName }}</span></sc-if>
 </button>
 <div style="display:flex;flex-direction:column;border-radius:14px;border:1px solid var(--border);overflow:hidden">
-<div style="display:flex;flex-direction:column;gap:4px;padding:14px 16px"><span style="font:600 14px Geist">Recebeu um convite?</span><span style="font:400 13px/1.5 Geist;color:var(--text2)">Coordenadores das congregações entram pelo link enviado por e-mail ou WhatsApp.</span></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:14px 16px"><span style="font:600 14px Geist">Recebeu um convite?</span><span style="font:400 13px/1.5 Geist;color:var(--text2)">Coordenadores do arranjo de ônibus nas congregações entram pelo link enviado por e-mail ou WhatsApp.</span></div>
 <button onClick="{{ goSignup }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:0;border-top:1px solid var(--border);background:var(--muted);color:var(--text);text-align:left;cursor:pointer;transition:background .2s" style-hover="background:var(--primary-s)">
 <span style="width:36px;height:36px;border-radius:10px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></span>
 <span style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font:600 14px Geist">Seu circuito ainda não usa o SUOAC?</span><span style="font:400 13px Geist;color:var(--text2)">Cadastre o circuito em poucos minutos</span></span>
@@ -155,7 +155,7 @@ button,input{font-family:inherit}
 <div style="display:flex;flex-direction:column;gap:16px;animation:swap .3s ease both">
 <label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Circuito</span><input value="{{ su.f.circ }}" onChange="{{ su.on.circ }}" placeholder="Ex.: SP-17" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;text-transform:uppercase" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
 <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px">
-<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Cidade</span><input value="{{ su.f.cidade }}" onChange="{{ su.on.cidade }}" placeholder="Ex.: Campinas" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Cidade principal</span><input value="{{ su.f.cidade }}" onChange="{{ su.on.cidade }}" placeholder="Ex.: Campinas" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
 <label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">UF</span><input value="{{ su.f.uf }}" onChange="{{ su.on.uf }}" placeholder="SP" maxLength="2" style="width:100%;box-sizing:border-box;height:48px;padding:0 14px;border:1.5px solid var(--border2);border-radius:13px;background:var(--surface);color:var(--text);font:400 15px Geist;outline:none;transition:border-color .2s;text-transform:uppercase;text-align:center" style-focus="border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-s)"></label>
 </div>
 <div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 14px Geist">Seu privilégio</span>
@@ -179,7 +179,7 @@ button,input{font-family:inherit}
 </sc-for>
 </div>
 <button onClick="{{ su.addCong }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px 0 8px;border:1px dashed var(--border2);border-radius:10px;background:transparent;color:var(--primary);font:500 14px Geist;cursor:pointer" style-hover="border-color:var(--primary);background:var(--primary-s)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>Adicionar congregação</button>
-<span style="font:400 13px/1.5 Geist;color:var(--text2)">Você pode completar a lista e convidar os coordenadores das congregações depois, pelo painel.</span>
+<span style="font:400 13px/1.5 Geist;color:var(--text2)">Você pode completar a lista e convidar os coordenadores do arranjo de ônibus de cada congregação depois, pelo painel.</span>
 </div>
 </sc-if>
 
@@ -394,7 +394,7 @@ class Component extends DCLogic {
           focusCode: () => this.codeRef.current && this.codeRef.current.focus(),
           boxes: Array.from({ length: 6 }, (_, i) => { const cur = i === f.code.length; return { v: f.code[i] || '', bd: f.code[i] ? 'var(--primary)' : cur ? 'var(--primary)' : 'var(--border2)', sh: cur ? '0 0 0 4px var(--primary-s)' : 'none' }; }),
           resendLabel: f.resent ? 'Código reenviado' : 'Reenviar código', resend: () => set({ resent: true }),
-          summary: [{ k: 'Coordenador', v: f.nome.trim() }, { k: 'Circuito', v: f.circ.trim().toUpperCase() + ' · ' + f.cidade.trim() + '/' + f.uf }, { k: 'Sua congregação', v: f.congs[0].name.trim() + ' · ' + f.congs[0].code }, { k: 'Congregações', v: filled.length + (filled.length === 1 ? ' cadastrada' : ' cadastradas') }, { k: 'Próximo passo', v: 'Criar o primeiro evento' }],
+          summary: [{ k: 'Coord. do arranjo no circuito', v: f.nome.trim() }, { k: 'Circuito', v: f.circ.trim().toUpperCase() + ' · ' + f.cidade.trim() + '/' + f.uf }, { k: 'Sua congregação', v: f.congs[0].name.trim() + ' · ' + f.congs[0].code }, { k: 'Congregações', v: filled.length + (filled.length === 1 ? ' cadastrada' : ' cadastradas') }, { k: 'Próximo passo', v: 'Criar o primeiro evento' }],
           okOp: (st === 1 && !v1) || (st === 2 && !v2) || (st === 4 && !v4) ? 0.5 : 1,
           cta: f.busy ? (st === 3 ? 'Criando circuito…' : 'Verificando…') : st === 3 ? 'Criar circuito' : st === 4 ? 'Confirmar' : st === 5 ? 'Ir para o painel' : 'Continuar',
           next };
