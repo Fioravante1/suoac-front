@@ -28,6 +28,8 @@ interface AcceptInvitationFlowProps {
   /** Token do link, lido da URL no servidor. Nao e campo do formulario: a action o envia. */
   token: string;
   invitation: Invitation;
+  /** Recusa gravada: quem monta a pagina troca o fluxo pela confirmacao e muda o selo do cartao. */
+  onDeclined: () => void;
 }
 
 type FlowView = "details" | "password" | "decline";
@@ -43,7 +45,7 @@ const SUBMIT_FAILED = "Não foi possível concluir o cadastro agora. Tente novam
  * celular validos, e a senha so e pedida depois de o convidado confirmar quem
  * e. Voltar nao perde o que foi digitado.
  */
-export function AcceptInvitationFlow({ token, invitation }: AcceptInvitationFlowProps) {
+export function AcceptInvitationFlow({ token, invitation, onDeclined }: AcceptInvitationFlowProps) {
   const [view, setView] = useState<FlowView>("details");
   /** Convite que deixou de servir entre abrir a tela e enviar: o formulario cede lugar ao aviso. */
   const [rejection, setRejection] = useState<InvitationRejection | null>(null);
@@ -167,10 +169,12 @@ export function AcceptInvitationFlow({ token, invitation }: AcceptInvitationFlow
   if (view === "decline") {
     return (
       <InvitationDeclineStep
+        token={token}
         invitedBy={invitation.invitedBy}
         congregation={invitation.congregation}
-        expiresAt={invitation.expiresAt}
         onBack={() => setView("details")}
+        onDeclined={onDeclined}
+        onRejected={setRejection}
       />
     );
   }

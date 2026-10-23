@@ -26,6 +26,9 @@ const brandPanelColors = {
   brandPanelAttentionSoft: "rgb(242 193 75 / 0.15)",
   brandPanelAttentionRing: "rgb(242 193 75 / 0.35)",
   brandPanelAttentionPulse: "rgb(242 193 75 / 0.55)",
+  brandPanelCritical: "#F4A3A3",
+  brandPanelCriticalSoft: "rgb(240 114 114 / 0.18)",
+  brandPanelCriticalRing: "rgb(240 114 114 / 0.35)",
   brandPanelTextSecondary: "rgb(255 255 255 / 0.6)",
 } as const;
 

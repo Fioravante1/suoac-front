@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CircleAlert, Clock, Link2Off, UserCheck, WifiOff, XCircle } from "lucide-react";
+import { CircleAlert, Clock, Link2Off, UserCheck, UserX, WifiOff, XCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { formatDate } from "@/shared/lib";
@@ -53,6 +53,13 @@ const NOTICES: Record<InvitationNoticeState, Notice> = {
     description: "Quem convidou você cancelou este convite. Peça um novo a ele, se ainda precisar de acesso.",
     action: "Ir para a entrada",
     tone: "critical",
+  },
+  declined: {
+    icon: UserX,
+    title: "Este convite foi recusado",
+    description: "Ele não pode mais ser aceito. Se a recusa foi engano, peça um novo convite a quem convidou você.",
+    action: "Ir para a entrada",
+    tone: "neutral",
   },
   "not-found": {
     icon: Link2Off,

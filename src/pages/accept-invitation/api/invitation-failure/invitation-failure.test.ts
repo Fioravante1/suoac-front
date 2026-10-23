@@ -53,6 +53,7 @@ describe("rejectionOf", () => {
     ["INVITATION_EXPIRED", "expired"],
     ["INVITATION_USED", "used"],
     ["INVITATION_REVOKED", "revoked"],
+    ["INVITATION_DECLINED", "declined"],
     ["INVITATION_EMAIL_ALREADY_REGISTERED", "email-registered"],
   ])("traduz %s para o estado %s", (code, state) => {
     expect(rejectionOf({ code, details: null })?.state).toBe(state);
