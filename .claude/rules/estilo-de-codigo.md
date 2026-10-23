@@ -59,6 +59,60 @@ ver `.claude/rules/compartilhado/idioma-do-codigo.md`.
 - Componentes e tipos usam PascalCase.
 - Hooks usam camelCase com prefixo `use`.
 
+### Estrutura de um arquivo de componente
+
+O componente e o ultimo bloco do arquivo: **nenhuma funcao de modulo fica abaixo dele**. Quem abre o
+arquivo le de cima para baixo — imports, tipos, constantes e, por fim, o componente —, e uma funcao
+solta depois dele obriga a procurar o que o componente chama no rodape.
+
+- **Handlers e derivacoes pequenas ficam dentro do componente**, como `function handleSubmit()` ou
+  `function resolveMatchStatus()`, perto do JSX que os usa. Esse e o padrao do projeto
+  (`reset-password-form`, `accept-invitation-flow`).
+- **Logica pura que passa de poucas linhas** — calculo sobre texto, intervalo, regra de formato —
+  nao mora no `.tsx`: vai para o segmento `lib` (ou `model`, se for do dominio) como modulo proprio,
+  com teste unitario, e o componente so a chama. E o que a torna testavel sem montar a tela e
+  reaproveitavel por outro campo (`phoneDeletionRange` em `shared/lib/phone`, usada por
+  `PhoneFieldNext`).
+- **Subcomponente** usado so por um componente nasce em pasta propria dentro de `ui/`, como qualquer
+  modulo (ver "Organizacao interna de segmentos" em `arquitetura-fsd.md`) — nao como segunda funcao
+  no mesmo arquivo.
+
+```tsx
+// Errado — a logica de texto fica solta abaixo do componente
+export function PhoneField(props: PhoneFieldProps) {
+  return <TextField onKeyDown={selectPhoneDigitToDelete} {...props} />;
+}
+
+function selectPhoneDigitToDelete(event: KeyboardEvent<HTMLInputElement>) {
+  /* ...dezenas de linhas de manipulacao de texto... */
+}
+
+// Correto — a regra vive em `shared/lib/phone`, com teste; o componente so liga os fios
+export function PhoneField({ onKeyDown, ...props }: PhoneFieldProps) {
+  function extendDeletionOverSeparators(event: KeyboardEvent<HTMLInputElement>) {
+    const { selectionStart, selectionEnd, value } = event.currentTarget;
+
+    if (!isPhoneDeletionKey(event.key) || selectionStart !== selectionEnd) return;
+
+    const [start, end] = phoneDeletionRange(value, selectionStart ?? 0, event.key);
+    event.currentTarget.setSelectionRange(start, end);
+  }
+
+  return (
+    <TextField
+      onKeyDown={(event) => {
+        extendDeletionOverSeparators(event);
+        onKeyDown?.(event);
+      }}
+      {...props}
+    />
+  );
+}
+```
+
+Vale para os arquivos que voce cria ou toca. Arquivo existente que ja foge disso migra pela regra do
+escoteiro: ao mexer nele, mova a funcao daquele arquivo junto com a mudanca — sem mutirao.
+
 ### Prettier
 
 O padrao real do projeto esta em `.prettierrc.json`.
