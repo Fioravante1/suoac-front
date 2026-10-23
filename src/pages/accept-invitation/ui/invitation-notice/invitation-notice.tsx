@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { CircleAlert, Clock, Link2Off, UserCheck, UserX, WifiOff, XCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { formatDate } from "@/shared/lib";
 import { routes } from "@/shared/config";
+import { Spinner } from "@/shared/ui/spinner";
+
+import { requestRenewalAction } from "../../api";
 
 import type { InvitationNoticeState, InvitationRejection } from "../../model";
+import { InvitationRenewalSent } from "../invitation-renewal-sent";
 
 import styles from "./invitation-notice.module.css";
 
 interface InvitationNoticeProps {
   rejection: InvitationRejection;
+  /** Token do link, para o pedido de novo convite no expirado. */
+  token: string;
 }
 
 interface Notice {
@@ -87,22 +93,74 @@ const NOTICES: Record<InvitationNoticeState, Notice> = {
   },
 };
 
+type RenewalRequest = "idle" | "sending" | "sent";
+
+const REQUEST_FAILED = "Não foi possível enviar o pedido agora. Verifique sua conexão e tente novamente.";
+
 const TONE_CLASS: Record<Notice["tone"], string> = {
   attention: styles.iconAttention,
   critical: styles.iconCritical,
   neutral: styles.iconNeutral,
 };
 
-export function InvitationNotice({ rejection }: InvitationNoticeProps) {
-  const { state, details } = rejection;
+/**
+ * Aviso de convite que nao pode ser aceito. No expirado, "Pedir novo convite"
+ * avisa quem convidou e leva a "Pedido enviado" (SUC-76); se o convite mudou de
+ * estado nesse meio-tempo, o aviso troca pelo estado verdadeiro.
+ */
+export function InvitationNotice({ rejection, token }: InvitationNoticeProps) {
+  const [current, setCurrent] = useState(rejection);
+  const [request, setRequest] = useState<RenewalRequest>("idle");
+  const [requestError, setRequestError] = useState<string | null>(null);
+  /*
+   * O aviso sai do DOM quando o pedido e enviado, levando junto o foco, que
+   * cai no `body`. Mover o foco para a confirmacao anuncia o conteudo e
+   * devolve o ponto de leitura a quem usa leitor de tela.
+   */
+  const focusResult = useCallback((node: HTMLElement | null) => {
+    node?.focus();
+  }, []);
+
+  const { state, details } = current;
   const notice = NOTICES[state];
   const Icon = notice.icon;
-  /*
-   * "Pedir novo convite" aparece como no desenho, mas o back ainda nao recebe o
-   * pedido: o clique explica, em vez de fingir que algo foi enviado.
-   */
-  const [isRequestUnavailable, setIsRequestUnavailable] = useState(false);
   const canRequestNew = state === "expired";
+  const isSending = request === "sending";
+
+  async function requestNew() {
+    setRequestError(null);
+    setRequest("sending");
+
+    try {
+      const result = await requestRenewalAction({ token });
+
+      if (result.status === "requested") {
+        setRequest("sent");
+        return;
+      }
+
+      setRequest("idle");
+
+      if (result.status === "rejected") {
+        setCurrent(result.rejection);
+        return;
+      }
+
+      setRequestError(result.message);
+    } catch {
+      // Falha antes de a action responder — conexao caida, deploy no meio da requisicao.
+      setRequest("idle");
+      setRequestError(REQUEST_FAILED);
+    }
+  }
+
+  if (request === "sent") {
+    return (
+      <div ref={focusResult} tabIndex={-1}>
+        <InvitationRenewalSent invitedBy={details?.invitedBy ?? null} email={details?.email ?? null} />
+      </div>
+    );
+  }
 
   return (
     <section className={styles.notice} aria-labelledby="invitation-notice-title">
@@ -139,15 +197,15 @@ export function InvitationNotice({ rejection }: InvitationNoticeProps) {
       )}
 
       {canRequestNew && (
-        <button type="button" className={styles.action} onClick={() => setIsRequestUnavailable(true)}>
-          Pedir novo convite
+        <button type="button" className={styles.action} onClick={() => void requestNew()} disabled={isSending}>
+          {isSending && <Spinner className={styles.spinner} size="small" />}
+          {isSending ? "Enviando…" : "Pedir novo convite"}
         </button>
       )}
 
-      {isRequestUnavailable && (
-        <p className={styles.unavailable} role="alert">
-          O pedido de novo convite ainda não está disponível.
-          {details ? ` Fale diretamente com ${details.invitedBy}.` : " Fale diretamente com quem convidou você."}
+      {requestError && (
+        <p key={requestError} className={styles.requestError} role="alert">
+          {requestError}
         </p>
       )}
 

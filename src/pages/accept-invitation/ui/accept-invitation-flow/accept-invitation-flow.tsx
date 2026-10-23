@@ -161,7 +161,7 @@ export function AcceptInvitationFlow({ token, invitation, onDeclined }: AcceptIn
   if (rejection) {
     return (
       <div ref={focusResult} tabIndex={-1} className={styles.result}>
-        <InvitationNotice rejection={rejection} />
+        <InvitationNotice rejection={rejection} token={token} />
       </div>
     );
   }

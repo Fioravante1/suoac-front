@@ -75,7 +75,7 @@ export async function AcceptInvitationPage({ token, status }: AcceptInvitationPa
   if (lookup.status === "rejected") {
     return (
       <AuthShell>
-        <InvitationNotice rejection={lookup.rejection} />
+        <InvitationNotice rejection={lookup.rejection} token={rawToken} />
       </AuthShell>
     );
   }

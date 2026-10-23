@@ -12,6 +12,7 @@ const declineInvitationAction = vi.fn<(input: unknown) => Promise<DeclineInvitat
 vi.mock("../../api", () => ({
   acceptInvitationAction: (input: unknown) => acceptInvitationAction(input),
   declineInvitationAction: (input: unknown) => declineInvitationAction(input),
+  requestRenewalAction: vi.fn(),
 }));
 
 const { AcceptInvitationFlow } = await import("./accept-invitation-flow");
