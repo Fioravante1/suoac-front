@@ -10,6 +10,10 @@ export const endpoints = {
     circuitSignups: "/auth/circuit-signups",
     circuitSignupConfirmations: "/auth/circuit-signups/confirmations",
   },
+  invitations: {
+    detail: (token: string) => `/invitations/${encodeURIComponent(token)}` as const,
+    acceptances: (token: string) => `/invitations/${encodeURIComponent(token)}/acceptances` as const,
+  },
   congregations: {
     list: (circuitId: string) => `/circuits/${circuitId}/congregations` as const,
     detail: (id: string) => `/congregations/${id}` as const,

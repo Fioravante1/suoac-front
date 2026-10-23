@@ -1,0 +1,148 @@
+.notice,
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.notice {
+  align-items: center;
+  gap: var(--suoac-space-6);
+  text-align: center;
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.text {
+  gap: var(--suoac-space-2);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--suoac-radius-pill);
+}
+
+.iconAttention {
+  background: var(--suoac-color-attention-soft);
+  color: var(--suoac-color-attention-text);
+}
+
+.iconCritical {
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+}
+
+/* Falha do servico nao e problema do link: a cor de atencao sugeriria que a
+   pessoa precisa resolver algo, e aqui ela so precisa tentar de novo. */
+.iconNeutral {
+  background: var(--suoac-color-neutral-soft);
+  color: var(--suoac-color-text-secondary);
+}
+
+.title {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-bold);
+}
+
+.description {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+  line-height: 1.55;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  width: 100%;
+  margin: 0;
+  padding: var(--suoac-space-4);
+  border-radius: var(--suoac-radius-control);
+  background: var(--suoac-color-surface-muted);
+  font-size: var(--suoac-font-size-small);
+  text-align: left;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--suoac-space-4);
+}
+
+.summaryKey {
+  color: var(--suoac-color-text-secondary);
+  white-space: nowrap;
+}
+
+.summaryValue {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-weight: var(--suoac-font-weight-semibold);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.action,
+.secondaryAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 3.125rem;
+  border-radius: var(--suoac-radius-control);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-body);
+  font-weight: var(--suoac-font-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.action {
+  border: 0;
+  background: var(--suoac-color-primary);
+  color: var(--suoac-color-on-primary);
+}
+
+.action:hover {
+  background: var(--suoac-color-primary-dark);
+}
+
+/* Com o pedido de novo convite em destaque, a saida vira acao secundaria. */
+.secondaryAction {
+  border: 1px solid var(--suoac-color-border-strong);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+}
+
+.secondaryAction:hover {
+  background: var(--suoac-color-surface-muted);
+}
+
+.unavailable {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--suoac-color-attention);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-attention-soft);
+  color: var(--suoac-color-attention-text);
+  font-size: var(--suoac-font-size-small);
+  text-align: left;
+}
+
+.action:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 3px;
+}
