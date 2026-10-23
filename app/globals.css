@@ -63,6 +63,10 @@
   --suoac-color-brand-panel-attention-soft: rgb(242 193 75 / 0.15);
   --suoac-color-brand-panel-attention-ring: rgb(242 193 75 / 0.35);
   --suoac-color-brand-panel-attention-pulse: rgb(242 193 75 / 0.55);
+  /* Selo "Recusado" (vermelho claro) do cartao. */
+  --suoac-color-brand-panel-critical: #f4a3a3;
+  --suoac-color-brand-panel-critical-soft: rgb(240 114 114 / 0.18);
+  --suoac-color-brand-panel-critical-ring: rgb(240 114 114 / 0.35);
   --suoac-color-brand-panel-text-secondary: rgb(255 255 255 / 0.6);
 
   /* Semantic backgrounds */

@@ -17,18 +17,19 @@ export type TicketInvitation = Pick<
   "role" | "invitedBy" | "circuit" | "circuitCity" | "circuitState" | "congregation" | "congregationCode"
 >;
 
-export type TicketBadge = "pending" | "accepted";
+export type TicketBadge = "pending" | "accepted" | "declined";
 
 interface InvitationTicketProps {
   invitation: TicketInvitation;
   badge: TicketBadge;
-  /** Linha abaixo do cartao: validade do convite ou confirmacao do aceite. */
+  /** Linha abaixo do cartao: validade do convite ou confirmacao do aceite ou da recusa. */
   footnote: string;
 }
 
 const BADGES: Record<TicketBadge, { label: string; className: string }> = {
   pending: { label: "Aguardando você", className: styles.badgePending },
   accepted: { label: "Aceito", className: styles.badgeAccepted },
+  declined: { label: "Recusado", className: styles.badgeDeclined },
 };
 
 /**

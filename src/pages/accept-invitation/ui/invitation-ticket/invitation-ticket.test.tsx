@@ -13,7 +13,7 @@ const COORDINATOR_INVITATION: TicketInvitation = {
   congregationCode: "31245",
 };
 
-function renderTicket(invitation = COORDINATOR_INVITATION, badge: "pending" | "accepted" = "pending") {
+function renderTicket(invitation = COORDINATOR_INVITATION, badge: "pending" | "accepted" | "declined" = "pending") {
   return render(<InvitationTicket invitation={invitation} badge={badge} footnote="Convite válido até 30/10/2026" />);
 }
 
@@ -65,6 +65,14 @@ describe("InvitationTicket", () => {
 
     expect(screen.getByText("Aceito")).toBeInTheDocument();
     expect(screen.queryByText("Aguardando você")).not.toBeInTheDocument();
+  });
+
+  it("marca o convite como recusado depois da recusa", () => {
+    renderTicket(COORDINATOR_INVITATION, "declined");
+
+    expect(screen.getByText("Recusado")).toBeInTheDocument();
+    expect(screen.queryByText("Aguardando você")).not.toBeInTheDocument();
+    expect(screen.queryByText("Aceito")).not.toBeInTheDocument();
   });
 
   it("assina a linha de rodapé do cartão", () => {

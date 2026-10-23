@@ -156,6 +156,17 @@
   animation-fill-mode: both;
 }
 
+/* "Recusado" entra com um leve salto, sem o carimbo do aceite. */
+.badgeDeclined {
+  background: var(--suoac-color-brand-panel-critical-soft);
+  color: var(--suoac-color-brand-panel-critical);
+  box-shadow: inset 0 0 0 1px var(--suoac-color-brand-panel-critical-ring);
+  animation-name: var(--suoac-animation-pop);
+  animation-duration: 0.3s;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 var(--suoac-color-brand-panel-attention-pulse);
