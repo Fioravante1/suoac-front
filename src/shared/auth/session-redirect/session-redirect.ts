@@ -22,6 +22,12 @@
  * no `http-client` + `unauthorized.tsx`, e remover este módulo, o
  * `SessionGuard` e a detecção no `useServerError`/`query-client`.
  */
+/*
+ * Do modulo, nao do barril `@/shared/lib`: o barril reexporta `useServerError`,
+ * que importa este arquivo — importar por ele fecharia um ciclo.
+ */
+import { hardNavigate } from "@/shared/lib/navigation";
+
 import { SESSION_EXPIRED_MESSAGE, PASSWORD_CHANGE_REQUIRED_MESSAGE } from "../constants";
 
 const CHANGE_PASSWORD_PATH = "/change-password";
@@ -73,7 +79,7 @@ export function redirectToSessionExpired(): void {
 
   const returnUrl = window.location.pathname + window.location.search;
   const params = new URLSearchParams({ sessionExpired: "true", returnUrl });
-  window.location.href = `/login?${params.toString()}`;
+  hardNavigate(`/login?${params.toString()}`);
 }
 
 /**
@@ -96,7 +102,7 @@ export function redirectToPasswordChangeRequired(): void {
   if (isRedirecting || typeof window === "undefined") return;
 
   isRedirecting = true;
-  window.location.href = CHANGE_PASSWORD_PATH;
+  hardNavigate(CHANGE_PASSWORD_PATH);
 }
 
 /** @internal Exported for testing only */

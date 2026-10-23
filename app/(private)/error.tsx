@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@/shared/api";
+import { hardNavigate } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { ErrorState } from "@/shared/ui/error-state";
 
@@ -24,12 +25,7 @@ export default function PrivateError({
       description="Estamos com dificuldades para carregar esta página. Tente novamente ou volte ao início."
       action={<Button onClick={handleRetry}>Tentar novamente</Button>}
       secondaryAction={
-        <Button
-          variant="ghost"
-          onClick={() => {
-            window.location.href = "/";
-          }}
-        >
+        <Button variant="ghost" onClick={() => hardNavigate("/")}>
           Voltar ao início
         </Button>
       }

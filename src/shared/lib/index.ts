@@ -17,7 +17,7 @@ export {
 } from "./deadline";
 export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
-export { isRedirectRejection } from "./is-redirect-rejection";
+export { hardNavigate, isRedirectRejection } from "./navigation";
 export { calcPercentage } from "./number";
 export {
   PHONE_MASK_MAX_LENGTH,
