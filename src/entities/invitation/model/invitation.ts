@@ -23,7 +23,7 @@ export function isInvitationRole(value: string): value is InvitationRole {
 }
 
 /**
- * Codigo de maquina que acompanha cada recusa do convite (SUC-36 e SUC-68). O front
+ * Codigo de maquina que acompanha cada recusa do convite (SUC-36, SUC-68 e SUC-72). O front
  * distingue os estados por ele, e nao pelo texto da mensagem: o `409` sozinho
  * quer dizer "ja usado" na consulta e tambem "e-mail ja cadastrado" no aceite.
  */
@@ -33,6 +33,7 @@ export const INVITATION_ERROR_CODES = {
   USED: "INVITATION_USED",
   REVOKED: "INVITATION_REVOKED",
   DECLINED: "INVITATION_DECLINED",
+  NOT_EXPIRED: "INVITATION_NOT_EXPIRED",
   EMAIL_ALREADY_REGISTERED: "INVITATION_EMAIL_ALREADY_REGISTERED",
 } as const;
 
