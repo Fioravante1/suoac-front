@@ -25,8 +25,11 @@ const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.h
  *
  * Tambem vale para quem tem troca de senha obrigatoria pendente: redefinir pelo
  * link resolve a pendencia, entao prende-lo na tela de troca seria um beco.
+ *
+ * O aceite de convite (SUC-27) entra pelo mesmo motivo: o convidado pode abrir o
+ * link num navegador com a sessao de outra pessoa, e o aceite abre a sessao dele.
  */
-const TOKEN_LINK_ROUTES: readonly string[] = [routes.resetPassword];
+const TOKEN_LINK_ROUTES: readonly string[] = [routes.resetPassword, routes.acceptInvitation];
 
 /**
  * Gate de autenticação server-side (Next 16 Proxy). Roda antes de a rota ser

@@ -68,6 +68,34 @@ describe("routeGuard", () => {
     });
   });
 
+  describe("aceite de convite", () => {
+    it("deixa passar sem sessão", async () => {
+      getSessionMock.mockResolvedValue(null);
+
+      const res = await routeGuard(request("/accept-invitation?token=abc"));
+
+      expect(res.headers.get("location")).toBeNull();
+    });
+
+    it("deixa passar com sessão de outra pessoa, em vez de mandar para o painel dela", async () => {
+      // O convidado pode abrir o link num computador compartilhado, e o aceite
+      // abre a sessão dele no lugar da que estava lá.
+      getSessionMock.mockResolvedValue({ ...user, mustChangePassword: false });
+
+      const res = await routeGuard(request("/accept-invitation?token=abc"));
+
+      expect(res.headers.get("location")).toBeNull();
+    });
+
+    it("deixa passar com troca de senha obrigatória pendente", async () => {
+      getSessionMock.mockResolvedValue({ ...user, mustChangePassword: true });
+
+      const res = await routeGuard(request("/accept-invitation?token=abc"));
+
+      expect(res.headers.get("location")).toBeNull();
+    });
+  });
+
   it("redireciona não autenticado de rota privada para /login com returnUrl", async () => {
     getSessionMock.mockResolvedValue(null);
 
