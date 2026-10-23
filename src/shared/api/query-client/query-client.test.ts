@@ -13,6 +13,7 @@ beforeEach(() => {
 
   Object.defineProperty(window, "location", {
     value: {
+      origin: "https://suoac.com",
       pathname: "/congregations",
       search: "?page=2",
       get href() {
@@ -33,7 +34,9 @@ describe("query-client handleAuthError", () => {
 
     cache.config.onError?.(new Error(SESSION_EXPIRED_MESSAGE), undefined!);
 
-    expect(mockLocationHref).toHaveBeenCalledWith("/login?sessionExpired=true&returnUrl=%2Fcongregations%3Fpage%3D2");
+    expect(mockLocationHref).toHaveBeenCalledWith(
+      "https://suoac.com/login?sessionExpired=true&returnUrl=%2Fcongregations%3Fpage%3D2",
+    );
   });
 
   it("redireciona para a troca de senha quando erro tem PASSWORD_CHANGE_REQUIRED_MESSAGE", () => {
@@ -42,7 +45,7 @@ describe("query-client handleAuthError", () => {
 
     cache.config.onError?.(new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE), undefined!);
 
-    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
+    expect(mockLocationHref).toHaveBeenCalledWith("https://suoac.com/change-password");
   });
 
   it("nao redireciona para outros erros", () => {

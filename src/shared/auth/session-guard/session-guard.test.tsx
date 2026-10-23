@@ -26,6 +26,7 @@ beforeEach(() => {
 
   Object.defineProperty(window, "location", {
     value: {
+      origin: "https://suoac.com",
       pathname: "/dashboard",
       search: "",
       get href() {

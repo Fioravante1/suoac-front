@@ -19,6 +19,7 @@ beforeEach(() => {
 
   Object.defineProperty(window, "location", {
     value: {
+      origin: "https://suoac.com",
       pathname: "/passengers",
       search: "?page=3",
       get href() {
@@ -53,7 +54,9 @@ describe("redirectToSessionExpired", () => {
   it("redireciona para /login com sessionExpired e returnUrl", () => {
     redirectToSessionExpired();
 
-    expect(mockLocationHref).toHaveBeenCalledWith("/login?sessionExpired=true&returnUrl=%2Fpassengers%3Fpage%3D3");
+    expect(mockLocationHref).toHaveBeenCalledWith(
+      "https://suoac.com/login?sessionExpired=true&returnUrl=%2Fpassengers%3Fpage%3D3",
+    );
   });
 
   it("dispara apenas uma vez (gate isRedirecting)", () => {
@@ -81,7 +84,7 @@ describe("redirectToPasswordChangeRequired", () => {
   it("redireciona para /change-password", () => {
     redirectToPasswordChangeRequired();
 
-    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
+    expect(mockLocationHref).toHaveBeenCalledWith("https://suoac.com/change-password");
   });
 
   it("compartilha o gate com o redirect de sessão (dispara uma vez)", () => {
