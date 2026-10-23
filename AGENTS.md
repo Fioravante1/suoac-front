@@ -80,6 +80,7 @@ o que vale igual no backend e no frontend. **Nao edite esses arquivos aqui** —
 | `commits.md`                           | sempre — Conventional Commits em portugues, organizacao por significado, sem trailer de IA    |
 | `idioma-do-codigo.md`                  | `**/*.{ts,tsx}`, `**/*.{js,mjs,cjs}` — identificadores em ingles, textos humanos em portugues |
 | `aninhamento-e-ternarios.md`           | `**/*.{ts,tsx}` — early returns obrigatorios, proibido `if` ou ternario aninhado              |
+| `lacos-e-iteracao.md`                  | `**/*.{ts,tsx}` — metodos de array/string e regex no lugar de `while` com contador            |
 
 Para feature flags (`flags/next`, `@vercel/flags-core`), consulte tambem a skill em
 `.claude/skills/flags-sdk/SKILL.md` (espelhada em `.agents/skills/flags-sdk/SKILL.md`).
