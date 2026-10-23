@@ -17,6 +17,16 @@ const brandPanelColors = {
   brandPanelOnHighlight: "#0A1A29",
   brandPanelTile: "rgb(255 255 255 / 0.06)",
   brandPanelTileBorder: "rgb(255 255 255 / 0.12)",
+  brandPanelTicket: "rgb(255 255 255 / 0.05)",
+  brandPanelTicketRing: "rgb(255 255 255 / 0.1)",
+  brandPanelTicketDivider: "rgb(255 255 255 / 0.16)",
+  brandPanelTicketBand: "rgb(0 0 0 / 0.12)",
+  brandPanelTextFaint: "rgb(255 255 255 / 0.5)",
+  brandPanelAttention: "#F2C14B",
+  brandPanelAttentionSoft: "rgb(242 193 75 / 0.15)",
+  brandPanelAttentionRing: "rgb(242 193 75 / 0.35)",
+  brandPanelAttentionPulse: "rgb(242 193 75 / 0.55)",
+  brandPanelTextSecondary: "rgb(255 255 255 / 0.6)",
 } as const;
 
 export const themeTokens = {
