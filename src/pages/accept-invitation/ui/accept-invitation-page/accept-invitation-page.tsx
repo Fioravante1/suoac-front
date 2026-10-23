@@ -5,14 +5,13 @@ import { redirect } from "next/navigation";
  * servidor, e o barril reexporta hooks `"use client"` — o build falha ao ver
  * hook de cliente alcancado por Server Component.
  */
-import { formatDate } from "@/shared/lib/date";
 import { getSession } from "@/shared/auth/session";
 import { routes } from "@/shared/config";
 import { AuthShell } from "@/widgets/auth-shell";
 
 import { loadInvitation } from "../../api/load-invitation-action";
 import { readWelcomeSummary } from "../../api/welcome-cookie";
-import { AcceptInvitationFlow } from "../accept-invitation-flow";
+import { AcceptInvitationStage } from "../accept-invitation-stage";
 import { InvitationNotice } from "../invitation-notice";
 import { InvitationTicket } from "../invitation-ticket";
 import { InvitationWelcome } from "../invitation-welcome";
@@ -81,19 +80,5 @@ export async function AcceptInvitationPage({ token, status }: AcceptInvitationPa
     );
   }
 
-  const { invitation } = lookup;
-
-  return (
-    <AuthShell
-      aside={
-        <InvitationTicket
-          invitation={invitation}
-          badge="pending"
-          footnote={`Convite válido até ${formatDate(invitation.expiresAt)}`}
-        />
-      }
-    >
-      <AcceptInvitationFlow token={rawToken} invitation={invitation} />
-    </AuthShell>
-  );
+  return <AcceptInvitationStage token={rawToken} invitation={lookup.invitation} />;
 }

@@ -1,4 +1,4 @@
-export { DECLINE_REASONS, DECLINE_REASON_LABELS } from "./decline-reasons";
+export { DECLINE_REASONS, DECLINE_REASON_LABELS, isDeclineReason } from "./decline-reasons";
 export type { DeclineReason } from "./decline-reasons";
 export {
   DETAILS_STEP_FIELDS,

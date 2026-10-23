@@ -21,6 +21,7 @@ describe("InvitationNotice", () => {
     ["expired", "Este convite expirou"],
     ["used", "Este convite já foi usado"],
     ["revoked", "Este convite foi cancelado"],
+    ["declined", "Este convite foi recusado"],
     ["not-found", "Este convite não é válido"],
     ["email-registered", "Este e-mail já tem uma conta"],
     ["unavailable", "Não foi possível abrir o convite"],

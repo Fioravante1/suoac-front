@@ -1,7 +1,7 @@
 import type { ExpiredInvitationDetails, Invitation } from "@/entities/invitation";
 
 /**
- * Por que o convite nao pode ser aceito, ou a falha que impede de saber. Cada
+ * Por que o convite nao pode ser aceito nem recusado, ou a falha que impede de saber. Cada
  * um tem texto e saida propria na tela — o card SUC-27 proibiu colapsar isso
  * num erro generico.
  *
@@ -12,6 +12,7 @@ export const INVITATION_NOTICE_STATES = [
   "expired",
   "used",
   "revoked",
+  "declined",
   "not-found",
   "email-registered",
   "unavailable",

@@ -1,0 +1,51 @@
+.confirmation,
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirmation {
+  align-items: flex-start;
+  gap: var(--suoac-space-5);
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-slow);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.text {
+  gap: var(--suoac-space-2);
+}
+
+/* Neutro, como no desenho: recusar nao e erro nem vitoria. */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--suoac-radius-xl);
+  background: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-secondary);
+  animation-name: var(--suoac-animation-pop);
+  animation-duration: 0.45s;
+  animation-timing-function: var(--suoac-motion-ease-overshoot);
+  animation-fill-mode: both;
+}
+
+.title {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-size: 1.75rem;
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: var(--suoac-line-height-body);
+  text-wrap: pretty;
+}

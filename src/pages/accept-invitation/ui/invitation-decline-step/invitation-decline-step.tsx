@@ -4,18 +4,24 @@ import { useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { formatDate } from "@/shared/lib";
+import { useServerError } from "@/shared/lib";
+import { Spinner } from "@/shared/ui/spinner";
 
-import { DECLINE_REASONS, DECLINE_REASON_LABELS, type DeclineReason } from "../../model";
+import { declineInvitationAction } from "../../api";
+import { DECLINE_REASONS, DECLINE_REASON_LABELS, type DeclineReason, type InvitationRejection } from "../../model";
 
 import styles from "./invitation-decline-step.module.css";
 
 interface InvitationDeclineStepProps {
+  /** Token do link, lido da URL no servidor. Nao e campo do formulario: a action o envia. */
+  token: string;
   invitedBy: string;
   congregation: string;
-  /** Validade do convite, ISO 8601: sem a recusa disponivel, e o que resta a quem nao quer aceitar. */
-  expiresAt: string;
   onBack: () => void;
+  /** Recusa gravada: quem chama troca a tela pela confirmacao. */
+  onDeclined: () => void;
+  /** O convite deixou de servir entre abrir a tela e recusar: quem chama troca a tela pelo aviso. */
+  onRejected: (rejection: InvitationRejection) => void;
 }
 
 interface DeclineFormValues {
@@ -23,27 +29,62 @@ interface DeclineFormValues {
 }
 
 const REASONS = Object.values(DECLINE_REASONS);
+const SUBMIT_FAILED = "Não foi possível recusar o convite agora. Verifique sua conexão e tente novamente.";
 
 /**
- * Recusa do convite: o convidado escolhe um motivo e confirma.
+ * Recusa do convite (SUC-69): o convidado escolhe um motivo e confirma.
  *
- * A tela e a do desenho, mas o back ainda nao recebe a recusa (SUC-68). Ate o
- * endpoint existir, confirmar nao finge sucesso: explica que ainda nao esta
- * disponivel e que ignorar o convite resolve, porque ele expira sozinho. O
- * SUC-69 troca isso pela chamada real.
+ * Quem enviou o convite e avisado pelo back. Falha de rede ou do servico fica
+ * na propria tela, com o motivo ja escolhido, para tentar de novo; so os
+ * vereditos definitivos — usado, expirado, cancelado, ja recusado — trocam a
+ * tela por um aviso.
  */
-export function InvitationDeclineStep({ invitedBy, congregation, expiresAt, onBack }: InvitationDeclineStepProps) {
-  const [isUnavailable, setIsUnavailable] = useState(false);
+export function InvitationDeclineStep({
+  token,
+  invitedBy,
+  congregation,
+  onBack,
+  onDeclined,
+  onRejected,
+}: InvitationDeclineStepProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { serverError, clearServerError, showServerError } = useServerError();
   const { register, handleSubmit, control } = useForm<DeclineFormValues>({ defaultValues: { reason: null } });
   // `useWatch` em vez de `watch()`: o React Compiler nao memoiza o retorno de `watch`.
-  const hasReason = useWatch({ control, name: "reason" }) !== null;
+  const reason = useWatch({ control, name: "reason" });
+
+  async function submit(values: DeclineFormValues) {
+    if (values.reason === null) {
+      return;
+    }
+
+    clearServerError();
+    setIsSubmitting(true);
+
+    try {
+      const result = await declineInvitationAction({ token, reason: values.reason });
+
+      if (result.status === "declined") {
+        onDeclined();
+        return;
+      }
+
+      if (result.status === "rejected") {
+        onRejected(result.rejection);
+        return;
+      }
+
+      showServerError(result.message, SUBMIT_FAILED);
+    } catch {
+      // Falha antes de a action responder — conexao caida, deploy no meio da requisicao.
+      showServerError(null, SUBMIT_FAILED);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
-    <form
-      className={styles.decline}
-      onSubmit={handleSubmit(() => setIsUnavailable(true))}
-      aria-labelledby="invitation-decline-title"
-    >
+    <form className={styles.decline} onSubmit={handleSubmit(submit)} aria-labelledby="invitation-decline-title">
       <header className={styles.header}>
         <h2 id="invitation-decline-title" className={styles.title}>
           Recusar convite?
@@ -53,33 +94,31 @@ export function InvitationDeclineStep({ invitedBy, congregation, expiresAt, onBa
         </p>
       </header>
 
-      <fieldset className={styles.reasons}>
+      <fieldset className={styles.reasons} disabled={isSubmitting}>
         <legend className={styles.legend}>Motivo da recusa</legend>
-        {REASONS.map((reason) => (
-          <label key={reason} className={styles.reason}>
-            <input type="radio" value={reason} className={styles.input} {...register("reason")} />
+        {REASONS.map((option) => (
+          <label key={option} className={styles.reason}>
+            <input type="radio" value={option} className={styles.input} {...register("reason")} />
             <span className={styles.radio} aria-hidden />
-            {DECLINE_REASON_LABELS[reason]}
+            {DECLINE_REASON_LABELS[option]}
           </label>
         ))}
       </fieldset>
 
-      {isUnavailable && (
-        <p className={styles.unavailable} role="alert">
+      {serverError && (
+        <p key={serverError} className={styles.error} role="alert">
           <CircleAlert size={17} strokeWidth={2} aria-hidden />
-          <span>
-            Recusar convite ainda não está disponível. Basta ignorar esta mensagem: o convite expira em{" "}
-            {formatDate(expiresAt)}. Se preferir, avise {invitedBy}.
-          </span>
+          <span>{serverError}</span>
         </p>
       )}
 
       <div className={styles.actions}>
-        <button type="button" className={styles.back} onClick={onBack}>
+        <button type="button" className={styles.back} onClick={onBack} disabled={isSubmitting}>
           Voltar
         </button>
-        <button type="submit" className={styles.confirm} disabled={!hasReason}>
-          Recusar
+        <button type="submit" className={styles.confirm} disabled={reason === null || isSubmitting}>
+          {isSubmitting && <Spinner className={styles.spinner} size="small" />}
+          {isSubmitting ? "Recusando…" : "Recusar"}
         </button>
       </div>
     </form>

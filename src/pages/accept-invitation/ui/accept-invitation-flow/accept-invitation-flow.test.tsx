@@ -3,12 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Invitation } from "@/entities/invitation";
 
-import type { AcceptInvitationResult } from "../../api";
+import type { AcceptInvitationResult, DeclineInvitationResult } from "../../api";
 
 const acceptInvitationAction = vi.fn<(input: unknown) => Promise<AcceptInvitationResult>>();
 
+const declineInvitationAction = vi.fn<(input: unknown) => Promise<DeclineInvitationResult>>();
+
 vi.mock("../../api", () => ({
   acceptInvitationAction: (input: unknown) => acceptInvitationAction(input),
+  declineInvitationAction: (input: unknown) => declineInvitationAction(input),
 }));
 
 const { AcceptInvitationFlow } = await import("./accept-invitation-flow");
@@ -40,8 +43,10 @@ function redirectRejection() {
   });
 }
 
-function renderFlow(invitation: Invitation = INVITATION) {
-  return render(<AcceptInvitationFlow token={TOKEN} invitation={invitation} />);
+function renderFlow(invitation: Invitation = INVITATION, onDeclined = vi.fn()) {
+  render(<AcceptInvitationFlow token={TOKEN} invitation={invitation} onDeclined={onDeclined} />);
+
+  return onDeclined;
 }
 
 function advance() {
@@ -67,6 +72,7 @@ function submit() {
 }
 
 beforeEach(() => {
+  declineInvitationAction.mockReset();
   acceptInvitationAction.mockReset();
 });
 
@@ -163,6 +169,30 @@ describe("AcceptInvitationFlow — etapa de dados", () => {
     fireEvent.click(screen.getByRole("button", { name: "Voltar" }));
 
     expect(screen.getByLabelText("Nome completo")).toHaveValue("Ana B. Souza");
+  });
+
+  it("recusa o convite com o motivo escolhido e avisa quem montou a página", async () => {
+    declineInvitationAction.mockResolvedValue({ status: "declined" });
+    const onDeclined = renderFlow();
+    fireEvent.click(screen.getByRole("button", { name: "Recusar convite" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Recebi por engano" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Recusar" }));
+
+    await waitFor(() => expect(onDeclined).toHaveBeenCalledTimes(1));
+    expect(declineInvitationAction).toHaveBeenCalledWith({ token: TOKEN, reason: "RECEIVED_BY_MISTAKE" });
+  });
+
+  it("troca a tela pelo aviso quando o convite mudou de estado antes da recusa", async () => {
+    declineInvitationAction.mockResolvedValue({ status: "rejected", rejection: { state: "used", details: null } });
+    const onDeclined = renderFlow();
+    fireEvent.click(screen.getByRole("button", { name: "Recusar convite" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Recebi por engano" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Recusar" }));
+
+    expect(await screen.findByRole("heading", { name: "Este convite já foi usado" })).toBeInTheDocument();
+    expect(onDeclined).not.toHaveBeenCalled();
   });
 });
 

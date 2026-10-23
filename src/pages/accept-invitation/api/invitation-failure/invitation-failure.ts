@@ -15,6 +15,7 @@ const STATE_BY_CODE = new Map<string, InvitationNoticeState>([
   [INVITATION_ERROR_CODES.EXPIRED, "expired"],
   [INVITATION_ERROR_CODES.USED, "used"],
   [INVITATION_ERROR_CODES.REVOKED, "revoked"],
+  [INVITATION_ERROR_CODES.DECLINED, "declined"],
   [INVITATION_ERROR_CODES.EMAIL_ALREADY_REGISTERED, "email-registered"],
 ]);
 
