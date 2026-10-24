@@ -154,9 +154,25 @@ describe("SignInForm", () => {
     expect(onSignUp).toHaveBeenCalledOnce();
   });
 
-  it("mantém o usuário conectado por padrão, como o desenho pede", () => {
+  it("mostra o Manter conectado desmarcado e desabilitado: a API de sessão estendida ainda não existe (SUC-39)", () => {
     render(<SignInForm />);
 
-    expect(screen.getByRole("checkbox", { name: "Manter conectado neste computador" })).toBeChecked();
+    const checkbox = screen.getByRole("checkbox", { name: "Manter conectado neste computador" });
+
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+  });
+
+  it("envia à ação de entrada só e-mail, senha e destino, sem promessa de sessão estendida", async () => {
+    signInAction.mockResolvedValue({ status: "success", firstName: "Maria", redirectTo: "/dashboard" });
+    render(<SignInForm />);
+    fillCredentials();
+
+    fireEvent.click(getSubmit());
+
+    // Também prova que o envio passa pelo `zodResolver` com o controle desabilitado: o react-hook-form
+    // não pode tratar o campo desabilitado como `undefined` e travar o botão em silêncio.
+    await waitFor(() => expect(signInAction).toHaveBeenCalledTimes(1));
+    expect(signInAction).toHaveBeenCalledWith({ ...CREDENTIALS, returnUrl: null });
   });
 });
