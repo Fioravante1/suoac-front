@@ -34,6 +34,7 @@ const GENERIC_ERROR = "Não foi possível entrar agora. Verifique sua conexão e
  * legado (SUC-34). Ver `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` §3.1.
  */
 export async function signInAction({ returnUrl, ...credentials }: SignInInput): Promise<SignInResult> {
+  // `rememberMe` fixo em `false` ate a API de sessao estendida (SUC-39); o controle esta desabilitado (SUC-44).
   const parsed = signInSchema.safeParse({ ...credentials, rememberMe: false });
 
   if (!parsed.success) {
