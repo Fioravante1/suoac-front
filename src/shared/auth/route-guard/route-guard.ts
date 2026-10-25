@@ -9,11 +9,11 @@ import { getSession } from "../session";
 /**
  * Rotas acessíveis sem sessão. Todas as demais exigem autenticação.
  *
- * Privacidade e Ajuda entram aqui porque são alcançadas pelo rodapé da tela de
- * entrada: sem isso o gate as devolveria para `/login`, e o link do rodapé
+ * Privacidade, Termos e Ajuda entram aqui porque são alcançadas pelo rodapé e pelo
+ * aceite da tela de entrada: sem isso o gate as devolveria para `/login`, e o link do rodapé
  * pareceria quebrado mesmo com a página existindo.
  */
-const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.help];
+const PUBLIC_ROUTES: readonly string[] = [routes.login, routes.privacy, routes.terms, routes.help];
 
 /**
  * Rotas abertas por link com token, acessiveis **com ou sem sessao**.
