@@ -120,7 +120,7 @@ describe("routeGuard", () => {
     expect(res.headers.get("location")).toBeNull();
   });
 
-  it.each(["/privacidade", "/ajuda"])("permite não autenticado acessar %s", async (path) => {
+  it.each(["/privacidade", "/termos", "/ajuda"])("permite não autenticado acessar %s", async (path) => {
     // São alcançadas pelo rodapé da tela de entrada. Se o gate as barrar, o link
     // devolve o visitante para /login e parece quebrado, mesmo com a página no ar.
     getSessionMock.mockResolvedValue(null);
