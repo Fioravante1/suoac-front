@@ -18,9 +18,9 @@ vi.mock("next/navigation", () => ({
 
 const { SignInForm } = await import("./sign-in-form");
 
-const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta" };
+const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta", rememberMe: false };
 
-function fillCredentials({ email, password } = CREDENTIALS) {
+function fillCredentials({ email, password }: { email: string; password: string } = CREDENTIALS) {
   fireEvent.change(screen.getByLabelText("E-mail"), { target: { value: email } });
   fireEvent.change(screen.getByLabelText("Senha"), { target: { value: password } });
 }
@@ -154,25 +154,24 @@ describe("SignInForm", () => {
     expect(onSignUp).toHaveBeenCalledOnce();
   });
 
-  it("mostra o Manter conectado desmarcado e desabilitado: a API de sessão estendida ainda não existe (SUC-39)", () => {
+  it("mostra o Manter conectado desmarcado e habilitado: a sessão estendida é escolha explícita", () => {
     render(<SignInForm />);
 
     const checkbox = screen.getByRole("checkbox", { name: "Manter conectado neste computador" });
 
     expect(checkbox).not.toBeChecked();
-    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeEnabled();
   });
 
-  it("envia à ação de entrada só e-mail, senha e destino, sem promessa de sessão estendida", async () => {
+  it("envia à ação de entrada o que o usuário escolheu em Manter conectado", async () => {
     signInAction.mockResolvedValue({ status: "success", firstName: "Maria", redirectTo: "/dashboard" });
     render(<SignInForm />);
     fillCredentials();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Manter conectado neste computador" }));
 
     fireEvent.click(getSubmit());
 
-    // Também prova que o envio passa pelo `zodResolver` com o controle desabilitado: o react-hook-form
-    // não pode tratar o campo desabilitado como `undefined` e travar o botão em silêncio.
     await waitFor(() => expect(signInAction).toHaveBeenCalledTimes(1));
-    expect(signInAction).toHaveBeenCalledWith({ ...CREDENTIALS, returnUrl: null });
+    expect(signInAction).toHaveBeenCalledWith({ ...CREDENTIALS, rememberMe: true, returnUrl: null });
   });
 });

@@ -141,9 +141,12 @@ Request body:
 ```json
 {
   "email": "coordenador@suoac.dev",
-  "password": "Senha@123"
+  "password": "Senha@123",
+  "rememberMe": false
 }
 ```
+
+`rememberMe` e opcional (padrao `false`) e pede a sessao estendida; ver [5.1.1](#511-duracao-da-sessao-manter-conectado).
 
 Response body (200):
 
@@ -151,6 +154,8 @@ Response body (200):
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs...",
   "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+  "extendedSession": false,
+  "refreshExpiresIn": 604800,
   "user": {
     "id": "f8b6c15f-6ebf-4712-a8e3-930f0019c33a",
     "name": "Coordenador de Circuito",
@@ -183,6 +188,8 @@ import type { User } from "@/entities/user";
 export interface SignInResponseDto {
   accessToken: string;
   refreshToken: string;
+  extendedSession?: boolean;
+  refreshExpiresIn?: number;
   user: User;
 }
 ```
@@ -346,9 +353,29 @@ Configuracao dos cookies:
   secure: process.env.NODE_ENV === "production",  // HTTPS apenas em producao
   sameSite: "lax",              // protege contra CSRF em requests cross-origin
   path: "/",                    // disponivel em todas as rotas
-  maxAge: 604800,               // 7 dias em segundos
+  maxAge: lifetime.extended ? lifetime.refreshExpiresIn : undefined,  // ver 5.1.1
 }
 ```
+
+#### 5.1.1 Duracao da sessao ("Manter conectado")
+
+O backend decide a duracao e a informa em toda resposta de autenticacao (`extendedSession` e
+`refreshExpiresIn`, em segundos). `createSession` recebe esse par como `SessionLifetime`:
+
+| Modo      | Origem                       | Refresh token | Cookies                                              |
+| --------- | ---------------------------- | ------------- | ---------------------------------------------------- |
+| Padrao    | login sem `rememberMe`       | 7 dias        | de sessao, sem `maxAge`: somem ao fechar o navegador |
+| Estendido | login com `rememberMe: true` | 30 dias       | persistentes, `maxAge = refreshExpiresIn`            |
+
+- A marca `extended` viaja dentro do refresh token (e do access token), nunca no usuario: vale so
+  para o dispositivo que a pediu. A renovacao (`/auth/refresh`) e a troca de senha preservam o
+  modo, entao a sessao estendida e uma janela deslizante de 30 dias a cada uso.
+- `toSessionLifetime(response)` le o par da resposta e, na duvida (campos ausentes ou invalidos),
+  devolve o modo padrao: o cookie que some ao fechar o navegador, nunca o que persiste.
+- Aceite de convite e confirmacao de autocadastro sempre abrem sessao padrao.
+- A redefinicao de senha encerra as duas modalidades (zera o refresh e incrementa a versao da sessao).
+- Limitacao conhecida: so ha um refresh token por usuario no backend, entao entrar em outro
+  dispositivo derruba a sessao estendida do primeiro (SUC-77).
 
 ### 5.2 Por que `suoac-user` nao e httpOnly
 
@@ -361,14 +388,14 @@ JavaScript.
 
 ### 5.3 Funcoes do modulo `session.ts`
 
-| Funcao            | Assinatura                                                        | Descricao                                   |
-| ----------------- | ----------------------------------------------------------------- | ------------------------------------------- |
-| `createSession`   | `(accessToken, refreshToken, user: SessionUser) => Promise<void>` | Cria os 3 cookies apos login                |
-| `getSession`      | `() => Promise<SessionUser \| null>`                              | Le e parseia o cookie `suoac-user`          |
-| `getAccessToken`  | `() => Promise<string \| null>`                                   | Retorna o access token do cookie httpOnly   |
-| `getRefreshToken` | `() => Promise<string \| null>`                                   | Retorna o refresh token do cookie httpOnly  |
-| `deleteSession`   | `() => Promise<void>`                                             | Remove os 3 cookies                         |
-| `hasSession`      | `() => Promise<boolean>`                                          | Verifica se o cookie de access token existe |
+| Funcao            | Assinatura                                                                                    | Descricao                                                |
+| ----------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `createSession`   | `(accessToken, refreshToken, user: SessionUser, lifetime?: SessionLifetime) => Promise<void>` | Cria os 3 cookies; `lifetime` omitido vale sessao padrao |
+| `getSession`      | `() => Promise<SessionUser \| null>`                                                          | Le e parseia o cookie `suoac-user`                       |
+| `getAccessToken`  | `() => Promise<string \| null>`                                                               | Retorna o access token do cookie httpOnly                |
+| `getRefreshToken` | `() => Promise<string \| null>`                                                               | Retorna o refresh token do cookie httpOnly               |
+| `deleteSession`   | `() => Promise<void>`                                                                         | Remove os 3 cookies                                      |
+| `hasSession`      | `() => Promise<boolean>`                                                                      | Verifica se o cookie de access token existe              |
 
 ### 5.4 Interface `SessionUser`
 

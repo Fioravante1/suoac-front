@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { httpClient, HttpError, endpoints } from "@/shared/api/http-client";
-import { createSession } from "@/shared/auth/session";
+import { createSession, toSessionLifetime } from "@/shared/auth/session";
 import { SESSION_EXPIRED_MESSAGE } from "@/shared/auth";
 import { routes } from "@/shared/config";
 
@@ -74,16 +74,21 @@ export async function changePasswordAction(
       },
     });
 
-    await createSession(response.accessToken, response.refreshToken, {
-      id: response.user.id,
-      name: response.user.name,
-      email: response.user.email,
-      role: response.user.role,
-      isActive: response.user.isActive,
-      circuitId: response.user.circuitId,
-      congregationId: response.user.congregationId,
-      mustChangePassword: response.user.mustChangePassword,
-    });
+    await createSession(
+      response.accessToken,
+      response.refreshToken,
+      {
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email,
+        role: response.user.role,
+        isActive: response.user.isActive,
+        circuitId: response.user.circuitId,
+        congregationId: response.user.congregationId,
+        mustChangePassword: response.user.mustChangePassword,
+      },
+      toSessionLifetime(response),
+    );
   } catch (error) {
     return mapChangePasswordError(error);
   }
