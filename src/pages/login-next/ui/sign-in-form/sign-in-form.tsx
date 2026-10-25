@@ -53,7 +53,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
     // Valida ao sair do campo e, dai em diante, a cada tecla: avisar do erro no
     // primeiro caractere digitado seria implicancia.
     mode: "onTouched",
-    // `rememberMe` desmarcado: o controle esta desabilitado (ver abaixo).
+    // Desmarcado por padrão: a sessão estendida é escolha explícita, não algo que um computador compartilhado herde.
     defaultValues: { email: "", password: "", rememberMe: false },
   });
 
@@ -74,6 +74,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
     const result = await signInAction({
       email: values.email,
       password: values.password,
+      rememberMe: values.rememberMe,
       returnUrl,
     });
 
@@ -143,18 +144,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
             {...register("password")}
           />
 
-          {/*
-           * "Manter conectado" espera a API de sessao estendida (SUC-39), que ainda
-           * nao existe. Ate la o controle fica desmarcado e desabilitado (SUC-44),
-           * como "Esqueci a senha" quando nao tem para onde ir: marcado e ignorado
-           * em silencio, ele prometeria uma sessao mais longa que ninguem entrega.
-           *
-           * Para devolver o controle, o SUC-39 muda tres pontos juntos: aqui, o
-           * valor padrao (`true`, como no desenho) e o `disabled`; o `onSubmit`,
-           * que passa a enviar `rememberMe`; e `signInAction`, que hoje o fixa em
-           * `false`. Mudar so um deles deixaria um controle ativo que nao faz nada.
-           */}
-          <Checkbox label="Manter conectado neste computador" disabled {...register("rememberMe")} />
+          <Checkbox label="Manter conectado neste computador" disabled={isBusy} {...register("rememberMe")} />
         </div>
 
         <button

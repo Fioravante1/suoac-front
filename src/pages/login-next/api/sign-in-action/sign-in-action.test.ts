@@ -12,16 +12,28 @@ vi.mock("@/shared/api/http-client", async (importOriginal) => ({
 
 vi.mock("@/shared/auth/session", () => ({
   createSession: (...args: unknown[]) => createSession(...args),
+  toSessionLifetime: (response: { extendedSession?: boolean; refreshExpiresIn?: number }) => ({
+    extended: response.extendedSession === true,
+    refreshExpiresIn: response.refreshExpiresIn ?? 604800,
+  }),
 }));
 
 const { signInAction } = await import("./sign-in-action");
 
-const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta" };
+const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta", rememberMe: false };
 
-function givenBackendAccepts(name = "Fioravante Chiozzi", mustChangePassword = false) {
+function givenBackendAccepts(
+  name = "Fioravante Chiozzi",
+  mustChangePassword = false,
+  lifetime: { extendedSession: boolean; refreshExpiresIn: number } = {
+    extendedSession: false,
+    refreshExpiresIn: 604800,
+  },
+) {
   httpClient.mockResolvedValue({
     accessToken: "token-de-acesso",
     refreshToken: "token-de-renovacao",
+    ...lifetime,
     user: {
       id: "1",
       name,
@@ -50,8 +62,28 @@ describe("signInAction", () => {
       "token-de-acesso",
       "token-de-renovacao",
       expect.objectContaining({ email: CREDENTIALS.email }),
+      { extended: false, refreshExpiresIn: 604800 },
     );
     expect(result).toEqual({ status: "success", firstName: "Fioravante", redirectTo: "/dashboard" });
+  });
+
+  it("pede a sessão estendida ao backend e grava o cookie pelo tempo que ele informa", async () => {
+    givenBackendAccepts("Fioravante Chiozzi", false, { extendedSession: true, refreshExpiresIn: 2592000 });
+
+    await signInAction({ ...CREDENTIALS, rememberMe: true });
+
+    expect(httpClient).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: { email: CREDENTIALS.email, password: CREDENTIALS.password, rememberMe: true },
+      }),
+    );
+    expect(createSession).toHaveBeenCalledWith(
+      "token-de-acesso",
+      "token-de-renovacao",
+      expect.objectContaining({ email: CREDENTIALS.email }),
+      { extended: true, refreshExpiresIn: 2592000 },
+    );
   });
 
   it("devolve ao usuário a tela de onde ele foi barrado", async () => {
@@ -99,7 +131,7 @@ describe("signInAction", () => {
   });
 
   it("não chega a chamar a API com dados que já são inválidos", async () => {
-    const result = await signInAction({ email: "nao-e-email", password: "123" });
+    const result = await signInAction({ email: "nao-e-email", password: "123", rememberMe: false });
 
     expect(httpClient).not.toHaveBeenCalled();
     expect(result).toEqual({ status: "error", message: "Dados inválidos. Confira o e-mail e a senha." });
