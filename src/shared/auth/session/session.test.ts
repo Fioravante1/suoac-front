@@ -27,7 +27,15 @@ vi.mock("./session-signature", () => ({
   ),
 }));
 
-import { createSession, getSession, getAccessToken, getRefreshToken, deleteSession, hasSession } from "./session";
+import {
+  createSession,
+  getSession,
+  getAccessToken,
+  getRefreshToken,
+  deleteSession,
+  hasSession,
+  toSessionLifetime,
+} from "./session";
 import type { SessionUser } from "./session";
 
 const testUser: SessionUser = {
@@ -79,6 +87,42 @@ describe("createSession", () => {
         path: "/",
       }),
     );
+  });
+});
+
+describe("createSession — duração", () => {
+  function maxAgesOfCookies(): unknown[] {
+    return mockSet.mock.calls.map(([, , options]) => (options as { maxAge?: number }).maxAge);
+  }
+
+  it("grava cookies de sessão, sem maxAge, no modo padrão: somem ao fechar o navegador", async () => {
+    await createSession("a", "r", testUser);
+
+    expect(maxAgesOfCookies()).toEqual([undefined, undefined, undefined]);
+  });
+
+  it("grava os três cookies com o tempo informado pelo backend na sessão estendida", async () => {
+    await createSession("a", "r", testUser, { extended: true, refreshExpiresIn: 2592000 });
+
+    expect(maxAgesOfCookies()).toEqual([2592000, 2592000, 2592000]);
+  });
+});
+
+describe("toSessionLifetime", () => {
+  it("lê a sessão estendida da resposta do backend", () => {
+    expect(toSessionLifetime({ extendedSession: true, refreshExpiresIn: 2592000 })).toEqual({
+      extended: true,
+      refreshExpiresIn: 2592000,
+    });
+  });
+
+  it.each([
+    ["resposta sem os campos", {}],
+    ["extendedSession falso", { extendedSession: false, refreshExpiresIn: 604800 }],
+    ["tempo ausente", { extendedSession: true }],
+    ["tempo inválido", { extendedSession: true, refreshExpiresIn: 0 }],
+  ])("cai na sessão padrão com %s", (_caso, response) => {
+    expect(toSessionLifetime(response).extended).toBe(false);
   });
 });
 
