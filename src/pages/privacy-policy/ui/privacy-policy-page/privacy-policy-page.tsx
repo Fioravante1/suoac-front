@@ -1,10 +1,9 @@
 /**
  * Pagina publica de privacidade.
  *
- * O texto e **provisorio** e diz isso na propria pagina. Descreve apenas o que
- * foi verificado no codigo — os dados que o sistema trata, quem os ve e quais
- * cookies existem — e nao assume compromisso que ninguem decidiu ainda. As
- * perguntas que faltam estao listadas para quem for redigir a versao final.
+ * Texto definitivo (SUC-45). Os fatos sobre dados, visibilidade e cookies foram
+ * verificados no codigo; retencao, compartilhamento, correcao/remocao e canal de
+ * contato sao decisoes da coordenacao do circuito.
  *
  * O estilo do texto corrido vem da moldura em `app/(public)/layout.module.css`,
  * por isso aqui ha apenas conteudo semantico.
@@ -14,14 +13,6 @@ export function PrivacyPolicyPage() {
     <article>
       <h1>Privacidade</h1>
       <p>Que informações o SUOAC guarda, para que servem e quem consegue vê-las.</p>
-
-      <aside>
-        <p>
-          <strong>Este texto é provisório.</strong> A política definitiva ainda será redigida pela coordenação do
-          circuito. O que está abaixo descreve o funcionamento atual do sistema, sem assumir compromissos que ainda não
-          foram decididos.
-        </p>
-      </aside>
 
       <h2>Que dados o sistema guarda</h2>
       <p>
@@ -48,17 +39,34 @@ export function PrivacyPolicyPage() {
       </ul>
       <p>Não há cookies de publicidade nem ferramentas de rastreamento de navegação.</p>
 
-      <h2>O que a versão final precisa responder</h2>
+      <h2>Por quanto tempo os dados ficam</h2>
       <p>
-        Estas perguntas dependem de decisão da coordenação e por isso ainda não estão respondidas aqui: por quanto tempo
-        os dados de um evento são mantidos depois que ele termina; em que situações eles são compartilhados fora do
-        circuito; e como alguém pede correção ou remoção dos próprios dados.
+        Os dados de um evento são mantidos por 2 anos. Já o cadastro dos irmãos permanece na base para ser usado em
+        eventos futuros.
       </p>
 
-      <h2>Dúvidas</h2>
+      <h2>Compartilhamento</h2>
+      <p>Os dados não são compartilhados fora do circuito.</p>
+
+      <h2>Correção e remoção dos dados</h2>
       <p>
-        Enquanto não há um canal próprio, fale com o coordenador do seu circuito — é quem administra o sistema e pode
-        encaminhar o assunto.
+        O sistema é usado apenas por Coordenadores do arranjo de ônibus no circuito e nas congregações e por
+        assistentes, e cada um pode corrigir os próprios dados. O Coordenador do arranjo de ônibus no circuito também
+        pode excluir outros usuários.
+      </p>
+      <p>
+        Quem viaja não usa o sistema, mas seus dados também podem ser corrigidos ou apagados: o pedido vai ao
+        Coordenador do arranjo de ônibus na congregação ou ao e-mail{" "}
+        <a href="mailto:suoac@gmail.com">suoac@gmail.com</a>.
+      </p>
+      <p>
+        Para excluir o cadastro do Coordenador do arranjo de ônibus no circuito, envie o pedido por e-mail para{" "}
+        <a href="mailto:suoac@gmail.com">suoac@gmail.com</a>.
+      </p>
+
+      <h2>Dúvidas e contato</h2>
+      <p>
+        O canal de contato do SUOAC é o e-mail <a href="mailto:suoac@gmail.com">suoac@gmail.com</a>.
       </p>
     </article>
   );
