@@ -112,6 +112,12 @@
   margin-bottom: var(--suoac-space-2);
 }
 
+.main p a {
+  color: var(--suoac-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .main li::marker {
   color: var(--suoac-color-primary);
 }
@@ -121,23 +127,4 @@
   margin-bottom: var(--suoac-space-8);
   color: var(--suoac-color-text-secondary);
   font-size: var(--suoac-font-size-lead);
-}
-
-/*
- * Aviso de conteudo provisorio. Some quando a coordenacao escrever o texto
- * definitivo — ver SUC-41.
- */
-.main aside {
-  margin-bottom: var(--suoac-space-8);
-  padding: var(--suoac-space-4) var(--suoac-space-5);
-  border-left: 3px solid var(--suoac-color-attention);
-  border-radius: var(--suoac-radius-sm);
-  background-color: var(--suoac-color-attention-soft);
-  color: var(--suoac-color-attention-text);
-  font-size: var(--suoac-font-size-small);
-  line-height: 1.6;
-}
-
-.main aside p:last-child {
-  margin-bottom: 0;
 }
