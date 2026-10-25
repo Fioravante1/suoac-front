@@ -39,10 +39,10 @@ export function AuthPanel({ children }: AuthPanelProps) {
 
       <footer className={styles.footer}>
         <span>© {currentYear} SUOAC</span>
-        <Link className={styles.link} href={routes.privacy}>
+        <Link className={styles.link} href={routes.privacy} target="_blank" rel="noopener noreferrer">
           Privacidade
         </Link>
-        <Link className={styles.link} href={routes.help}>
+        <Link className={styles.link} href={routes.help} target="_blank" rel="noopener noreferrer">
           Ajuda
         </Link>
       </footer>
