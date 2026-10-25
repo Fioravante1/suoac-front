@@ -20,8 +20,13 @@ export function PrivacyPolicyPage() {
         necessários para isso:
       </p>
       <ul>
-        <li>de quem viaja: nome, congregação, dias de participação e os pagamentos registrados;</li>
-        <li>de quem coordena: nome, e-mail e o papel exercido no circuito ou na congregação.</li>
+        <li>
+          de quem viaja: nome, RG (guardado criptografado), telefone e observações, quando informados, além da
+          congregação, dos dias de participação e dos pagamentos registrados;
+        </li>
+        <li>
+          de quem coordena: nome, e-mail, telefone, quando informado, e o papel exercido no circuito ou na congregação.
+        </li>
       </ul>
 
       <h2>Quem consegue ver</h2>

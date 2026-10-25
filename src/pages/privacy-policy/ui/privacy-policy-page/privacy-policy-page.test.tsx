@@ -20,6 +20,7 @@ describe("página de privacidade", () => {
     render(<PrivacyPolicyPage />);
 
     expect(screen.getByRole("heading", { level: 2, name: /que dados o sistema guarda/i })).toBeInTheDocument();
+    expect(screen.getByText(/rg \(guardado criptografado\)/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /quem consegue ver/i })).toBeInTheDocument();
   });
 
