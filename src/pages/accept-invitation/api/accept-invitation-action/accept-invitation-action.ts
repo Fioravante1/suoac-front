@@ -6,6 +6,7 @@ import type { Invitation } from "@/entities/invitation";
 import { endpoints, httpClientRaw } from "@/shared/api/http-client";
 import { createSession } from "@/shared/auth/session";
 import { routes } from "@/shared/config";
+import { TERMS_VERSION } from "@/shared/config/terms";
 
 import { acceptInvitationPayloadSchema, type InvitationRejection } from "../../model";
 import { readInvitationFailure, rejectionOf } from "../invitation-failure";
@@ -18,6 +19,8 @@ export interface AcceptInvitationInput {
   name: string;
   phone: string;
   password: string;
+  /** O aceite dos termos feito na tela. So `true` chega a API: nao ha envio de versao sem aceite. */
+  acceptedTerms: boolean;
 }
 
 /**
@@ -58,7 +61,8 @@ interface AcceptResponseDto {
  * sessao e leva a tela de boas-vindas.
  *
  * Contrato: `POST /invitations/:token/acceptances`, corpo
- * `{ name, phone, password }` (todos obrigatorios, SUC-67) — `201` com
+ * `{ name, phone, password }` (todos obrigatorios, SUC-67) mais
+ * `termsVersion` (SUC-86, opcional na API por enquanto) — `201` com
  * `{ accessToken, refreshToken, user }`, ou erro com `code`: `404`, `410`,
  * `409` (usado), `403` (revogado) e `409` `INVITATION_EMAIL_ALREADY_REGISTERED`.
  * O `409` e ambiguo: so o `code` diz qual dos dois e.
@@ -81,6 +85,7 @@ export async function acceptInvitationAction(input: AcceptInvitationInput): Prom
     name: input.name,
     phone: input.phone,
     password: input.password,
+    acceptedTerms: input.acceptedTerms,
   });
 
   if (!parsed.success) {
@@ -140,7 +145,12 @@ async function postAcceptance(
     response = await httpClientRaw(endpoints.invitations.acceptances(token), {
       method: "POST",
       anonymous: true,
-      body: { name: payload.name, phone: payload.phone.replace(/\D/g, ""), password: payload.password },
+      body: {
+        name: payload.name,
+        phone: payload.phone.replace(/\D/g, ""),
+        password: payload.password,
+        termsVersion: TERMS_VERSION,
+      },
     });
   } catch {
     return { status: "error", message: GENERIC_ERROR };

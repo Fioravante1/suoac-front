@@ -62,15 +62,27 @@ describe("acceptInvitationSchema", () => {
 });
 
 describe("acceptInvitationPayloadSchema", () => {
-  it("valida o que o back exige e descarta confirmação e termos", () => {
-    const result = acceptInvitationPayloadSchema.safeParse(VALID);
+  const PAYLOAD = { ...VALID, acceptedTerms: true };
+
+  it("valida o que o back exige e descarta a confirmação, mantendo o aceite", () => {
+    const result = acceptInvitationPayloadSchema.safeParse(PAYLOAD);
 
     expect(result.success).toBe(true);
-    expect(result.data).toEqual({ name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@Segura123" });
+    expect(result.data).toEqual({
+      name: "Maria Souza",
+      phone: "(19) 99654-3210",
+      password: "Senha@Segura123",
+      acceptedTerms: true,
+    });
+  });
+
+  it("recusa o envio sem o aceite dos termos", () => {
+    expect(acceptInvitationPayloadSchema.safeParse({ ...PAYLOAD, acceptedTerms: false }).success).toBe(false);
+    expect(acceptInvitationPayloadSchema.safeParse(VALID).success).toBe(false);
   });
 
   it("apara o nome antes de enviar", () => {
-    const result = acceptInvitationPayloadSchema.safeParse({ ...VALID, name: "  Maria Souza  " });
+    const result = acceptInvitationPayloadSchema.safeParse({ ...PAYLOAD, name: "  Maria Souza  " });
 
     expect(result.data?.name).toBe("Maria Souza");
   });

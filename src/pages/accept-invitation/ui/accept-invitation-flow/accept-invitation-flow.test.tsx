@@ -275,6 +275,7 @@ describe("AcceptInvitationFlow — envio", () => {
         name: "Ana Beatriz Souza",
         phone: "(19) 99654-3210",
         password: SENHA,
+        acceptedTerms: true,
       }),
     );
   });

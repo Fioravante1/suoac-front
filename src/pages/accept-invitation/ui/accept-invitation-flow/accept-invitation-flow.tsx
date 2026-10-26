@@ -120,6 +120,7 @@ export function AcceptInvitationFlow({ token, invitation, onDeclined }: AcceptIn
         name: values.name,
         phone: values.phone,
         password: values.password,
+        acceptedTerms: values.terms,
       });
     } catch (error) {
       // Sucesso: a action redirecionou para as boas-vindas e a navegacao ja esta em curso.

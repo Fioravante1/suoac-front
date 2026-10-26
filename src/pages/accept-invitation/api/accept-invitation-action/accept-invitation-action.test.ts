@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { endpoints } from "@/shared/api/http-client";
+import { TERMS_VERSION } from "@/shared/config/terms";
 
 import type { InvitationLookup } from "../../model";
 
@@ -30,7 +31,13 @@ const { acceptInvitationAction } = await import("./accept-invitation-action");
 
 const TOKEN = "a".repeat(64);
 
-const INPUT = { token: TOKEN, name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@Segura123" };
+const INPUT = {
+  token: TOKEN,
+  name: "Maria Souza",
+  phone: "(19) 99654-3210",
+  password: "Senha@Segura123",
+  acceptedTerms: true,
+};
 
 const INVITATION = {
   name: "Maria Souza",
@@ -78,14 +85,21 @@ describe("acceptInvitationAction", () => {
       );
     });
 
-    it("envia nome, celular só com dígitos e senha, sem a sessão do navegador", async () => {
+    it("envia nome, celular só com dígitos, senha e a versão dos termos, sem a sessão do navegador", async () => {
       await expect(acceptInvitationAction(INPUT)).rejects.toThrow("NEXT_REDIRECT");
 
       expect(httpClientRaw).toHaveBeenCalledWith(endpoints.invitations.acceptances(TOKEN), {
         method: "POST",
         anonymous: true,
-        body: { name: "Maria Souza", phone: "19996543210", password: "Senha@Segura123" },
+        body: { name: "Maria Souza", phone: "19996543210", password: "Senha@Segura123", termsVersion: TERMS_VERSION },
       });
+    });
+
+    it("não envia nada à API quando os termos não foram aceitos", async () => {
+      const result = await acceptInvitationAction({ ...INPUT, acceptedTerms: false });
+
+      expect(result).toEqual({ status: "error", message: expect.any(String) });
+      expect(httpClientRaw).not.toHaveBeenCalled();
     });
 
     it("abre a sessão com o usuário devolvido", async () => {

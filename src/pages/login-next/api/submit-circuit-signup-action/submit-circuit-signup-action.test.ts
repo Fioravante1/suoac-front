@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { endpoints } from "@/shared/api/http-client";
+import { TERMS_VERSION } from "@/shared/config/terms";
 
 import type { SignupFormValues } from "../../model";
 
@@ -43,7 +44,7 @@ beforeEach(() => {
 // ── Test Suite ───────────────────────────────────────────────────
 describe("submitCircuitSignupAction", () => {
   describe("envio", () => {
-    it("deve enviar o payload do contrato, anônimo, sem o aceite e com celular só em dígitos", async () => {
+    it("deve enviar o payload do contrato, anônimo, com a versão dos termos e celular só em dígitos", async () => {
       httpClientRaw.mockResolvedValue(new Response(null, { status: 202 }));
 
       await submitCircuitSignupAction(buildInput());
@@ -63,6 +64,7 @@ describe("submitCircuitSignupAction", () => {
             { name: "Central", code: "SP17-CENTRAL" },
             { name: "Taquaral", code: "SP17-TAQ" },
           ],
+          termsVersion: TERMS_VERSION,
         },
       });
     });
