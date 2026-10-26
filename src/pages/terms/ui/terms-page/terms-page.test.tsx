@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { formatTermsDate } from "@/shared/config/terms";
+
 import { TermsPage } from "./terms-page";
 
 describe("página de termos de uso", () => {
@@ -8,6 +10,12 @@ describe("página de termos de uso", () => {
     render(<TermsPage />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Termos de uso" })).toBeInTheDocument();
+  });
+
+  it("exibe como última atualização a data da versão que os formulários enviam", () => {
+    render(<TermsPage />);
+
+    expect(screen.getByText(`Última atualização: ${formatTermsDate()}`)).toBeInTheDocument();
   });
 
   it("diz quem pode usar e que não há cadastro aberto", () => {

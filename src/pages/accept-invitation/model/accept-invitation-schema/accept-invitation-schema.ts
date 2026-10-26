@@ -46,13 +46,15 @@ export const acceptInvitationDetailsSchema = z.object({
 /** O que a Server Action recebe: o que o back exige no aceite (SUC-67). */
 export const acceptInvitationPayloadSchema = acceptInvitationDetailsSchema.extend({
   password: newPasswordSchema,
+  /** Sem aceite nao ha o que enviar: a versao dos termos so acompanha um aceite de fato. */
+  acceptedTerms: z.literal(true),
 });
 
 export type AcceptInvitationPayload = z.infer<typeof acceptInvitationPayloadSchema>;
 
 /**
- * O formulario inteiro, das duas etapas. Confirmacao e termos so existem na
- * tela: o back nao os recebe nem registra o aceite dos termos.
+ * O formulario inteiro, das duas etapas. A confirmacao so existe na tela. Os
+ * termos viram `acceptedTerms` na Server Action, que envia a versao em vigor.
  */
 export const acceptInvitationSchema = z
   .object({

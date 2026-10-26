@@ -1,6 +1,7 @@
 "use server";
 
 import { endpoints, httpClientRaw } from "@/shared/api/http-client";
+import { TERMS_VERSION } from "@/shared/config/terms";
 import { phoneDigits } from "@/shared/lib/phone";
 
 import { readSignupConflicts, signupSchema, type SignupConflict, type SignupFormValues } from "../../model";
@@ -25,8 +26,9 @@ const CONFLICT_ERROR = "Alguns dados já estão em uso. Confira os campos destac
  * JSON de um `202` — e `anonymous`, já que quem se cadastra ainda não tem sessão.
  *
  * O payload sai do schema, não do formulário cru: é ele que deixa circuito, UF e
- * código em maiúsculas, como a API persiste. Celular segue só com dígitos e o
- * aceite dos termos, que é só consentimento da tela, não vai.
+ * código em maiúsculas, como a API persiste. Celular segue só com dígitos. O
+ * aceite dos termos já foi exigido pelo schema (`acceptedTerms`); o que vai à API
+ * é a versão em vigor, `termsVersion`, que a API registra com o momento (SUC-86).
  *
  * Os conflitos (`409`) e a recusa de código repetido (`422`) voltam em
  * `conflicts`, com o caminho do campo, para a tela pintar cada erro no lugar certo.
@@ -44,7 +46,12 @@ export async function submitCircuitSignupAction(input: SignupFormValues): Promis
     const response = await httpClientRaw(endpoints.auth.circuitSignups, {
       method: "POST",
       anonymous: true,
-      body: { coordinator: { ...coordinator, phone: phoneDigits(coordinator.phone) }, circuit, congregations },
+      body: {
+        coordinator: { ...coordinator, phone: phoneDigits(coordinator.phone) },
+        circuit,
+        congregations,
+        termsVersion: TERMS_VERSION,
+      },
     });
 
     if (response.ok) {
