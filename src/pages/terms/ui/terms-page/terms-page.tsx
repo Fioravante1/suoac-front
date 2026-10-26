@@ -1,12 +1,16 @@
 import Link from "next/link";
 
 import { routes } from "@/shared/config/routes";
+import { formatTermsDate } from "@/shared/config/terms";
 
 /**
  * Pagina publica de termos de uso (SUC-63).
  *
  * Texto definitivo, aprovado pelo dono do produto. Nao ha clausula de limitacao
  * de responsabilidade nem de foro de proposito: dependem de revisao juridica.
+ *
+ * A data da ultima atualizacao vem de `TERMS_VERSION`, a mesma versao que os
+ * formularios enviam a API: alterar os termos e alterar aquela constante.
  *
  * O estilo do texto corrido vem da moldura em `app/(public)/layout.module.css`,
  * por isso aqui ha apenas conteudo semantico.
@@ -15,7 +19,7 @@ export function TermsPage() {
   return (
     <article>
       <h1>Termos de uso</h1>
-      <p>Última atualização: 25 de outubro de 2026</p>
+      <p>Última atualização: {formatTermsDate()}</p>
 
       <h2>1. O que é o SUOAC</h2>
       <p>
