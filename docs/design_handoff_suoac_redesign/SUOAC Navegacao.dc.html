@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e4e9e7;font-family:Geist,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1f6e5a;text-decoration:none}a:hover{color:#174e40}
+button{font-family:inherit}
+[data-art]{--bg:#f7f9f8;--surface:#fff;--muted:#f1f5f3;--border:#e3e8e6;--border2:#cfd8d4;--text:#1e1f24;--text2:#667085;--primary:#1f6e5a;--primary-d:#174e40;--primary-s:#e6f4ef;--navy:#0d2b45;--succ:#2e9e5b;--succ-s:#e7f6ee;--attn:#f5b700;--attn-t:#8a6d00;--attn-s:#fff4cf;--crit:#d64545;--crit-s:#fdecec;--info:#2f6fed;--info-s:#e8f0ff;--shadow:0 1px 2px rgb(16 24 40/.04),0 8px 24px rgb(31 110 90/.06);--glass:rgb(255 255 255/.78);--on-primary:#fff;--logo-l:block;--logo-d:none}
+[data-art][data-theme="dark"]{--bg:#0e1413;--surface:#151d1b;--muted:#1c2623;--border:#25312e;--border2:#34433f;--text:#e9efed;--text2:#9aa8a3;--primary:#4fb393;--primary-d:#7fcfb4;--primary-s:#183229;--navy:#0a1a29;--succ:#4cc07c;--succ-s:#163121;--attn:#f2c14b;--attn-t:#f2c14b;--attn-s:#342b10;--crit:#f07272;--crit-s:#3a1d1d;--info:#82a9ff;--info-s:#18233d;--shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.25);--glass:rgb(21 29 27/.78);--on-primary:#0e1413;--logo-l:none;--logo-d:block}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@keyframes pop{from{opacity:0;transform:translate(-50%,10px) scale(.96)}}
+@keyframes seat{from{opacity:0;transform:scale(.4)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgb(79 179 147/.55)}70%{box-shadow:0 0 0 12px rgb(79 179 147/0)}100%{box-shadow:0 0 0 0 rgb(79 179 147/0)}}
+</style>
+</helmet>
+<section data-screen-label="Turno 1" style="display:flex;flex-direction:column;gap:40px;padding:72px 80px 120px;font-family:Geist,sans-serif">
+<div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+<h1 style="margin:0;font:600 28px/1.2 Geist;color:#1e1f24;letter-spacing:-0.01em">Dashboard do circuito · 3 direções de navegação</h1>
+<p style="margin:0;font:400 16px/1.5 Geist;color:#667085;text-wrap:pretty">Mesmo conteúdo (Congresso Regional, inscrições abertas) em três estruturas sem menu lateral. Cada prancha tem seu próprio alternador claro/escuro. Compare <a href="#1a">1a</a>, <a href="#1b">1b</a> e <a href="#1c">1c</a>.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:72px;align-items:flex-start">
+
+<div id="1a" style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="background:#1f6e5a;color:#fff;font:600 13px Geist;padding:4px 10px;border-radius:999px">1a</span>
+<span style="font:600 16px Geist;color:#1e1f24">Barra de comando no topo</span>
+<span style="font:400 14px Geist;color:#667085">Abas horizontais + busca global ⌘K. A mais familiar e densa.</span>
+</div>
+<div data-art="1" data-theme="{{ themeA }}" data-screen-label="1a Barra de comando" style="width:1440px;background:var(--bg);color:var(--text);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgb(13 43 69/.18);transition:background-color .3s,color .3s">
+<header style="height:68px;padding:0 32px;display:flex;align-items:center;gap:20px;background:var(--surface);border-bottom:1px solid var(--border)">
+<div style="display:flex;align-items:center;gap:10px">
+<img src="assets/logo-mark.png" alt="SUOAC" style="width:34px;height:34px;display:var(--logo-l)">
+<img src="assets/logo-mark-dark.png" alt="SUOAC" style="width:34px;height:34px;border-radius:9px;display:var(--logo-d)">
+<div style="display:flex;flex-direction:column;line-height:1.15;flex-shrink:0;white-space:nowrap"><span style="font:700 17px Geist;letter-spacing:.05em">SUOAC</span><span style="font:400 12px Geist;color:var(--text2)">Circuito SP-17</span></div>
+</div>
+<nav style="display:flex;gap:2px;padding:4px;background:var(--muted);border-radius:999px;flex-shrink:0;white-space:nowrap">
+<sc-for list="{{ navA }}" as="n" hint-placeholder-count="6">
+<button onClick="{{ n.onClick }}" style="height:34px;padding:0 16px;border:0;border-radius:999px;font:500 14px Geist;cursor:pointer;background:{{ n.bg }};color:{{ n.fg }};box-shadow:{{ n.sh }};transition:all .2s ease">{{ n.label }}</button>
+</sc-for>
+</nav>
+<div style="flex:1"></div>
+<button style="width:250px;flex-shrink:0;height:40px;display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text2);font:400 14px Geist;cursor:text;transition:border-color .2s" style-hover="border-color:var(--border2)">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<span style="flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Buscar passageiro ou RG</span>
+<span style="font:500 12px Geist;padding:2px 7px;border:1px solid var(--border);border-radius:6px;background:var(--surface)">⌘K</span>
+</button>
+<div style="display:flex;align-items:center;gap:6px">
+<button style="position:relative;width:40px;height:40px;border:0;border-radius:12px;background:transparent;color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--muted)">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+<span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--crit);border:2px solid var(--surface)"></span>
+</button>
+<button onClick="{{ toggleA }}" title="Alternar tema" style="width:40px;height:40px;border:0;border-radius:12px;background:transparent;color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--muted)">
+<sc-if value="{{ darkA }}" hint-placeholder-val="{{ false }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></sc-if>
+<sc-if value="{{ lightA }}" hint-placeholder-val="{{ true }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></sc-if>
+</button>
+<div style="display:flex;align-items:center;gap:10px;margin-left:6px;padding-left:14px;border-left:1px solid var(--border)">
+<span style="width:36px;height:36px;border-radius:50%;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;font:600 13px Geist">MO</span>
+<div style="display:flex;flex-direction:column;line-height:1.2;flex-shrink:0;white-space:nowrap"><span style="font:600 14px Geist">Marcos Oliveira</span><span style="font:400 12px Geist;color:var(--text2)">Coord. do circuito</span></div>
+</div>
+</div>
+</header>
+
+<main style="padding:28px 32px 36px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;animation:rise .5s ease both">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--primary-s);color:var(--primary);font:500 13px Geist"><span style="width:7px;height:7px;border-radius:50%;background:var(--primary);animation:pulse 2s infinite"></span>Inscrições abertas</span>
+<span style="font:400 14px Geist;color:var(--text2)">Quarta, 7 de outubro</span>
+</div>
+<h2 style="margin:0;font:600 30px/1.2 Geist;letter-spacing:-0.015em">Congresso Regional 2026</h2>
+<div style="display:flex;gap:20px;font:400 14px Geist;color:var(--text2)">
+<span style="display:flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>23 a 25 de outubro · sexta a domingo</span>
+<span style="display:flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>Salão de Assembleias · Campinas, SP</span>
+<span style="display:flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle></svg>R$ 40 por dia</span>
+</div>
+</div>
+<div style="display:flex;gap:10px">
+<button style="height:42px;padding:0 16px;display:flex;align-items:center;gap:8px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer;transition:all .2s" style-hover="background:var(--muted)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>Exportar listas</button>
+<button style="height:42px;padding:0 16px;display:flex;align-items:center;gap:8px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer;transition:all .2s" style-hover="background:var(--muted)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle></svg>Registrar pagamento</button>
+<button style="height:42px;padding:0 18px;display:flex;align-items:center;gap:8px;border:0;border-radius:12px;background:var(--primary);color:var(--on-primary);font:600 14px Geist;cursor:pointer;transition:all .2s;box-shadow:0 6px 16px rgb(31 110 90/.25)" style-hover="background:var(--primary-d);transform:translateY(-1px)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg>Cadastrar passageiro</button>
+</div>
+</div>
+
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;animation:rise .5s .05s ease both">
+<span style="font:600 13px Geist;color:var(--text2);margin-right:4px">4 pontos de atenção</span>
+<sc-for list="{{ alerts }}" as="a" hint-placeholder-count="4">
+<button style="display:flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:500 13px Geist;cursor:pointer;transition:all .2s" style-hover="border-color:var(--border2);transform:translateY(-1px)">
+<span style="width:8px;height:8px;border-radius:50%;background:{{ a.fg }}"></span>{{ a.title }}<span style="color:var(--primary);font-weight:600">{{ a.action }} →</span>
+</button>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px">
+<div style="grid-column:span 4;display:flex;flex-direction:column;gap:18px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .1s ease both">
+<div style="font:600 15px Geist">Prazos</div>
+<div style="display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:var(--attn-s)">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 13px Geist;color:var(--attn-t)">Inscrições encerram</span><span style="font:500 13px Geist;color:var(--attn-t)">seg, 12/10</span></div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 40px/1 Geist;letter-spacing:-0.02em;color:var(--text)">5</span><span style="font:500 15px Geist">dias</span></div>
+<div style="height:6px;border-radius:999px;background:rgb(138 109 0/.15);overflow:hidden;margin-top:6px"><div style="width:76%;height:100%;background:var(--attn);border-radius:999px;transform-origin:left;animation:grow 1.2s cubic-bezier(.2,.8,.2,1) both"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:var(--muted)">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 13px Geist;color:var(--text2)">Pagamento até</span><span style="font:500 13px Geist;color:var(--text2)">seg, 19/10</span></div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 40px/1 Geist;letter-spacing:-0.02em">12</span><span style="font:500 15px Geist">dias</span></div>
+<div style="height:6px;border-radius:999px;background:var(--border);overflow:hidden;margin-top:6px"><div style="width:57%;height:100%;background:var(--primary);border-radius:999px;transform-origin:left;animation:grow 1.2s .1s cubic-bezier(.2,.8,.2,1) both"></div></div>
+</div>
+<div style="font:400 13px Geist;color:var(--text2)">Publicado em 21/09 · congresso em 16 dias</div>
+</div>
+
+<div style="grid-column:span 8;display:flex;flex-direction:column;gap:18px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .15s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<div style="font:600 15px Geist">Ocupação por dia</div>
+<div style="font:400 13px Geist;color:var(--text2)">4 ônibus · 46 lugares cada · 184 por dia</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+<sc-for list="{{ days }}" as="d" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:14px;background:var(--bg);border:1px solid var(--border);transition:all .2s" style-hover="border-color:var(--border2);transform:translateY(-2px)">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div style="display:flex;flex-direction:column;line-height:1.3"><span style="font:600 15px Geist">{{ d.name }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ d.date }}</span></div>
+<span style="padding:3px 9px;border-radius:999px;font:500 12px Geist;background:{{ d.bBg }};color:{{ d.bFg }}">{{ d.bLabel }}</span>
+</div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 38px/1 Geist;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ d.n }}</span><span style="font:400 14px Geist;color:var(--text2)">de {{ d.cap }}</span><span style="margin-left:auto;font:600 15px Geist;color:{{ d.bFg }}">{{ d.pctStr }}</span></div>
+<div style="position:relative;height:10px;border-radius:999px;background:var(--muted);overflow:hidden">
+<div style="width:{{ d.pctStr }};height:100%;border-radius:999px;background:var(--primary);transform-origin:left;animation:grow 1.1s cubic-bezier(.2,.8,.2,1) both"></div>
+<div style="position:absolute;left:80%;top:0;bottom:0;width:2px;background:var(--bg)"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+<sc-for list="{{ d.buses }}" as="b" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:5px">
+<div style="height:4px;border-radius:999px;background:var(--border);overflow:hidden"><div style="width:{{ b.w }};height:100%;background:var(--primary);opacity:.65;transform-origin:left;animation:grow 1s .2s ease both"></div></div>
+<span style="font:400 12px Geist;color:var(--text2)">Ô{{ b.i }} · {{ b.n }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:6px;font:400 13px Geist;color:var(--text2);padding-top:12px;border-top:1px solid var(--border)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Saída {{ d.saida }} · retorno {{ d.ret }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="grid-column:span 7;display:flex;flex-direction:column;gap:14px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .2s ease both">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 15px Geist">Congregações</span><span style="font:400 13px Geist;color:var(--text2)">{{ finCount }} de 10 finalizaram a lista</span></div>
+<div style="display:flex;gap:2px;padding:3px;background:var(--muted);border-radius:10px">
+<sc-for list="{{ filtersA }}" as="f" hint-placeholder-count="3">
+<button onClick="{{ f.onClick }}" style="height:30px;padding:0 12px;border:0;border-radius:8px;font:500 13px Geist;cursor:pointer;background:{{ f.bg }};color:{{ f.fg }};box-shadow:{{ f.sh }};transition:all .2s">{{ f.label }}</button>
+</sc-for>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 80px 200px 120px;gap:16px;padding:0 4px 8px;border-bottom:1px solid var(--border);font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">
+<span>Congregação</span><span style="text-align:right">Inscritos</span><span>Pago</span><span>Lista</span>
+</div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ congsA }}" as="c" hint-placeholder-count="10">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 80px 200px 120px;gap:16px;align-items:center;height:46px;padding:0 4px;border-radius:10px;transition:background .15s;cursor:pointer;animation:rise .35s ease both" style-hover="background:var(--muted)">
+<span style="font:500 14px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span>
+<span style="font:500 14px Geist;text-align:right;font-variant-numeric:tabular-nums">{{ c.n }}</span>
+<div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:6px;border-radius:999px;background:var(--muted);overflow:hidden"><div style="width:{{ c.pctStr }};height:100%;border-radius:999px;background:{{ c.bar }};transform-origin:left;animation:grow 1s ease both"></div></div><span style="width:40px;text-align:right;font:500 13px Geist;font-variant-numeric:tabular-nums;color:var(--text2)">{{ c.pctLabel }}</span></div>
+<span style="justify-self:start;padding:3px 9px;border-radius:999px;font:500 12px Geist;background:{{ c.sBg }};color:{{ c.sFg }}">{{ c.status }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="grid-column:span 5;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:16px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .25s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 15px Geist">Pagamentos</span><span style="font:400 13px Geist;color:var(--text2)">até 19/10</span></div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 32px/1 Geist;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ totals.rec }}</span><span style="font:400 14px Geist;color:var(--text2)">recebidos de {{ totals.esp }}</span></div>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="font:600 22px/1 Geist;color:var(--primary)">{{ totals.pct }}</span><span style="font:400 13px Geist;color:var(--text2)">faltam {{ totals.pend }}</span></div>
+</div>
+<div style="display:flex;height:12px;gap:3px;border-radius:999px;overflow:hidden">
+<sc-for list="{{ payBreak }}" as="p" hint-placeholder-count="4"><div style="width:{{ p.w }};background:{{ p.color }};transform-origin:left;animation:grow 1.1s cubic-bezier(.2,.8,.2,1) both"></div></sc-for>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px">
+<sc-for list="{{ payBreak }}" as="p" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:8px;font:400 13px Geist;color:var(--text2)"><span style="width:8px;height:8px;border-radius:3px;background:{{ p.color }}"></span>{{ p.label }}<span style="margin-left:auto;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums">{{ p.n }}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .3s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 15px Geist">Ônibus e rastreamento</span><a href="#1a" style="font:500 13px Geist;color:var(--primary)">Gerenciar</a></div>
+<div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:12px;background:var(--muted)">
+<span style="width:40px;height:40px;border-radius:12px;background:var(--surface);color:var(--primary);display:grid;place-items:center;flex-shrink:0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m3 11 19-9-9 19-2-8-8-2z"></path></svg></span>
+<div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font:500 14px Geist">Rastreamento disponível em 23/10</span><span style="font:400 13px Geist;color:var(--text2)">Começa quando o compartilhador iniciar, às 06:30</span></div>
+</div>
+<div style="display:flex;justify-content:space-between;font:400 13px Geist;color:var(--text2)"><span>Compartilhador: não definido</span><a href="#1a" style="font:500 13px Geist;color:var(--primary)">Definir →</a></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+<div id="1b" style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="background:#1f6e5a;color:#fff;font:600 13px Geist;padding:4px 10px;border-radius:999px">1b</span>
+<span style="font:600 16px Geist;color:#1e1f24">Dock flutuante</span>
+<span style="font:400 14px Geist;color:#667085">Navegação em uma doca inferior com ação rápida central. A mais calma, foco no tempo e nos lugares.</span>
+</div>
+<div data-art="1" data-theme="{{ themeB }}" data-screen-label="1b Dock flutuante" style="position:relative;width:1440px;background:var(--bg);color:var(--text);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgb(13 43 69/.18);transition:background-color .3s,color .3s">
+<header style="height:76px;padding:0 40px;display:flex;align-items:center;gap:20px">
+<div style="display:flex;align-items:center;gap:10px">
+<img src="assets/logo-mark.png" alt="SUOAC" style="width:34px;height:34px;display:var(--logo-l)">
+<img src="assets/logo-mark-dark.png" alt="SUOAC" style="width:34px;height:34px;border-radius:9px;display:var(--logo-d)">
+<span style="font:700 17px Geist;letter-spacing:.05em">SUOAC</span>
+<span style="font:400 14px Geist;color:var(--text2);padding-left:10px;border-left:1px solid var(--border)">Circuito SP-17</span>
+</div>
+<div style="flex:1"></div>
+<button style="width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="border-color:var(--border2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+<button style="position:relative;width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="border-color:var(--border2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span style="position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--crit);border:2px solid var(--surface)"></span></button>
+<button onClick="{{ toggleB }}" title="Alternar tema" style="width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center" style-hover="border-color:var(--border2)">
+<sc-if value="{{ darkB }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></sc-if>
+<sc-if value="{{ lightB }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></sc-if>
+</button>
+<span style="width:40px;height:40px;border-radius:50%;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;font:600 14px Geist">MO</span>
+</header>
+
+<main style="padding:16px 40px 140px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;animation:rise .6s ease both">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:820px">
+<span style="font:400 16px Geist;color:var(--text2)">Boa noite, Marcos.</span>
+<h2 style="margin:0;font:600 48px/1.08 Geist;letter-spacing:-0.025em;text-wrap:balance">Faltam <span style="color:var(--primary)">16 dias</span> para o Congresso Regional</h2>
+<span style="font:400 16px Geist;color:var(--text2)">23 a 25 de outubro · Salão de Assembleias, Campinas · R$ 40 por dia</span>
+</div>
+<span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--primary-s);color:var(--primary);font:500 14px Geist;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--primary);animation:pulse 2s infinite"></span>Inscrições abertas</span>
+</div>
+
+<div style="padding:26px 32px 22px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);animation:rise .6s .08s ease both">
+<div style="position:relative;height:104px">
+<div style="position:absolute;top:44px;left:0;right:0;height:6px;border-radius:999px;background:var(--muted)"></div>
+<div style="position:absolute;top:44px;left:94.1%;right:0;height:6px;border-radius:999px;background:var(--primary-s)"></div>
+<div style="position:absolute;top:44px;left:0;width:47%;height:6px;border-radius:999px;background:var(--primary);transform-origin:left;animation:grow 1.6s cubic-bezier(.2,.8,.2,1) both"></div>
+<div style="position:absolute;left:47%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;animation:rise .6s .9s ease both">
+<span style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--primary);color:var(--on-primary);font:600 12px Geist;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"></path><circle cx="7" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle></svg>Hoje · 07/10</span>
+<span style="width:16px;height:16px;border-radius:50%;background:var(--primary);border:3px solid var(--surface);animation:pulse 2s infinite"></span>
+</div>
+<div style="position:absolute;left:0;top:40px;display:flex;flex-direction:column;gap:10px"><span style="width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--surface)"></span><div style="display:flex;flex-direction:column;line-height:1.3"><span style="font:600 13px Geist">Publicado</span><span style="font:400 12px Geist;color:var(--text2)">21/09</span></div></div>
+<div style="position:absolute;left:61.8%;top:40px;transform:translateX(-7px);display:flex;flex-direction:column;gap:10px"><span style="width:14px;height:14px;border-radius:50%;background:var(--attn);border:3px solid var(--surface)"></span><div style="display:flex;flex-direction:column;line-height:1.3"><span style="font:600 13px Geist">Fim das inscrições</span><span style="font:400 12px Geist;color:var(--attn-t)">12/10 · em 5 dias</span></div></div>
+<div style="position:absolute;left:82.4%;top:40px;transform:translateX(-7px);display:flex;flex-direction:column;gap:10px"><span style="width:14px;height:14px;border-radius:50%;background:var(--border2);border:3px solid var(--surface)"></span><div style="display:flex;flex-direction:column;line-height:1.3"><span style="font:600 13px Geist">Pagamento</span><span style="font:400 12px Geist;color:var(--text2)">19/10 · em 12 dias</span></div></div>
+<div style="position:absolute;right:0;top:40px;display:flex;flex-direction:column;align-items:flex-end;gap:10px"><span style="width:14px;height:14px;border-radius:50%;background:var(--primary-s);border:3px solid var(--primary)"></span><div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.3"><span style="font:600 13px Geist">Congresso</span><span style="font:400 12px Geist;color:var(--text2)">23–25/10</span></div></div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+<sc-for list="{{ days }}" as="d" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:20px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;animation:rise .6s .15s ease both" style-hover="transform:translateY(-3px);box-shadow:0 18px 40px rgb(31 110 90/.12)">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 22px Geist;letter-spacing:-0.01em">{{ d.name }}</span><span style="font:400 14px Geist;color:var(--text2)">{{ d.date }} · saída {{ d.saida }}</span></div>
+<span style="padding:4px 10px;border-radius:999px;font:500 12px Geist;background:{{ d.bBg }};color:{{ d.bFg }}">{{ d.bLabel }}</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;padding:18px;border-radius:14px;background:var(--bg)">
+<sc-for list="{{ d.buses }}" as="b" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:grid;grid-template-rows:repeat(4,9px);grid-auto-flow:column;grid-auto-columns:9px;gap:3px">
+<sc-for list="{{ b.seats }}" as="s" hint-placeholder-count="46"><span style="width:9px;height:9px;border-radius:3px;background:{{ s.c }};animation:seat .4s {{ s.d }} ease both"></span></sc-for>
+</div>
+<span style="font:400 12px Geist;color:var(--text2)">Ônibus {{ b.i }} · {{ b.n }}/46</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="display:flex;align-items:baseline;gap:6px"><span style="font:600 28px/1 Geist;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ d.n }}</span><span style="font:400 14px Geist;color:var(--text2)">inscritos</span></span>
+<span style="font:500 14px Geist;color:{{ d.bFg }}">{{ d.freeLabel }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px">
+<div style="grid-column:span 4;display:flex;flex-direction:column;gap:20px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);animation:rise .6s .2s ease both">
+<span style="font:600 16px Geist">Pagamentos</span>
+<div style="display:flex;align-items:center;gap:22px">
+<div style="width:132px;height:132px;border-radius:50%;background:conic-gradient(var(--primary) 0 {{ totals.pctNum }}%, var(--muted) 0);display:grid;place-items:center;flex-shrink:0">
+<div style="width:104px;height:104px;border-radius:50%;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:600 26px/1 Geist">{{ totals.pct }}</span><span style="font:400 12px Geist;color:var(--text2)">recebido</span></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-direction:column"><span style="font:600 22px Geist;font-variant-numeric:tabular-nums">{{ totals.rec }}</span><span style="font:400 13px Geist;color:var(--text2)">de {{ totals.esp }}</span></div>
+<div style="display:flex;flex-direction:column"><span style="font:600 16px Geist;color:var(--crit);font-variant-numeric:tabular-nums">{{ totals.pend }}</span><span style="font:400 13px Geist;color:var(--text2)">pendentes até 19/10</span></div>
+</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ payBreak }}" as="p" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--bg);font:400 13px Geist;color:var(--text2)"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.color }}"></span>{{ p.label }} <b style="color:var(--text);font-weight:600">{{ p.n }}</b></span></sc-for>
+</div>
+</div>
+
+<div style="grid-column:span 5;display:flex;flex-direction:column;gap:16px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);animation:rise .6s .25s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 16px Geist">Congregações</span><span style="font:400 13px Geist;color:var(--text2)">{{ finCount }} de 10 finalizaram</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px">
+<sc-for list="{{ congs }}" as="c" hint-placeholder-count="10">
+<div style="display:flex;flex-direction:column;gap:6px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .15s" style-hover="background:var(--muted)">
+<div style="display:flex;align-items:center;gap:6px"><span style="font:500 14px Geist;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span><sc-if value="{{ c.fin }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--succ)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if><span style="font:500 13px Geist;color:var(--text2);font-variant-numeric:tabular-nums">{{ c.pctLabel }}</span></div>
+<div style="height:4px;border-radius:999px;background:var(--muted);overflow:hidden"><div style="width:{{ c.pctStr }};height:100%;background:{{ c.bar }};transform-origin:left;animation:grow 1s .3s ease both"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="grid-column:span 3;display:flex;flex-direction:column;gap:12px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);animation:rise .6s .3s ease both">
+<span style="font:600 16px Geist">Atenção</span>
+<sc-for list="{{ alerts }}" as="a" hint-placeholder-count="4">
+<div style="display:flex;gap:10px;padding:10px;border-radius:12px;cursor:pointer;transition:background .15s" style-hover="background:var(--muted)">
+<span style="width:8px;height:8px;margin-top:6px;border-radius:50%;background:{{ a.fg }};flex-shrink:0"></span>
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font:500 14px/1.35 Geist">{{ a.title }}</span><span style="font:400 13px/1.4 Geist;color:var(--text2)">{{ a.desc }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</main>
+
+<sc-if value="{{ dockOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:50%;bottom:112px;transform:translateX(-50%);width:340px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:0 24px 60px rgb(13 43 69/.22);display:flex;flex-direction:column;gap:2px;animation:pop .22s cubic-bezier(.2,.8,.2,1) both;z-index:5">
+<sc-for list="{{ quick }}" as="q" hint-placeholder-count="4">
+<button onClick="{{ closeDock }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:12px;background:transparent;color:var(--text);text-align:left;cursor:pointer;transition:background .15s" style-hover="background:var(--muted)">
+<span style="width:34px;height:34px;border-radius:10px;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;font:600 16px Geist">{{ q.glyph }}</span>
+<span style="display:flex;flex-direction:column;flex:1"><span style="font:500 14px Geist">{{ q.label }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ q.hint }}</span></span>
+<span style="font:500 12px Geist;color:var(--text2);padding:2px 6px;border:1px solid var(--border);border-radius:6px">{{ q.key }}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<nav style="position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:8px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:24px;box-shadow:0 18px 50px rgb(13 43 69/.18);z-index:6">
+<button title="Painel" style="position:relative;width:76px;height:58px;border:0;border-radius:16px;background:var(--primary-s);color:var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg><span style="font:600 12px Geist">Painel</span></button>
+<button title="Eventos" style="width:76px;height:58px;border:0;border-radius:16px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s" style-hover="background:var(--muted);color:var(--text);transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg><span style="font:500 12px Geist">Eventos</span></button>
+<button title="Passageiros" style="width:76px;height:58px;border:0;border-radius:16px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s" style-hover="background:var(--muted);color:var(--text);transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg><span style="font:500 12px Geist">Passageiros</span></button>
+<button onClick="{{ toggleDock }}" title="Ação rápida" style="width:58px;height:58px;margin:0 6px;border:0;border-radius:18px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 20px rgb(31 110 90/.35);transition:transform .25s cubic-bezier(.2,.8,.2,1)" style-hover="transform:scale(1.06)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="transform:rotate({{ plusRot }});transition:transform .25s cubic-bezier(.2,.8,.2,1)"><path d="M5 12h14M12 5v14"></path></svg></button>
+<button title="Financeiro" style="width:76px;height:58px;border:0;border-radius:16px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s" style-hover="background:var(--muted);color:var(--text);transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg><span style="font:500 12px Geist">Financeiro</span></button>
+<button title="Congregações" style="width:76px;height:58px;border:0;border-radius:16px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s" style-hover="background:var(--muted);color:var(--text);transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5"></path></svg><span style="font:500 12px Geist">Congregações</span></button>
+<button title="Ônibus" style="width:76px;height:58px;border:0;border-radius:16px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s" style-hover="background:var(--muted);color:var(--text);transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"></path><circle cx="7" cy="18" r="2"></circle><path d="M9 18h5"></path><circle cx="16" cy="18" r="2"></circle></svg><span style="font:500 12px Geist">Ônibus</span></button>
+</nav>
+</div>
+</div>
+
+<div id="1c" style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="background:#1f6e5a;color:#fff;font:600 13px Geist;padding:4px 10px;border-radius:999px">1c</span>
+<span style="font:600 16px Geist;color:#1e1f24">Hub do evento</span>
+<span style="font:400 14px Geist;color:#667085">O evento ativo é a navegação: seletor de evento, ciclo de vida e abas contextuais.</span>
+</div>
+<div data-art="1" data-theme="{{ themeC }}" data-screen-label="1c Hub do evento" style="width:1440px;background:var(--bg);color:var(--text);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgb(13 43 69/.18);transition:background-color .3s,color .3s">
+<div style="background:var(--navy);color:#fff;padding:0 40px;transition:background-color .3s">
+<div style="height:68px;display:flex;align-items:center;gap:18px">
+<img src="assets/logo-mark-dark.png" alt="SUOAC" style="width:34px;height:34px;border-radius:9px">
+<span style="font:700 17px Geist;letter-spacing:.05em">SUOAC</span>
+<span style="width:1px;height:24px;background:rgb(255 255 255/.15)"></span>
+<button style="display:flex;align-items:center;gap:10px;height:38px;padding:0 12px 0 14px;border:1px solid rgb(255 255 255/.14);border-radius:12px;background:rgb(255 255 255/.06);color:#fff;font:500 14px Geist;cursor:pointer;transition:background .2s" style-hover="background:rgb(255 255 255/.12)">
+<span style="width:8px;height:8px;border-radius:50%;background:#4fb393"></span>Congresso Regional 2026<span style="color:rgb(255 255 255/.6)">23–25 out</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+</button>
+<div style="flex:1"></div>
+<button style="width:40px;height:40px;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center" style-hover="background:rgb(255 255 255/.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+<button style="position:relative;width:40px;height:40px;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center" style-hover="background:rgb(255 255 255/.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#f07272;border:2px solid var(--navy)"></span></button>
+<button onClick="{{ toggleC }}" title="Alternar tema" style="width:40px;height:40px;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center" style-hover="background:rgb(255 255 255/.1)">
+<sc-if value="{{ darkC }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></sc-if>
+<sc-if value="{{ lightC }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></sc-if>
+</button>
+<span style="width:36px;height:36px;margin-left:6px;border-radius:50%;background:rgb(255 255 255/.12);display:grid;place-items:center;font:600 13px Geist">MO</span>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:28px 0 26px">
+<div style="display:flex;flex-direction:column;gap:10px">
+<h2 style="margin:0;font:600 34px/1.15 Geist;letter-spacing:-0.02em">Congresso Regional 2026</h2>
+<span style="font:400 15px Geist;color:rgb(255 255 255/.72)">Sexta a domingo, 23 a 25 de outubro · Salão de Assembleias, Campinas · R$ 40 por dia</span>
+</div>
+<div style="display:flex;gap:10px">
+<button style="height:42px;padding:0 16px;border:1px solid rgb(255 255 255/.22);border-radius:12px;background:transparent;color:#fff;font:500 14px Geist;cursor:pointer;transition:background .2s" style-hover="background:rgb(255 255 255/.08)">Encerrar inscrições</button>
+<button style="height:42px;padding:0 18px;display:flex;align-items:center;gap:8px;border:0;border-radius:12px;background:#e6f4ef;color:#174e40;font:600 14px Geist;cursor:pointer;transition:all .2s" style-hover="background:#fff;transform:translateY(-1px)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>Cadastrar passageiro</button>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:0;padding-bottom:26px">
+<div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#4fb393;color:#0a1a29;display:grid;place-items:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="font:500 14px Geist;color:rgb(255 255 255/.72)">Rascunho</span></div>
+<span style="flex:0 0 72px;height:2px;margin:0 14px;background:#4fb393"></span>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#0a1a29;border:2px solid #4fb393;display:grid;place-items:center;animation:pulse 2s infinite"><span style="width:8px;height:8px;border-radius:50%;background:#4fb393"></span></span><span style="display:flex;flex-direction:column;line-height:1.2"><span style="font:600 14px Geist">Aberto para inscrições</span><span style="font:400 12px Geist;color:rgb(255 255 255/.6)">desde 21/09</span></span></div>
+<span style="flex:0 0 72px;height:2px;margin:0 14px;background:rgb(255 255 255/.18)"></span>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;border:2px solid rgb(255 255 255/.25)"></span><span style="display:flex;flex-direction:column;line-height:1.2"><span style="font:500 14px Geist;color:rgb(255 255 255/.72)">Inscrições encerradas</span><span style="font:400 12px Geist;color:#f2c14b">12/10 · em 5 dias</span></span></div>
+<span style="flex:0 0 72px;height:2px;margin:0 14px;background:rgb(255 255 255/.18)"></span>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;border:2px solid rgb(255 255 255/.25)"></span><span style="display:flex;flex-direction:column;line-height:1.2"><span style="font:500 14px Geist;color:rgb(255 255 255/.72)">Finalizado</span><span style="font:400 12px Geist;color:rgb(255 255 255/.6)">após 25/10</span></span></div>
+</div>
+<nav style="display:flex;gap:4px;border-top:1px solid rgb(255 255 255/.1)">
+<sc-for list="{{ tabsC }}" as="t" hint-placeholder-count="6">
+<button onClick="{{ t.onClick }}" style="position:relative;display:flex;align-items:center;gap:8px;height:52px;padding:0 16px;border:0;background:transparent;color:{{ t.fg }};font:500 14px Geist;cursor:pointer;transition:color .2s" style-hover="color:#fff">{{ t.label }}<span style="font:500 12px Geist;padding:1px 7px;border-radius:999px;background:rgb(255 255 255/.1);display:{{ t.cDisp }}">{{ t.count }}</span><span style="position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:#4fb393;transform:scaleX({{ t.bar }});transition:transform .3s cubic-bezier(.2,.8,.2,1)"></span></button>
+</sc-for>
+</nav>
+</div>
+
+<main style="padding:28px 40px 40px;display:flex;flex-direction:column;gap:20px">
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+<sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:8px;padding:20px 22px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s ease both">
+<span style="font:500 13px Geist;color:var(--text2)">{{ k.label }}</span>
+<span style="font:600 30px/1 Geist;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:{{ k.fg }}">{{ k.value }}</span>
+<span style="font:400 13px Geist;color:var(--text2)">{{ k.sub }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:20px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .08s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 16px Geist">Ocupação por dia</span><span style="display:flex;align-items:center;gap:8px;font:400 13px Geist;color:var(--text2)"><span style="width:14px;border-top:2px dashed var(--attn)"></span>alerta de 80%</span></div>
+<sc-for list="{{ days }}" as="d" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:120px minmax(0,1fr) 150px;gap:20px;align-items:center">
+<div style="display:flex;flex-direction:column;line-height:1.3"><span style="font:600 15px Geist">{{ d.name }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ d.date }} · {{ d.saida }}</span></div>
+<div style="position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;height:30px">
+<sc-for list="{{ d.buses }}" as="b" hint-placeholder-count="4"><div style="position:relative;border-radius:7px;background:var(--muted);overflow:hidden"><div style="width:{{ b.w }};height:100%;background:var(--primary);transform-origin:left;animation:grow .9s {{ b.delay }} cubic-bezier(.2,.8,.2,1) both"></div><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font:600 12px Geist;color:var(--on-primary)">Ô{{ b.i }}</span></div></sc-for>
+<div style="position:absolute;left:80%;top:-5px;bottom:-5px;border-left:2px dashed var(--attn)"></div>
+</div>
+<div style="display:flex;align-items:baseline;justify-content:flex-end;gap:8px"><span style="font:600 18px Geist;font-variant-numeric:tabular-nums">{{ d.n }}/{{ d.cap }}</span><span style="font:600 13px Geist;padding:2px 8px;border-radius:999px;background:{{ d.bBg }};color:{{ d.bFg }}">{{ d.pctStr }}</span></div>
+</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .14s ease both">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 16px Geist">Ranking de pagamento por congregação</span><a href="#1c" style="font:500 13px Geist;color:var(--primary)">Relatório financeiro →</a></div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ congs }}" as="c" hint-placeholder-count="10">
+<div style="display:grid;grid-template-columns:28px minmax(0,1fr) 110px 260px 120px;gap:16px;align-items:center;height:44px;padding:0 8px;border-radius:10px;cursor:pointer;transition:background .15s" style-hover="background:var(--muted)">
+<span style="font:600 13px Geist;color:var(--text2);font-variant-numeric:tabular-nums">{{ c.rank }}</span>
+<span style="font:500 14px Geist">{{ c.name }}</span>
+<span style="font:400 13px Geist;color:var(--text2)">{{ c.n }} inscritos</span>
+<div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:6px;border-radius:999px;background:var(--muted);overflow:hidden"><div style="width:{{ c.pctStr }};height:100%;border-radius:999px;background:{{ c.bar }};transform-origin:left;animation:grow 1s .2s ease both"></div></div><span style="width:38px;text-align:right;font:600 13px Geist;font-variant-numeric:tabular-nums">{{ c.pctLabel }}</span></div>
+<span style="justify-self:end;padding:3px 9px;border-radius:999px;font:500 12px Geist;background:{{ c.sBg }};color:{{ c.sFg }}">{{ c.status }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .1s ease both">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px"><span style="font:600 16px Geist">Precisa da sua atenção</span><span style="font:600 12px Geist;padding:2px 8px;border-radius:999px;background:var(--crit-s);color:var(--crit)">4</span></div>
+<sc-for list="{{ alerts }}" as="a" hint-placeholder-count="4">
+<div style="display:flex;gap:12px;padding:12px;border-radius:12px;transition:background .15s" style-hover="background:var(--muted)">
+<span style="width:32px;height:32px;border-radius:10px;background:{{ a.bg }};color:{{ a.fg }};display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"></path><path d="M12 9v4M12 17h.01"></path></svg></span>
+<div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:500 14px/1.35 Geist">{{ a.title }}</span><span style="font:400 13px/1.4 Geist;color:var(--text2)">{{ a.desc }}</span>
+<button style="align-self:flex-start;margin-top:4px;height:30px;padding:0 12px;border:1px solid var(--border2);border-radius:9px;background:var(--surface);color:var(--text);font:500 13px Geist;cursor:pointer;transition:all .2s" style-hover="border-color:var(--primary);color:var(--primary)">{{ a.action }}</button></div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);animation:rise .5s .16s ease both">
+<span style="font:600 16px Geist">Rastreamento dos ônibus</span>
+<div style="position:relative;height:120px;border-radius:12px;background:var(--muted);overflow:hidden;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:24px 24px">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center"><span style="width:36px;height:36px;border-radius:50%;background:var(--surface);color:var(--text2);display:grid;place-items:center;border:1px solid var(--border)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m3 11 19-9-9 19-2-8-8-2z"></path></svg></span><span style="font:500 13px Geist;color:var(--text2)">Ativa no dia 23/10, a partir das 06:30</span></div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font:400 13px Geist;color:var(--text2)">Compartilhador ainda não definido</span><a href="#1c" style="font:500 13px Geist;color:var(--primary)">Definir →</a></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { themeA: 'light', themeB: 'light', themeC: 'dark', navA: 'Painel', congFilter: 'Todas', dockOpen: false, tabC: 'Visão geral' };
+
+  data() {
+    if (this._d) return this._d;
+    const brl = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    const raw = [['Jardim Paulista',28,92,true],['Recanto Verde',14,88,true],['Vila Nova',24,81,false],['Centro',31,74,true],['Bela Vista',26,70,true],['Parque das Flores',19,63,false],['Santa Rita',22,58,false],['Morada do Sol',15,52,false],['São José',17,45,false],['Cidade Alta',0,0,false]];
+    let esp = 0, rec = 0;
+    const congs = raw.map(([name, n, pct, fin], i) => {
+      const e = Math.round(n * 102.24 / 10) * 10, r = Math.round(e * pct / 1000) * 10;
+      esp += e; rec += r;
+      const bar = n === 0 ? 'var(--border2)' : pct >= 75 ? 'var(--succ)' : pct >= 50 ? 'var(--attn)' : 'var(--crit)';
+      const st = fin ? ['Finalizada', 'var(--succ-s)', 'var(--succ)'] : n === 0 ? ['Sem inscritos', 'var(--crit-s)', 'var(--crit)'] : ['Em andamento', 'var(--muted)', 'var(--text2)'];
+      return { name, n, fin, pct, rank: n === 0 ? '–' : i + 1, pctStr: pct + '%', pctLabel: n === 0 ? '—' : pct + '%', bar, status: st[0], sBg: st[1], sFg: st[2] };
+    });
+    const pctNum = Math.round(rec / esp * 100);
+    const totals = { esp: brl(esp), rec: brl(rec), pend: brl(esp - rec), pct: pctNum + '%', pctNum };
+    const mk = (name, date, n, saida, ret) => {
+      const pct = Math.round(n / 184 * 100);
+      let left = n;
+      const buses = [1, 2, 3, 4].map((i, bi) => {
+        const c = Math.min(46, Math.max(0, left)); left -= c;
+        const seats = Array.from({ length: 46 }, (_, s) => ({ c: s < c ? 'var(--primary)' : 'var(--border2)', d: (bi * 0.08 + s * 0.008).toFixed(3) + 's' }));
+        return { i, n: c, w: (c / 46 * 100).toFixed(1) + '%', delay: (bi * 0.12) + 's', seats };
+      });
+      const tone = pct >= 95 ? ['Quase lotado', 'var(--crit-s)', 'var(--crit)'] : pct >= 80 ? ['Acima de 80%', 'var(--attn-s)', 'var(--attn-t)'] : ['Com vagas', 'var(--succ-s)', 'var(--succ)'];
+      return { name, date, n, cap: 184, pct, pctStr: pct + '%', saida, ret, buses, free: 184 - n, freeLabel: (184 - n) + ' lugares livres', bLabel: tone[0], bBg: tone[1], bFg: tone[2] };
+    };
+    const days = [mk('Sexta-feira', '23/10', 152, '06:30', '18:30'), mk('Sábado', '24/10', 171, '06:30', '18:30'), mk('Domingo', '25/10', 178, '06:30', '17:45')];
+    const total = 196;
+    const payBreak = [['Pago', 118, 'var(--succ)'], ['Parcial', 34, 'var(--attn)'], ['Pendente', 39, 'var(--crit)'], ['Isento', 5, 'var(--info)']]
+      .map(([label, n, color]) => ({ label, n, color, w: (n / total * 100).toFixed(1) + '%' }));
+    const alerts = [
+      { title: 'Domingo com 97% da capacidade', desc: 'Restam 6 lugares. Considere mais um ônibus.', action: 'Adicionar ônibus', fg: 'var(--crit)', bg: 'var(--crit-s)' },
+      { title: 'Cidade Alta sem inscritos', desc: 'Nenhum passageiro cadastrado até agora.', action: 'Enviar lembrete', fg: 'var(--crit)', bg: 'var(--crit-s)' },
+      { title: 'Inscrições encerram em 5 dias', desc: 'Segunda, 12/10. 6 congregações ainda não finalizaram.', action: 'Ver pendentes', fg: 'var(--attn)', bg: 'var(--attn-s)' },
+      { title: 'São José com 45% pago', desc: 'Menor percentual de pagamento do circuito.', action: 'Ver congregação', fg: 'var(--attn)', bg: 'var(--attn-s)' },
+    ];
+    const kpis = [
+      { label: 'Passageiros inscritos', value: String(total), sub: '9 de 10 congregações', fg: 'var(--text)' },
+      { label: 'Ocupação média', value: '91%', sub: '501 de 552 lugares nos 3 dias', fg: 'var(--text)' },
+      { label: 'Recebido', value: totals.rec, sub: totals.pct + ' de ' + totals.esp, fg: 'var(--primary)' },
+      { label: 'Inscrições encerram', value: '5 dias', sub: 'Segunda, 12/10', fg: 'var(--attn-t)' },
+    ];
+    const quick = [
+      { glyph: '+', label: 'Cadastrar passageiro', hint: 'Nome, RG e dias', key: 'N' },
+      { glyph: 'R$', label: 'Registrar pagamento', hint: 'Total ou parcial', key: 'P' },
+      { glyph: '↓', label: 'Exportar listas', hint: 'Por dia ou congregação', key: 'E' },
+      { glyph: '✓', label: 'Encerrar inscrições', hint: 'Antes do prazo de 12/10', key: 'X' },
+    ];
+    this._d = { congs, totals, days, payBreak, alerts, kpis, quick, finCount: congs.filter(c => c.fin).length };
+    return this._d;
+  }
+
+  renderVals() {
+    const d = this.data(), s = this.state;
+    const toggle = k => () => this.setState(p => ({ [k]: p[k] === 'dark' ? 'light' : 'dark' }));
+    const navA = ['Painel', 'Eventos', 'Passageiros', 'Financeiro', 'Congregações', 'Ônibus'].map(label => {
+      const on = s.navA === label;
+      return { label, onClick: () => this.setState({ navA: label }), bg: on ? 'var(--surface)' : 'transparent', fg: on ? 'var(--text)' : 'var(--text2)', sh: on ? '0 1px 3px rgb(16 24 40/.12)' : 'none' };
+    });
+    const filtersA = ['Todas', 'Pendentes', 'Finalizadas'].map(label => {
+      const on = s.congFilter === label;
+      return { label, onClick: () => this.setState({ congFilter: label }), bg: on ? 'var(--surface)' : 'transparent', fg: on ? 'var(--text)' : 'var(--text2)', sh: on ? '0 1px 3px rgb(16 24 40/.12)' : 'none' };
+    });
+    const congsA = d.congs.filter(c => s.congFilter === 'Todas' || (s.congFilter === 'Finalizadas' ? c.fin : !c.fin));
+    const tabsC = [['Visão geral', ''], ['Passageiros', '196'], ['Financeiro', ''], ['Congregações', '10'], ['Ônibus', '4'], ['Listas e exportações', '']].map(([label, count]) => {
+      const on = s.tabC === label;
+      return { label, count, cDisp: count ? 'inline-block' : 'none', onClick: () => this.setState({ tabC: label }), fg: on ? '#fff' : 'rgb(255 255 255/.66)', bar: on ? 1 : 0 };
+    });
+    return {
+      ...d, navA, filtersA, congsA, tabsC,
+      themeA: s.themeA, themeB: s.themeB, themeC: s.themeC,
+      darkA: s.themeA === 'dark', lightA: s.themeA !== 'dark',
+      darkB: s.themeB === 'dark', lightB: s.themeB !== 'dark',
+      darkC: s.themeC === 'dark', lightC: s.themeC !== 'dark',
+      toggleA: toggle('themeA'), toggleB: toggle('themeB'), toggleC: toggle('themeC'),
+      dockOpen: s.dockOpen, plusRot: s.dockOpen ? '45deg' : '0deg',
+      toggleDock: () => this.setState(p => ({ dockOpen: !p.dockOpen })),
+      closeDock: () => this.setState({ dockOpen: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>
