@@ -52,3 +52,11 @@
     display: none;
   }
 }
+
+/* Em tela de toque o alvo chega a 44px. */
+@media (pointer: coarse) {
+  .toggle {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
