@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices, type Project } from "@playwright/test";
 
 import {
   E2E_API_BASE_URL,
@@ -18,7 +18,31 @@ import {
  * Nao entram em `yarn run check`. O check e rodado a cada mudanca e precisa ser
  * rapido; subir navegador a cada vez transformaria a validacao em espera, e
  * validacao lenta acaba sendo pulada. No CI a suite roda em job proprio.
+ *
+ * A regressao visual (`*.visual.spec.ts`, SUC-42) e um projeto a parte, so
+ * registrado com `PLAYWRIGHT_VISUAL=1`, que `scripts/test-visual.sh` define dentro
+ * do contêiner. Fora dele a baseline nao casaria (fonte e plataforma), entao
+ * `yarn test:e2e` nem a enxerga.
  */
+const isVisualRun = process.env.PLAYWRIGHT_VISUAL === "1";
+
+const visualProject: Project = {
+  name: "visual",
+  testMatch: "**/*.visual.spec.ts",
+  use: { ...devices["Desktop Chrome"] },
+  /*
+   * So aqui, e nao na config global: o que vale para a baseline nao pode
+   * vazar para um `toHaveScreenshot` de spec funcional, que rodaria fora
+   * do contêiner. Sem plataforma no nome do arquivo, porque so existe um
+   * ambiente de captura. Tolerancia zero de proposito: no mesmo ambiente
+   * a captura e deterministica, e qualquer pixel diferente e mudanca de
+   * aparencia. Afrouxar so com caso concreto.
+   */
+  snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}{ext}",
+  expect: {
+    toHaveScreenshot: { animations: "disabled", caret: "hide", maxDiffPixels: 0, threshold: 0 },
+  },
+};
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -39,12 +63,14 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: "**/*.visual.spec.ts",
       use: {
         ...devices["Desktop Chrome"],
         // Largura minima do redesign. Ver .claude/rules/ui-e-design-system.md.
         viewport: { width: 1280, height: 900 },
       },
     },
+    ...(isVisualRun ? [visualProject] : []),
   ],
 
   webServer: [

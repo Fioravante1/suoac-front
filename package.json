@@ -16,6 +16,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:visual": "bash scripts/test-visual.sh",
+    "test:visual:update": "bash scripts/test-visual.sh --update-snapshots",
     "test:all": "yarn test:unit && yarn test:e2e",
     "architecture:check": "steiger ./src",
     "typecheck": "tsc --noEmit",
