@@ -46,7 +46,17 @@ yarn test:e2e:ui   # modo interativo, para investigar falha
 yarn test:all      # unitarios + E2E
 ```
 
-Regressao visual com `toHaveScreenshot()` ainda **nao** esta configurada: baselines tiradas antes de
-existir tela redesenhada fotografariam apenas telas que vao morrer. Entra na Fatia 1, junto com a
-primeira tela nova — e com o tratamento das duas armadilhas conhecidas, fonte/plataforma e animacao
-de entrada.
+Regressao visual (`*.visual.spec.ts`, SUC-42) e um projeto Playwright a parte e roda **so no
+conteiner** oficial do Playwright, na mesma versao do `@playwright/test`:
+
+```bash
+yarn test:visual          # compara com as baselines em tests/e2e/__screenshots__/
+yarn test:visual:update   # regrava; revise o diff imagem a imagem
+```
+
+- Tela redesenhada nova ganha baseline nos dois temas e nas tres larguras do responsivo
+  (celular, tablet e desktop), junto com a fatia. Tela ainda nao redesenhada nao ganha.
+- Tolerancia zero (`maxDiffPixels: 0`, `threshold: 0`) e animacao desabilitada. A captura
+  estica a janela ate o conteudo e forca as imagens `lazy` antes de fotografar: `fullPage` e
+  imagem tardia fazem duas capturas seguidas diferirem.
+- Nao use `yarn test:e2e` para visual: o projeto so existe no conteiner, de proposito.
