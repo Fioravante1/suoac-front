@@ -15,9 +15,9 @@ interface ResetPasswordPageProps {
 /**
  * Tela de redefinicao de senha, aberta pelo link do e-mail (SUC-26).
  *
- * Nasce sem fachada e sem flag, diferente da tela de entrada: nao existe versao
- * legada com que coexistir, e o link chega por e-mail — gatear a rota faria um
- * link valido morrer se a flag `REDESIGN_LOGIN` fosse desligada depois do envio.
+ * Nasceu sem fachada e sem flag: nao havia versao legada com que coexistir, e o
+ * link chega por e-mail — gatear a rota faria um link valido morrer se a flag
+ * fosse desligada depois do envio (SUC-26).
  *
  * O token e verificado **aqui, no servidor**, antes de qualquer campo aparecer:
  * quem chega com link expirado le isso de imediato, em vez de descobrir depois

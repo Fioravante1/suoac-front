@@ -26,14 +26,10 @@ const GENERIC_ERROR = "Não foi possível entrar agora. Verifique sua conexão e
  * Autentica e abre a sessao, devolvendo para onde ir — em vez de redirecionar
  * aqui mesmo.
  *
- * A diferenca em relacao a `features/sign-in`, que redireciona no servidor, e
- * deliberada: a tela nova confirma a entrada com "Bem-vindo, {nome}" antes de
- * sair, e um `redirect()` aqui tornaria esse momento inalcancavel. O nome vem
- * do backend; deriva-lo do e-mail, como o prototipo faz, saudaria
+ * Nao redireciona no servidor: a tela confirma a entrada com "Bem-vindo, {nome}"
+ * antes de sair, e um `redirect()` aqui tornaria esse momento inalcancavel. O
+ * nome vem do backend; deriva-lo do e-mail, como o prototipo faz, saudaria
  * `secretaria@congregacao.org` como "Secretaria".
- *
- * Duplicacao temporaria, com data de morte conhecida: some no corte do login
- * legado (SUC-34). Ver `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` §3.1.
  */
 export async function signInAction({ returnUrl, ...credentials }: SignInInput): Promise<SignInResult> {
   const parsed = signInSchema.safeParse(credentials);

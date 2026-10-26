@@ -8,8 +8,9 @@ import { E2E_BASE_URL, E2E_FLAGS_SECRET } from "./environment";
  * Flags SDK: o cookie `vercel-flag-overrides` e lido antes do adapter ser
  * consultado, entao o valor forcado vence sem depender de rede nem de painel.
  *
- * Por que isto e necessario: todo teste de fachada precisa dizer explicitamente de
- * que lado esta, ligado ou desligado. Sem o override, o valor viria do painel da
+ * Hoje nenhum teste o usa: a unica fachada com flag (login, Fatia 1) foi cortada
+ * em SUC-34. Fica para a proxima fatia: todo teste de fachada precisa dizer
+ * explicitamente de que lado esta, ligado ou desligado. Sem o override, o valor viria do painel da
  * Vercel — no CI nenhuma chave esta configurada e tudo cai no `defaultValue`, mas
  * na maquina de quem desenvolve a chave vem do `.env.local` e o resultado passa a
  * depender do ambiente `development`, que muda sem avisar o teste.

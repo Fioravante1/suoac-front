@@ -46,8 +46,13 @@ No SUOAC a fachada já existe e não precisa ser inventada: **os arquivos de rot
 Um arquivo de rota que escolhe entre dois slices FSD é exatamente a fachada do Strangler Fig, no
 ponto mais barato possível de inserir e de remover.
 
+> **Histórico.** O exemplo abaixo é a fachada da Fatia 1, que existiu até o corte (SUC-34,
+> 26/10/2026): `src/pages/login-next` foi renomeado para `src/pages/login`, o slice antigo, a flag
+> `REDESIGN_LOGIN` e a contenção de tema do ramo antigo foram removidos, e `app/(auth)/login/page.tsx`
+> voltou a exportar o slice direto. As fatias seguintes seguem o mesmo ciclo.
+
 ```tsx
-// app/(auth)/login/page.tsx — a fachada
+// app/(auth)/login/page.tsx — a fachada (enquanto a Fatia 1 coexistia)
 import { redesignLoginFlag } from "@/shared/feature-flags";
 import { LoginPage } from "@/pages/login";
 import { LoginPage as LoginPageNext } from "@/pages/login-next";
@@ -114,7 +119,7 @@ src/pages/login-next/     # redesign
 
 Razões:
 
-- **Apagar é trivial.** No corte: `rm -rf src/pages/login && mv src/pages/login-next src/pages/login`,
+- **Apagar é trivial.** No corte (na Fatia 1, SUC-34, o `login-next` virou `login` e o antigo foi apagado): `rm -rf src/pages/login && mv src/pages/login-next src/pages/login`,
   mais um ajuste de import na rota. Nada de desentrelaçar código novo de código velho.
 - **Não polui o slice antigo.** Misturar as duas versões dentro de `src/pages/login/ui/` faria cada
   arquivo carregar a pergunta "isso é do novo ou do velho?" até o fim do redesign.
@@ -193,7 +198,7 @@ aquele domínio sem tocar nos outros.
 Nomenclatura: prefixo `REDESIGN_` + nome da fatia.
 
 ```text
-REDESIGN_LOGIN            Fatia 1 — login, recuperação, convite, autocadastro
+REDESIGN_LOGIN            Fatia 1 — login, recuperação, convite, autocadastro (removida em SUC-34)
 REDESIGN_APP_SHELL        Fatia 2 — faixa do evento, abas, seletor, avatar
 REDESIGN_OVERVIEW         Fatia 3 — visão geral e ocupação dos ônibus
 REDESIGN_PASSENGERS       Fatia 4 — passageiros e importação de lista

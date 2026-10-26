@@ -1,15 +1,14 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 
 import { E2E_API_BASE_URL, E2E_BASE_URL } from "./support/environment";
-import { overrideFlags } from "./support/feature-flags";
 
 /**
  * A rota `/reset-password`, aberta pelo link do e-mail (SUC-26).
  *
  * Nao repete o que o teste unitario cobre — os textos de cada estado e a
  * validacao do formulario estao la. O que so existe aqui e a rota real: a
- * verificacao do token acontecendo no servidor antes da primeira pintura, o
- * corpo que sai de fato para a API, e a independencia da flag do redesign.
+ * verificacao do token acontecendo no servidor antes da primeira pintura e o
+ * corpo que sai de fato para a API.
  *
  * O estado do token vem do proprio valor dele na API local — ver
  * `support/mock-api-server.mjs`.
@@ -191,20 +190,5 @@ test.describe("rota de redefinicao de senha", () => {
      * de mesma origem: o token entraria no log de acesso.
      */
     expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
-  });
-});
-
-test.describe("independencia da flag do redesign", () => {
-  test("continua servindo a tela com REDESIGN_LOGIN desligada", async ({ page, context }) => {
-    await overrideFlags(context, { REDESIGN_LOGIN: false });
-
-    await page.goto("/reset-password?token=token-valido");
-
-    /*
-     * O link chega por e-mail e sobrevive a troca de flag. Se esta rota fosse
-     * gateada junto com `/login`, desligar a flag depois do envio transformaria
-     * link valido em 404 — ver a decisao registrada no SUC-26.
-     */
-    await expect(page.getByRole("heading", { name: "Crie uma nova senha" })).toBeVisible();
   });
 });
