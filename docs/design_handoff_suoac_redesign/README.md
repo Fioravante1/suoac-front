@@ -174,7 +174,7 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 - Ícones: SVG inline estilo Lucide; usar a biblioteca de ícones do codebase (ex.: `lucide-react`).
 
 ## Arquivos
-- `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
+- `SUOAC Dashboard.dc.html` — canvas de exploração da navegação do painel (barra de comando, dock flutuante e hub do evento). Não traz mais os modais nem a faixa do evento da versão anterior, que ficam no histórico do git.
 - `SUOAC Login.dc.html` — login, recuperação, nova senha e autocadastro do circuito.
 - `SUOAC Convite.dc.html` — cadastro do coordenador da congregação pelo link de convite.
 - `SUOAC Mobile.dc.html` — vitrine com as 19 telas em celular (390×844), agrupadas por fluxo.
