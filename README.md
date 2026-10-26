@@ -104,7 +104,6 @@ Por dependerem de APIs server-only (`async_hooks`), são mantidas fora de `@/sha
 | Flag                      | Tipo    | Descrição                                                                                    |
 | ------------------------- | ------- | -------------------------------------------------------------------------------------------- |
 | `SHOW_PENDING_MENU_ITEMS` | boolean | Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações). |
-| `REDESIGN_LOGIN`          | boolean | Serve a tela de login redesenhada em `/login`. Temporária — removida em SUC-34.              |
 
 Os valores das flags são gerenciados no painel do Vercel Flags (ou via `vercel flags`),
 por ambiente (production/preview/development).

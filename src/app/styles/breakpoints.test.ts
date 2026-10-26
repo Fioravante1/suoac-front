@@ -18,7 +18,7 @@ const declarations = extractDeclarationsOf(loadCss("app/globals.css"), ":root");
 /** Telas de acesso, as primeiras adaptadas ao celular e ao tablet. */
 const RESPONSIVE_DIRECTORIES = [
   "src/widgets/auth-shell",
-  "src/pages/login-next",
+  "src/pages/login",
   "src/pages/reset-password",
   "src/pages/accept-invitation",
   "src/shared/ui/password-strength-meter",

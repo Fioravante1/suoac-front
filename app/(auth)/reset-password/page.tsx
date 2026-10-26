@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 /**
  * Rota aberta pelo link de recuperacao de senha.
  *
- * Sem fachada e sem flag, diferente de `/login`: nao ha versao legada desta
- * tela, e gatear a rota mataria link valido caso a flag `REDESIGN_LOGIN` fosse
- * desligada depois do envio do e-mail — ver SUC-26.
+ * Sem fachada e sem flag: nao ha versao legada desta tela, e gatear a rota
+ * mataria link valido caso a flag fosse desligada depois do envio do e-mail —
+ * ver SUC-26.
  */
 export default async function Page({
   searchParams,
