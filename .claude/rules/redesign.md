@@ -20,8 +20,9 @@ qualquer coisa do redesign. O que segue e o resumo operacional.
 
 - O ponto de decisao entre versao antiga e nova e **o arquivo de rota em `/app`**, que ja deve ser
   fino. Nenhum `if (flag)` espalhado pelo resto do codigo.
-- O slice novo nasce ao lado do antigo com sufixo `-next` (`src/pages/login-next`).
-- `login` e `login-next` **nunca** importam um do outro. Se algo for reaproveitavel, copie para o
+- O slice novo nasce ao lado do antigo com sufixo `-next` (na Fatia 1 foi `login-next`, promovido a
+  `login` no corte, SUC-34).
+- O slice `x` e o `x-next` **nunca** importam um do outro. Se algo for reaproveitavel, copie para o
   slice novo ou promova para uma camada inferior antes de usar nos dois.
 - A URL nunca muda. Nao crie rotas `/v2`.
 - O corte do codigo antigo e **PR proprio**, que so apaga, renomeia e remove a flag.
