@@ -26,7 +26,7 @@ vi.mock("@/shared/auth/session", () => ({
 const { resetPasswordAction } = await import("./reset-password-action");
 
 const TOKEN = "token-do-link";
-const SENHA = "NovaSenha123";
+const SENHA = "NovaSenha@123";
 
 const entradaValida = { token: TOKEN, newPassword: SENHA, confirmPassword: SENHA };
 
@@ -103,7 +103,7 @@ describe("resetPasswordAction", () => {
   });
 
   it("barra confirmação divergente antes de tocar a API", async () => {
-    const result = await resetPasswordAction({ ...entradaValida, confirmPassword: "OutraSenha123" });
+    const result = await resetPasswordAction({ ...entradaValida, confirmPassword: "OutraSenha@123" });
 
     expect(httpClient).not.toHaveBeenCalled();
     expect(result).toEqual({ status: "error", message: "Revise a senha e a confirmação." });

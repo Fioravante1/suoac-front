@@ -16,7 +16,12 @@ const { submitCircuitSignupAction } = await import("./submit-circuit-signup-acti
 // ── Helpers ──────────────────────────────────────────────────────
 function buildInput(overrides: Partial<SignupFormValues> = {}): SignupFormValues {
   return {
-    coordinator: { name: "João Silva", email: "joao@example.com", phone: "(19) 99999-9999", password: "Senha123" },
+    coordinator: {
+      name: "João Silva",
+      email: "joao@example.com",
+      phone: "(19) 99999-9999",
+      password: "Senha-Segura123",
+    },
     circuit: { name: "sp-17", city: "Campinas", state: "sp" },
     acceptedTerms: true,
     congregations: [
@@ -47,7 +52,12 @@ describe("submitCircuitSignupAction", () => {
         method: "POST",
         anonymous: true,
         body: {
-          coordinator: { name: "João Silva", email: "joao@example.com", phone: "19999999999", password: "Senha123" },
+          coordinator: {
+            name: "João Silva",
+            email: "joao@example.com",
+            phone: "19999999999",
+            password: "Senha-Segura123",
+          },
           circuit: { name: "SP-17", city: "Campinas", state: "SP" },
           congregations: [
             { name: "Central", code: "SP17-CENTRAL" },

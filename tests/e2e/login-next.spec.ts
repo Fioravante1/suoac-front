@@ -122,7 +122,7 @@ test.describe("autocadastro de circuito em etapas", () => {
     await page.getByLabel("Nome completo").fill("João Silva");
     await page.getByLabel("E-mail").fill("joao@example.com");
     await page.getByLabel("Celular (WhatsApp)").fill("(19) 99999-9999");
-    await page.getByLabel("Crie uma senha").fill("Senha123");
+    await page.getByLabel("Crie uma senha").fill("Senha-Segura123");
     await page.getByRole("button", { name: "Continuar" }).click();
 
     await expect(page.getByRole("heading", { name: "Dados do circuito" })).toBeVisible();
@@ -206,7 +206,7 @@ test.describe("autocadastro de circuito em etapas", () => {
       await page.getByLabel("Nome completo").fill("João Silva");
       await page.getByLabel("E-mail").fill("joao@example.com");
       await page.getByLabel("Celular (WhatsApp)").fill("19999999999");
-      await page.getByLabel("Crie uma senha").fill("Senha123");
+      await page.getByLabel("Crie uma senha").fill("Senha-Segura123");
       await page.getByRole("button", { name: "Continuar" }).click();
 
       const circuit = page.getByRole("textbox", { name: "Circuito", exact: true });
@@ -271,14 +271,14 @@ test.describe("autocadastro de circuito em etapas", () => {
       await expect(page.getByText("Informe um e-mail válido.")).toBeHidden();
 
       const password = page.getByLabel("Crie uma senha", { exact: true });
-      await password.fill("Senha1");
-      await expect(page.getByText("A senha deve conter no mínimo 8 caracteres.")).toBeVisible();
+      await password.fill("Senha-123aa");
+      await expect(page.getByText("A senha deve conter no mínimo 12 caracteres.")).toBeVisible();
       await expect(page.getByRole("status")).toContainText("quase lá");
       const requirements = page.getByRole("list", { name: "Requisitos da senha" });
-      await expect(requirements.getByText(/Pelo menos 8 caracteres/)).toContainText("pendente");
-      await password.fill("Senha123");
+      await expect(requirements.getByText(/12 ou mais caracteres/)).toContainText("pendente");
+      await password.fill("Senha-Segura123");
       await expect(page.getByRole("status")).toContainText("forte");
-      await expect(requirements.getByText(/Pelo menos 8 caracteres/)).toContainText("cumprido");
+      await expect(requirements.getByText(/12 ou mais caracteres/)).toContainText("cumprido");
       await page.getByRole("button", { name: "Mostrar senha" }).click();
       await expect(password).toHaveAttribute("type", "text");
       await page.getByRole("button", { name: "Ocultar senha" }).click();

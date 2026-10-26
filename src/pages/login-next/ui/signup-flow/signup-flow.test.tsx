@@ -53,7 +53,7 @@ function fillCoordinator() {
   type("Nome completo", "João Silva");
   type("E-mail", "joao@example.com");
   type("Celular (WhatsApp)", "(19) 99999-9999");
-  type("Crie uma senha", "Senha123");
+  type("Crie uma senha", "Senha-Segura123");
 }
 
 /** Preenche a etapa 2, aceite dos termos incluído. */
@@ -106,7 +106,7 @@ describe("SignupFlow", () => {
     it("não deve pular uma etapa quando o avanço é clicado duas vezes", async () => {
       renderFlow();
       fillCoordinator();
-      await waitFor(() => expect(screen.getByLabelText("Crie uma senha")).toHaveValue("Senha123"));
+      await waitFor(() => expect(screen.getByLabelText("Crie uma senha")).toHaveValue("Senha-Segura123"));
 
       const next = screen.getByRole("button", { name: "Continuar" });
       fireEvent.click(next);
@@ -163,7 +163,7 @@ describe("SignupFlow", () => {
       expect(screen.getByLabelText("Nome completo")).toHaveValue("João Silva");
       expect(screen.getByLabelText("E-mail")).toHaveValue("joao@example.com");
       expect(screen.getByLabelText("Celular (WhatsApp)")).toHaveValue("(19) 99999-9999");
-      expect(screen.getByLabelText("Crie uma senha")).toHaveValue("Senha123");
+      expect(screen.getByLabelText("Crie uma senha")).toHaveValue("Senha-Segura123");
     });
 
     it("deve manter os valores da etapa 2 ao ir para a 3 e voltar", async () => {
@@ -214,7 +214,7 @@ describe("SignupFlow", () => {
       fillCoordinator();
       type("Crie uma senha", "Senha1");
 
-      await waitFor(() => expect(screen.getByText("A senha deve conter no mínimo 8 caracteres.")).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText("A senha deve conter no mínimo 12 caracteres.")).toBeInTheDocument());
       clickNext();
 
       await waitFor(() => expect(screen.getByText("Etapa 1 de 3")).toBeInTheDocument());
@@ -244,7 +244,7 @@ describe("SignupFlow", () => {
     it("deve recusar senha que a API recusaria", async () => {
       renderFlow();
       fillCoordinator();
-      type("Crie uma senha", "senhasenha");
+      type("Crie uma senha", "senhasenhasenha");
 
       clickNext();
 

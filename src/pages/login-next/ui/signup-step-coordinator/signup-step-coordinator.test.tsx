@@ -39,9 +39,9 @@ describe("SignupStepCoordinator", () => {
   it("deve mostrar a força da senha abaixo do campo enquanto ela é digitada", () => {
     render(<Harness />);
 
-    expect(screen.getByText("Use letras maiúsculas, minúsculas e números")).toBeInTheDocument();
+    expect(screen.getByText("Use letras maiúsculas, minúsculas, números e símbolos")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "Senha123" } });
+    fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "Senha-Segura123" } });
 
     expect(screen.getByRole("status")).toHaveTextContent("forte");
     expect(screen.getByRole("list", { name: "Requisitos da senha" })).toBeInTheDocument();
@@ -50,26 +50,26 @@ describe("SignupStepCoordinator", () => {
   it("deve explicar os requisitos que faltam enquanto a pessoa digita", () => {
     render(<Harness />);
 
-    fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "senhalonga" } });
+    fireEvent.change(screen.getByLabelText("Crie uma senha"), { target: { value: "senhalongaaaa" } });
 
     const requirements = screen.getByRole("list", { name: "Requisitos da senha" });
     expect(within(requirements).getByText(/Uma letra maiúscula/)).toHaveTextContent("pendente");
     expect(within(requirements).getByText(/Um número/)).toHaveTextContent("pendente");
-    expect(within(requirements).getByText(/Pelo menos 8 caracteres/)).toHaveTextContent("cumprido");
+    expect(within(requirements).getByText(/12 ou mais caracteres/)).toHaveTextContent("cumprido");
   });
 
   it("deve permitir mostrar e ocultar a senha sem alterar seu valor", () => {
     render(<Harness />);
     const password = screen.getByLabelText("Crie uma senha");
-    fireEvent.change(password, { target: { value: "Senha123" } });
+    fireEvent.change(password, { target: { value: "Senha-Segura123" } });
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar senha" }));
     expect(password).toHaveAttribute("type", "text");
-    expect(password).toHaveValue("Senha123");
+    expect(password).toHaveValue("Senha-Segura123");
 
     fireEvent.click(screen.getByRole("button", { name: "Ocultar senha" }));
     expect(password).toHaveAttribute("type", "password");
-    expect(password).toHaveValue("Senha123");
+    expect(password).toHaveValue("Senha-Segura123");
   });
 
   it("deve abrir o celular com teclado numérico", () => {

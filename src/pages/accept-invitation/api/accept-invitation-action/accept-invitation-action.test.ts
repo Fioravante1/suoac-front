@@ -30,7 +30,7 @@ const { acceptInvitationAction } = await import("./accept-invitation-action");
 
 const TOKEN = "a".repeat(64);
 
-const INPUT = { token: TOKEN, name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@123" };
+const INPUT = { token: TOKEN, name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@Segura123" };
 
 const INVITATION = {
   name: "Maria Souza",
@@ -84,7 +84,7 @@ describe("acceptInvitationAction", () => {
       expect(httpClientRaw).toHaveBeenCalledWith(endpoints.invitations.acceptances(TOKEN), {
         method: "POST",
         anonymous: true,
-        body: { name: "Maria Souza", phone: "19996543210", password: "Senha@123" },
+        body: { name: "Maria Souza", phone: "19996543210", password: "Senha@Segura123" },
       });
     });
 
