@@ -173,6 +173,9 @@ yarn test                # Vitest em watch mode
 yarn test:unit           # testes unitários em modo run
 yarn test:coverage       # cobertura de testes
 yarn architecture:check  # valida FSD com Steiger
+yarn test:e2e            # E2E funcional com Playwright (fora do check)
+yarn test:visual         # regressão visual, no contêiner do Playwright (fora do check)
+yarn test:visual:update  # regrava as baselines visuais
 yarn run check           # validação completa
 yarn validate            # alias seguro para yarn run check
 ```
@@ -198,6 +201,28 @@ Exemplo:
 src/pages/home/ui/home-page.tsx
 src/pages/home/ui/home-page.test.tsx
 ```
+
+### Regressão visual
+
+`yarn test:visual` compara capturas da tela de entrada (`tests/e2e/login.visual.spec.ts`) com as
+baselines de `tests/e2e/__screenshots__/`, nos temas claro e escuro e em três larguras: celular
+(390px), tablet (820px) e desktop (1280px). Não entra em `yarn run check`.
+
+- **Roda sempre no contêiner.** O script sobe a imagem oficial do Playwright, na mesma versão do
+  `@playwright/test` do `package.json`, porque baseline depende de sistema, fonte e navegador.
+  Precisa de Docker, e a primeira execução baixa a imagem. O CI roda o mesmo comando, então o
+  resultado é o mesmo na sua máquina e lá.
+- **Tolerância zero.** Qualquer pixel diferente falha. Afrouxar só com caso concreto, registrado no
+  card.
+- **Quando falha**, o diff fica em `test-results/` (esperado, obtido e diferença) e, no CI, no
+  artefato `visual-diff` do job _Visual Regression_.
+- **Atualizar a baseline** é `yarn test:visual:update`. O diff das imagens se revisa uma a uma, como
+  código: nada de regravar tudo para o teste passar. Commite as imagens junto com a mudança que as
+  alterou.
+- **Upgrade do Playwright** muda a imagem e, quase sempre, os pixels: regrave as baselines no mesmo
+  PR do upgrade.
+- Telas novas do redesign entram aqui junto com a fatia; telas ainda não redesenhadas não têm
+  baseline, porque vão morrer no corte.
 
 ---
 
