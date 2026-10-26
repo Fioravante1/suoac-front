@@ -157,7 +157,7 @@ describe("SignInForm", () => {
   it("mostra o Manter conectado desmarcado e habilitado: a sessão estendida é escolha explícita", () => {
     render(<SignInForm />);
 
-    const checkbox = screen.getByRole("checkbox", { name: "Manter conectado neste computador" });
+    const checkbox = screen.getByRole("checkbox", { name: "Manter conectado neste dispositivo" });
 
     expect(checkbox).not.toBeChecked();
     expect(checkbox).toBeEnabled();
@@ -167,7 +167,7 @@ describe("SignInForm", () => {
     signInAction.mockResolvedValue({ status: "success", firstName: "Maria", redirectTo: "/dashboard" });
     render(<SignInForm />);
     fillCredentials();
-    fireEvent.click(screen.getByRole("checkbox", { name: "Manter conectado neste computador" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Manter conectado neste dispositivo" }));
 
     fireEvent.click(getSubmit());
 

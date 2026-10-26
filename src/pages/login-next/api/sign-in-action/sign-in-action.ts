@@ -10,7 +10,7 @@ import type { SignInResponseDto } from "./sign-in.dto";
 export interface SignInInput {
   email: string;
   password: string;
-  /** "Manter conectado neste computador": pede a sessão estendida (SUC-39). */
+  /** "Manter conectado neste dispositivo": pede a sessão estendida (SUC-39). */
   rememberMe: boolean;
   /** Para onde o usuario tentava ir quando foi barrado pelo gate de sessao. */
   returnUrl?: string | null;

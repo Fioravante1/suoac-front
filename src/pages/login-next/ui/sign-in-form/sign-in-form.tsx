@@ -144,7 +144,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
             {...register("password")}
           />
 
-          <Checkbox label="Manter conectado neste computador" disabled={isBusy} {...register("rememberMe")} />
+          <Checkbox label="Manter conectado neste dispositivo" disabled={isBusy} {...register("rememberMe")} />
         </div>
 
         <button

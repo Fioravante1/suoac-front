@@ -10,7 +10,7 @@ import { z } from "zod";
 export const signInSchema = z.object({
   email: z.email("Informe um e-mail válido."),
   password: z.string().min(6, "A senha precisa ter pelo menos 6 caracteres."),
-  /** "Manter conectado neste computador": pede a sessão estendida ao backend (SUC-39). */
+  /** "Manter conectado neste dispositivo": pede a sessão estendida ao backend (SUC-39). */
   rememberMe: z.boolean(),
 });
 
