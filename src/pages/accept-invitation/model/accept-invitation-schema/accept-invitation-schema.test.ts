@@ -5,8 +5,8 @@ import { acceptInvitationPayloadSchema, acceptInvitationSchema } from "./accept-
 const VALID = {
   name: "Maria Souza",
   phone: "(19) 99654-3210",
-  password: "Senha@123",
-  confirmPassword: "Senha@123",
+  password: "Senha@Segura123",
+  confirmPassword: "Senha@Segura123",
   terms: true,
 };
 
@@ -66,7 +66,7 @@ describe("acceptInvitationPayloadSchema", () => {
     const result = acceptInvitationPayloadSchema.safeParse(VALID);
 
     expect(result.success).toBe(true);
-    expect(result.data).toEqual({ name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@123" });
+    expect(result.data).toEqual({ name: "Maria Souza", phone: "(19) 99654-3210", password: "Senha@Segura123" });
   });
 
   it("apara o nome antes de enviar", () => {

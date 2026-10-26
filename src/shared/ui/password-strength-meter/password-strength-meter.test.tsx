@@ -7,31 +7,32 @@ describe("PasswordStrengthMeter", () => {
   it("nao classifica senha quando o campo esta vazio", () => {
     render(<PasswordStrengthMeter value="" />);
 
-    expect(screen.getByText("Use letras maiúsculas, minúsculas e números")).toBeInTheDocument();
-    expect(screen.getByText("0 de 4 requisitos cumpridos.")).toBeInTheDocument();
+    expect(screen.getByText("Use letras maiúsculas, minúsculas, números e símbolos")).toBeInTheDocument();
+    expect(screen.getByText("0 de 5 requisitos cumpridos.")).toBeInTheDocument();
   });
 
   it.each([
-    ["!", "muito fraca", 0],
+    ["   ", "muito fraca", 0],
     ["abc", "fraca", 1],
-    ["abcdefgh", "razoável", 2],
-    ["Abcdefgh", "quase lá", 3],
-    ["Abcdefg1", "forte", 4],
+    ["abcdefghijkl", "razoável", 2],
+    ["Abcdefghijkl", "razoável", 3],
+    ["Abcdefghijk1", "quase lá", 4],
+    ["Abcdefghij1!", "forte", 5],
   ])("classifica %s como %s pelo total de requisitos", (password, label, count) => {
     render(<PasswordStrengthMeter value={password} />);
 
     expect(screen.getByRole("status")).toHaveTextContent(label);
-    expect(screen.getByText(`${count} de 4 requisitos cumpridos.`)).toBeInTheDocument();
+    expect(screen.getByText(`${count} de 5 requisitos cumpridos.`)).toBeInTheDocument();
   });
 
   it("lista os requisitos pendentes, nao so a nota", () => {
-    render(<PasswordStrengthMeter value="senhalonga" />);
+    render(<PasswordStrengthMeter value="senhalongaaaa" />);
 
     const requirements = screen.getByRole("list", { name: "Requisitos da senha" });
     const maiuscula = screen.getByText(/Uma letra maiúscula/);
     const minuscula = screen.getByText(/Uma letra minúscula/);
 
-    expect(within(requirements).getAllByRole("listitem")).toHaveLength(4);
+    expect(within(requirements).getAllByRole("listitem")).toHaveLength(5);
     expect(maiuscula).toHaveTextContent("pendente");
     expect(minuscula).toHaveTextContent("cumprido");
   });
@@ -49,23 +50,23 @@ describe("PasswordStrengthMeter", () => {
   });
 
   it("anuncia o progresso a leitor de tela sem depender de cor", () => {
-    render(<PasswordStrengthMeter value="senhalonga" />);
+    render(<PasswordStrengthMeter value="senhalongaaaa" />);
 
-    expect(screen.getByText("2 de 4 requisitos cumpridos.")).toBeInTheDocument();
+    expect(screen.getByText("2 de 5 requisitos cumpridos.")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("razoável");
   });
 
   it("não chama de boa a senha que o servidor vai recusar", () => {
-    // Seis caracteres com maiúscula, minúscula e número: cumpre três dos quatro
-    // requisitos e reprova no mínimo de 8. "Boa" prometeria aprovação.
-    render(<PasswordStrengthMeter value="Senha1" />);
+    // Dez caracteres com maiúscula, minúscula, número e símbolo: cumpre quatro dos
+    // cinco requisitos e reprova no mínimo de 12. "Boa" prometeria aprovação.
+    render(<PasswordStrengthMeter value="Senha-123aa" />);
 
     expect(screen.getByRole("status")).toHaveTextContent("quase lá");
-    expect(screen.getByText(/Pelo menos 8 caracteres/)).toHaveTextContent("pendente");
+    expect(screen.getByText(/12 ou mais caracteres/)).toHaveTextContent("pendente");
   });
 
   it("esconde a lista quando so as barras sao pedidas", () => {
-    render(<PasswordStrengthMeter value="Senha123" barsOnly />);
+    render(<PasswordStrengthMeter value="Senha-Segura123" barsOnly />);
 
     expect(screen.queryByText(/Uma letra maiúscula/)).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("forte");

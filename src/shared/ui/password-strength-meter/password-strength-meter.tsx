@@ -17,14 +17,14 @@ interface PasswordStrengthMeterProps {
 /*
  * So o ultimo nivel e aceito pela API — os anteriores sao graus de insuficiencia,
  * nao de qualidade. Por isso o penultimo e "quase la" e nao "boa", como traz o
- * handoff: senha de seis caracteres com maiuscula, minuscula e numero cumpre
- * tres dos quatro requisitos, e chamar isso de boa prometeria uma aprovacao que
- * o servidor vai negar. E a unica palavra em que esta tela se afasta do desenho.
+ * handoff: senha de seis caracteres com maiuscula, minuscula, numero e simbolo
+ * cumpre quatro dos cinco requisitos, e chamar isso de boa prometeria uma
+ * aprovacao que o servidor vai negar. E a unica palavra em que esta tela se afasta do desenho.
  */
-const LEVEL_LABELS = ["muito fraca", "fraca", "razoável", "quase lá", "forte"] as const;
+const LEVEL_LABELS = ["muito fraca", "fraca", "razoável", "razoável", "quase lá", "forte"] as const;
 
 /** Instrucao no lugar da nota enquanto o campo esta vazio — nao ha o que medir. */
-const EMPTY_HINT = "Use letras maiúsculas, minúsculas e números";
+const EMPTY_HINT = "Use letras maiúsculas, minúsculas, números e símbolos";
 
 /**
  * Forca da senha em barras, com a lista do que ainda falta.

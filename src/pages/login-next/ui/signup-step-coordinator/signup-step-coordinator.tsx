@@ -6,6 +6,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import {
   PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
   PHONE_MASK_MAX_LENGTH,
   formatPhoneInput,
   usePasswordTruncationNotice,
@@ -83,7 +84,7 @@ export function SignupStepCoordinator() {
         <PasswordFieldNext
           label="Crie uma senha"
           autoComplete="new-password"
-          placeholder="Mínimo de 8 caracteres"
+          placeholder={`Mínimo de ${PASSWORD_MIN_LENGTH} caracteres`}
           /*
            * O teto é do campo, não só do schema: sem ele o medidor chega a
            * dizer "senha forte" numa senha de 120 caracteres que o avanço vai

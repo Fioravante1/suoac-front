@@ -1,14 +1,15 @@
 /**
  * Politica de senha do SUOAC, espelhando o que a API exige.
  *
- * O backend valida isto em todo DTO de senha — criar usuario, trocar senha e
- * redefinir por link — com `PASSWORD_COMPLEXITY_REGEX`. Senha que passa aqui e
+ * O backend valida isto em todo DTO de senha — criar usuario, aceitar convite,
+ * cadastrar circuito, trocar senha e redefinir por link — com
+ * `PASSWORD_COMPLEXITY_REGEX`. Senha que passa aqui e
  * reprovada la volta como `400`, e o usuario leva a recusa depois de digitar a
  * senha duas vezes. Por isso as regras moram num lugar so, consumido pelos
  * schemas Zod e pelo medidor de forca.
  */
 
-export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MIN_LENGTH = 12;
 
 /** Teto do backend; serve para barrar colagem absurda antes da requisicao. */
 export const PASSWORD_MAX_LENGTH = 100;
@@ -16,12 +17,18 @@ export const PASSWORD_MAX_LENGTH = 100;
 export const PASSWORD_REQUIREMENTS = [
   {
     id: "length",
-    label: `Pelo menos ${PASSWORD_MIN_LENGTH} caracteres`,
+    label: `${PASSWORD_MIN_LENGTH} ou mais caracteres`,
     test: (v: string) => v.length >= PASSWORD_MIN_LENGTH,
   },
   { id: "lowercase", label: "Uma letra minúscula", test: (v: string) => /[a-z]/.test(v) },
   { id: "uppercase", label: "Uma letra maiúscula", test: (v: string) => /[A-Z]/.test(v) },
   { id: "digit", label: "Um número", test: (v: string) => /\d/.test(v) },
+  /*
+   * Simbolo e qualquer caractere que nao seja letra, numero nem espaco — a mesma
+   * expressao Unicode da API (SUC-79). Letra acentuada e letra, e espaco nao
+   * conta: sem isso "uma frase com espacos" passaria por simbolo.
+   */
+  { id: "symbol", label: "Um símbolo", test: (v: string) => /[^\p{L}\p{N}\s]/u.test(v) },
 ] as const;
 
 /**
@@ -39,7 +46,7 @@ export function isWithinMaxLength(value: string): boolean {
 export type PasswordRequirementId = (typeof PASSWORD_REQUIREMENTS)[number]["id"];
 
 export const PASSWORD_COMPLEXITY_MESSAGE =
-  "A senha deve conter ao menos uma letra maiúscula, uma minúscula e um número.";
+  "A senha deve conter ao menos uma letra maiúscula, uma minúscula, um número e um símbolo.";
 
 export const PASSWORD_MIN_LENGTH_MESSAGE = `A senha deve conter no mínimo ${PASSWORD_MIN_LENGTH} caracteres.`;
 

@@ -49,8 +49,8 @@ function formDataOf(values: Record<string, string>): FormData {
 
 const validInput = {
   currentPassword: "80275@Suoac",
-  newPassword: "NovaSenhaForte123",
-  confirmPassword: "NovaSenhaForte123",
+  newPassword: "NovaSenha@Forte123",
+  confirmPassword: "NovaSenha@Forte123",
 };
 
 const userResponse = {
@@ -76,7 +76,7 @@ describe("changePasswordAction", () => {
 
     expect(httpClientMock).toHaveBeenCalledWith("/auth/change-password", {
       method: "POST",
-      body: { currentPassword: "80275@Suoac", newPassword: "NovaSenhaForte123" },
+      body: { currentPassword: "80275@Suoac", newPassword: "NovaSenha@Forte123" },
     });
     expect(createSessionMock).toHaveBeenCalledWith(
       "novo-a",

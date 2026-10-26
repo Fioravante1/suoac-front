@@ -4,8 +4,8 @@ import { changePasswordSchema } from "./change-password-schema";
 
 const validData = {
   currentPassword: "80275@Suoac",
-  newPassword: "NovaSenhaForte123",
-  confirmPassword: "NovaSenhaForte123",
+  newPassword: "NovaSenha@Forte123",
+  confirmPassword: "NovaSenha@Forte123",
 };
 
 describe("changePasswordSchema", () => {
@@ -13,7 +13,7 @@ describe("changePasswordSchema", () => {
     expect(changePasswordSchema.safeParse(validData).success).toBe(true);
   });
 
-  it("rejeita nova senha com menos de 8 caracteres", () => {
+  it("rejeita nova senha com menos de 12 caracteres", () => {
     const result = changePasswordSchema.safeParse({ ...validData, newPassword: "Abc123", confirmPassword: "Abc123" });
 
     expect(result.success).toBe(false);
@@ -41,8 +41,8 @@ describe("changePasswordSchema", () => {
     // Contraprova do caso acima: a correcao nao pode ter apertado demais.
     const result = changePasswordSchema.safeParse({
       ...validData,
-      newPassword: "NovaSenha123",
-      confirmPassword: "NovaSenha123",
+      newPassword: "NovaSenha@123",
+      confirmPassword: "NovaSenha@123",
     });
 
     expect(result.success).toBe(true);
@@ -56,7 +56,7 @@ describe("changePasswordSchema", () => {
   });
 
   it("rejeita quando a confirmação não coincide", () => {
-    const result = changePasswordSchema.safeParse({ ...validData, confirmPassword: "OutraSenha123" });
+    const result = changePasswordSchema.safeParse({ ...validData, confirmPassword: "OutraSenha@123" });
 
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -66,9 +66,9 @@ describe("changePasswordSchema", () => {
 
   it("rejeita quando a nova senha é igual à atual", () => {
     const result = changePasswordSchema.safeParse({
-      currentPassword: "MesmaSenha123",
-      newPassword: "MesmaSenha123",
-      confirmPassword: "MesmaSenha123",
+      currentPassword: "MesmaSenha@123",
+      newPassword: "MesmaSenha@123",
+      confirmPassword: "MesmaSenha@123",
     });
 
     expect(result.success).toBe(false);
