@@ -11,6 +11,11 @@ export function getInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/** Primeiro nome, para saudacao ("Ola, Maria!"); sem nome, devolve vazio. */
+export function getFirstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? "";
+}
+
 export function getGreetingByTime(): string {
   const hour = new Date().getHours();
   if (hour < 12) return "Bom dia";

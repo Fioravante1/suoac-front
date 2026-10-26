@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#e9eeec;font-family:Geist,sans-serif}a{color:#1f6e5a}a:hover{color:#174e40}</style>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:72px;padding:64px;width:max-content">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:600 13px Geist;letter-spacing:.12em;text-transform:uppercase;color:#1f6e5a">SUOAC · Mobile</span><h1 style="margin:0;font:600 40px/1.1 Geist;letter-spacing:-0.025em;color:#1e1f24">Acesso, cadastro e recuperação de senha</h1><span style="font:400 16px Geist;color:#667085">As mesmas telas do desktop, responsivas abaixo de 760px. Cada tela é interativa.</span></div>
+<section style="display:flex;flex-direction:column;gap:28px">
+<h2 style="margin:0;font:600 24px Geist;letter-spacing:-0.015em;color:#1e1f24">Login e recuperação</h2>
+<div style="display:flex;gap:40px">
+<div data-screen-label="01 Login" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">01</span>Login</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="02 Erro de login" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">02</span>Erro de login</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#erro" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="03 Esqueci a senha" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">03</span>Esqueci a senha</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#esqueci" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="04 Link enviado" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">04</span>Link enviado</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#link-enviado" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="05 Nova senha" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">05</span>Nova senha</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#nova-senha" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="06 Nova senha preenchida" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">06</span>Nova senha preenchida</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#nova-senha-preenchida" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="07 Senha alterada" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">07</span>Senha alterada</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#senha-alterada" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section style="display:flex;flex-direction:column;gap:28px">
+<h2 style="margin:0;font:600 24px Geist;letter-spacing:-0.015em;color:#1e1f24">Cadastro do circuito</h2>
+<div style="display:flex;gap:40px">
+<div data-screen-label="08 1 · Seus dados" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">08</span>1 · Seus dados</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#cadastro-1" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="09 2 · Dados do circuito" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">09</span>2 · Dados do circuito</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#cadastro-2" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="10 3 · Congregações" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">10</span>3 · Congregações</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#cadastro-3" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="11 4 · Confirmar e-mail" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">11</span>4 · Confirmar e-mail</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#cadastro-4" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="12 5 · Circuito criado" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">12</span>5 · Circuito criado</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#f7f9f8;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#1e1f24"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#1e1f24;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #1e1f24;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#1e1f24"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Login.dc.html#cadastro-5" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#f7f9f8"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section style="display:flex;flex-direction:column;gap:28px">
+<h2 style="margin:0;font:600 24px Geist;letter-spacing:-0.015em;color:#1e1f24">Convite do coordenador do arranjo na congregação</h2>
+<div style="display:flex;gap:40px">
+<div data-screen-label="13 1 · Dados" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">13</span>1 · Dados</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="14 2 · Senha" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">14</span>2 · Senha</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#senha" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="15 Convite aceito" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">15</span>Convite aceito</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#aceito" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="16 Recusar convite" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">16</span>Recusar convite</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#recusar" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="17 Convite recusado" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">17</span>Convite recusado</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#recusado" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="18 Convite expirado" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">18</span>Convite expirado</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#expirado" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+<div data-screen-label="19 Pedido enviado" style="display:flex;flex-direction:column;gap:14px">
+<span style="display:flex;align-items:center;gap:8px;font:500 14px Geist;color:#1e1f24"><span style="min-width:26px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:7px;background:#0d2b45;color:#fff;display:grid;place-items:center;font:600 11px Geist">19</span>Pedido enviado</span>
+<div style="width:390px;height:844px;padding:10px;border-radius:54px;background:#0b0f0e;box-shadow:0 30px 60px rgb(13 43 69/.18),inset 0 0 0 1.5px #2a312f;box-sizing:content-box">
+<div style="position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:#0d2b45;display:flex;flex-direction:column">
+<div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 38px;font:600 15px Geist;color:#fff"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><span style="width:17px;height:10px;border-radius:2px;background:#fff;opacity:.9"></span><span style="width:24px;height:11px;border-radius:3px;border:1.5px solid #fff;box-sizing:border-box;padding:1.5px"><span style="display:block;width:70%;height:100%;border-radius:1px;background:#fff"></span></span></span></div>
+<span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0b0f0e"></span>
+<iframe src="SUOAC Convite.dc.html#pedido-enviado" loading="lazy" style="width:390px;flex:1;border:0;display:block;background:#0d2b45"></iframe>
+<span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1e1f24;opacity:.85"></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

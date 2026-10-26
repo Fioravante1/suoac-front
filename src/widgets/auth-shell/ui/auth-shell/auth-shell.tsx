@@ -8,6 +8,12 @@ import styles from "./auth-shell.module.css";
 interface AuthShellProps {
   /** Tela de acesso ativa, renderizada na coluna da direita. */
   children: ReactNode;
+  /**
+   * Painel da esquerda no lugar da apresentacao da marca. O convite (SUC-27)
+   * mostra ali o cartao-ingresso com quem convidou, o circuito e a congregacao;
+   * as demais telas ficam com o padrao.
+   */
+  aside?: ReactNode;
 }
 
 /**
@@ -18,10 +24,10 @@ interface AuthShellProps {
  * dividido que cada tela teria de repetir — e e a peca que define a proporcao
  * entre as colunas.
  */
-export function AuthShell({ children }: AuthShellProps) {
+export function AuthShell({ children, aside }: AuthShellProps) {
   return (
     <div className={styles.page}>
-      <BrandPanel />
+      {aside ?? <BrandPanel />}
       <AuthPanel>{children}</AuthPanel>
     </div>
   );

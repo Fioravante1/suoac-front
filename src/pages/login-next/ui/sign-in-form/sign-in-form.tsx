@@ -53,7 +53,8 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
     // Valida ao sair do campo e, dai em diante, a cada tecla: avisar do erro no
     // primeiro caractere digitado seria implicancia.
     mode: "onTouched",
-    defaultValues: { email: "", password: "", rememberMe: true },
+    // Desmarcado por padrão: a sessão estendida é escolha explícita, não algo que um computador compartilhado herde.
+    defaultValues: { email: "", password: "", rememberMe: false },
   });
 
   /*
@@ -73,6 +74,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
     const result = await signInAction({
       email: values.email,
       password: values.password,
+      rememberMe: values.rememberMe,
       returnUrl,
     });
 
@@ -142,7 +144,7 @@ export function SignInForm({ onForgotPassword, onSignUp }: SignInFormProps) {
             {...register("password")}
           />
 
-          <Checkbox label="Manter conectado neste computador" disabled={isBusy} {...register("rememberMe")} />
+          <Checkbox label="Manter conectado neste dispositivo" disabled={isBusy} {...register("rememberMe")} />
         </div>
 
         <button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@/shared/api";
+import { hardNavigate } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { ErrorState } from "@/shared/ui/error-state";
 
@@ -24,12 +25,7 @@ export default function AuthError({
       description="Estamos com dificuldades para carregar esta página. Tente novamente ou volte ao login."
       action={<Button onClick={handleRetry}>Tentar novamente</Button>}
       secondaryAction={
-        <Button
-          variant="ghost"
-          onClick={() => {
-            window.location.href = "/login";
-          }}
-        >
+        <Button variant="ghost" onClick={() => hardNavigate("/login")}>
           Voltar ao login
         </Button>
       }

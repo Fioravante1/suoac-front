@@ -21,4 +21,27 @@ describe("AuthShell", () => {
     expect(screen.getByRole("button", { name: "Alternar tema" })).toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
+
+  it("mostra a apresentação da marca quando a tela não traz painel próprio", () => {
+    renderWithTheme(
+      <AuthShell>
+        <h2>Entrar</h2>
+      </AuthShell>,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Coordenação inteligente para o arranjo de ônibus." }),
+    ).toBeInTheDocument();
+  });
+
+  it("troca a apresentação da marca pelo painel que a tela traz", () => {
+    renderWithTheme(
+      <AuthShell aside={<aside>Cartão do convite</aside>}>
+        <h2>Seus dados</h2>
+      </AuthShell>,
+    );
+
+    expect(screen.getByText("Cartão do convite")).toBeInTheDocument();
+    expect(screen.queryByText("Coordenação inteligente para o arranjo de ônibus.")).not.toBeInTheDocument();
+  });
 });

@@ -1,10 +1,11 @@
-import { type InputHTMLAttributes, forwardRef, useId } from "react";
+import { type InputHTMLAttributes, type ReactNode, forwardRef, useId } from "react";
 import { Check } from "lucide-react";
 
 import styles from "./checkbox.module.css";
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
-  label: string;
+  /** Texto do rotulo; aceita links, como o aceite de termos. */
+  label: ReactNode;
 }
 
 /**

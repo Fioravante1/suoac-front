@@ -1,0 +1,75 @@
+.panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Abaixo de 1024px o painel e o cabecalho; a base maior abriga a sobreposicao do cartao. */
+  padding: 1.75rem var(--suoac-space-6) 3.25rem;
+  color: var(--suoac-color-text-inverse);
+  background-color: var(--suoac-color-brand-panel);
+  background-image: radial-gradient(var(--suoac-color-brand-panel-pattern) 1px, transparent 1px);
+  background-size: 1.375rem 1.375rem;
+}
+
+/*
+ * Dois aneis concentricos saindo pelo canto superior direito. Decorativos: dao
+ * profundidade ao fundo chapado sem competir com o texto.
+ */
+.ringOuter,
+.ringInner {
+  position: absolute;
+  border: 1px solid var(--suoac-color-brand-panel-pattern);
+  border-radius: 50%;
+}
+
+.ringOuter {
+  top: -12.5rem;
+  right: -12.5rem;
+  width: 35rem;
+  height: 35rem;
+}
+
+.ringInner {
+  top: -5.625rem;
+  right: -5.625rem;
+  width: 21.25rem;
+  height: 21.25rem;
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  width: 100%;
+  max-width: 30rem;
+}
+
+/* Tablet retrato: cabecalho mais alto, com a mesma folga para o cartao sobreposto. */
+@media (min-width: 47.5rem) {
+  .panel {
+    padding: 3.5rem 4rem 6rem;
+  }
+
+  .content {
+    gap: 1.375rem;
+  }
+}
+
+/* Desktop e tablet paisagem: coluna da esquerda, sem sobreposicao. */
+@media (min-width: 64rem) {
+  .panel {
+    padding: 2.5rem;
+  }
+
+  .content {
+    gap: 2.25rem;
+  }
+}
+
+@media (min-width: 75rem) {
+  .panel {
+    padding: 3.5rem;
+  }
+}

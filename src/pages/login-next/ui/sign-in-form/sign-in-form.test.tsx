@@ -18,9 +18,9 @@ vi.mock("next/navigation", () => ({
 
 const { SignInForm } = await import("./sign-in-form");
 
-const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta" };
+const CREDENTIALS = { email: "coordenador@circuito.org", password: "senha-correta", rememberMe: false };
 
-function fillCredentials({ email, password } = CREDENTIALS) {
+function fillCredentials({ email, password }: { email: string; password: string } = CREDENTIALS) {
   fireEvent.change(screen.getByLabelText("E-mail"), { target: { value: email } });
   fireEvent.change(screen.getByLabelText("Senha"), { target: { value: password } });
 }
@@ -154,9 +154,24 @@ describe("SignInForm", () => {
     expect(onSignUp).toHaveBeenCalledOnce();
   });
 
-  it("mantém o usuário conectado por padrão, como o desenho pede", () => {
+  it("mostra o Manter conectado desmarcado e habilitado: a sessão estendida é escolha explícita", () => {
     render(<SignInForm />);
 
-    expect(screen.getByRole("checkbox", { name: "Manter conectado neste computador" })).toBeChecked();
+    const checkbox = screen.getByRole("checkbox", { name: "Manter conectado neste dispositivo" });
+
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeEnabled();
+  });
+
+  it("envia à ação de entrada o que o usuário escolheu em Manter conectado", async () => {
+    signInAction.mockResolvedValue({ status: "success", firstName: "Maria", redirectTo: "/dashboard" });
+    render(<SignInForm />);
+    fillCredentials();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Manter conectado neste dispositivo" }));
+
+    fireEvent.click(getSubmit());
+
+    await waitFor(() => expect(signInAction).toHaveBeenCalledTimes(1));
+    expect(signInAction).toHaveBeenCalledWith({ ...CREDENTIALS, rememberMe: true, returnUrl: null });
   });
 });

@@ -29,6 +29,10 @@ vi.mock("@/shared/api/http-client", () => ({
 
 vi.mock("@/shared/auth/session", () => ({
   createSession: (...args: unknown[]) => createSessionMock(...args),
+  toSessionLifetime: (response: { extendedSession?: boolean; refreshExpiresIn?: number }) => ({
+    extended: response.extendedSession === true,
+    refreshExpiresIn: response.refreshExpiresIn ?? 604800,
+  }),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -78,6 +82,7 @@ describe("changePasswordAction", () => {
       "novo-a",
       "novo-r",
       expect.objectContaining({ id: "u1", mustChangePassword: false }),
+      { extended: false, refreshExpiresIn: 604800 },
     );
     expect(redirectMock).toHaveBeenCalledWith("/dashboard");
   });

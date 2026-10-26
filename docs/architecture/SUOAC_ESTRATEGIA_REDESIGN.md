@@ -2,7 +2,7 @@
 
 **Criado em:** 09/10/2026
 **Status:** em execução — Fatia 0 em andamento
-**Última atualização:** 09/10/2026
+**Última atualização:** 26/10/2026
 **Proposta de design:** `docs/design_handoff_suoac_redesign/`
 
 Este documento define **como** o redesign do SUOAC será executado sem parar a aplicação atual, que já
@@ -14,13 +14,13 @@ mudam no `AGENTS.md` durante a transição.
 
 ## 1. Premissas (decisões já tomadas)
 
-| #   | Decisão                                                                                                                                                              | Consequência                                                                                                                                                                              |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P1  | O backend é nosso. Funcionalidades novas (ônibus/poltronas, importação, notificações, busca, autocadastro, recuperação de senha, convite) ganham endpoints próprios. | Cada fatia tem um par front/API. A flag da fatia só liga quando a API está de pé em staging.                                                                                              |
-| P2  | **Desktop-first durante o redesign.** O handoff tem largura mínima de 1280px e nenhuma tela nova nasce responsiva.                                                   | Suspende a regra mobile-first, hoje em `.claude/rules/ui-e-design-system.md`. O app antigo continua responsivo enquanto existir.                                                          |
-| P3  | **Mobile só depois do redesign**, e apenas para funcionalidades essenciais.                                                                                          | Vira uma fase própria, pós-corte do legado. Não bloqueia nenhuma fatia.                                                                                                                   |
-| P4  | Rollout por ambiente: flag ligada em `staging.suoac.com` primeiro; produção liga por fatia, depois de aprovada.                                                      | Sem `identify()` nem targeting por usuário. Override individual em produção via Vercel Toolbar (§4.4).                                                                                    |
-| P5  | A primeira fatia é a **tela de Login**.                                                                                                                              | É a fatia mais isolada do sistema: nenhuma outra tela depende dela, e ela não depende do shell. Serve para exercitar toda a mecânica (flag, tokens, tema escuro, corte) com risco mínimo. |
+| #   | Decisão                                                                                                                                                                                                                       | Consequência                                                                                                                                                                                          |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | O backend é nosso. Funcionalidades novas (ônibus/poltronas, importação, notificações, busca, autocadastro, recuperação de senha, convite) ganham endpoints próprios.                                                          | Cada fatia tem um par front/API. A flag da fatia só liga quando a API está de pé em staging.                                                                                                          |
+| P2  | **Web responsivo, em três larguras.** O SUOAC web funciona em celular (abaixo de 760px), tablet (760px a 1023px) e desktop (1024px em diante). Cada fatia nasce responsiva. Substitui o desktop-first de 09/10/2026 (SUC-83). | A regra desktop-first sai de `.claude/rules/ui-e-design-system.md`. O desenho de celular e tablet vem do handoff; sem desenho, a fatia não é responsiva. Larguras de corte em `--suoac-breakpoint-*`. |
+| P3  | **Sem app nativo.** O celular usa a mesma aplicação web, que ganha instalação (PWA) em card próprio (SUC-84).                                                                                                                 | A fase mobile separada deixa de existir. Não bloqueia nenhuma fatia.                                                                                                                                  |
+| P4  | Rollout por ambiente: flag ligada em `staging.suoac.com` primeiro; produção liga por fatia, depois de aprovada.                                                                                                               | Sem `identify()` nem targeting por usuário. Override individual em produção via Vercel Toolbar (§4.4).                                                                                                |
+| P5  | A primeira fatia é a **tela de Login**.                                                                                                                                                                                       | É a fatia mais isolada do sistema: nenhuma outra tela depende dela, e ela não depende do shell. Serve para exercitar toda a mecânica (flag, tokens, tema escuro, corte) com risco mínimo.             |
 
 > P4 não é só preferência: na tela de login **não existe usuário identificado**, então targeting por
 > usuário é tecnicamente impossível ali.
@@ -254,19 +254,19 @@ pode ser apagado no mesmo PR que liga a flag** — ver §6.
 A ordem segue três critérios: isolamento (quanto menos coisa depende da fatia, melhor para começar),
 dependência de API nova, e valor entregue.
 
-| #   | Fatia                              | Depende de     | API nova | Observação                                                                                                                                 |
-| --- | ---------------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0   | **Fundação**                       | —              | não      | Tokens dark, escopo de contenção do legado, primitivos novos, `ThemeProvider` por cookie. Sem flag: é aditivo e invisível até alguém usar. |
-| 1   | **Login**                          | Fundação       | sim      | Recuperação de senha, aceite de convite e autocadastro de circuito **não existem hoje** (§7). O login em si usa a API atual.               |
-| 2   | **Shell do evento**                | Fundação       | parcial  | Faixa fixa, seletor de evento, abas, avatar, encerrar inscrições. Substitui `widgets/app-shell`. Pré-requisito de todas as abas.           |
-| 3   | **Visão geral**                    | Shell          | sim      | Ocupação por poltrona é a maior dependência de backend do projeto.                                                                         |
-| 4   | **Passageiros + importação**       | Shell          | sim      | Importação de planilha com classificação por RG.                                                                                           |
-| 5   | **Financeiro**                     | Shell          | pouca    | Mais próximo do que já existe; bom candidato a adiantar se a API de ônibus atrasar.                                                        |
-| 6   | **Congregações**                   | Shell          | sim      | Código de congregação e coordenador/assistente com convite.                                                                                |
-| 7   | **Ônibus**                         | Shell, Fatia 3 | sim      | Criar/excluir ônibus com realocação e renumeração.                                                                                         |
-| 8   | **Listas e exportações**           | Shell, Fatia 7 | parcial  | Já existe export de inscritos; muda formato e seleção de colunas.                                                                          |
-| 9   | **Busca ⌘K e notificações**        | Shell          | sim      | Transversal; depois das abas existirem para serem alvo da busca.                                                                           |
-| 10  | **Corte final e mobile essencial** | todas          | —        | Remoção do legado, limpeza de flags, remoção do escopo de contenção, fase mobile (P3).                                                     |
+| #   | Fatia                        | Depende de     | API nova | Observação                                                                                                                                 |
+| --- | ---------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0   | **Fundação**                 | —              | não      | Tokens dark, escopo de contenção do legado, primitivos novos, `ThemeProvider` por cookie. Sem flag: é aditivo e invisível até alguém usar. |
+| 1   | **Login**                    | Fundação       | sim      | Recuperação de senha, aceite de convite e autocadastro de circuito **não existem hoje** (§7). O login em si usa a API atual.               |
+| 2   | **Shell do evento**          | Fundação       | parcial  | Faixa fixa, seletor de evento, abas, avatar, encerrar inscrições. Substitui `widgets/app-shell`. Pré-requisito de todas as abas.           |
+| 3   | **Visão geral**              | Shell          | sim      | Ocupação por poltrona é a maior dependência de backend do projeto.                                                                         |
+| 4   | **Passageiros + importação** | Shell          | sim      | Importação de planilha com classificação por RG.                                                                                           |
+| 5   | **Financeiro**               | Shell          | pouca    | Mais próximo do que já existe; bom candidato a adiantar se a API de ônibus atrasar.                                                        |
+| 6   | **Congregações**             | Shell          | sim      | Código de congregação e coordenador/assistente com convite.                                                                                |
+| 7   | **Ônibus**                   | Shell, Fatia 3 | sim      | Criar/excluir ônibus com realocação e renumeração.                                                                                         |
+| 8   | **Listas e exportações**     | Shell, Fatia 7 | parcial  | Já existe export de inscritos; muda formato e seleção de colunas.                                                                          |
+| 9   | **Busca ⌘K e notificações**  | Shell          | sim      | Transversal; depois das abas existirem para serem alvo da busca.                                                                           |
+| 10  | **Corte final do legado**    | todas          | —        | Remoção do legado e limpeza de flags e do escopo de contenção. O celular não é mais desta fatia: cada fatia nasce responsiva (P2).         |
 
 Nota sobre a Fatia 2: o shell é o maior ponto de "tudo ou nada" do redesign, porque a navegação
 muda de rotas com sidebar para abas dentro de um evento. Enquanto `REDESIGN_APP_SHELL` estiver
@@ -431,7 +431,9 @@ divergirem.
 As regras abaixo conflitavam com o redesign. **Todas já foram aplicadas no `AGENTS.md` em
 09/10/2026** — o registro fica aqui como histórico da decisão:
 
-1. **Mobile-first (§6).** Suspensa para slices do redesign enquanto durar a transição (P2/P3).
+1. **Mobile-first (§6).** Suspensa para slices do redesign em 09/10/2026 (P2/P3). **Superada em
+   26/10/2026 (SUC-83):** o web passou a ser responsivo em três larguras, e a redação abaixo ficou
+   como histórico.
    Redação proposta: _"Durante o redesign (ver `SUOAC_ESTRATEGIA_REDESIGN.md`), telas novas são
    desktop-first com largura mínima de 1280px. Telas v1 permanecem responsivas. A fase mobile
    acontece após o corte do legado e cobre apenas funcionalidades essenciais."_
@@ -469,14 +471,14 @@ Cada um desses PRs roda `yarn run check` e é pequeno o suficiente para ser revi
 
 ## 11. Riscos
 
-| Risco                                         | Mitigação                                                                                                                  |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Flags acumulam e o legado nunca morre         | Teto de 2 flags de redesign vivas em produção (§4.2); corte é PR próprio e priorizado.                                     |
-| Shell novo com abas v1 dentro fica incoerente | Período curto e assumido; escopo de contenção de tema evita o pior (ilegibilidade). Priorizar as abas logo após a Fatia 2. |
-| API nova atrasa e trava a fila                | Fatia 5 (Financeiro) é a de menor dependência — serve de fatia de folga para não parar o front.                            |
-| Tema escuro vaza para telas não redesenhadas  | `legacy-light-scope.css` (§3.3), removido no corte final.                                                                  |
-| Mobile fica sem dono depois do redesign       | É a Fatia 10, no mesmo plano, não um "depois a gente vê".                                                                  |
-| Duplicação `-next` vira permanente            | Cada slice `-next` tem issue de corte desde o nascimento; o sufixo torna o débito visível em qualquer `ls`.                |
+| Risco                                         | Mitigação                                                                                                                   |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Flags acumulam e o legado nunca morre         | Teto de 2 flags de redesign vivas em produção (§4.2); corte é PR próprio e priorizado.                                      |
+| Shell novo com abas v1 dentro fica incoerente | Período curto e assumido; escopo de contenção de tema evita o pior (ilegibilidade). Priorizar as abas logo após a Fatia 2.  |
+| API nova atrasa e trava a fila                | Fatia 5 (Financeiro) é a de menor dependência — serve de fatia de folga para não parar o front.                             |
+| Tema escuro vaza para telas não redesenhadas  | `legacy-light-scope.css` (§3.3), removido no corte final.                                                                   |
+| Fatia redesenhada sem desenho de celular      | O card de cada fatia exige o desenho nas três larguras antes de começar; o handoff ainda não cobre o painel (Fatias 2 a 9). |
+| Duplicação `-next` vira permanente            | Cada slice `-next` tem issue de corte desde o nascimento; o sufixo torna o débito visível em qualquer `ls`.                 |
 
 ---
 
@@ -498,7 +500,7 @@ consome — a dependência front/API precisa ficar visível no mesmo board.
 | 7 — Ônibus                   | SUC-11 | quebrar ao iniciar |
 | 8 — Listas e exportações     | SUC-12 | quebrar ao iniciar |
 | 9 — Busca e notificações     | SUC-13 | quebrar ao iniciar |
-| 10 — Corte final e mobile    | SUC-14 | quebrar ao iniciar |
+| 10 — Corte final             | SUC-14 | quebrar ao iniciar |
 
 As fatias 2 a 10 ganham histórias **no início da própria fatia**, não agora: o contrato de API de
 cada uma muda o formato das histórias de front, e card escrito com seis meses de antecedência é card

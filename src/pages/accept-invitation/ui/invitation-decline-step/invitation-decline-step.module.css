@@ -1,0 +1,180 @@
+.decline,
+.header,
+.reasons {
+  display: flex;
+  flex-direction: column;
+}
+
+.decline {
+  gap: 1.375rem;
+  animation-name: var(--suoac-animation-swap);
+  animation-duration: var(--suoac-motion-duration-medium);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.header {
+  gap: var(--suoac-space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: var(--suoac-line-height-body);
+  text-wrap: pretty;
+}
+
+.reasons {
+  gap: var(--suoac-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* O titulo do grupo existe para leitor de tela; a pergunta ja esta no titulo da tela. */
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  height: var(--suoac-input-height-lg);
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  font-size: 0.9375rem;
+  font-weight: var(--suoac-font-weight-medium);
+  cursor: pointer;
+  transition:
+    border-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.reason:has(.input:checked) {
+  border-color: var(--suoac-color-critical);
+  background: var(--suoac-color-critical-soft);
+}
+
+.reason:has(.input:focus-visible) {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+}
+
+/* O radio nativo continua no DOM, so invisivel: e ele que carrega estado e teclado. */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.radio {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--suoac-color-border-strong);
+  transition: box-shadow var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.input:checked + .radio {
+  box-shadow: inset 0 0 0 5px var(--suoac-color-critical);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--suoac-color-critical);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical-dark);
+  font-size: var(--suoac-font-size-small);
+  line-height: 1.45;
+  animation-name: var(--suoac-animation-shake);
+  animation-duration: var(--suoac-motion-duration-medium);
+}
+
+.error svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.back,
+.confirm {
+  height: var(--suoac-input-height-lg);
+  border-radius: var(--suoac-radius-md);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    opacity var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.back {
+  border: 1px solid var(--suoac-color-border-strong);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.back:hover {
+  background: var(--suoac-color-surface-muted);
+}
+
+.confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 0;
+  background: var(--suoac-color-critical);
+  color: var(--suoac-color-text-inverse);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.confirm:hover:not(:disabled) {
+  background: var(--suoac-color-critical-dark);
+}
+
+.confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.back:focus-visible,
+.confirm:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 3px;
+}
+
+.spinner {
+  color: currentColor;
+}

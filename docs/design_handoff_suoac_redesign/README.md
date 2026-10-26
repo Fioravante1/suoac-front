@@ -1,4 +1,4 @@
-# Handoff: Redesign SUOAC (Dashboard do circuito + Login)
+# Handoff: Redesign SUOAC (Dashboard do circuito + Login + Convite)
 
 ## Visão geral
 Redesign do painel do **Coordenador do arranjo de ônibus no circuito** no SUOAC: gestão de eventos (congressos/assembleias), ônibus, passageiros, pagamentos, congregações e listas de embarque. Inclui login, recuperação de senha, primeiro acesso por convite e **autocadastro de circuito**.
@@ -13,8 +13,11 @@ Os arquivos `.dc.html` são **referências de design em HTML** — protótipos q
 
 ---
 
+## Nomenclatura de privilégios
+Nunca usar "coordenador" sozinho: existe também o **coordenador do corpo de anciãos**. Sempre escrever **Coordenador do arranjo de ônibus no circuito** / **na congregação** (forma curta aceitável em espaços estreitos: "Coord. do arranjo").
+
 ## Navegação (sem menu lateral)
-Largura mínima de design: **1280px**. Fonte única: **Geist** (400/500/600/700, Google Fonts).
+Dashboard: largura mínima de design **1280px** (versão mobile do painel ainda não desenhada). Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
 
 ### Faixa fixa do evento (topo, fundo `--navy`)
 Altura 68px, padding horizontal 40px, texto branco. Da esquerda para a direita:
@@ -59,7 +62,7 @@ Total previsto/recebido/pendente, gráfico por congregação (hover), ordenaçã
 ### 4. Congregações
 - Filtro rápido por congregação em **chips com nome completo** (sem iniciais), suporta 20+ congregações com rolagem/“ver todas”.
 - Cards/linhas por congregação: inscritos, pagamento, coordenador, por dia.
-- **Nova congregação** (modal): nome, **código da congregação (obrigatório)**, **Coordenador do arranjo de ônibus na congregação** (nome, telefone, e-mail, enviar convite), **assistente opcional** (nome, telefone, e-mail, enviar convite).
+- **Nova congregação** (modal): nome, **código da congregação (obrigatório)**, **Coordenador do arranjo de ônibus na congregação** (nome, telefone, e-mail, enviar convite). Sem campo de assistente: nota informativa "O assistente é escolhido pelo coordenador da congregação, depois que ele aceitar o convite."
 
 ### 5. Ônibus
 Lista por dia com ocupação, motorista/empresa. **Adicionar ônibus** (modal). **Excluir ônibus**: confirmação que mostra quantos passageiros serão realocados; ao excluir, passageiros vão para os próximos ônibus com vaga e os ônibus são renumerados (ver `deleteBus()`).
@@ -69,6 +72,16 @@ Geração de lista de embarque por ônibus/dia e por congregação, escolha de c
 
 ### Modal "Novo passageiro"
 Modal central (não drawer). Busca em **registros de eventos anteriores** por nome/RG (sugestões com "Viajou em …"); se não existir, opção de **cadastrar novo passageiro**. Campos: nome, RG, congregação (dropdown abre abaixo do campo), dias, pagamento (Pago/Parcial/Pendente; Parcial pede valor). Ao salvar: animação de "bilhete" e toast.
+
+### 8. Aceite de convite (`SUOAC Convite.dc.html`)
+Link enviado pelo coordenador do circuito **somente ao Coordenador do arranjo de ônibus na congregação**. O assistente não entra por convite: é promovido pelo próprio coordenador da congregação. Mesmo layout dividido do login.
+- **Painel esquerdo**: título "{Nome} convidou você para o arranjo de ônibus" + cartão-ingresso (fundo `rgb(255 255 255/.05)`, divisórias tracejadas): privilégio, congregação + código, circuito + cidade, remetente (avatar + papel). Selo de status na linha de "Privilégio": *Aguardando você* (âmbar, pulse) → *Aceito* (verde, animação stamp) / *Recusado* / *Expirado*. Validade abaixo do cartão.
+- **Etapa 1 – Dados**: nome e celular pré-preenchidos pelo convite (editáveis, máscara `(00) 00000-0000`); e-mail travado com "Verificado pelo convite" (é o login). Link "Não é você? Recusar convite".
+- **Etapa 2 – Senha**: mesmo padrão da Nova senha (medidor 4 níveis, requisitos 2×2, confirmação em tempo real) + aceite de termos. CTA "Aceitar convite e entrar".
+- **Sucesso**: "Bem-vindo, {nome}!", resumo (privilégio, congregação, login), "Entrar no painel". Coordenador do circuito é notificado.
+- **Recusar**: motivos em lista (radio), botões Voltar / Recusar (`--crit`).
+- **Expirado**: aviso (convites valem 7 dias) + "Pedir novo convite" → "Pedido enviado".
+- Props do protótipo: `inviteState` (valido/expirado), `theme`.
 
 ### 7. Login (`SUOAC Login.dc.html`)
 Layout dividido: painel escuro `#0d2b45` à esquerda com **timeline** animada das etapas do evento (linha verde progressiva sincronizada com os itens; sem trilho de fundo), formulário à direita (surface).
@@ -91,6 +104,19 @@ Layout dividido: painel escuro `#0d2b45` à esquerda com **timeline** animada da
   4. Confirmação de e-mail: código de 6 dígitos (caixas individuais, reenviar).
   5. Sucesso: resumo (coordenador, circuito, sua congregação, total) → "Ir para o painel".
   Erros aparecem em faixa `--crit-s`/`--crit` acima do formulário.
+
+### 9. Responsivo: celular e tablet (Login + Convite)
+O app é uma única web responsiva (sem app nativo). Breakpoints por largura da janela (`window.innerWidth`, estado `vw`):
+- **Celular (< 760px)**
+  - Login (tela inicial) e Convite: painel navy vira **cabeçalho compacto** (padding 24–28px 20px 52px, título 24px, texto 15px); **timeline oculta**. O formulário fica num **cartão sobreposto** (`margin-top:-28px`, radius `26px 26px 0 0`, fundo `--bg`, padding 20–22px 20px).
+  - Demais telas do Login (esqueci, link enviado, nova senha, cadastro 1–5): painel navy **oculto**; topo com logo 34px + "SUOAC" à esquerda e alternar tema à direita; formulário alinhado ao topo, padding 16–20px.
+  - Convite: cartão-ingresso mantido, com padding menor (cabeçalho 16px 18px, células 12px 18px, privilégio 16px).
+  - Requisitos de senha em **1 coluna**; títulos H2 26–28px.
+  - Inputs com **fonte 16px** (evita zoom automático no iOS). Texto "Manter conectado **neste dispositivo**".
+- **Tablet retrato (760–1023px)**: mesma estrutura em coluna única; cabeçalho navy maior (padding 56px 64px 96px, título 32px, texto 17px), cartão sobreposto `margin-top:-40px`, radius 32px, padding 28–32px 48px; timeline oculta; requisitos de senha em 2 colunas.
+- **Tablet paisagem / desktop (≥ 1024px)**: layout dividido original. Entre 1024–1199px, padding reduzido (painel 40px, formulário 28px 32px).
+- Containers com padding usam `box-sizing:border-box` para não gerar rolagem horizontal/vertical extra.
+- Protótipo: hashes abrem estados direto — Login: `#erro #esqueci #link-enviado #nova-senha #nova-senha-preenchida #senha-alterada #cadastro-1…#cadastro-5`; Convite: `#senha #aceito #recusar #recusado #expirado #pedido-enviado`.
 
 ---
 
@@ -149,7 +175,11 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 
 ## Arquivos
 - `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
-- `SUOAC Login.dc.html` — login, recuperação, nova senha, convite e autocadastro do circuito.
+- `SUOAC Navegacao.dc.html` — canvas de exploração da navegação do painel (barra de comando, dock flutuante e hub do evento). Não substitui o Dashboard.
+- `SUOAC Login.dc.html` — login, recuperação, nova senha e autocadastro do circuito.
+- `SUOAC Convite.dc.html` — cadastro do coordenador da congregação pelo link de convite.
+- `SUOAC Mobile.dc.html` — vitrine com as 19 telas em celular (390×844), agrupadas por fluxo.
+- `SUOAC Tablet.dc.html` — vitrine em tablet: 9 telas em retrato (820×1180) e 3 em paisagem (1180×820).
 - `support.js` — runtime necessário apenas para abrir os protótipos no navegador.
 - `assets/` — logos.
-- `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login, cadastro do circuito e nova senha.
+- `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login, cadastro do circuito, nova senha e aceite de convite (dados, senha, aceito).

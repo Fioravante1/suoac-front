@@ -30,13 +30,23 @@ Referencia visual: Material 3, Linear, Stripe, Notion, Google Workspace.
 
 Principios obrigatorios:
 
-- **Desktop-first**: telas novas sao projetadas para desktop, com largura minima de 1280px.
-  A regra anterior de mobile-first foi **descontinuada** em 09/10/2026. O SUOAC e operado por
-  coordenadores sentados, planejando viagem; o uso em celular e pontual e sera tratado como um
-  recorte proprio, com as funcionalidades essenciais de campo, **depois** do redesign (ver
-  `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md`, Fatia 10). Nao gaste esforco adaptando telas
-  novas para telas pequenas enquanto o redesign estiver em andamento, e **nao altere** a
-  responsividade das telas ainda nao redesenhadas.
+- **Responsivo em tres larguras**: toda tela nasce funcionando em celular, tablet e desktop. A
+  regra desktop-first, de 09/10/2026, foi **substituida** em 26/10/2026 (SUC-83): o SUOAC web
+  passou a ser a unica aplicacao tambem no celular.
+  - **Larguras de corte** (tokens `--suoac-breakpoint-*`, espelhados em `theme-tokens.ts`):
+    celular abaixo de 760px (`47.5rem`), tablet retrato de 760px a 1023px e, de 1024px (`64rem`)
+    em diante, o layout dividido de desktop e tablet paisagem. Acima de 1200px (`75rem`) o
+    espacamento volta ao tamanho cheio.
+  - **Mobile-first no CSS**: o estilo base e o do celular, e `@media (min-width: ...)` acrescenta
+    o tablet e o desktop. `@media` nao le `var()`, entao o CSS Module escreve o valor do token;
+    `src/app/styles/breakpoints.test.ts` falha se um corte nao for um dos declarados.
+  - **O desenho vem do handoff.** Celular e tablet saem de `docs/design_handoff_suoac_redesign/`
+    (secao 9 do README e as vitrines Mobile e Tablet), nao de improviso. O handoff so cobre a
+    Fatia 1; as demais so ficam responsivas quando o desenho existir, e o card da fatia deve
+    pedi-lo antes de comecar.
+  - **Nao altere** a responsividade de telas ainda nao redesenhadas.
+  - Alvos de toque de 44x44px em tela de toque (`@media (pointer: coarse)`), e campos com fonte
+    de 16px, que evita o zoom automatico do iOS.
 - **Minimalismo funcional**: cada elemento deve ter proposito. Remova o que nao agrega.
 - **Espacamento generoso**: usar a escala oficial (4, 8, 12, 16, 20, 24, 32, 40, 48px). Nunca
   comprimir conteudo. Ar entre elementos transmite clareza.
@@ -183,7 +193,7 @@ Antes de concluir qualquer interface nova, verifique:
 - [ ] Tem feedback de sucesso e erro para acoes do usuario?
 - [ ] Acoes destrutivas pedem confirmacao?
 - [ ] Estados hover e focus sao visiveis?
-- [ ] Funciona bem no mobile (areas de toque, layout responsivo)?
+- [ ] Funciona nas tres larguras (celular, tablet e desktop), sem rolagem horizontal, com alvos de toque de 44px?
 - [ ] Icones sao Lucide, outline, e reforçam o significado?
 
 ---

@@ -1,7 +1,7 @@
 "use server";
 
 import { httpClient, HttpError, endpoints } from "@/shared/api/http-client";
-import { createSession } from "@/shared/auth/session";
+import { createSession, toSessionLifetime } from "@/shared/auth/session";
 import { routes } from "@/shared/config";
 
 import { signInSchema } from "../../model";
@@ -10,6 +10,8 @@ import type { SignInResponseDto } from "./sign-in.dto";
 export interface SignInInput {
   email: string;
   password: string;
+  /** "Manter conectado neste dispositivo": pede a sessão estendida (SUC-39). */
+  rememberMe: boolean;
   /** Para onde o usuario tentava ir quando foi barrado pelo gate de sessao. */
   returnUrl?: string | null;
 }
@@ -34,7 +36,7 @@ const GENERIC_ERROR = "Não foi possível entrar agora. Verifique sua conexão e
  * legado (SUC-34). Ver `docs/architecture/SUOAC_ESTRATEGIA_REDESIGN.md` §3.1.
  */
 export async function signInAction({ returnUrl, ...credentials }: SignInInput): Promise<SignInResult> {
-  const parsed = signInSchema.safeParse({ ...credentials, rememberMe: false });
+  const parsed = signInSchema.safeParse(credentials);
 
   if (!parsed.success) {
     return { status: "error", message: "Dados inválidos. Confira o e-mail e a senha." };
@@ -43,21 +45,26 @@ export async function signInAction({ returnUrl, ...credentials }: SignInInput): 
   try {
     const response = await httpClient<SignInResponseDto>(endpoints.auth.login, {
       method: "POST",
-      body: { email: parsed.data.email, password: parsed.data.password },
+      body: { email: parsed.data.email, password: parsed.data.password, rememberMe: parsed.data.rememberMe },
     });
 
     const { user } = response;
 
-    await createSession(response.accessToken, response.refreshToken, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      circuitId: user.circuitId,
-      congregationId: user.congregationId,
-      mustChangePassword: user.mustChangePassword,
-    });
+    await createSession(
+      response.accessToken,
+      response.refreshToken,
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        circuitId: user.circuitId,
+        congregationId: user.congregationId,
+        mustChangePassword: user.mustChangePassword,
+      },
+      toSessionLifetime(response),
+    );
 
     return {
       status: "success",

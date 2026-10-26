@@ -1,22 +1,68 @@
+/*
+ * Abaixo de 1024px o painel e um cartao que sobe sobre a apresentacao da marca
+ * (`margin-top` negativo). Nas telas internas a apresentacao some e o painel
+ * vira a pagina inteira, com a marca no topo.
+ */
 .panel {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--suoac-space-8) var(--suoac-space-10);
+  margin-top: -1.75rem;
+  padding: var(--suoac-space-5);
+  border-radius: 1.625rem 1.625rem 0 0;
   color: var(--suoac-color-text-primary);
   background: var(--suoac-color-background);
 }
 
+.panel:has([data-auth-screen="inner"]) {
+  margin-top: 0;
+  padding: var(--suoac-space-4) var(--suoac-space-5) var(--suoac-space-5);
+  border-radius: 0;
+}
+
 .header {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+}
+
+.panel:has([data-auth-screen="inner"]) .header {
+  justify-content: space-between;
+}
+
+/* Marca no topo: so onde a apresentacao nao esta (telas internas, abaixo de 1024px). */
+.brand {
+  display: none;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.panel:has([data-auth-screen="inner"]) .brand {
+  display: flex;
+}
+
+.logo {
+  border-radius: 0.625rem;
+}
+
+.wordmark {
+  /* Lettering da marca: tamanho proprio da identidade, fora da escala de texto. */
+  font-size: var(--suoac-font-size-lead);
+  font-weight: var(--suoac-font-weight-bold);
+  letter-spacing: 0.06em;
 }
 
 .viewport {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: var(--suoac-space-6) 0;
+  padding: 0 0 var(--suoac-space-5);
+}
+
+.panel:has([data-auth-screen="inner"]) .viewport {
+  padding: var(--suoac-space-5) 0;
 }
 
 .view {
@@ -67,4 +113,57 @@
   outline: 2px solid var(--suoac-color-primary);
   outline-offset: 2px;
   border-radius: var(--suoac-radius-sm);
+}
+
+/* Tablet retrato: cartao maior sobre uma apresentacao mais alta. */
+@media (min-width: 47.5rem) {
+  .panel {
+    margin-top: -2.5rem;
+    padding: 1.75rem 3rem 2rem;
+    border-radius: 2rem 2rem 0 0;
+  }
+
+  .panel:has([data-auth-screen="inner"]) {
+    padding: 1.75rem 3rem 2rem;
+  }
+
+  .viewport {
+    padding-bottom: var(--suoac-space-6);
+  }
+
+  .panel:has([data-auth-screen="inner"]) .viewport {
+    align-items: center;
+    padding: var(--suoac-space-6) 0;
+  }
+}
+
+/* Desktop e tablet paisagem: o painel volta a ser a coluna da direita. */
+@media (min-width: 64rem) {
+  .panel,
+  .panel:has([data-auth-screen="inner"]) {
+    margin-top: 0;
+    padding: 1.75rem 2rem;
+    border-radius: 0;
+  }
+
+  .panel:has([data-auth-screen="inner"]) .header {
+    justify-content: flex-end;
+  }
+
+  .panel:has([data-auth-screen="inner"]) .brand {
+    display: none;
+  }
+
+  .viewport,
+  .panel:has([data-auth-screen="inner"]) .viewport {
+    align-items: center;
+    padding: var(--suoac-space-6) 0;
+  }
+}
+
+@media (min-width: 75rem) {
+  .panel,
+  .panel:has([data-auth-screen="inner"]) {
+    padding: var(--suoac-space-8) var(--suoac-space-10);
+  }
 }

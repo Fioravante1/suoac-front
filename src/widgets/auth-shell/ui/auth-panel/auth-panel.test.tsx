@@ -25,6 +25,12 @@ describe("AuthPanel", () => {
     expect(screen.getByRole("button", { name: "Alternar tema" })).toBeInTheDocument();
   });
 
+  it("traz a marca no topo, para as telas que abrem sem a apresentação", () => {
+    renderWithTheme(<AuthPanel />);
+
+    expect(screen.getByText("SUOAC")).toBeInTheDocument();
+  });
+
   it("permite trocar o tema antes de entrar no sistema", () => {
     renderWithTheme(<AuthPanel />);
 
@@ -50,5 +56,16 @@ describe("AuthPanel", () => {
 
     expect(screen.getByRole("link", { name: "Privacidade" })).toHaveAttribute("href", "/privacidade");
     expect(screen.getByRole("link", { name: "Ajuda" })).toHaveAttribute("href", "/ajuda");
+  });
+
+  it("abre Privacidade e Ajuda em nova aba, sem perder o formulário em andamento", () => {
+    renderWithTheme(<AuthPanel />);
+
+    for (const name of ["Privacidade", "Ajuda"]) {
+      const link = screen.getByRole("link", { name });
+
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    }
   });
 });

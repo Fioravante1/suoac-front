@@ -52,6 +52,17 @@
   box-shadow: var(--suoac-shadow-focus-ring);
 }
 
+/*
+ * Campo somente leitura — o e-mail do convite, que vira login e nao se edita.
+ * O fundo cinza e sem contorno diz que nao e para mexer. O anel de foco fica:
+ * o campo recebe foco por teclado e leitor de tela, e a pessoa precisa ver
+ * onde esta.
+ */
+.control:has(.input:read-only) {
+  border-color: transparent;
+  background: var(--suoac-color-surface-muted);
+}
+
 .invalid {
   border-color: var(--suoac-color-critical);
 }

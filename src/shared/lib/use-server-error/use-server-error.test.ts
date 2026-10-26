@@ -14,6 +14,7 @@ beforeEach(() => {
 
   Object.defineProperty(window, "location", {
     value: {
+      origin: "https://suoac.com",
       pathname: "/financial",
       search: "",
       get href() {
@@ -86,7 +87,7 @@ describe("useServerError", () => {
       result.current.showServerError(PASSWORD_CHANGE_REQUIRED_MESSAGE);
     });
 
-    expect(mockLocationHref).toHaveBeenCalledWith("/change-password");
+    expect(mockLocationHref).toHaveBeenCalledWith("https://suoac.com/change-password");
     expect(result.current.serverError).toBeNull();
   });
 });

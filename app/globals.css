@@ -52,6 +52,22 @@
   --suoac-color-brand-panel-on-highlight: #0a1a29;
   --suoac-color-brand-panel-tile: rgb(255 255 255 / 0.06);
   --suoac-color-brand-panel-tile-border: rgb(255 255 255 / 0.12);
+  /* Cartao-ingresso do convite (SUC-27): fundo, contorno, divisorias tracejadas e faixa de rodape. */
+  --suoac-color-brand-panel-ticket: rgb(255 255 255 / 0.05);
+  --suoac-color-brand-panel-ticket-ring: rgb(255 255 255 / 0.1);
+  --suoac-color-brand-panel-ticket-divider: rgb(255 255 255 / 0.16);
+  --suoac-color-brand-panel-ticket-band: rgb(0 0 0 / 0.12);
+  --suoac-color-brand-panel-text-faint: rgb(255 255 255 / 0.5);
+  /* Selo "Aguardando voce" (ambar) do cartao. */
+  --suoac-color-brand-panel-attention: #f2c14b;
+  --suoac-color-brand-panel-attention-soft: rgb(242 193 75 / 0.15);
+  --suoac-color-brand-panel-attention-ring: rgb(242 193 75 / 0.35);
+  --suoac-color-brand-panel-attention-pulse: rgb(242 193 75 / 0.55);
+  /* Selo "Recusado" (vermelho claro) do cartao. */
+  --suoac-color-brand-panel-critical: #f4a3a3;
+  --suoac-color-brand-panel-critical-soft: rgb(240 114 114 / 0.18);
+  --suoac-color-brand-panel-critical-ring: rgb(240 114 114 / 0.35);
+  --suoac-color-brand-panel-text-secondary: rgb(255 255 255 / 0.6);
 
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
@@ -150,6 +166,19 @@
   --suoac-layout-mobile-nav-height: 4.5rem;
   --suoac-layout-sidebar-width: 17rem;
   --suoac-layout-content-max-width: 75rem;
+
+  /*
+   * Larguras de corte do web responsivo (SUC-83), do handoff: celular abaixo de
+   * 760px, tablet retrato de 760px a 1023px e, de 1024px em diante, o layout
+   * dividido de desktop e tablet paisagem. Acima de 1200px o espacamento do
+   * desktop volta ao tamanho cheio.
+   *
+   * `@media` nao le `var()`: os CSS Modules escrevem estes mesmos valores, em
+   * `min-width`, e `breakpoints.test.ts` falha se algum se afastar daqui.
+   */
+  --suoac-breakpoint-tablet: 47.5rem;
+  --suoac-breakpoint-desktop: 64rem;
+  --suoac-breakpoint-desktop-wide: 75rem;
 
   /* Motion */
   --suoac-motion-duration-fast: 180ms;

@@ -17,9 +17,16 @@
   --timeline-active-color: var(--suoac-color-brand-panel-on-highlight);
   --timeline-active-ring: 0 0 0 6px var(--suoac-color-brand-panel-highlight-glow);
 
-  display: flex;
+  /* A jornada so cabe no layout dividido; abaixo de 1024px o cabecalho fica enxuto. */
+  display: none;
   flex-direction: column;
   gap: 1.125rem;
+}
+
+@media (min-width: 64rem) {
+  .timeline {
+    display: flex;
+  }
 }
 
 .kicker {

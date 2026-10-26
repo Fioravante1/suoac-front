@@ -1,5 +1,12 @@
 "use client";
 
+/*
+ * Do modulo, nao do barril `@/shared/lib`: esta tela substitui o layout raiz
+ * quebrado e fica de pe com o minimo de dependencias — o barril arrastaria
+ * hooks de React e do restante do app.
+ */
+import { hardNavigate } from "@/shared/lib/navigation";
+
 export default function GlobalError({
   unstable_retry,
 }: {
@@ -140,9 +147,7 @@ export default function GlobalError({
                 Tentar novamente
               </button>
               <button
-                onClick={() => {
-                  window.location.href = "/";
-                }}
+                onClick={() => hardNavigate("/")}
                 style={{
                   height: "2.75rem",
                   padding: "0 1.5rem",

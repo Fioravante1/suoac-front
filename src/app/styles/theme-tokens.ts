@@ -17,6 +17,19 @@ const brandPanelColors = {
   brandPanelOnHighlight: "#0A1A29",
   brandPanelTile: "rgb(255 255 255 / 0.06)",
   brandPanelTileBorder: "rgb(255 255 255 / 0.12)",
+  brandPanelTicket: "rgb(255 255 255 / 0.05)",
+  brandPanelTicketRing: "rgb(255 255 255 / 0.1)",
+  brandPanelTicketDivider: "rgb(255 255 255 / 0.16)",
+  brandPanelTicketBand: "rgb(0 0 0 / 0.12)",
+  brandPanelTextFaint: "rgb(255 255 255 / 0.5)",
+  brandPanelAttention: "#F2C14B",
+  brandPanelAttentionSoft: "rgb(242 193 75 / 0.15)",
+  brandPanelAttentionRing: "rgb(242 193 75 / 0.35)",
+  brandPanelAttentionPulse: "rgb(242 193 75 / 0.55)",
+  brandPanelCritical: "#F4A3A3",
+  brandPanelCriticalSoft: "rgb(240 114 114 / 0.18)",
+  brandPanelCriticalRing: "rgb(240 114 114 / 0.35)",
+  brandPanelTextSecondary: "rgb(255 255 255 / 0.6)",
 } as const;
 
 export const themeTokens = {
@@ -152,6 +165,11 @@ export const themeTokens = {
     mobileNavHeight: "4.5rem",
     sidebarWidth: "17rem",
     contentMaxWidth: "75rem",
+  },
+  breakpoint: {
+    tablet: "47.5rem",
+    desktop: "64rem",
+    desktopWide: "75rem",
   },
   component: {
     buttonHeight: "2.75rem",

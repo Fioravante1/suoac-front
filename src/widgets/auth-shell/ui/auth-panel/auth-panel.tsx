@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { routes } from "@/shared/config";
@@ -18,7 +19,8 @@ interface AuthPanelProps {
 
 /**
  * Metade direita das telas de acesso: alternancia de tema, a tela ativa e o
- * rodape institucional.
+ * rodape institucional. Abaixo de 1024px vira o cartao que sobe sobre a
+ * apresentacao da marca (SUC-83).
  *
  * Diferente do painel de apresentacao, esta coluna acompanha o tema escolhido.
  */
@@ -30,6 +32,11 @@ export function AuthPanel({ children }: AuthPanelProps) {
   return (
     <section className={styles.panel}>
       <header className={styles.header}>
+        {/* Marca do topo: so aparece onde a apresentacao nao esta (ver o CSS). */}
+        <div className={styles.brand}>
+          <Image src="/logo-mark.png" alt="" width={34} height={34} className={styles.logo} />
+          <span className={styles.wordmark}>SUOAC</span>
+        </div>
         <ThemeToggle />
       </header>
 
@@ -39,10 +46,10 @@ export function AuthPanel({ children }: AuthPanelProps) {
 
       <footer className={styles.footer}>
         <span>© {currentYear} SUOAC</span>
-        <Link className={styles.link} href={routes.privacy}>
+        <Link className={styles.link} href={routes.privacy} target="_blank" rel="noopener noreferrer">
           Privacidade
         </Link>
-        <Link className={styles.link} href={routes.help}>
+        <Link className={styles.link} href={routes.help} target="_blank" rel="noopener noreferrer">
           Ajuda
         </Link>
       </footer>

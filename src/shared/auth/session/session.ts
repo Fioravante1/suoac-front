@@ -23,14 +23,42 @@ const ACCESS_TOKEN_COOKIE = "suoac-access-token";
 const REFRESH_TOKEN_COOKIE = "suoac-refresh-token";
 const USER_COOKIE = "suoac-user";
 
-const MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
+/**
+ * Duração da sessão, como o backend a informa (SUC-39).
+ *
+ * - `extended`: "Manter conectado". Os cookies persistem por `refreshExpiresIn`
+ *   segundos e sobrevivem ao fechamento do navegador.
+ * - padrão: cookies de sessão, sem `maxAge`; somem quando o navegador fecha.
+ */
+export interface SessionLifetime {
+  extended: boolean;
+  /** Tempo de vida do refresh token, em segundos. */
+  refreshExpiresIn: number;
+}
 
-function cookieOptions(): {
+const STANDARD_LIFETIME: SessionLifetime = { extended: false, refreshExpiresIn: 7 * 24 * 60 * 60 };
+
+/**
+ * Lê o modo da sessão da resposta de autenticação. Resposta sem os campos (backend
+ * antigo, fluxo que só emite sessão padrão) vale como padrão: na dúvida, o cookie
+ * que some ao fechar o navegador, nunca o que persiste.
+ */
+export function toSessionLifetime(response: { extendedSession?: boolean; refreshExpiresIn?: number }): SessionLifetime {
+  const { extendedSession, refreshExpiresIn } = response;
+
+  if (extendedSession !== true || !Number.isInteger(refreshExpiresIn) || (refreshExpiresIn ?? 0) <= 0) {
+    return STANDARD_LIFETIME;
+  }
+
+  return { extended: true, refreshExpiresIn: refreshExpiresIn as number };
+}
+
+function cookieOptions(lifetime: SessionLifetime): {
   httpOnly: boolean;
   secure: boolean;
   sameSite: "lax";
   path: string;
-  maxAge: number;
+  maxAge?: number;
 } {
   return {
     // Todos os cookies de sessão são httpOnly: tokens nunca devem ser lidos por JS,
@@ -40,20 +68,27 @@ function cookieOptions(): {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE,
+    ...(lifetime.extended && { maxAge: lifetime.refreshExpiresIn }),
   };
 }
 
-export async function createSession(accessToken: string, refreshToken: string, user: SessionUser): Promise<void> {
+export async function createSession(
+  accessToken: string,
+  refreshToken: string,
+  user: SessionUser,
+  lifetime: SessionLifetime = STANDARD_LIFETIME,
+): Promise<void> {
   const cookieStore = await cookies();
 
   // O cookie de usuário é assinado (HMAC) para ser à prova de adulteração: impede que
   // o circuitId/role sejam editados no navegador para escalar acesso. Ver session-signature.
   const signedUser = await signSession(JSON.stringify(user));
 
-  cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, cookieOptions());
-  cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions());
-  cookieStore.set(USER_COOKIE, signedUser, cookieOptions());
+  const options = cookieOptions(lifetime);
+
+  cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, options);
+  cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, options);
+  cookieStore.set(USER_COOKIE, signedUser, options);
 }
 
 export async function getSession(): Promise<SessionUser | null> {

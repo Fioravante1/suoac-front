@@ -8,6 +8,10 @@ const mockCreateSession = vi.fn();
 vi.mock("../session", () => ({
   getRefreshToken: (...args: unknown[]) => mockGetRefreshToken(...args),
   createSession: (...args: unknown[]) => mockCreateSession(...args),
+  toSessionLifetime: (response: { extendedSession?: boolean; refreshExpiresIn?: number }) => ({
+    extended: response.extendedSession === true,
+    refreshExpiresIn: response.refreshExpiresIn ?? 604800,
+  }),
 }));
 
 import { refreshSession } from "./refresh-session";
@@ -53,7 +57,10 @@ describe("refreshSession", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: "refresh-token-123" }),
     });
-    expect(mockCreateSession).toHaveBeenCalledWith("new-access-token", "new-refresh-token", testUser);
+    expect(mockCreateSession).toHaveBeenCalledWith("new-access-token", "new-refresh-token", testUser, {
+      extended: false,
+      refreshExpiresIn: 604800,
+    });
   });
 
   it("retorna null quando nao ha refresh token", async () => {

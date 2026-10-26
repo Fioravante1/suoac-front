@@ -10,18 +10,17 @@ describe("página de privacidade", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Privacidade" })).toBeInTheDocument();
   });
 
-  it("avisa que o texto é provisório", () => {
-    // Enquanto a coordenação não escrever a versão final, a página não pode
-    // passar por política definitiva — seria compromisso que ninguém assumiu.
+  it("não exibe aviso de texto provisório", () => {
     render(<PrivacyPolicyPage />);
 
-    expect(screen.getByText(/este texto é provisório/i)).toBeInTheDocument();
+    expect(screen.queryByText(/provisório/i)).not.toBeInTheDocument();
   });
 
   it("diz que dados o sistema guarda e quem os vê", () => {
     render(<PrivacyPolicyPage />);
 
     expect(screen.getByRole("heading", { level: 2, name: /que dados o sistema guarda/i })).toBeInTheDocument();
+    expect(screen.getByText(/rg \(guardado criptografado\)/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /quem consegue ver/i })).toBeInTheDocument();
   });
 
@@ -35,10 +34,35 @@ describe("página de privacidade", () => {
     expect(screen.getByText(/não há cookies de publicidade/i)).toBeInTheDocument();
   });
 
-  it("lista as perguntas que a versão final precisa responder", () => {
-    // Serve de pauta para quem for redigir: retenção, compartilhamento e remoção.
+  it("declara a retenção dos dados do evento e do cadastro dos irmãos", () => {
     render(<PrivacyPolicyPage />);
 
-    expect(screen.getByText(/por quanto tempo os dados de um evento são mantidos/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /por quanto tempo os dados ficam/i })).toBeInTheDocument();
+    expect(screen.getByText(/mantidos por 2 anos/i)).toBeInTheDocument();
+    expect(screen.getByText(/cadastro dos irmãos permanece na base/i)).toBeInTheDocument();
+  });
+
+  it("declara que os dados não saem do circuito", () => {
+    render(<PrivacyPolicyPage />);
+
+    expect(screen.getByText(/não são compartilhados fora do circuito/i)).toBeInTheDocument();
+  });
+
+  it("explica como corrigir e remover dados", () => {
+    render(<PrivacyPolicyPage />);
+
+    expect(screen.getByRole("heading", { level: 2, name: /correção e remoção/i })).toBeInTheDocument();
+    expect(screen.getByText(/pode corrigir os próprios dados/i)).toBeInTheDocument();
+    expect(screen.getByText(/também pode excluir outros usuários/i)).toBeInTheDocument();
+    expect(screen.getByText(/quem viaja não usa o sistema/i)).toBeInTheDocument();
+  });
+
+  it("indica o e-mail do SUOAC como canal de contato", () => {
+    render(<PrivacyPolicyPage />);
+
+    const links = screen.getAllByRole("link", { name: "suoac@gmail.com" });
+
+    expect(links.length).toBeGreaterThan(0);
+    links.forEach((link) => expect(link).toHaveAttribute("href", "mailto:suoac@gmail.com"));
   });
 });
