@@ -17,7 +17,7 @@ Os arquivos `.dc.html` são **referências de design em HTML** — protótipos q
 Nunca usar "coordenador" sozinho: existe também o **coordenador do corpo de anciãos**. Sempre escrever **Coordenador do arranjo de ônibus no circuito** / **na congregação** (forma curta aceitável em espaços estreitos: "Coord. do arranjo").
 
 ## Navegação (sem menu lateral)
-Largura mínima de design: **1280px**. Fonte única: **Geist** (400/500/600/700, Google Fonts).
+Dashboard: largura mínima de design **1280px** (versão mobile do painel ainda não desenhada). Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
 
 ### Faixa fixa do evento (topo, fundo `--navy`)
 Altura 68px, padding horizontal 40px, texto branco. Da esquerda para a direita:
@@ -105,6 +105,19 @@ Layout dividido: painel escuro `#0d2b45` à esquerda com **timeline** animada da
   5. Sucesso: resumo (coordenador, circuito, sua congregação, total) → "Ir para o painel".
   Erros aparecem em faixa `--crit-s`/`--crit` acima do formulário.
 
+### 9. Responsivo: celular e tablet (Login + Convite)
+O app é uma única web responsiva (sem app nativo). Breakpoints por largura da janela (`window.innerWidth`, estado `vw`):
+- **Celular (< 760px)**
+  - Login (tela inicial) e Convite: painel navy vira **cabeçalho compacto** (padding 24–28px 20px 52px, título 24px, texto 15px); **timeline oculta**. O formulário fica num **cartão sobreposto** (`margin-top:-28px`, radius `26px 26px 0 0`, fundo `--bg`, padding 20–22px 20px).
+  - Demais telas do Login (esqueci, link enviado, nova senha, cadastro 1–5): painel navy **oculto**; topo com logo 34px + "SUOAC" à esquerda e alternar tema à direita; formulário alinhado ao topo, padding 16–20px.
+  - Convite: cartão-ingresso mantido, com padding menor (cabeçalho 16px 18px, células 12px 18px, privilégio 16px).
+  - Requisitos de senha em **1 coluna**; títulos H2 26–28px.
+  - Inputs com **fonte 16px** (evita zoom automático no iOS). Texto "Manter conectado **neste dispositivo**".
+- **Tablet retrato (760–1023px)**: mesma estrutura em coluna única; cabeçalho navy maior (padding 56px 64px 96px, título 32px, texto 17px), cartão sobreposto `margin-top:-40px`, radius 32px, padding 28–32px 48px; timeline oculta; requisitos de senha em 2 colunas.
+- **Tablet paisagem / desktop (≥ 1024px)**: layout dividido original. Entre 1024–1199px, padding reduzido (painel 40px, formulário 28px 32px).
+- Containers com padding usam `box-sizing:border-box` para não gerar rolagem horizontal/vertical extra.
+- Protótipo: hashes abrem estados direto — Login: `#erro #esqueci #link-enviado #nova-senha #nova-senha-preenchida #senha-alterada #cadastro-1…#cadastro-5`; Convite: `#senha #aceito #recusar #recusado #expirado #pedido-enviado`.
+
 ---
 
 ## Interações e animações
@@ -164,6 +177,8 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 - `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
 - `SUOAC Login.dc.html` — login, recuperação, nova senha e autocadastro do circuito.
 - `SUOAC Convite.dc.html` — cadastro do coordenador da congregação pelo link de convite.
+- `SUOAC Mobile.dc.html` — vitrine com as 19 telas em celular (390×844), agrupadas por fluxo.
+- `SUOAC Tablet.dc.html` — vitrine em tablet: 9 telas em retrato (820×1180) e 3 em paisagem (1180×820).
 - `support.js` — runtime necessário apenas para abrir os protótipos no navegador.
 - `assets/` — logos.
 - `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login, cadastro do circuito, nova senha e aceite de convite (dados, senha, aceito).
