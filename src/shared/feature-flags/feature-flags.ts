@@ -89,18 +89,3 @@ export const showPendingMenuItemsFlag = booleanFlag({
   key: "SHOW_PENDING_MENU_ITEMS",
   description: "Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações).",
 });
-
-/**
- * Serve a tela de entrada redesenhada (`src/pages/login-next`) em `/login`.
- *
- * CRIADA EM 14/10/2026 — TEMPORARIA. Removida em SUC-34, junto com o slice
- * `src/pages/login`, a fachada da rota e a contencao de tema das telas de acesso.
- *
- * Desligada devolve a tela atual sem deploy: e o kill switch da fatia.
- */
-export const redesignLoginFlag = redesignFlag({
-  key: "REDESIGN_LOGIN",
-  description: "Serve a tela de login redesenhada.",
-  slice: "Fatia 1 — Login",
-  removalCard: "SUC-34",
-});
