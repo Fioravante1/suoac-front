@@ -25,6 +25,12 @@ describe("AuthPanel", () => {
     expect(screen.getByRole("button", { name: "Alternar tema" })).toBeInTheDocument();
   });
 
+  it("traz a marca no topo, para as telas que abrem sem a apresentação", () => {
+    renderWithTheme(<AuthPanel />);
+
+    expect(screen.getByText("SUOAC")).toBeInTheDocument();
+  });
+
   it("permite trocar o tema antes de entrar no sistema", () => {
     renderWithTheme(<AuthPanel />);
 

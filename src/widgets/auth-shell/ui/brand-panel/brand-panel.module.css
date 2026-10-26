@@ -45,7 +45,7 @@
 }
 
 .headline {
-  /* Encolhe com a largura da coluna, que varia com a viewport a partir de 1280px. */
+  /* Encolhe com a largura da tela: de 30px no celular a 40px no desktop largo. */
   font-size: clamp(1.875rem, 3vw, var(--suoac-font-size-display));
   font-weight: var(--suoac-font-weight-semibold);
   line-height: 1.15;
@@ -54,8 +54,15 @@
 }
 
 .tagline {
-  font-size: var(--suoac-font-size-lead);
+  /* 15px no celular; o paragrafo de destaque (17px) a partir do tablet. */
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--suoac-color-brand-panel-text-muted);
   text-wrap: pretty;
+}
+
+@media (min-width: 47.5rem) {
+  .tagline {
+    font-size: var(--suoac-font-size-lead);
+  }
 }

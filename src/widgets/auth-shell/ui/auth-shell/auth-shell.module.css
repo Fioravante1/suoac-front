@@ -1,15 +1,50 @@
 /*
- * Duas colunas, sem ponto de quebra: o redesign e desktop-first e o handoff tem
- * largura minima de 1280px (premissa P2 da estrategia). O recorte mobile vira
- * fase propria, depois do corte do legado.
+ * Mobile-first, em tres larguras (SUC-83; cortes em `--suoac-breakpoint-*`):
+ *
+ * - abaixo de 1024px, uma coluna: a apresentacao da marca vira cabecalho e o
+ *   formulario sobe num cartao sobreposto a ela;
+ * - de 1024px em diante, duas colunas: a apresentacao a esquerda e o formulario
+ *   a direita.
  *
  * A coluna da direita tem minimo de 480px para que o formulario de 400px caiba
  * com respiro; o que sobra fica com a apresentacao.
  */
 .page {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(30rem, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
   flex: 1;
   width: 100%;
   min-height: 100vh;
+  /* No celular, `vh` ignora a barra de enderecos e empurra o rodape para fora da tela. */
+  min-height: 100dvh;
+}
+
+/*
+ * Telas internas (recuperar senha, autocadastro, redefinir) abrem sem a
+ * apresentacao da marca abaixo de 1024px: ali o cabecalho gigante so empurraria
+ * o formulario para fora da tela. Quem pede isso e a propria tela, com
+ * `data-auth-screen="inner"` — o shell nao sabe qual tela esta ativa.
+ */
+.page:has([data-auth-screen="inner"]) {
+  grid-template-rows: 1fr;
+}
+
+.page:has([data-auth-screen="inner"]) > aside {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .page {
+    grid-template-columns: minmax(0, 1.1fr) minmax(30rem, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .page:has([data-auth-screen="inner"]) {
+    grid-template-rows: auto;
+  }
+
+  .page:has([data-auth-screen="inner"]) > aside {
+    display: flex;
+  }
 }
