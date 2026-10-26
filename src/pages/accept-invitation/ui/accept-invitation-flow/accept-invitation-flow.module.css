@@ -82,10 +82,17 @@
 
 .title {
   margin: 0;
-  font-size: 1.875rem;
+  /* 26px no celular; 30px a partir do tablet. */
+  font-size: 1.625rem;
   font-weight: var(--suoac-font-weight-semibold);
   line-height: 1.15;
   letter-spacing: -0.025em;
+}
+
+@media (min-width: 47.5rem) {
+  .title {
+    font-size: 1.875rem;
+  }
 }
 
 .subtitle {
@@ -200,4 +207,11 @@
    foco veio de uma troca de conteudo, nao de navegacao por teclado. */
 .result:focus {
   outline: none;
+}
+
+/* Dedo, nao largura: em tela de toque o alvo de "Voltar" chega a 44px. */
+@media (pointer: coarse) {
+  .back {
+    height: 2.75rem;
+  }
 }

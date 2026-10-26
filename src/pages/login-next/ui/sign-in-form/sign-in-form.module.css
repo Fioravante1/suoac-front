@@ -11,10 +11,17 @@
 }
 
 .title {
-  font-size: var(--suoac-font-size-h1);
+  /* 28px no celular; o H1 de 32px a partir do tablet. */
+  font-size: 1.75rem;
   font-weight: var(--suoac-font-weight-semibold);
   line-height: 1.15;
   letter-spacing: -0.025em;
+}
+
+@media (min-width: 47.5rem) {
+  .title {
+    font-size: var(--suoac-font-size-h1);
+  }
 }
 
 .subtitle {
@@ -261,4 +268,15 @@
 .signUpChevron {
   flex-shrink: 0;
   color: var(--suoac-color-primary);
+}
+
+/*
+ * Em tela de toque o link cresce para 44px de altura, mas por margem negativa:
+ * a area de toque aumenta sem empurrar o rotulo do campo.
+ */
+@media (pointer: coarse) {
+  .inlineLink {
+    padding-block: 0.75rem;
+    margin-block: -0.75rem;
+  }
 }
