@@ -329,6 +329,9 @@ Comportamento:
 A limpeza local tem prioridade sobre a revogacao remota. Mesmo que o backend esteja indisponivel,
 o usuario consegue sair do sistema.
 
+O logout encerra so a sessao deste dispositivo (ver 5.1.2): quem esta logado em outro aparelho
+continua logado.
+
 ---
 
 ## 5. Gerenciamento de sessao
@@ -367,15 +370,31 @@ O backend decide a duracao e a informa em toda resposta de autenticacao (`extend
 | Padrao    | login sem `rememberMe`       | 7 dias        | de sessao, sem `maxAge`: somem ao fechar o navegador |
 | Estendido | login com `rememberMe: true` | 30 dias       | persistentes, `maxAge = refreshExpiresIn`            |
 
-- A marca `extended` viaja dentro do refresh token (e do access token), nunca no usuario: vale so
-  para o dispositivo que a pediu. A renovacao (`/auth/refresh`) e a troca de senha preservam o
-  modo, entao a sessao estendida e uma janela deslizante de 30 dias a cada uso.
+- O modo vale so para o dispositivo que o pediu: no backend ele fica na linha da sessao daquele
+  dispositivo (ver 5.1.2), nunca no usuario. A renovacao (`/auth/refresh`) e a troca de senha o
+  preservam, entao a sessao estendida e uma janela deslizante de 30 dias a cada uso.
 - `toSessionLifetime(response)` le o par da resposta e, na duvida (campos ausentes ou invalidos),
   devolve o modo padrao: o cookie que some ao fechar o navegador, nunca o que persiste.
 - Aceite de convite e confirmacao de autocadastro sempre abrem sessao padrao.
-- A redefinicao de senha encerra as duas modalidades (zera o refresh e incrementa a versao da sessao).
-- Limitacao conhecida: so ha um refresh token por usuario no backend, entao entrar em outro
-  dispositivo derruba a sessao estendida do primeiro (SUC-77).
+- A redefinicao de senha encerra as duas modalidades, em todos os dispositivos.
+
+#### 5.1.2 Sessao por dispositivo
+
+Cada login abre uma sessao propria no backend (tabela `sessions`, uma linha por dispositivo). O
+`sid` dela viaja no access token e no refresh token; o front nao o le nem o guarda, so repassa os
+tokens como sempre.
+
+- Entrar em outro aparelho **nao** derruba a sessao dos demais: o "Manter conectado" de um
+  computador sobrevive a um login no celular.
+- `POST /auth/refresh` renova so a sessao do refresh token apresentado. Um token ja rotacionado
+  recebe 401 sem derrubar a sessao, entao duas abas que renovam juntas nao se anulam: a sessao
+  segue valida com o token que venceu.
+- `POST /auth/logout` encerra so a sessao do dispositivo de quem saiu (ver 4).
+- Redefinir ou trocar a senha, e o reset feito por um administrador, encerram **todas** as sessoes.
+- Cada usuario guarda no maximo 10 sessoes; ao passar, as menos usadas caem. Quem for derrubado
+  por isso ve o fluxo normal de sessao expirada.
+- Sessao aberta antes do SUC-77 nao tem linha no backend: o refresh dela da 401 uma unica vez e a
+  pessoa entra de novo.
 
 ### 5.2 Por que `suoac-user` nao e httpOnly
 
