@@ -585,6 +585,24 @@ Isso garante que:
 - O **client** impede submissoes invalidas com feedback instantaneo.
 - O **servidor** revalida para impedir bypass (ex: requisicoes forjadas sem o formulario).
 
+### 8.4 Politica de senha (SUC-79 e SUC-80)
+
+Quem **define** senha — aceite de convite, autocadastro de circuito, redefinicao por link e troca
+de senha — segue a politica abaixo. O login nao a aplica: o schema de entrada so exige que o campo
+nao esteja vazio, para que quem cadastrou senha de 8 caracteres antes da mudanca continue entrando.
+
+| Regra                | Valor                                                                                          |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| Comprimento          | de 12 a 100 caracteres                                                                         |
+| Composicao           | uma letra minuscula, uma maiuscula, um numero e um simbolo                                     |
+| Simbolo              | qualquer caractere que nao seja letra, numero nem espaco (`[^\p{L}\p{N}\s]` com a flag `u`)    |
+| Senhas ja existentes | nao ha troca forcada: a regra vale a partir do proximo cadastro, convite, troca ou redefinicao |
+
+A fonte no front e `src/shared/lib/password-policy/` (`PASSWORD_MIN_LENGTH`, `PASSWORD_REQUIREMENTS`,
+mensagens e `newPasswordSchema`), lida por todos os formularios e pelo medidor de forca, que conta
+cinco requisitos. A fonte na API e `src/common/validators/password.constants.ts` do `suoac-back`; as
+duas precisam andar juntas, e `password-policy.test.ts` compara a expressao do front com a da API.
+
 ---
 
 ## 9. Tratamento de erros
