@@ -50,8 +50,8 @@ test.describe("rota de redefinicao de senha", () => {
 
   test("redefine a senha e envia o token no corpo, nunca na query string", async ({ page, request }) => {
     await page.goto("/reset-password?token=token-valido");
-    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha123");
-    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha123");
+    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha@123");
+    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha@123");
     await page.getByRole("button", { name: "Salvar nova senha" }).click();
 
     await expect(page.getByRole("heading", { name: "Senha alterada" })).toBeVisible();
@@ -64,7 +64,7 @@ test.describe("rota de redefinicao de senha", () => {
 
     const enviado = await resetRecebidoPor(request, "token-valido");
 
-    expect(enviado?.body).toEqual({ token: "token-valido", newPassword: "NovaSenha123" });
+    expect(enviado?.body).toEqual({ token: "token-valido", newPassword: "NovaSenha@123" });
     // A confirmacao e assunto do formulario, nao da API.
     expect(enviado?.body).not.toHaveProperty("confirmPassword");
     // Sem query string nenhuma: o token iria para log de acesso e `Referer`.
@@ -107,8 +107,8 @@ test.describe("rota de redefinicao de senha", () => {
 
   test("nao envia senha fora da politica para a API", async ({ page, request }) => {
     await page.goto("/reset-password?token=token-politica");
-    await page.getByLabel("Nova senha", { exact: true }).fill("senhalonga");
-    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("senhalonga");
+    await page.getByLabel("Nova senha", { exact: true }).fill("senhalongaaaa");
+    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("senhalongaaaa");
     await page.getByRole("button", { name: "Salvar nova senha" }).click();
 
     await expect(page.getByText(/ao menos uma letra maiúscula/)).toBeVisible();
@@ -127,8 +127,8 @@ test.describe("rota de redefinicao de senha", () => {
 
     await expect(page.getByRole("heading", { name: "Crie uma nova senha" })).toBeVisible();
 
-    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha123");
-    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha123");
+    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha@123");
+    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha@123");
     await page.getByRole("button", { name: "Salvar nova senha" }).click();
 
     await expect(page.getByRole("heading", { name: "Este link expirou" })).toBeVisible();
@@ -140,8 +140,8 @@ test.describe("rota de redefinicao de senha", () => {
 
   test("ignora a URL alterada depois de a tela abrir", async ({ page, request }) => {
     await page.goto("/reset-password?token=token-nao-relido");
-    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha123");
-    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha123");
+    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha@123");
+    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha@123");
 
     await page.evaluate(() => {
       window.history.replaceState(null, "", "/reset-password?token=token-usado");
@@ -166,8 +166,8 @@ test.describe("rota de redefinicao de senha", () => {
      */
     await page.goto("/reset-password?token=token-consumivel");
 
-    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha123");
-    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha123");
+    await page.getByLabel("Nova senha", { exact: true }).fill("NovaSenha@123");
+    await page.getByLabel("Confirme a nova senha", { exact: true }).fill("NovaSenha@123");
     await page.getByRole("button", { name: "Salvar nova senha" }).click();
 
     await expect(page.getByRole("heading", { name: "Senha alterada" })).toBeVisible();

@@ -14,7 +14,7 @@ vi.mock("../../api", () => ({
 const { ResetPasswordForm } = await import("./reset-password-form");
 
 const TOKEN = "token-do-link";
-const SENHA = "NovaSenha123";
+const SENHA = "NovaSenha@123";
 
 /**
  * `redirect` na action chega ao cliente como rejeicao, depois de o roteador ja
@@ -117,7 +117,7 @@ describe("ResetPasswordForm", () => {
 
   it("aponta a confirmação divergente inline, antes de chamar o servidor", async () => {
     render(<ResetPasswordForm token={TOKEN} />);
-    preencher(SENHA, "OutraSenha123");
+    preencher(SENHA, "OutraSenha@123");
     enviar();
 
     expect(await screen.findByText("As senhas não coincidem")).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe("ResetPasswordForm", () => {
     // O indicador ao lado do rotulo ja cobre a divergencia; repetir embaixo do
     // campo e o ruido que o `status` foi criado para evitar.
     render(<ResetPasswordForm token={TOKEN} />);
-    preencher(SENHA, "OutraSenha123");
+    preencher(SENHA, "OutraSenha@123");
     fireEvent.blur(screen.getByLabelText("Confirme a nova senha"));
 
     await waitFor(() => expect(screen.getAllByText(/As senhas não coincidem/)).toHaveLength(1));
@@ -164,7 +164,7 @@ describe("ResetPasswordForm", () => {
 
   it("barra senha fora da política antes de chamar o servidor", async () => {
     render(<ResetPasswordForm token={TOKEN} />);
-    preencher("senhalonga");
+    preencher("senhalongaaaa");
     enviar();
 
     expect(await screen.findByText(/ao menos uma letra maiúscula/)).toBeInTheDocument();
@@ -189,9 +189,9 @@ describe("ResetPasswordForm", () => {
   it("mostra o medidor de força enquanto a senha é digitada", () => {
     render(<ResetPasswordForm token={TOKEN} />);
 
-    expect(screen.getByText("Use letras maiúsculas, minúsculas e números")).toBeInTheDocument();
+    expect(screen.getByText("Use letras maiúsculas, minúsculas, números e símbolos")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalonga" } });
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalongaaaa" } });
 
     // Duas regioes vivas convivem aqui: a nota do medidor e o indicador de
     // coincidencia. A assercao aponta a do medidor pelo texto.

@@ -18,7 +18,7 @@ vi.mock("../../api", () => ({
 const { AcceptInvitationFlow } = await import("./accept-invitation-flow");
 
 const TOKEN = "a".repeat(64);
-const SENHA = "Senha@123";
+const SENHA = "Senha@Segura123";
 
 const INVITATION: Invitation = {
   name: "Ana Beatriz Souza",

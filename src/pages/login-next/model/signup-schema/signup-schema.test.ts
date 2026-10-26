@@ -16,7 +16,7 @@ function buildValues(overrides: Record<string, unknown> = {}) {
       name: "João Silva",
       email: "joao@example.com",
       phone: "(19) 99999-9999",
-      password: "Senha123",
+      password: "Senha-Segura123",
     },
     circuit: { name: "SP-17", city: "Campinas", state: "SP" },
     acceptedTerms: true,
@@ -66,7 +66,7 @@ describe("signupSchema", () => {
     });
 
     it("deve recusar senha que a API recusaria", () => {
-      const values = buildValues({ coordinator: { ...buildValues().coordinator, password: "senhasenha" } });
+      const values = buildValues({ coordinator: { ...buildValues().coordinator, password: "senhasenhasenha" } });
 
       // Mesma política do backend, importada de `shared/lib/password-policy`.
       expect(failedPaths(values)).toContain("coordinator.password");
@@ -283,7 +283,7 @@ describe("buildSignupSummary", () => {
         name: "  João Silva  ",
         email: "joao@example.com",
         phone: "(19) 99999-9999",
-        password: "Senha@123",
+        password: "Senha@Segura123",
       },
       circuit: { name: " sp-17 ", city: " Campinas ", state: "sp" },
       acceptedTerms: true,
@@ -308,7 +308,7 @@ describe("buildSignupSummary", () => {
         name: "João Silva",
         email: "joao@example.com",
         phone: "(19) 99999-9999",
-        password: "Senha@123",
+        password: "Senha@Segura123",
       },
       circuit: { name: "SP-17", city: "Campinas", state: "SP" },
       acceptedTerms: true,

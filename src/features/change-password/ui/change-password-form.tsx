@@ -5,7 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, KeyRound, Loader2 } from "lucide-react";
 
-import { PASSWORD_MAX_LENGTH, isRedirectRejection, useServerError, usePasswordTruncationNotice } from "@/shared/lib";
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  isRedirectRejection,
+  useServerError,
+  usePasswordTruncationNotice,
+} from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { PasswordField } from "@/shared/ui/password-field";
 import { PasswordStrengthMeter } from "@/shared/ui/password-strength-meter";
@@ -110,7 +116,7 @@ export function ChangePasswordForm() {
       <div className={styles.fieldGroup}>
         <PasswordField
           label="Nova senha"
-          placeholder="Mínimo de 8 caracteres"
+          placeholder={`Mínimo de ${PASSWORD_MIN_LENGTH} caracteres`}
           autoComplete="new-password"
           maxLength={PASSWORD_MAX_LENGTH}
           error={errors.newPassword?.message}

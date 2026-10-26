@@ -26,8 +26,8 @@ const changePasswordActionMock = vi.mocked(changePasswordAction);
 /** Cumpre a politica inteira: 8+ caracteres, maiuscula, minuscula e numero. */
 function fillValidForm() {
   fireEvent.change(screen.getByLabelText("Senha atual"), { target: { value: "80275@Suoac" } });
-  fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "NovaSenhaForte123" } });
-  fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "NovaSenhaForte123" } });
+  fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "NovaSenha@Forte123" } });
+  fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "NovaSenha@Forte123" } });
 }
 
 describe("ChangePasswordForm", () => {
@@ -46,15 +46,15 @@ describe("ChangePasswordForm", () => {
 
   it("recusa inline a senha que o servidor recusaria, sem chamar a action", async () => {
     /*
-     * O defeito do SUC-59: `senhalonga` cumpre o minimo de caracteres, passava
+     * O defeito do SUC-59: `senhalongaaaa` cumpre o minimo de caracteres, passava
      * pela validacao do cliente e tomava `400` do servidor — no primeiro acesso
      * de quem entra no sistema, depois de digitar a senha duas vezes.
      */
     render(<ChangePasswordForm />);
 
     fireEvent.change(screen.getByLabelText("Senha atual"), { target: { value: "80275@Suoac" } });
-    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalonga" } });
-    fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "senhalonga" } });
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalongaaaa" } });
+    fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "senhalongaaaa" } });
 
     fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
 
@@ -65,9 +65,9 @@ describe("ChangePasswordForm", () => {
   it("mostra o que falta na senha enquanto ela é digitada", () => {
     render(<ChangePasswordForm />);
 
-    expect(screen.getByText("Use letras maiúsculas, minúsculas e números")).toBeInTheDocument();
+    expect(screen.getByText("Use letras maiúsculas, minúsculas, números e símbolos")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalonga" } });
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "senhalongaaaa" } });
 
     expect(screen.getByText("razoável")).toBeInTheDocument();
     expect(screen.getByText(/Uma letra maiúscula/)).toHaveTextContent("pendente");
@@ -91,7 +91,7 @@ describe("ChangePasswordForm", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Informe sua senha atual.")).toBeInTheDocument();
-      expect(screen.getByText(/no mínimo 8 caracteres/i)).toBeInTheDocument();
+      expect(screen.getByText(/no mínimo 12 caracteres/i)).toBeInTheDocument();
     });
 
     expect(changePasswordActionMock).not.toHaveBeenCalled();
@@ -101,7 +101,7 @@ describe("ChangePasswordForm", () => {
     render(<ChangePasswordForm />);
 
     fireEvent.change(screen.getByLabelText("Senha atual"), { target: { value: "80275@Suoac" } });
-    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "NovaSenhaForte123" } });
+    fireEvent.change(screen.getByLabelText("Nova senha"), { target: { value: "NovaSenha@Forte123" } });
     fireEvent.change(screen.getByLabelText("Confirmar nova senha"), { target: { value: "Diferente123" } });
 
     fireEvent.click(screen.getByRole("button", { name: /Definir nova senha/i }));
@@ -129,8 +129,8 @@ describe("ChangePasswordForm", () => {
     expect(prevState).toBeUndefined();
     expect(formData).toBeInstanceOf(FormData);
     expect(formData.get("currentPassword")).toBe("80275@Suoac");
-    expect(formData.get("newPassword")).toBe("NovaSenhaForte123");
-    expect(formData.get("confirmPassword")).toBe("NovaSenhaForte123");
+    expect(formData.get("newPassword")).toBe("NovaSenha@Forte123");
+    expect(formData.get("confirmPassword")).toBe("NovaSenha@Forte123");
   });
 
   it("desabilita os campos enquanto a troca de senha está em andamento", async () => {
@@ -230,8 +230,8 @@ describe("ChangePasswordForm", () => {
     render(<ChangePasswordForm />);
 
     const novaSenha = screen.getByLabelText("Nova senha");
-    fireEvent.paste(novaSenha, { clipboardData: { getData: () => "NovaSenha123" } });
-    fireEvent.change(novaSenha, { target: { value: "NovaSenha123" } });
+    fireEvent.paste(novaSenha, { clipboardData: { getData: () => "NovaSenha@123" } });
+    fireEvent.change(novaSenha, { target: { value: "NovaSenha@123" } });
 
     expect(screen.queryByText(PASSWORD_TRUNCATED_MESSAGE)).not.toBeInTheDocument();
   });
