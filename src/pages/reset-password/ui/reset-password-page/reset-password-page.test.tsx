@@ -11,6 +11,7 @@ vi.mock("../../api/verify-reset-token-action", () => ({
 
 vi.mock("@/widgets/auth-shell", () => ({
   AuthShell: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-shell">{children}</div>,
+  InnerAuthScreen: ({ children }: { children: React.ReactNode }) => <div data-testid="inner-screen">{children}</div>,
 }));
 
 vi.mock("../reset-password-form", () => ({
@@ -67,5 +68,13 @@ describe("ResetPasswordPage", () => {
     render(await ResetPasswordPage({ token: "token-do-link" }));
 
     expect(screen.getByTestId("auth-shell")).toBeInTheDocument();
+  });
+
+  it("abre como tela interna, sem a apresentação da marca no celular e no tablet", async () => {
+    verifyResetTokenAction.mockResolvedValue("valid");
+
+    render(await ResetPasswordPage({ token: "token-do-link" }));
+
+    expect(screen.getByTestId("inner-screen")).toContainElement(screen.getByTestId("form"));
   });
 });

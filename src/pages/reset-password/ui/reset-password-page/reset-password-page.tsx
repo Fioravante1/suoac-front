@@ -1,4 +1,4 @@
-import { AuthShell } from "@/widgets/auth-shell";
+import { AuthShell, InnerAuthScreen } from "@/widgets/auth-shell";
 
 import { verifyResetTokenAction } from "../../api/verify-reset-token-action";
 import { ResetPasswordForm } from "../reset-password-form";
@@ -31,7 +31,9 @@ export async function ResetPasswordPage({ token, status }: ResetPasswordPageProp
   if (status === "sucesso") {
     return (
       <AuthShell>
-        <ResetPasswordSuccess />
+        <InnerAuthScreen>
+          <ResetPasswordSuccess />
+        </InnerAuthScreen>
       </AuthShell>
     );
   }
@@ -43,8 +45,10 @@ export async function ResetPasswordPage({ token, status }: ResetPasswordPageProp
 
   return (
     <AuthShell>
-      {tokenState === "valid" && <ResetPasswordForm token={rawToken} />}
-      {tokenState !== "valid" && <TokenNotice state={tokenState} />}
+      <InnerAuthScreen>
+        {tokenState === "valid" && <ResetPasswordForm token={rawToken} />}
+        {tokenState !== "valid" && <TokenNotice state={tokenState} />}
+      </InnerAuthScreen>
     </AuthShell>
   );
 }
