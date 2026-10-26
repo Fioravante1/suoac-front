@@ -166,6 +166,11 @@ export const themeTokens = {
     sidebarWidth: "17rem",
     contentMaxWidth: "75rem",
   },
+  breakpoint: {
+    tablet: "47.5rem",
+    desktop: "64rem",
+    desktopWide: "75rem",
+  },
   component: {
     buttonHeight: "2.75rem",
     buttonHeightSm: "2.25rem",

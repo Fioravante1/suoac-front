@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { InnerAuthScreen } from "@/widgets/auth-shell";
+
 import { ForgotPasswordForm } from "../forgot-password-form";
 import { SignInForm } from "../sign-in-form";
 import { SignupFlow } from "../signup-flow";
@@ -13,11 +15,19 @@ export function AuthFlow() {
   const [view, setView] = useState<AuthView>("sign-in");
 
   if (view === "forgot-password") {
-    return <ForgotPasswordForm onBack={() => setView("sign-in")} />;
+    return (
+      <InnerAuthScreen>
+        <ForgotPasswordForm onBack={() => setView("sign-in")} />
+      </InnerAuthScreen>
+    );
   }
 
   if (view === "signup") {
-    return <SignupFlow onBack={() => setView("sign-in")} />;
+    return (
+      <InnerAuthScreen>
+        <SignupFlow onBack={() => setView("sign-in")} />
+      </InnerAuthScreen>
+    );
   }
 
   return <SignInForm onForgotPassword={() => setView("forgot-password")} onSignUp={() => setView("signup")} />;

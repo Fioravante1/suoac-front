@@ -35,4 +35,17 @@ describe("AuthFlow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Voltar para o login" }));
     expect(screen.getByRole("heading", { name: "Entrar" })).toBeInTheDocument();
   });
+
+  it("deixa a entrada com a apresentação da marca e marca as demais telas como internas", () => {
+    const { container } = render(<AuthFlow />);
+
+    expect(container.querySelector("[data-auth-screen]")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Esqueci a senha" }));
+    expect(container.querySelector("[data-auth-screen='inner']")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Voltar" }));
+    fireEvent.click(screen.getByRole("button", { name: /Seu circuito ainda não usa o SUOAC/ }));
+    expect(container.querySelector("[data-auth-screen='inner']")).not.toBeNull();
+  });
 });

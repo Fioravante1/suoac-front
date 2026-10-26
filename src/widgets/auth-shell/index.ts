@@ -12,3 +12,4 @@ export { AuthShell } from "./ui/auth-shell";
 export { AuthPanel } from "./ui/auth-panel";
 export { BrandPanel } from "./ui/brand-panel";
 export { BrandPanelFrame } from "./ui/brand-panel-frame";
+export { InnerAuthScreen } from "./ui/inner-auth-screen";

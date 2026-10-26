@@ -167,6 +167,19 @@
   --suoac-layout-sidebar-width: 17rem;
   --suoac-layout-content-max-width: 75rem;
 
+  /*
+   * Larguras de corte do web responsivo (SUC-83), do handoff: celular abaixo de
+   * 760px, tablet retrato de 760px a 1023px e, de 1024px em diante, o layout
+   * dividido de desktop e tablet paisagem. Acima de 1200px o espacamento do
+   * desktop volta ao tamanho cheio.
+   *
+   * `@media` nao le `var()`: os CSS Modules escrevem estes mesmos valores, em
+   * `min-width`, e `breakpoints.test.ts` falha se algum se afastar daqui.
+   */
+  --suoac-breakpoint-tablet: 47.5rem;
+  --suoac-breakpoint-desktop: 64rem;
+  --suoac-breakpoint-desktop-wide: 75rem;
+
   /* Motion */
   --suoac-motion-duration-fast: 180ms;
   --suoac-motion-duration-base: 200ms;
