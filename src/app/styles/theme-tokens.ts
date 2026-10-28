@@ -64,6 +64,7 @@ export const themeTokens = {
     glass: "rgb(255 255 255 / 0.78)",
     scrim: "rgb(16 24 40 / 0.45)",
     modalScrim: "rgb(10 26 41 / 0.55)",
+    sheetScrim: "rgb(10 26 41 / 0.45)",
     overlay: "rgb(247 249 248 / 0.72)",
   },
   event: {
@@ -123,6 +124,8 @@ export const themeTokens = {
     xl: "20px",
     pill: "999px",
     control: "14px",
+    modal: "22px",
+    sheet: "24px",
   },
   shadow: {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
@@ -132,6 +135,8 @@ export const themeTokens = {
     dropdown: "0 24px 60px rgb(13 43 69 / 0.28)",
     menu: "0 18px 40px rgb(13 43 69 / 0.2)",
     modal: "0 40px 100px rgb(10 26 41 / 0.45)",
+    sheet: "0 -10px 40px rgb(10 26 41 / 0.25)",
+    modalWide: "0 30px 80px rgb(10 26 41 / 0.35)",
     buttonPrimary: "0 6px 16px rgb(31 110 90 / 0.25)",
     buttonPrimaryStrong: "0 10px 24px rgb(31 110 90 / 0.28)",
     focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
@@ -165,11 +170,13 @@ export const themeTokens = {
     mobileNavHeight: "4.5rem",
     sidebarWidth: "17rem",
     contentMaxWidth: "75rem",
+    compactMaxWidth: "27.5rem",
   },
   breakpoint: {
     tablet: "47.5rem",
     desktop: "64rem",
     desktopWide: "75rem",
+    panelDesktop: "80rem",
   },
   component: {
     buttonHeight: "2.75rem",
@@ -239,6 +246,8 @@ export const darkThemeTokens: ThemeVariant = {
     scrim: "rgb(0 0 0 / 0.6)",
     // O handoff define um unico scrim de modal, igual nos dois temas.
     modalScrim: "rgb(10 26 41 / 0.55)",
+    // Idem para o scrim do sheet.
+    sheetScrim: "rgb(10 26 41 / 0.45)",
     overlay: "rgb(14 20 19 / 0.72)",
   },
   event: {
@@ -261,6 +270,8 @@ export const darkThemeTokens: ThemeVariant = {
     dropdown: "0 24px 60px rgb(0 0 0 / 0.5)",
     menu: "0 18px 40px rgb(0 0 0 / 0.45)",
     modal: "0 40px 100px rgb(0 0 0 / 0.6)",
+    sheet: "0 -10px 40px rgb(0 0 0 / 0.45)",
+    modalWide: "0 30px 80px rgb(0 0 0 / 0.55)",
     buttonPrimary: "0 6px 16px rgb(0 0 0 / 0.35)",
     buttonPrimaryStrong: "0 10px 24px rgb(0 0 0 / 0.4)",
     // Mesma declaracao do tema claro: a cor vem de um token que ja muda.

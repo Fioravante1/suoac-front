@@ -32,6 +32,8 @@ const COLORS_SHARED_BY_BOTH_THEMES = [
   "--suoac-color-text-inverse",
   // O handoff define um unico scrim de modal.
   "--suoac-color-modal-scrim",
+  // E um unico scrim de sheet, o do painel no celular e no tablet.
+  "--suoac-color-sheet-scrim",
 ];
 
 /**

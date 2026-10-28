@@ -68,6 +68,8 @@
   --suoac-shadow-dropdown: 0 24px 60px rgb(13 43 69 / 0.28);
   --suoac-shadow-menu: 0 18px 40px rgb(13 43 69 / 0.2);
   --suoac-shadow-modal: 0 40px 100px rgb(10 26 41 / 0.45);
+  --suoac-shadow-sheet: 0 -10px 40px rgb(10 26 41 / 0.25);
+  --suoac-shadow-modal-wide: 0 30px 80px rgb(10 26 41 / 0.35);
   --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
   --suoac-color-scrim: rgb(16 24 40 / 0.45);

@@ -39,11 +39,12 @@ describe("larguras de corte do web responsivo", () => {
     expect(declarations.get(`--suoac-breakpoint-${camelToKebab(name)}`)).toBe(value);
   });
 
-  it("ordena celular, tablet e desktop do menor para o maior", () => {
-    const [tablet, desktop, desktopWide] = declaredBreakpoints.map((value) => Number.parseFloat(value));
+  it("declara os cortes do menor para o maior", () => {
+    const widths = declaredBreakpoints.map((value) => Number.parseFloat(value));
+    const ascending = widths.toSorted((left, right) => left - right);
 
-    expect(tablet).toBeLessThan(desktop);
-    expect(desktop).toBeLessThan(desktopWide);
+    expect(widths).toEqual(ascending);
+    expect(new Set(widths).size).toBe(widths.length);
   });
 
   it.each(RESPONSIVE_DIRECTORIES)("so usa cortes declarados nos CSS Modules de %s", (directory) => {
