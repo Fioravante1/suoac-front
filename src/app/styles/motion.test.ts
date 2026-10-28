@@ -20,7 +20,9 @@ import { themeTokens } from "./theme-tokens";
  * `globals.css` continua sendo o que o handoff pediu.
  */
 const globals = loadCss("app/globals.css");
-const dashboardPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard.dc.html");
+// O painel desktop e o `v3` desde 28/10/2026 (SUC-103); o `SUOAC Dashboard.dc.html`
+// dessa exportacao e o canvas de exploracao da navegacao, sem as animacoes.
+const dashboardPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard v3.dc.html");
 const loginPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Login.dc.html");
 const dashboardMobilePrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard Mobile.dc.html");
 
