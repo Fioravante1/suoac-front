@@ -1,8 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
+import { useIsClient } from "@/shared/lib";
 import { Spinner } from "@/shared/ui/spinner";
 
 import styles from "./loading-overlay.module.css";
@@ -11,17 +11,6 @@ type LoadingOverlayProps = Readonly<{
   open: boolean;
   label?: string;
 }>;
-
-const emptySubscribe = () => () => {};
-
-// Hidrata só no cliente (snapshot do servidor = false), evitando portal durante o SSR.
-function useIsClient(): boolean {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
-}
 
 /**
  * Overlay de carregamento que cobre a tela inteira, escurece o conteúdo com um leve desfoque
