@@ -1,8 +1,8 @@
 # SUOAC — Estratégia de Redesign Incremental
 
 **Criado em:** 09/10/2026
-**Status:** em execução — Fatia 0 em andamento
-**Última atualização:** 26/10/2026
+**Status:** em execução — Fatia 2 em andamento
+**Última atualização:** 28/10/2026
 **Proposta de design:** `docs/design_handoff_suoac_redesign/`
 
 Este documento define **como** o redesign do SUOAC será executado sem parar a aplicação atual, que já
@@ -30,6 +30,9 @@ mudam no `AGENTS.md` durante a transição.
 > CSP do projeto (`default-src 'self'`) bloqueia `vercel.live`, e abrir a política por conveniência
 > de QA custa mais do que vale. Decisão do coordenador: validar em staging basta — o sistema tem
 > poucos usuários e staging tem dados representativos. Ver SUC-19.
+>
+> As larguras de P2 são as das telas de acesso. O painel, a partir da Fatia 2, só entra no desktop
+> em 1280px (§5.1).
 
 ---
 
@@ -279,6 +282,51 @@ ligada e as abas ainda forem telas v1, cada aba renderiza a tela antiga dentro d
 escopo de contenção de tema (§3.3). É intencionalmente feio por um período — e é o preço de não
 fazer big bang.
 
+### 5.1 Decisões da Fatia 2 (28/10/2026, SUC-6)
+
+O handoff do painel entrou no repositório em 28/10/2026 (SUC-103) e trouxe **duas navegações**, não
+uma:
+
+- **Celular e tablet** seguem o `SUOAC Dashboard Mobile.dc.html`: topo navy, barra inferior com o
+  botão "+" (no tablet, uma pílula flutuante) e a tela "Mais" (SUC-110).
+- **Desktop** segue o `SUOAC Dashboard v3.dc.html`: faixa do evento, resumo, abas e dock de ações
+  (SUC-106 a SUC-109).
+
+Decisões do usuário, registradas no épico:
+
+| Decisão                                                                                                                                        | Motivo                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| O desktop do painel começa em **1280px** (`--suoac-breakpoint-panel-desktop`); abaixo disso vale o layout de tablet. O acesso segue em 1024px. | O README do handoff diz 1100px, mas o `v3` aplica `min-width: 1280px`: cortar antes criaria rolagem horizontal entre 1100 e 1279px. O layout de tablet foi feito para toque e vai até 1180px. |
+| O tablet usa o layout do celular, não o do desktop.                                                                                            | É o desenho do handoff (seção 10 do README, objeto `T`). O `v3` responsivo, que o README chama de alternativa legada para tablet, não é usado.                                                |
+| O evento selecionado fica num **cookie lido no servidor**, como o tema (§3.3).                                                                 | As URLs não mudam e o layout consegue ler o cookie, o que não faz com `searchParams`. Custo aceito: duas abas do navegador compartilham o evento. A regra do evento padrão é do SUC-104.      |
+| A aba **Pagamentos** existe nas três larguras para os papéis da congregação.                                                                   | Esses papéis já veem o financeiro hoje, e o critério de corte (§6) exige paridade funcional. O desenho do desktop ainda não tem a aba (SUC-97).                                               |
+| As **devoluções** de evento cancelado são da Fatia 5 (SUC-100), não do shell.                                                                  | Registrar devolução é trabalho financeiro; o shell só mostra o estado de evento cancelado (SUC-111).                                                                                          |
+
+**Fonte do desenho.** Até a próxima exportação, o README do handoff tem duas fontes da verdade: ele
+ainda chama o `SUOAC Dashboard.dc.html` de fonte do painel, mas esse arquivo é a antiga exploração da
+navegação. Vale o `v3` para o desktop e o `Dashboard Mobile` para celular e tablet. Os `.dc.html` não
+são editados aqui (`.claude/rules/redesign.md`); a correção vem com a reexportação.
+
+**Faltas de desenho são impeditivo.** O que o handoff não desenha não é improvisado: cada falta virou
+card e bloqueia os cards que dependem dela.
+
+- Tela "Meu perfil" (SUC-96): bloqueia a faixa do desktop (SUC-106) e a navegação do celular (SUC-110).
+- Aba Pagamentos dos papéis da congregação no desktop (SUC-97): bloqueia o painel desses papéis
+  (SUC-113).
+- Escolha das congregações que participam do evento (SUC-98): bloqueia o formulário de evento
+  (SUC-112) e a API correspondente (SUC-102).
+
+**API nova da fatia:** duplicar evento como rascunho (SUC-99), tipo de evento "Outro" (SUC-101) e
+escolha das congregações do evento (SUC-102). Encerrar inscrições e finalizar a lista da congregação
+usam endpoints que já existem.
+
+**Decisões pendentes**, registradas nos cards e a cargo do usuário:
+
+- SUC-104: se as telas v1 dentro do shell novo passam a seguir o evento selecionado, e como.
+- SUC-108: o que as abas Ônibus e Listas mostram até as Fatias 7 e 8.
+- SUC-99: o que acontece com datas e prazos ao duplicar um evento.
+- SUC-100: como as devoluções são registradas, e por quem.
+
 ---
 
 ## 6. Critério de corte (quando o antigo morre)
@@ -476,14 +524,14 @@ Cada um desses PRs roda `yarn run check` e é pequeno o suficiente para ser revi
 
 ## 11. Riscos
 
-| Risco                                         | Mitigação                                                                                                                   |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Flags acumulam e o legado nunca morre         | Teto de 2 flags de redesign vivas em produção (§4.2); corte é PR próprio e priorizado.                                      |
-| Shell novo com abas v1 dentro fica incoerente | Período curto e assumido; escopo de contenção de tema evita o pior (ilegibilidade). Priorizar as abas logo após a Fatia 2.  |
-| API nova atrasa e trava a fila                | Fatia 5 (Financeiro) é a de menor dependência — serve de fatia de folga para não parar o front.                             |
-| Tema escuro vaza para telas não redesenhadas  | `legacy-light-scope.css` (§3.3), removido no corte final.                                                                   |
-| Fatia redesenhada sem desenho de celular      | O card de cada fatia exige o desenho nas três larguras antes de começar; o handoff ainda não cobre o painel (Fatias 2 a 9). |
-| Duplicação `-next` vira permanente            | Cada slice `-next` tem issue de corte desde o nascimento; o sufixo torna o débito visível em qualquer `ls`.                 |
+| Risco                                         | Mitigação                                                                                                                                                                                                                                           |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flags acumulam e o legado nunca morre         | Teto de 2 flags de redesign vivas em produção (§4.2); corte é PR próprio e priorizado.                                                                                                                                                              |
+| Shell novo com abas v1 dentro fica incoerente | Período curto e assumido; escopo de contenção de tema evita o pior (ilegibilidade). Priorizar as abas logo após a Fatia 2.                                                                                                                          |
+| API nova atrasa e trava a fila                | Fatia 5 (Financeiro) é a de menor dependência — serve de fatia de folga para não parar o front.                                                                                                                                                     |
+| Tema escuro vaza para telas não redesenhadas  | `LegacyThemeScope` (§3.3), removido no corte final.                                                                                                                                                                                                 |
+| Fatia redesenhada sem desenho de celular      | O card de cada fatia exige o desenho nas três larguras antes de começar. Na Fatia 2, resolvido em 28/10/2026: o handoff cobre o painel nas três larguras, e o que falta desenhar virou card impeditivo (§5.1). As Fatias 3 a 9 conferem ao começar. |
+| Duplicação `-next` vira permanente            | Cada slice `-next` tem issue de corte desde o nascimento; o sufixo torna o débito visível em qualquer `ls`.                                                                                                                                         |
 
 ---
 
@@ -497,7 +545,7 @@ consome — a dependência front/API precisa ficar visível no mesmo board.
 | ---------------------------- | ------ | ------------------ |
 | 0 — Fundação                 | SUC-4  | histórias criadas  |
 | 1 — Login e acesso           | SUC-5  | histórias criadas  |
-| 2 — Shell do evento          | SUC-6  | quebrar ao iniciar |
+| 2 — Shell do evento          | SUC-6  | histórias criadas  |
 | 3 — Visão geral e ocupação   | SUC-7  | quebrar ao iniciar |
 | 4 — Passageiros e importação | SUC-8  | quebrar ao iniciar |
 | 5 — Financeiro               | SUC-9  | quebrar ao iniciar |
@@ -507,12 +555,13 @@ consome — a dependência front/API precisa ficar visível no mesmo board.
 | 9 — Busca e notificações     | SUC-13 | quebrar ao iniciar |
 | 10 — Corte final             | SUC-14 | quebrar ao iniciar |
 
-As fatias 2 a 10 ganham histórias **no início da própria fatia**, não agora: o contrato de API de
+As fatias 3 a 10 ganham histórias **no início da própria fatia**, não agora: o contrato de API de
 cada uma muda o formato das histórias de front, e card escrito com seis meses de antecedência é card
-reescrito.
+reescrito. A Fatia 2 foi quebrada em 28/10/2026, do SUC-96 ao SUC-116, mais o SUC-118, aberto
+durante o SUC-105 (§5.1). A devolução de evento cancelado (SUC-100) foi para o épico da Fatia 5.
 
 Labels em uso: `redesign`, `fatia-N`, `frontend`, `backend`, `design-system`, `feature-flags`,
-`corte-legado`, `divida-temporaria`, `decisao`, `testes`, `documentacao`.
+`corte-legado`, `divida-temporaria`, `decisao`, `testes`, `documentacao`, `bug`.
 
 ---
 
