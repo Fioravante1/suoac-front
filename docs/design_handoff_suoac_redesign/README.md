@@ -17,7 +17,7 @@ Os arquivos `.dc.html` são **referências de design em HTML** — protótipos q
 Nunca usar "coordenador" sozinho: existe também o **coordenador do corpo de anciãos**. Sempre escrever **Coordenador do arranjo de ônibus no circuito** / **na congregação** (forma curta aceitável em espaços estreitos: "Coord. do arranjo").
 
 ## Navegação (sem menu lateral)
-Dashboard: largura mínima de design **1280px** (versão mobile do painel ainda não desenhada). Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
+Dashboard: desktop ≥ 1100px, tablet e celular na seção 10. Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
 
 ### Faixa fixa do evento (topo, fundo `--navy`)
 Altura 68px, padding horizontal 40px, texto branco. Da esquerda para a direita:
@@ -175,11 +175,50 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 
 ## Arquivos
 - `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
-- `SUOAC Navegacao.dc.html` — canvas de exploração da navegação do painel (barra de comando, dock flutuante e hub do evento). Não substitui o Dashboard.
 - `SUOAC Login.dc.html` — login, recuperação, nova senha e autocadastro do circuito.
 - `SUOAC Convite.dc.html` — cadastro do coordenador da congregação pelo link de convite.
+- `SUOAC Dashboard Mobile.dc.html` — dashboard para celular e tablet (ver seção 10).
+- `SUOAC Lacunas.dc.html` + `SUOAC Lacunas Vitrine.dc.html` — estados e papéis (seção 11).
+- `SUOAC Dashboard v3.dc.html` — **painel desktop (fonte da verdade)**, com rascunho, cancelado, sem evento, criar/editar evento e papéis da congregação integrados (seção 11).
 - `SUOAC Mobile.dc.html` — vitrine com as 19 telas em celular (390×844), agrupadas por fluxo.
 - `SUOAC Tablet.dc.html` — vitrine em tablet: 9 telas em retrato (820×1180) e 3 em paisagem (1180×820).
 - `support.js` — runtime necessário apenas para abrir os protótipos no navegador.
 - `assets/` — logos.
 - `screenshots/` — capturas de referência (tema escuro, reduzidas para caber na tela; alguns textos quebram linha só por causa da redução — o HTML é a referência final): visão geral, ocupação, passageiros, importar lista, financeiro, congregações, ônibus, listas e exportações, novo passageiro, login, cadastro do circuito, nova senha e aceite de convite (dados, senha, aceito).
+
+
+### 10. Dashboard em celular e tablet
+- **Celular (< 760px): app próprio** — `SUOAC Dashboard Mobile.dc.html` (largura máx. 440px). Não é o desktop comprimido.
+  - Navegação inferior fixa (vidro + blur): Início · Passageiros · **FAB central "+" (Cadastrar passageiro)** · Financeiro · Mais. Alvos ≥ 44px.
+  - Topo navy compacto (64px): nome do evento abre sheet de eventos; busca (tela cheia), notificações (sheet), avatar → aba Mais.
+  - **Início**: hero navy (dias 23/24/25, "Faltam 16 dias", stepper de 4 etapas com rótulo, Encerrar inscrições); KPIs 2×2 tocáveis; Ocupação com segmentado Sex/Sáb/Dom, número de lugares livres, chips Todos/Com vagas/Lotados e carrossel horizontal (scroll-snap) de ônibus com mapa de assentos deitado (12×4); Atenção; Top 5 de menor % pago.
+  - **Passageiros**: busca + chips sticky (status e congregação → sheet); linhas com avatar na cor do status, congregação, dias (SEX/SÁB/DOM), pílula de status e valor em aberto; toque abre sheet com viagens, pagamento e ações; menu ⋯ com Importar/Exportar.
+  - **Financeiro**: card navy (arrecadado, barra pago/parcial/pendente, Ver em aberto, Registrar), aviso de ritmo, segmentado Por congregação / Últimos pagamentos.
+  - **Mais**: card de conta (privilégio "Coordenador do arranjo de ônibus no circuito"), atalhos para Ônibus, Congregações, Listas (telas empilhadas com "‹ Mais" e ação no topo), tema escuro, alterar senha, sair.
+  - Todos os detalhes e ações abrem como **bottom sheets** (alça, fundo escurecido, máx. 86–92vh): passageiro, ônibus (mapa vertical + lista), congregação, registrar pagamento (valor grande, atalhos R$ 40/80/120, Pix/Dinheiro/Cartão), exportar lista (dia + formato PDF/Excel/WhatsApp), confirmar encerramento.
+  - **Cadastrar passageiro**: tela cheia; primeiro busca no histórico do circuito ("Usar" preenche), ou "Cadastrar como novo"; formulário com dias (mostrando lugares livres), pagamento Pendente/Parcial/Pago (Parcial abre campo de valor) e rodapé fixo com total + Cadastrar.
+  - Inputs 16px (sem zoom no iOS). Estados por hash: `#inicio #passageiros #financeiro #mais #congregacoes #onibus #listas #cadastrar #cadastrar-form #sheet-onibus #sheet-passageiro #sheet-congregacao`.
+- **Tablet (760–1099px)**: `SUOAC Dashboard Mobile.dc.html` (o mesmo app, layout próprio ≥ 760px via objeto `T`): navegação em pílula flutuante (máx. 560px, bottom 16px) com FAB; Início em grade (hero com áreas "date btn" / "steps", KPIs 4 colunas, Ocupação | Atenção + Ranking); **Passageiros em mestre-detalhe** (lista + ficha fixa 360px; toque troca a ficha); Financeiro em 2 colunas; Mais, Listas e Congregações em 2 colunas; Ônibus em 4 colunas; sheets viram **modais centrais** (540px, `popM`); Cadastrar e Busca viram modais grandes (620px, 90vh) com fundo escurecido.
+- Alternativa legada para tablet: `SUOAC Dashboard v3.dc.html` — mesmo dashboard do desktop, responsivo via objeto `R` em `renderVals()` (estado `vw`): colunas laterais descem, KPIs 2×2, abas roláveis, faixa do evento empilhada, palco com 3 ônibus, linhas de passageiros em 2 linhas (grid-template-areas), modais com largura máx. 100%. Acima de 1100px = desktop.
+
+
+### 11. Lacunas: estados e papéis (`SUOAC Lacunas.dc.html`)
+Arquivo único e responsivo (celular < 760, tablet < 1100, desktop ≥ 1100; estado `vw`, objeto `L`). Vitrine com as 10 telas nos 3 tamanhos: `SUOAC Lacunas Vitrine.dc.html`. Hashes entre parênteses.
+- **Circuito sem evento** (`#sem-evento`): card navy com "Nenhum evento em andamento", **Criar evento** e **Duplicar o último**; lista de eventos anteriores com "Duplicar" (copia datas, valor, ônibus e congregações); resumo do circuito (congregações, coordenadores ativos, convites pendentes). Topo mostra "Nenhum evento ativo" com ponto cinza.
+- **Criar / editar evento** (`#criar-evento`, `#editar-evento`): tipo (Assembleia de circuito / Congresso regional / Outro), nome, local; dias de viagem (cada dia com saída/retorno e nº de ônibus; adicionar/remover); valor por dia, prazo de inscrição e de pagamento; stepper de ônibus por dia e lugares por ônibus (padrão 46); toggles "Todas as congregações" e "Avisar coordenadores ao publicar". Coluna lateral (sticky no desktop, abaixo no tablet/celular) com **prévia** de como as congregações veem o evento + checklist "Pronto para publicar". Ações: Salvar rascunho / **Publicar e abrir inscrições** (no celular em barra fixa inferior). Editar adiciona **zona de risco** "Cancelar evento".
+- **Evento em rascunho** (`#rascunho`): pílula "Rascunho" no topo; card tracejado com progresso (3 de 5) e itens pendentes com ação (ex.: Ônibus → Adicionar); "Editar evento" / "Publicar"; nota: é possível publicar sem ônibus. Card "Ao publicar" explica o que acontece.
+- **Evento cancelado** (`#cancelado`): faixa `--crit-s` com data, autor e efeitos (inscrições e pagamentos bloqueados, congregações avisadas) + "Duplicar como novo"; KPIs (afetados, a devolver, já devolvido, congregações quitadas); **devoluções por congregação** com barra e status Devolvido / Em andamento / Pendente; exportar lista.
+- **Papéis da congregação**:
+  - **Coordenador do arranjo de ônibus na congregação** (`#congregacao`): escopo só da própria congregação ("Jardim Paulista · Cód. 31245" no topo). Hero navy com status das inscrições, **Finalizar lista** (envia ao circuito; vira "Reabrir lista") e Cadastrar passageiro; KPIs (inscritos por dia, % pago, em aberto, lugares livres no circuito); passageiros da congregação; prazos; equipe. Navegação: Visão geral · Passageiros · Pagamentos · Equipe.
+  - **Assistente** (`#assistente`): mesmo painel, "Finalizar lista" desabilitado com nota explicando que só o coordenador finaliza; sem aba Equipe.
+  - **Equipe** (`#equipe`, `#equipe-vazia`): card do coordenador (entrou por convite do circuito); assistente atual com "Remover acesso" ou formulário **Promover um assistente** (nome, e-mail, telefone — opcional); tabela de permissões Coordenador × Assistente (assistente não finaliza lista nem gerencia equipe; ninguém vê outras congregações).
+- **Ônibus · detalhe e edição** (`#onibus-detalhe`): planta 46 lugares (guia em `--info`), veículo e motorista (empresa, placa, motorista, telefone, ponto de embarque, saída), guia a bordo com troca, toggle de rastreamento no dia, Excluir ônibus / Lista de embarque / Salvar.
+
+- **Integração no painel desktop** (`SUOAC Dashboard v3.dc.html`, fonte da verdade para desktop): as lacunas vivem dentro do painel real, com a mesma faixa navy, abas, cards e modais.
+  - **Seletor de evento**: inclui eventos em *Rascunho* e *Cancelado*. Rascunho → pílula "Rascunho · só você vê", faixa sem timeline/abas, ações "Editar evento" / "Publicar e abrir inscrições" e painel com checklist (3 de 5) + "Ao publicar". Cancelado → pílula vermelha, ação "Duplicar como novo", faixa `--crit-s`, KPIs e devoluções por congregação.
+  - **Criar novo evento / Editar evento atual** (no mesmo menu): modal central 1040px (padrão do "Novo passageiro"): formulário à esquerda (tipo, nome, local, dias, valor e prazos, ônibus por dia, lugares, toggles) e painel navy à direita com prévia + checklist. Editar tem zona de risco "Cancelar evento". Salvar rascunho → evento vira rascunho; Publicar → evento aberto.
+  - **Circuito sem evento**: faixa só com o topo ("Nenhum evento ativo"), sem abas; card navy com Criar evento / Duplicar o último + eventos anteriores.
+  - **Papéis da congregação**: topo mostra "Jardim Paulista · Cód. 31245", avatar e menu com o usuário do papel (Ana Souza / Paulo Lima) e o privilégio correto. Abas: Visão geral · Passageiros (filtrado na congregação) · Equipe (só coordenador). Botão da faixa vira **Finalizar lista** (assistente: bloqueado com aviso). Visão geral com KPIs, passageiros, prazos e equipe; Equipe com promover/remover assistente e tabela de permissões.
+  - **Protótipo**: menu do avatar → "Ver o protótipo como" (Circuito · Coord. na congregação · Assistente · Circuito sem evento). Hashes: `#rascunho #cancelado #sem-evento #criar-evento #editar-evento #congregacao #assistente #equipe #equipe-vazia`. Estado: `role` (circ/coord/assist), `noEvent`, `evIdx` (1 rascunho, 3 cancelado), `evForm` (create/edit), `ef`, `finalized`, `hasAssist`.
+  - Ônibus · detalhe e edição segue apenas em `SUOAC Lacunas.dc.html` (`#onibus-detalhe`).
+- `SUOAC Lacunas.dc.html` continua como referência de tablet e celular dessas telas; na vitrine, as molduras de desktop já abrem o painel real.
