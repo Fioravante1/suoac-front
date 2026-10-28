@@ -13,6 +13,10 @@ paths:
   `suoac-swap` (troca de tela e de etapa: desliza da direita), `suoac-fade`, `suoac-modal-in`,
   `suoac-pop` (toast), `suoac-grow` (barras), `suoac-seat` (poltronas), `suoac-draw` (graficos),
   `suoac-shake` (erro) e `suoac-spin`.
+- No painel do celular e do tablet: `suoac-sheet-in` (sheet sobe da borda inferior),
+  `suoac-modal-centered-in` (modal central do tablet) e `suoac-modal-wide-in` (modal largo do
+  tablet). As tres partem de `translate(-50%)`, entao so servem a elemento centralizado assim — o
+  `ModalNext` de `shared/ui/modal-next` ja faz isso.
 - Duracao e curva vem dos tokens `--suoac-motion-*`. A curva padrao e
   `--suoac-motion-ease-standard`; qualquer outra precisa de motivo.
 - Listas entram escalonadas: 25ms por item (`--suoac-motion-stagger-step`), com teto de 400ms

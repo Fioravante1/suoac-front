@@ -1,0 +1,250 @@
+/*
+ * Camada do modal, renderizada em portal no <body>. Fica na escala de z-index do
+ * design system, abaixo dos toasts: um toast disparado com o modal aberto
+ * aparece por cima, como no desenho.
+ */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--suoac-z-modal);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--suoac-color-sheet-scrim);
+  animation-name: var(--suoac-animation-fade);
+  animation-duration: var(--suoac-motion-duration-base);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+/* No celular o modal largo ocupa a tela inteira: sem fundo escurecido. */
+.root[data-variant="wide"] .scrim {
+  display: none;
+}
+
+/*
+ * Celular, a base. As entradas do painel partem de `translate(-50%)`, entao o
+ * painel se centraliza na horizontal por `left` + `transform`.
+ */
+.panel {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--suoac-layout-compact-max-width);
+  overflow: hidden;
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  transform: translateX(-50%);
+  animation-duration: var(--suoac-motion-duration-medium);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+/* O foco vai ao painel so para o leitor de tela anunciar o titulo. */
+.panel:focus {
+  outline: none;
+}
+
+.sheet {
+  bottom: 0;
+  max-height: var(--modal-next-sheet-max-height, 92dvh);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: var(--suoac-radius-sheet) var(--suoac-radius-sheet) 0 0;
+  box-shadow: var(--suoac-shadow-sheet);
+  animation-name: var(--suoac-animation-sheet-in);
+}
+
+/* Celular e tablet pintam o modal largo com a cor da pagina, como no desenho. */
+.wide {
+  top: 0;
+  height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--suoac-color-background);
+  animation-name: var(--modal-next-enter, var(--suoac-animation-sheet-in));
+}
+
+/* Alca do sheet, nas medidas do desenho. Toque nela fecha, como no fundo. */
+.handle {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 10px 0 4px;
+  cursor: pointer;
+}
+
+.handleBar {
+  width: 40px;
+  height: 5px;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-border-strong);
+}
+
+.header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3) var(--suoac-space-5);
+}
+
+.title {
+  min-width: 0;
+  margin: 0;
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: var(--suoac-line-height-heading);
+  letter-spacing: -0.01em;
+  color: var(--suoac-color-text-primary);
+}
+
+.closeButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--suoac-button-height-sm);
+  height: var(--suoac-button-height-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--suoac-radius-md);
+  background: transparent;
+  color: var(--suoac-color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard),
+    color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.closeButton:hover {
+  background: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-primary);
+}
+
+.closeButton:focus-visible {
+  outline: none;
+  box-shadow: var(--suoac-shadow-focus-ring);
+}
+
+@media (pointer: coarse) {
+  .closeButton {
+    width: var(--suoac-button-height);
+    height: var(--suoac-button-height);
+  }
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--suoac-space-5) var(--suoac-space-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-4) var(--suoac-space-5);
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+/*
+ * Tablet: o sheet vira modal central de 540px, e o largo, modal de 620px com a
+ * altura da tela, de 5vh a 5vh.
+ */
+@media (min-width: 47.5rem) {
+  .root[data-variant="wide"] .scrim {
+    display: block;
+  }
+
+  .sheet,
+  .wide {
+    width: calc(100% - 2 * var(--suoac-space-6));
+    padding-bottom: 0;
+    border-radius: var(--suoac-radius-sheet);
+  }
+
+  .sheet {
+    top: 50%;
+    bottom: auto;
+    max-width: 540px;
+    max-height: 84vh;
+    transform: translate(-50%, -50%);
+    animation-name: var(--suoac-animation-modal-centered-in);
+  }
+
+  .wide {
+    top: 5vh;
+    bottom: 5vh;
+    height: auto;
+    max-width: 620px;
+    box-shadow: var(--suoac-shadow-modal-wide);
+    animation-name: var(--suoac-animation-modal-wide-in);
+  }
+
+  .handle {
+    display: none;
+  }
+
+  .header {
+    padding: var(--suoac-space-6) var(--suoac-space-6) var(--suoac-space-4);
+  }
+
+  .body {
+    padding: 0 var(--suoac-space-6) var(--suoac-space-6);
+  }
+
+  .footer {
+    padding: var(--suoac-space-4) var(--suoac-space-6);
+  }
+}
+
+/*
+ * Desktop do painel: o modal do `v3`. Cresce com o conteudo e quem rola e o
+ * fundo, com o modal centralizado por `margin: auto` enquanto couber na tela. Sem
+ * `transform`, porque a entrada dele (`suoac-modal-in`) sobe de baixo, sem partir
+ * de translate(-50%).
+ */
+@media (min-width: 80rem) {
+  .root {
+    display: flex;
+    padding: var(--suoac-space-6);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .scrim {
+    position: fixed;
+    background: var(--suoac-color-modal-scrim);
+    backdrop-filter: blur(var(--suoac-overlay-blur));
+  }
+
+  .sheet,
+  .wide {
+    position: relative;
+    inset: auto;
+    flex-shrink: 0;
+    width: var(--modal-next-width, 540px);
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    margin: auto;
+    background: var(--suoac-color-surface);
+    border-radius: var(--modal-next-radius, var(--suoac-radius-modal));
+    box-shadow: var(--suoac-shadow-modal);
+    transform: none;
+    animation-name: var(--suoac-animation-modal-in);
+  }
+
+  .body {
+    flex: none;
+    overflow-y: visible;
+  }
+}

@@ -20,13 +20,17 @@ import { themeTokens } from "./theme-tokens";
  * `globals.css` continua sendo o que o handoff pediu.
  */
 const globals = loadCss("app/globals.css");
-const dashboardPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard.dc.html");
+// O painel desktop e o `v3` desde 28/10/2026 (SUC-103); o `SUOAC Dashboard.dc.html`
+// dessa exportacao e o canvas de exploracao da navegacao, sem as animacoes.
+const dashboardPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard v3.dc.html");
 const loginPrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Login.dc.html");
+const dashboardMobilePrototype = loadCss("docs/design_handoff_suoac_redesign/SUOAC Dashboard Mobile.dc.html");
 
 const ourKeyframes = extractKeyframes(globals);
 const prototypeKeyframes = {
   dashboard: extractKeyframes(dashboardPrototype),
   login: extractKeyframes(loginPrototype),
+  dashboardMobile: extractKeyframes(dashboardMobilePrototype),
 };
 
 type PrototypeName = keyof typeof prototypeKeyframes;
@@ -45,6 +49,9 @@ const KEYFRAMES_FROM_HANDOFF: ReadonlyArray<[string, string, PrototypeName]> = [
   ["suoac-swap", "swap", "login"],
   ["suoac-fade", "fade", "dashboard"],
   ["suoac-modal-in", "popC2", "dashboard"],
+  ["suoac-sheet-in", "sheet", "dashboardMobile"],
+  ["suoac-modal-centered-in", "popM", "dashboardMobile"],
+  ["suoac-modal-wide-in", "popX", "dashboardMobile"],
   ["suoac-pop", "pop", "dashboard"],
   ["suoac-grow", "grow", "dashboard"],
   ["suoac-seat", "seat", "dashboard"],

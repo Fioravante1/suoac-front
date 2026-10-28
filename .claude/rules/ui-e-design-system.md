@@ -37,6 +37,11 @@ Principios obrigatorios:
     celular abaixo de 760px (`47.5rem`), tablet retrato de 760px a 1023px e, de 1024px (`64rem`)
     em diante, o layout dividido de desktop e tablet paisagem. Acima de 1200px (`75rem`) o
     espacamento volta ao tamanho cheio.
+  - **O painel (area logada, Fatia 2) corta o desktop em outro lugar**: layout de tablet ate
+    1279px e de desktop a partir de 1280px (`80rem`, `--suoac-breakpoint-panel-desktop`).
+    Decisao do usuario em 28/10/2026 (SUC-6): o README do handoff diz 1100px, mas o desktop do
+    `v3` exige 1280px de largura minima, e cortar antes criaria rolagem horizontal. As telas de
+    acesso continuam cortando em 1024px, e `breakpoints.test.ts` confere cada area com os seus.
   - **Mobile-first no CSS**: o estilo base e o do celular, e `@media (min-width: ...)` acrescenta
     o tablet e o desktop. `@media` nao le `var()`, entao o CSS Module escreve o valor do token;
     `src/app/styles/breakpoints.test.ts` falha se um corte nao for um dos declarados.

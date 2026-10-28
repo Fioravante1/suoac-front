@@ -19,6 +19,8 @@ export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
 export { hardNavigate, isRedirectRejection } from "./navigation";
 export { calcPercentage } from "./number";
+export { containTabKey, getFocusedElement, lockDocumentScroll, registerLayer, useIsClient, useModal } from "./overlay";
+export type { Layer } from "./overlay";
 export {
   PHONE_MASK_MAX_LENGTH,
   formatPhone,
@@ -39,7 +41,6 @@ export {
 } from "./password-policy";
 export { getFirstName, getInitials, getGreetingByTime, pluralize, uppercaseInput } from "./string";
 export { useDebouncedValue } from "./use-debounced-value";
-export { useModal } from "./use-modal";
 export { usePagination } from "./use-pagination";
 export { usePasswordTruncationNotice } from "./use-password-truncation-notice";
 export { useServerError } from "./use-server-error";

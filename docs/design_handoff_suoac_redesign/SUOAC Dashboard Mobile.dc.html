@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e4e9e7;font-family:Geist,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+a{color:#1f6e5a;text-decoration:none}a:hover{color:#174e40}
+button,input,select{font-family:inherit}
+*::-webkit-scrollbar{display:none}
+[data-art]{--bg:#f7f9f8;--surface:#fff;--muted:#f1f5f3;--border:#e3e8e6;--border2:#cfd8d4;--text:#1e1f24;--text2:#667085;--primary:#1f6e5a;--primary-d:#174e40;--primary-s:#e6f4ef;--navy:#0d2b45;--succ:#2e9e5b;--succ-s:#e7f6ee;--attn:#f5b700;--attn-t:#8a6d00;--attn-s:#fff4cf;--crit:#d64545;--crit-s:#fdecec;--info:#2f6fed;--info-s:#e8f0ff;--shadow:0 1px 2px rgb(16 24 40/.04),0 8px 24px rgb(31 110 90/.06);--glass:rgb(255 255 255/.86);--on-primary:#fff}
+[data-art][data-theme="dark"]{--bg:#0e1413;--surface:#151d1b;--muted:#1c2623;--border:#25312e;--border2:#34433f;--text:#e9efed;--text2:#9aa8a3;--primary:#4fb393;--primary-d:#7fcfb4;--primary-s:#183229;--navy:#0a1a29;--succ:#4cc07c;--succ-s:#163121;--attn:#f2c14b;--attn-t:#f2c14b;--attn-s:#342b10;--crit:#f07272;--crit-s:#3a1d1d;--info:#82a9ff;--info-s:#18233d;--shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.25);--glass:rgb(21 29 27/.86);--on-primary:#0e1413}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes fade{from{opacity:0}}
+@keyframes sheet{from{transform:translate(-50%,100%)}}
+@keyframes popM{from{opacity:0;transform:translate(-50%,-47%) scale(.97)}}
+@keyframes popX{from{opacity:0;transform:translate(-50%,14px) scale(.98)}}
+@keyframes push{from{opacity:0;transform:translateX(28px)}}
+@keyframes toast{from{opacity:0;transform:translate(-50%,12px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgb(79 179 147/.55)}70%{box-shadow:0 0 0 10px rgb(79 179 147/0)}100%{box-shadow:0 0 0 0 rgb(79 179 147/0)}}
+</style>
+</helmet>
+<div data-art="1" data-theme="{{ theme }}" data-screen-label="Painel mobile" style="position:relative;max-width:{{ T.maxW }};margin:0 auto;min-height:100vh;background:var(--bg);color:var(--text);font-family:Geist,sans-serif;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:{{ T.hdrPad }};display:flex;align-items:center;gap:6px">
+<button onClick="{{ openEvents }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:4px 0;border:0;background:transparent;color:#fff;text-align:left;cursor:pointer">
+<span style="font:500 12px Geist;color:rgb(255 255 255/.6)">Circuito SP-17</span>
+<span style="display:flex;align-items:center;gap:6px;max-width:100%;font:600 16px Geist"><span style="width:7px;height:7px;border-radius:50%;background:#4fb393;flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assembleia de Circuito</span><svg style="flex-shrink:0;opacity:.7" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg></span>
+</button>
+<button onClick="{{ openSearch }}" aria-label="Buscar" style="width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+<button onClick="{{ openNotifs }}" aria-label="Notificações" style="position:relative;width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:#f07272;border:2px solid var(--navy)"></span></sc-if></button>
+<button onClick="{{ goMore }}" aria-label="Conta" style="width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;padding:0"><span style="width:34px;height:34px;border-radius:50%;background:#e6f4ef;color:#174e40;display:grid;place-items:center;font:600 13px Geist">MO</span></button>
+</header>
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<section style="background:var(--navy);color:#fff;padding:{{ T.heroPad }};display:grid;grid-template-columns:{{ T.heroCols }};grid-template-areas:{{ T.heroAreas }};align-items:center;gap:18px {{ T.heroGapX }}">
+<div style="grid-area:date;display:flex;align-items:center;gap:14px">
+<div style="display:flex;gap:5px">
+<sc-for list="{{ dayTiles }}" as="d" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:44px;height:52px;border-radius:12px;background:rgb(255 255 255/.08)"><span style="font:600 10px Geist;text-transform:uppercase;letter-spacing:.06em;opacity:.7">{{ d.wd }}</span><span style="font:600 19px/1.1 Geist;font-variant-numeric:tabular-nums">{{ d.dd }}</span></span></sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 20px/1.15 Geist;letter-spacing:-0.01em">Faltam 16 dias</span><span style="font:400 13px Geist;color:rgb(255 255 255/.6)">Salão de Assembleias · Campinas</span></div>
+</div>
+<div style="grid-area:steps;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:relative">
+<span style="position:absolute;left:12.5%;right:12.5%;top:10px;height:2px;background:rgb(255 255 255/.14)"></span>
+<span style="position:absolute;left:12.5%;width:{{ tlFill }};top:10px;height:2px;background:#4fb393;transform-origin:left;animation:grow 1s .2s cubic-bezier(.2,.8,.2,1) both"></span>
+<sc-for list="{{ steps }}" as="t" hint-placeholder-count="4">
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+<span style="width:22px;height:22px;box-sizing:border-box;border-radius:50%;border:2px solid {{ t.ring }};background:var(--navy);display:grid;place-items:center;animation:{{ t.anim }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ t.dot }}"></span></span>
+<span style="display:flex;flex-direction:column;gap:1px;line-height:1.25"><span style="font:{{ t.weight }} 12px Geist;color:{{ t.fg }}">{{ t.label }}</span><span style="font:400 11px Geist;color:{{ t.subFg }}">{{ t.sub }}</span></span>
+</div>
+</sc-for>
+</div>
+<div style="grid-area:btn;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+<button onClick="{{ askClose }}" style="height:44px;border:1px solid rgb(255 255 255/.22);border-radius:12px;background:transparent;color:#fff;font:500 14px Geist;cursor:pointer">{{ closeLabel }}</button>
+<button onClick="{{ goPax }}" style="height:44px;border:0;border-radius:12px;background:rgb(255 255 255/.1);color:#fff;font:500 14px Geist;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">Ver inscritos<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+</section>
+
+<main style="display:grid;grid-template-columns:{{ T.homeCols }};grid-template-rows:{{ T.homeRows }};grid-template-areas:{{ T.homeAreas }};align-items:start;gap:{{ T.gap }};padding:{{ T.mainT }} {{ T.px }} 120px">
+<div style="grid-area:kpi;display:grid;grid-template-columns:{{ T.kpiCols }};gap:10px">
+<sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+<button onClick="{{ k.onClick }}" style="display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:var(--shadow);color:var(--text);text-align:left;cursor:pointer;min-width:0;animation:rise .4s ease both">
+<span style="font:500 12px Geist;color:var(--text2)">{{ k.label }}</span>
+<span style="font:600 24px/1 Geist;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:{{ k.fg }}">{{ k.value }}</span>
+<span style="font:400 12px/1.3 Geist;color:var(--text2)">{{ k.sub }}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="grid-area:occ;min-width:0;display:flex;flex-direction:column;gap:14px;padding:16px 0 16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow);animation:rise .4s .05s ease both">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 16px"><span style="font:600 16px Geist">Ocupação dos ônibus</span><button onClick="{{ goBuses }}" style="height:32px;padding:0 4px;border:0;background:transparent;color:var(--primary);font:500 13px Geist;cursor:pointer">Ver todos</button></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0 16px;padding:4px;border-radius:14px;background:var(--muted)">
+<sc-for list="{{ daySeg }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0;border:0;border-radius:10px;background:{{ d.bg }};box-shadow:{{ d.sh }};color:var(--text);cursor:pointer;transition:all .2s"><span style="font:600 13px Geist">{{ d.name }}</span><span style="font:500 11px Geist;color:{{ d.pFg }};font-variant-numeric:tabular-nums">{{ d.pct }}</span></button></sc-for>
+</div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 40px/1 Geist;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;color:{{ day.freeFg }}">{{ day.free }}</span><span style="font:500 14px Geist">lugares livres</span></div>
+<span style="font:400 13px/1.4 Geist;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums">{{ day.n }} de {{ day.cap }}<br>{{ day.nBus }} ônibus</span>
+</div>
+<div style="margin:0 16px;height:8px;border-radius:999px;background:var(--muted);overflow:hidden"><div style="width:{{ day.pct }};height:100%;border-radius:999px;background:{{ day.fill }};transition:width .5s cubic-bezier(.2,.8,.2,1)"></div></div>
+<div style="display:flex;gap:8px;overflow-x:auto;padding:0 16px;scrollbar-width:none">
+<sc-for list="{{ busFilters }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.onClick }}" style="flex-shrink:0;height:32px;padding:0 12px;border:1px solid {{ f.bd }};border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font:500 13px Geist;cursor:pointer;white-space:nowrap">{{ f.label }} <span style="opacity:.65;font-variant-numeric:tabular-nums">{{ f.n }}</span></button></sc-for>
+</div>
+<div style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 16px 4px;scroll-padding:16px;scrollbar-width:none">
+<sc-for list="{{ homeBuses }}" as="b" hint-placeholder-count="4">
+<button onClick="{{ b.open }}" style="flex-shrink:0;scroll-snap-align:start;width:168px;display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--bg);color:var(--text);text-align:left;cursor:pointer">
+<span style="display:flex;justify-content:space-between;align-items:baseline;width:100%"><span style="font:600 14px Geist">Ônibus {{ b.i }}</span><span style="font:600 12px Geist;color:{{ b.fg }};font-variant-numeric:tabular-nums">{{ b.n }}/46</span></span>
+<span style="position:relative;display:flex;flex-direction:column;gap:5px;padding:8px 8px 8px 14px;border-radius:12px 6px 6px 12px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--border2)">
+<span style="position:absolute;left:4px;top:8px;bottom:8px;width:4px;border-radius:2px;background:var(--info-s);box-shadow:inset 0 0 0 1px var(--border2)"></span>
+<span style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px"><sc-for list="{{ b.top }}" as="c" hint-placeholder-count="24"><span style="aspect-ratio:1;border-radius:2px;background:{{ c.bg }};box-shadow:inset 0 0 0 1px {{ c.bd }}"></span></sc-for></span>
+<span style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px"><sc-for list="{{ b.bot }}" as="c" hint-placeholder-count="24"><span style="aspect-ratio:1;border-radius:2px;background:{{ c.bg }};box-shadow:inset 0 0 0 1px {{ c.bd }}"></span></sc-for></span>
+</span>
+<span style="font:500 12px Geist;color:{{ b.fg }}">{{ b.tag }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="grid-area:att;min-width:0;display:flex;flex-direction:column;gap:4px;padding:16px 10px 8px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow);animation:rise .4s .1s ease both">
+<div style="display:flex;align-items:center;gap:8px;padding:0 6px 6px"><span style="font:600 16px Geist">Precisa da sua atenção</span><span style="font:600 12px Geist;padding:2px 8px;border-radius:999px;background:var(--crit-s);color:var(--crit)">3</span></div>
+<sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+<div style="display:flex;gap:12px;padding:10px 6px">
+<span style="width:34px;height:34px;border-radius:10px;background:{{ a.bg }};color:{{ a.fg }};display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"></path><path d="M12 9v4M12 17h.01"></path></svg></span>
+<div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font:500 14px/1.35 Geist">{{ a.title }}</span><span style="font:400 13px/1.4 Geist;color:var(--text2)">{{ a.desc }}</span>
+<button onClick="{{ a.onClick }}" style="align-self:flex-start;margin-top:6px;height:34px;padding:0 14px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);color:var(--text);font:500 13px Geist;cursor:pointer">{{ a.action }}</button></div>
+</div>
+</sc-for>
+</div>
+
+<div style="grid-area:rank;min-width:0;display:flex;flex-direction:column;gap:2px;padding:16px 10px 8px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow);animation:rise .4s .15s ease both">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 6px 6px"><span style="font:600 16px Geist">Pagamento por congregação</span><button onClick="{{ goCongs }}" style="height:32px;padding:0 4px;border:0;background:transparent;color:var(--primary);font:500 13px Geist;cursor:pointer">Ver as 20</button></div>
+<sc-for list="{{ rank5 }}" as="c" hint-placeholder-count="5">
+<button onClick="{{ c.open }}" style="display:grid;grid-template-columns:20px minmax(0,1fr) 44px;gap:10px;align-items:center;padding:10px 6px;border:0;border-radius:12px;background:transparent;color:var(--text);text-align:left;cursor:pointer">
+<span style="font:600 13px Geist;color:var(--text2);font-variant-numeric:tabular-nums">{{ c.rank }}</span>
+<span style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font:500 14px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span><span style="height:5px;border-radius:999px;background:var(--muted);overflow:hidden"><span style="display:block;width:{{ c.pctStr }};height:100%;border-radius:999px;background:{{ c.c }};transform-origin:left;animation:grow .9s .2s ease both"></span></span></span>
+<span style="font:600 13px Geist;text-align:right;font-variant-numeric:tabular-nums;color:{{ c.c }}">{{ c.pctStr }}</span>
+</button>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isPax }}" hint-placeholder-val="{{ false }}">
+<main style="display:grid;grid-template-columns:{{ T.paxCols }};grid-template-areas:{{ T.paxAreas }};column-gap:8px;align-items:start;padding:18px {{ T.paxPx }} 120px;animation:fade .25s ease both">
+<div style="grid-area:hdr;min-width:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:0 16px 14px">
+<div style="display:flex;flex-direction:column;gap:2px;min-width:0"><h1 style="margin:0;font:600 28px/1.1 Geist;letter-spacing:-0.025em">Passageiros</h1><span style="font:400 13px Geist;color:var(--text2)">912 inscritos · 214 com valor em aberto</span></div>
+<button onClick="{{ openPaxMenu }}" aria-label="Mais ações" style="width:44px;height:44px;flex-shrink:0;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);display:grid;place-items:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+</div>
+<div style="grid-area:srch;min-width:0;position:sticky;top:64px;z-index:10;display:flex;flex-direction:column;gap:10px;padding:10px 0 12px;background:var(--bg)">
+<label style="display:flex;align-items:center;gap:8px;height:44px;margin:0 16px;padding:0 14px;border:1px solid var(--border2);border-radius:12px;background:var(--surface)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input value="{{ pq }}" onChange="{{ onPq }}" placeholder="Buscar por nome ou RG" style="flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none"></label>
+<div style="display:flex;gap:8px;overflow-x:auto;padding:0 16px;scrollbar-width:none">
+<sc-for list="{{ payChips }}" as="f" hint-placeholder-count="4"><button onClick="{{ f.onClick }}" style="flex-shrink:0;display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid {{ f.bd }};border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font:500 13px Geist;cursor:pointer;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:{{ f.dot }};display:{{ f.dotD }}"></span>{{ f.label }}<span style="opacity:.65;font-variant-numeric:tabular-nums">{{ f.n }}</span></button></sc-for>
+<span style="flex-shrink:0;width:1px;margin:6px 2px;background:var(--border2)"></span>
+<button onClick="{{ openCongPick }}" style="flex-shrink:0;display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid {{ congChip.bd }};border-radius:999px;background:{{ congChip.bg }};color:{{ congChip.fg }};font:500 13px Geist;cursor:pointer;white-space:nowrap">{{ congChip.label }}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+</div>
+<div style="grid-area:cnt;display:flex;justify-content:space-between;align-items:center;padding:4px 16px 8px"><span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">{{ paxCount }}</span><button onClick="{{ toggleSort }}" style="height:32px;border:0;background:transparent;color:var(--text2);font:500 13px Geist;cursor:pointer;display:flex;align-items:center;gap:4px">{{ sortLabel }}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"></path></svg></button></div>
+<div style="grid-area:list;min-width:0;display:flex;flex-direction:column;margin:0 12px;border:1px solid var(--border);border-radius:18px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ paxRows }}" as="r" hint-placeholder-count="10">
+<button onClick="{{ r.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;border-top:{{ r.bt }};background:{{ r.bg }};transition:background .2s;color:var(--text);text-align:left;cursor:pointer;min-width:0">
+<span style="width:40px;height:40px;border-radius:50%;background:{{ r.avBg }};color:{{ r.avFg }};display:grid;place-items:center;font:600 14px Geist;flex-shrink:0">{{ r.ini }}</span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+<span style="font:500 15px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span>
+<span style="font:400 13px Geist;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.cong }}</span>
+<span style="display:flex;gap:4px;padding-top:2px"><sc-for list="{{ r.days }}" as="d" hint-placeholder-count="3"><span style="height:18px;padding:0 6px;border-radius:5px;background:{{ d.bg }};color:{{ d.fg }};font:600 10px/18px Geist;text-transform:uppercase;letter-spacing:.04em">{{ d.l }}</span></sc-for></span>
+</span>
+<span style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><span style="padding:3px 9px;border-radius:999px;font:500 12px Geist;background:{{ r.sBg }};color:{{ r.sFg }}">{{ r.status }}</span><span style="font:500 12px Geist;color:var(--text2);font-variant-numeric:tabular-nums">{{ r.payTxt }}</span></span>
+</button>
+</sc-for>
+<sc-if value="{{ paxEmpty }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:40px 20px;text-align:center"><span style="font:600 15px Geist">Nenhum passageiro encontrado</span><span style="font:400 13px Geist;color:var(--text2)">Ajuste a busca ou os filtros</span></div></sc-if>
+</div>
+<button onClick="{{ moreToast }}" style="grid-area:more;margin:14px 16px 0;height:44px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Carregar mais</button>
+<aside style="grid-area:pane;display:{{ T.paneD }};position:sticky;top:84px;margin:6px 12px 0 4px;padding:20px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow);animation:fade .25s ease both">
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:center;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:{{ sp.avBg }};color:{{ sp.avFg }};display:grid;place-items:center;font:600 18px Geist;flex-shrink:0">{{ sp.ini }}</span><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 19px Geist;letter-spacing:-0.01em">{{ sp.name }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ sp.cong }} · RG {{ sp.rg }}</span></span></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Viagens</span>
+<sc-for list="{{ sp.legs }}" as="l" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:1px solid var(--border);opacity:{{ l.op }}">
+<span style="width:44px;height:44px;border-radius:11px;background:{{ l.bg }};color:{{ l.fg }};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;flex-shrink:0"><span style="font:600 10px Geist;text-transform:uppercase;letter-spacing:.05em">{{ l.wd }}</span><span style="font:600 17px Geist">{{ l.dd }}</span></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 14px Geist">{{ l.title }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ l.sub }}</span></span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:var(--muted)">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 20px Geist;font-variant-numeric:tabular-nums">{{ sp.paid }}</span><span style="font:400 13px Geist;color:var(--text2)">de {{ sp.total }} · <span style="color:{{ sp.sFg }};font-weight:500">{{ sp.status }}</span></span></div>
+<div style="height:6px;border-radius:999px;background:var(--border);overflow:hidden"><div style="width:{{ sp.w }};height:100%;border-radius:999px;background:{{ sp.bar }};transform-origin:left;animation:grow .8s cubic-bezier(.2,.8,.2,1) both"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-if value="{{ sp.canPay }}" hint-placeholder-val="{{ true }}"><button onClick="{{ openPay }}" style="height:50px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 15px Geist;cursor:pointer">Registrar pagamento</button></sc-if>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px">
+<button onClick="{{ toastEdit }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Editar dados</button>
+<button onClick="{{ toastSeat }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Trocar poltrona</button>
+</div>
+<button onClick="{{ toastRemove }}" style="height:46px;border:0;border-radius:14px;background:transparent;color:var(--crit);font:500 14px Geist;cursor:pointer">Remover inscrição</button>
+</div>
+</div>
+</aside>
+</main>
+</sc-if>
+
+<sc-if value="{{ isFin }}" hint-placeholder-val="{{ false }}">
+<main style="display:grid;grid-template-columns:{{ T.finCols }};grid-template-rows:{{ T.finRows }};grid-template-areas:{{ T.finAreas }};align-items:start;gap:14px {{ T.gap }};padding:18px {{ T.px }} 120px;animation:fade .25s ease both">
+<div style="grid-area:ttl;display:flex;flex-direction:column;gap:2px;padding:0 2px"><h1 style="margin:0;font:600 28px/1.1 Geist;letter-spacing:-0.025em">Financeiro</h1><span style="font:400 13px Geist;color:var(--text2)">R$ 40 por dia · prazo 19/10</span></div>
+<div style="grid-area:hero;display:flex;flex-direction:column;gap:14px;padding:18px 16px;border-radius:20px;background:var(--navy);color:#fff">
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font:500 13px Geist;color:rgb(255 255 255/.65)">Arrecadado</span><span style="font:600 36px/1 Geist;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">R$ 58.320</span><span style="font:400 13px Geist;color:rgb(255 255 255/.65)">de R$ 89.400 esperados · 65%</span></div>
+<div style="display:flex;height:10px;gap:3px">
+<span style="flex:58;border-radius:4px;background:#4fb393;transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both"></span><span style="flex:9;border-radius:4px;background:#f2c14b"></span><span style="flex:33;border-radius:4px;background:rgb(255 255 255/.18)"></span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<span style="display:flex;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:6px;font:500 12px Geist;color:rgb(255 255 255/.65)"><span style="width:7px;height:7px;border-radius:50%;background:#4fb393"></span>Pagos</span><span style="font:600 16px Geist;font-variant-numeric:tabular-nums">698</span></span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:6px;font:500 12px Geist;color:rgb(255 255 255/.65)"><span style="width:7px;height:7px;border-radius:50%;background:#f2c14b"></span>Parciais</span><span style="font:600 16px Geist;font-variant-numeric:tabular-nums">86</span></span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:6px;font:500 12px Geist;color:rgb(255 255 255/.65)"><span style="width:7px;height:7px;border-radius:50%;background:rgb(255 255 255/.4)"></span>Pendentes</span><span style="font:600 16px Geist;font-variant-numeric:tabular-nums">128</span></span>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding-top:2px">
+<button onClick="{{ seeOpen }}" style="height:44px;border:1px solid rgb(255 255 255/.22);border-radius:12px;background:transparent;color:#fff;font:500 14px Geist;cursor:pointer">Ver em aberto</button>
+<button onClick="{{ openPay }}" style="height:44px;border:0;border-radius:12px;background:#e6f4ef;color:#174e40;font:600 14px Geist;cursor:pointer">Registrar</button>
+</div>
+</div>
+<div style="grid-area:ritmo;display:flex;gap:12px;padding:14px;border-radius:16px;background:var(--attn-s);color:var(--attn-t)">
+<svg style="flex-shrink:0;margin-top:1px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+<span style="font:500 13px/1.45 Geist">No ritmo atual, faltarão cerca de R$ 9.800 em 19/10. Vale lembrar as congregações com mais valor em aberto.</span>
+</div>
+<div style="grid-area:seg;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--muted)">
+<sc-for list="{{ finSeg }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="height:36px;border:0;border-radius:10px;background:{{ o.bg }};box-shadow:{{ o.sh }};color:var(--text);font:500 13px Geist;cursor:pointer">{{ o.label }}</button></sc-for>
+</div>
+<sc-if value="{{ finByCong }}" hint-placeholder-val="{{ true }}">
+<div style="grid-area:list;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:18px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ finCongs }}" as="c" hint-placeholder-count="8">
+<button onClick="{{ c.tap }}" style="display:flex;flex-direction:column;gap:8px;padding:13px 14px;border:0;border-top:{{ c.bt }};background:transparent;color:var(--text);text-align:left;cursor:pointer">
+<span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%"><span style="font:500 15px Geist;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span><span style="font:600 14px Geist;color:{{ c.c }};font-variant-numeric:tabular-nums;flex-shrink:0">{{ c.pctStr }}</span></span>
+<span style="display:flex;height:6px;width:100%;border-radius:999px;background:var(--muted);overflow:hidden"><span style="width:{{ c.pctStr }};background:{{ c.c }};transform-origin:left;animation:grow .9s .15s ease both"></span></span>
+<span style="display:flex;justify-content:space-between;width:100%;font:400 12px Geist;color:var(--text2);font-variant-numeric:tabular-nums"><span>{{ c.n }} passageiros · {{ c.rec }} recebidos</span><span style="color:var(--crit);font-weight:500">{{ c.open }}</span></span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ finFeed }}" hint-placeholder-val="{{ false }}">
+<div style="grid-area:list;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:18px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ feed }}" as="f" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:{{ f.bt }}">
+<span style="width:38px;height:38px;border-radius:11px;background:{{ f.bg }};color:{{ f.fg }};display:grid;place-items:center;font:600 11px Geist;flex-shrink:0">{{ f.glyph }}</span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 14px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.name }}</span><span style="font:400 12px Geist;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.sub }}</span></span>
+<span style="font:600 14px Geist;color:var(--succ);font-variant-numeric:tabular-nums;flex-shrink:0">{{ f.v }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</main>
+</sc-if>
+
+<sc-if value="{{ isMore }}" hint-placeholder-val="{{ false }}">
+<main style="display:grid;grid-template-columns:{{ T.cols2 }};align-items:start;gap:18px {{ T.gap }};padding:18px {{ T.px }} 120px;animation:fade .25s ease both">
+<div style="display:flex;flex-direction:column;gap:14px;padding:18px 16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow)">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:52px;height:52px;border-radius:50%;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;font:600 18px Geist;flex-shrink:0">MO</span><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 17px Geist">Marcos Oliveira</span><span style="font:400 13px Geist;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">marcos.oliveira@gmail.com</span></span></div>
+<span style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:12px;background:var(--primary-s);color:var(--primary);font:600 13px/1.4 Geist"><svg style="flex-shrink:0;margin-top:1px" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>Coordenador do arranjo de ônibus no circuito</span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font:600 14px Geist">Circuito SP-17</span><span style="font:400 13px Geist;color:var(--text2)">20 congregações · assistente: Paulo Santos</span></span>
+</div>
+<sc-for list="{{ moreGroups }}" as="g" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="padding:0 4px;font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">{{ g.title }}</span>
+<div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:18px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ g.items }}" as="i" hint-placeholder-count="3">
+<button onClick="{{ i.onClick }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 14px;border:0;border-top:{{ i.bt }};background:transparent;color:{{ i.fg }};text-align:left;cursor:pointer">
+<span style="width:34px;height:34px;border-radius:10px;background:{{ i.icBg }};color:{{ i.icFg }};display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ i.icon }}"></path></svg></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:500 15px Geist">{{ i.label }}</span><span style="font:400 12px Geist;color:var(--text2);display:{{ i.subD }}">{{ i.sub }}</span></span>
+<span style="display:{{ i.chevD }};color:var(--text2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"></path></svg></span>
+<span style="display:{{ i.togD }};width:44px;height:26px;border-radius:999px;background:{{ toggleBg }};position:relative;flex-shrink:0;transition:background .2s"><span style="position:absolute;top:3px;left:{{ toggleX }};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgb(0 0 0/.2);transition:left .2s"></span></span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</main>
+</sc-if>
+
+<sc-if value="{{ isSub }}" hint-placeholder-val="{{ false }}">
+<div style="position:sticky;top:64px;z-index:10;display:flex;align-items:center;gap:4px;height:48px;padding:0 6px;background:var(--glass);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)">
+<button onClick="{{ back }}" style="display:flex;align-items:center;gap:2px;height:44px;padding:0 8px;border:0;background:transparent;color:var(--primary);font:500 15px Geist;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Mais</button>
+<span style="flex:1"></span>
+<button onClick="{{ subAction.onClick }}" style="height:36px;padding:0 12px;margin-right:4px;border:0;border-radius:10px;background:var(--primary-s);color:var(--primary);font:600 13px Geist;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>{{ subAction.label }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCongs }}" hint-placeholder-val="{{ false }}">
+<main style="display:flex;flex-direction:column;gap:14px;padding:16px {{ T.px }} 120px;animation:push .3s cubic-bezier(.2,.8,.2,1) both">
+<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><h1 style="margin:0;font:600 28px/1.1 Geist;letter-spacing:-0.025em">Congregações</h1><span style="font:400 13px Geist;color:var(--text2)">20 no circuito · 912 passageiros</span></div>
+<div style="display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow)">
+<span style="display:flex;align-items:baseline;gap:6px"><span style="font:600 30px/1 Geist;letter-spacing:-0.02em">8</span><span style="font:400 14px Geist;color:var(--text2)">de 20 listas finalizadas</span></span>
+<div style="display:flex;gap:3px;height:10px"><sc-for list="{{ congSegs }}" as="t" hint-placeholder-count="20"><span style="flex:1;border-radius:3px;background:{{ t.c }}"></span></sc-for></div>
+<button onClick="{{ remindAll }}" style="height:44px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer;opacity:{{ remindOp }}">{{ remindLabel }}</button>
+</div>
+<div style="display:flex;gap:8px;overflow-x:auto;margin:0 -14px;padding:0 14px;scrollbar-width:none">
+<sc-for list="{{ congChips }}" as="f" hint-placeholder-count="4"><button onClick="{{ f.onClick }}" style="flex-shrink:0;display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid {{ f.bd }};border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font:500 13px Geist;cursor:pointer;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:{{ f.dot }};display:{{ f.dotD }}"></span>{{ f.label }}<span style="opacity:.65">{{ f.n }}</span></button></sc-for>
+</div>
+<div style="display:grid;grid-template-columns:{{ T.cols2 }};border:1px solid var(--border);border-radius:18px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ congList }}" as="c" hint-placeholder-count="10">
+<button onClick="{{ c.open }}" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border:0;border-top:{{ c.bt }};background:transparent;color:var(--text);text-align:left;cursor:pointer">
+<span style="width:42px;height:42px;border-radius:50%;background:conic-gradient({{ c.c }} 0 {{ c.pctNum }}%, var(--border) 0);display:grid;place-items:center;flex-shrink:0"><span style="width:34px;height:34px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:600 11px Geist;font-variant-numeric:tabular-nums">{{ c.pctLabel }}</span></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 15px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span><span style="font:400 12px Geist;color:var(--text2)">Cód. {{ c.code }} · {{ c.n }} inscritos</span></span>
+<span style="display:flex;align-items:center;gap:6px;font:500 12px Geist;color:var(--text2);flex-shrink:0"><span style="width:7px;height:7px;border-radius:50%;background:{{ c.dot }}"></span>{{ c.status }}</span>
+</button>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isBuses }}" hint-placeholder-val="{{ false }}">
+<main style="display:flex;flex-direction:column;gap:14px;padding:16px {{ T.px }} 120px;animation:push .3s cubic-bezier(.2,.8,.2,1) both">
+<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><h1 style="margin:0;font:600 28px/1.1 Geist;letter-spacing:-0.025em">Ônibus</h1><span style="font:400 13px Geist;color:var(--text2)">46 lugares cada · toque para ver os passageiros</span></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:var(--muted)">
+<sc-for list="{{ daySeg }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0;border:0;border-radius:10px;background:{{ d.bg }};box-shadow:{{ d.sh }};color:var(--text);cursor:pointer"><span style="font:600 13px Geist">{{ d.name }} {{ d.date }}</span><span style="font:500 11px Geist;color:var(--text2);font-variant-numeric:tabular-nums">{{ d.nBus }} ônibus · {{ d.pct }}</span></button></sc-for>
+</div>
+<div style="display:flex;gap:8px;overflow-x:auto;margin:0 -14px;padding:0 14px;scrollbar-width:none">
+<sc-for list="{{ busFilters }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.onClick }}" style="flex-shrink:0;height:34px;padding:0 12px;border:1px solid {{ f.bd }};border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font:500 13px Geist;cursor:pointer;white-space:nowrap">{{ f.label }} <span style="opacity:.65">{{ f.n }}</span></button></sc-for>
+</div>
+<div style="display:grid;grid-template-columns:{{ T.busCols }};gap:10px">
+<sc-for list="{{ allBuses }}" as="b" hint-placeholder-count="8">
+<button onClick="{{ b.open }}" style="display:flex;flex-direction:column;gap:10px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:var(--shadow);color:var(--text);text-align:left;cursor:pointer">
+<span style="display:flex;justify-content:space-between;align-items:baseline;width:100%"><span style="font:600 14px Geist">Ônibus {{ b.i }}</span><span style="font:600 12px Geist;color:{{ b.fg }};font-variant-numeric:tabular-nums">{{ b.n }}/46</span></span>
+<span style="position:relative;display:flex;flex-direction:column;gap:4px;padding:7px 7px 7px 12px;border-radius:10px 5px 5px 10px;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--border2)">
+<span style="position:absolute;left:3px;top:7px;bottom:7px;width:4px;border-radius:2px;background:var(--info-s);box-shadow:inset 0 0 0 1px var(--border2)"></span>
+<span style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px"><sc-for list="{{ b.top }}" as="c" hint-placeholder-count="24"><span style="aspect-ratio:1;border-radius:2px;background:{{ c.bg }};box-shadow:inset 0 0 0 1px {{ c.bd }}"></span></sc-for></span>
+<span style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px"><sc-for list="{{ b.bot }}" as="c" hint-placeholder-count="24"><span style="aspect-ratio:1;border-radius:2px;background:{{ c.bg }};box-shadow:inset 0 0 0 1px {{ c.bd }}"></span></sc-for></span>
+</span>
+<span style="font:500 12px Geist;color:{{ b.fg }}">{{ b.tag }}</span>
+</button>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isLists }}" hint-placeholder-val="{{ false }}">
+<main style="display:grid;grid-template-columns:{{ T.cols2 }};gap:14px;padding:16px {{ T.px }} 120px;animation:push .3s cubic-bezier(.2,.8,.2,1) both">
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:2px;padding:0 2px"><h1 style="margin:0;font:600 28px/1.1 Geist;letter-spacing:-0.025em">Listas e exportações</h1><span style="font:400 13px Geist;color:var(--text2)">Gere o arquivo e compartilhe direto do celular</span></div>
+<sc-for list="{{ listTypes }}" as="t" hint-placeholder-count="5">
+<button onClick="{{ t.open }}" style="display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);color:var(--text);text-align:left;cursor:pointer">
+<span style="width:44px;height:44px;border-radius:13px;background:{{ t.bg }};color:{{ t.fg }};display:grid;place-items:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font:600 15px Geist">{{ t.label }}</span><span style="font:400 13px/1.4 Geist;color:var(--text2)">{{ t.desc }}</span></span>
+<svg style="flex-shrink:0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</sc-for>
+</main>
+</sc-if>
+
+<nav style="position:fixed;left:50%;bottom:{{ T.navB }};transform:translateX(-50%);width:{{ T.navWd }};max-width:{{ T.navMax }};z-index:30;box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;padding:6px 6px {{ T.navPb }};background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-width:{{ T.navBw }};border-radius:{{ T.navR }};box-shadow:{{ T.navSh }}">
+<sc-for list="{{ tabsL }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;height:52px;justify-content:center;border:0;background:transparent;color:{{ t.fg }};font:{{ t.weight }} 11px Geist;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ t.sw }}" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg>{{ t.label }}</button></sc-for>
+<div style="display:flex;justify-content:center"><button onClick="{{ openNew }}" aria-label="Cadastrar passageiro" style="width:58px;height:58px;margin-top:-26px;border:4px solid var(--bg);border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgb(31 110 90/.35)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></button></div>
+<sc-for list="{{ tabsR }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;height:52px;justify-content:center;border:0;background:transparent;color:{{ t.fg }};font:{{ t.weight }} 11px Geist;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ t.sw }}" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg>{{ t.label }}</button></sc-for>
+</nav>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:12px 16px;border-radius:14px;background:#0d2b45;color:#fff;font:500 14px/1.35 Geist;box-shadow:0 16px 40px rgb(10 26 41/.35);animation:toast .3s cubic-bezier(.2,.8,.2,1) both"><svg style="flex-shrink:0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4fb393" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ toast }}</div>
+</sc-if>
+
+<sc-if value="{{ hasSheet }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSheet }}" style="position:fixed;inset:0;z-index:40;background:rgb(10 26 41/.45);animation:fade .2s ease both"></div>
+<div style="position:fixed;left:50%;top:{{ T.shT }};bottom:{{ T.shB }};transform:{{ T.shTf }};width:{{ T.shWd }};max-width:{{ T.shW }};max-height:{{ T.shMax }};z-index:41;box-sizing:border-box;display:flex;flex-direction:column;background:var(--surface);color:var(--text);border-radius:{{ T.shR }};box-shadow:0 -10px 40px rgb(10 26 41/.25);animation:{{ T.shAnim }}">
+<div onClick="{{ closeSheet }}" style="display:{{ T.handleD }};justify-content:center;padding:10px 0 4px;cursor:pointer;flex-shrink:0"><span style="width:40px;height:5px;border-radius:3px;background:var(--border2)"></span></div>
+<div style="flex:1;min-height:0;overflow-y:auto;padding:{{ T.shInPad }}">
+
+<sc-if value="{{ sh.pax }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:center;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:{{ sp.avBg }};color:{{ sp.avFg }};display:grid;place-items:center;font:600 18px Geist;flex-shrink:0">{{ sp.ini }}</span><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 19px Geist;letter-spacing:-0.01em">{{ sp.name }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ sp.cong }} · RG {{ sp.rg }}</span></span></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Viagens</span>
+<sc-for list="{{ sp.legs }}" as="l" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:1px solid var(--border);opacity:{{ l.op }}">
+<span style="width:44px;height:44px;border-radius:11px;background:{{ l.bg }};color:{{ l.fg }};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;flex-shrink:0"><span style="font:600 10px Geist;text-transform:uppercase;letter-spacing:.05em">{{ l.wd }}</span><span style="font:600 17px Geist">{{ l.dd }}</span></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 14px Geist">{{ l.title }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ l.sub }}</span></span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:var(--muted)">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 20px Geist;font-variant-numeric:tabular-nums">{{ sp.paid }}</span><span style="font:400 13px Geist;color:var(--text2)">de {{ sp.total }} · <span style="color:{{ sp.sFg }};font-weight:500">{{ sp.status }}</span></span></div>
+<div style="height:6px;border-radius:999px;background:var(--border);overflow:hidden"><div style="width:{{ sp.w }};height:100%;border-radius:999px;background:{{ sp.bar }};transform-origin:left;animation:grow .8s cubic-bezier(.2,.8,.2,1) both"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-if value="{{ sp.canPay }}" hint-placeholder-val="{{ true }}"><button onClick="{{ openPay }}" style="height:50px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 15px Geist;cursor:pointer">Registrar pagamento</button></sc-if>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px">
+<button onClick="{{ toastEdit }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Editar dados</button>
+<button onClick="{{ toastSeat }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Trocar poltrona</button>
+</div>
+<button onClick="{{ toastRemove }}" style="height:46px;border:0;border-radius:14px;background:transparent;color:var(--crit);font:500 14px Geist;cursor:pointer">Remover inscrição</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.bus }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><span style="display:flex;flex-direction:column;gap:2px"><span style="font:600 20px Geist;letter-spacing:-0.01em">Ônibus {{ sb.i }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ sb.day }} · {{ sb.n }} de 46 lugares</span></span><span style="padding:4px 10px;border-radius:999px;background:{{ sb.tagBg }};color:{{ sb.fg }};font:600 12px Geist">{{ sb.tag }}</span></div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="position:relative;flex-shrink:0;padding:28px 10px 12px;border-radius:22px 22px 12px 12px;background:var(--bg);box-shadow:inset 0 0 0 2px var(--border2)">
+<span style="position:absolute;top:8px;left:12px;right:12px;height:8px;border-radius:6px 6px 2px 2px;background:var(--info-s);box-shadow:inset 0 0 0 1.5px var(--border2)"></span>
+<div style="display:grid;grid-template-columns:18px 18px 8px 18px 18px;grid-auto-rows:18px;gap:4px"><sc-for list="{{ sb.cells }}" as="c" hint-placeholder-count="60"><span style="border-radius:4px 4px 5px 5px;background:{{ c.bg }};box-shadow:inset 0 0 0 1.5px {{ c.bd }}"></span></sc-for></div>
+</div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+<span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;padding-bottom:6px">Passageiros</span>
+<sc-for list="{{ sb.pax }}" as="p" hint-placeholder-count="10"><div style="display:flex;align-items:center;gap:8px;min-height:30px"><span style="width:24px;font:600 12px Geist;color:var(--text2);font-variant-numeric:tabular-nums;flex-shrink:0">{{ p.seat }}</span><span style="font:400 13px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span></div></sc-for>
+<span style="padding-top:6px;font:400 12px Geist;color:var(--text2)">+ {{ sb.more }} passageiros</span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px">
+<button onClick="{{ toastShare }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Compartilhar lista</button>
+<button onClick="{{ toastBoard }}" style="height:46px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 14px Geist;cursor:pointer">Lista de embarque</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.cong }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:14px"><span style="width:56px;height:56px;border-radius:50%;background:conic-gradient({{ sc.c }} 0 {{ sc.pctNum }}%, var(--border) 0);display:grid;place-items:center;flex-shrink:0"><span style="width:46px;height:46px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:600 13px Geist">{{ sc.pctLabel }}</span></span><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 19px Geist">{{ sc.name }}</span><span style="font:400 13px Geist;color:var(--text2)">Cód. {{ sc.code }} · {{ sc.status }}</span></span></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<sc-for list="{{ sc.kpis }}" as="k" hint-placeholder-count="3"><span style="display:flex;flex-direction:column;gap:3px;padding:12px;border-radius:14px;background:var(--muted)"><span style="font:500 11px Geist;color:var(--text2)">{{ k.l }}</span><span style="font:600 17px Geist;font-variant-numeric:tabular-nums;color:{{ k.fg }}">{{ k.v }}</span></span></sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:14px;border:1px solid var(--border)">
+<span style="font:500 12px Geist;color:var(--text2)">Coordenador do arranjo de ônibus na congregação</span>
+<span style="font:600 15px Geist">{{ sc.resp }}</span>
+<span style="font:400 13px Geist;color:var(--text2)">{{ sc.phone }}</span>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px">
+<button onClick="{{ toastRemind }}" style="height:46px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">Lembrar</button>
+<button onClick="{{ seeCongPax }}" style="height:46px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 14px Geist;cursor:pointer">Ver passageiros</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.events }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font:600 18px Geist;padding-bottom:6px">Eventos do circuito</span>
+<sc-for list="{{ events }}" as="e" hint-placeholder-count="3"><button onClick="{{ closeSheet }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 12px;border:0;border-radius:14px;background:{{ e.bg }};color:var(--text);text-align:left;cursor:pointer"><span style="width:8px;height:8px;border-radius:50%;background:{{ e.dot }};flex-shrink:0"></span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font:500 15px Geist">{{ e.name }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ e.when }}</span></span></button></sc-for>
+<button onClick="{{ toastNewEvent }}" style="margin-top:6px;height:48px;border:1px dashed var(--border2);border-radius:14px;background:transparent;color:var(--primary);font:600 14px Geist;cursor:pointer">+ Criar novo evento</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.notifs }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px"><span style="font:600 18px Geist">Notificações</span><button onClick="{{ markRead }}" style="height:32px;border:0;background:transparent;color:var(--primary);font:500 13px Geist;cursor:pointer">Marcar como lidas</button></div>
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4"><div style="display:flex;gap:12px;padding:12px 2px;border-top:{{ n.bt }}"><span style="width:34px;height:34px;border-radius:10px;background:{{ n.bg }};color:{{ n.fg }};display:grid;place-items:center;flex-shrink:0;font:600 14px Geist">{{ n.glyph }}</span><span style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font:{{ n.weight }} 14px/1.35 Geist">{{ n.title }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ n.time }}</span></span><span style="width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--primary);opacity:{{ n.dotOp }}"></span></div></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.congPick }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font:600 18px Geist;padding-bottom:8px">Filtrar por congregação</span>
+<sc-for list="{{ congOpts }}" as="c" hint-placeholder-count="10"><button onClick="{{ c.onClick }}" style="display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 12px;border:0;border-radius:12px;background:{{ c.bg }};color:var(--text);font:{{ c.weight }} 15px Geist;cursor:pointer;text-align:left"><span>{{ c.name }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ c.n }}</span></button></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.paxMenu }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px">
+<button onClick="{{ toastImport }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 12px;border:0;border-radius:14px;background:var(--muted);color:var(--text);font:500 15px Geist;cursor:pointer;text-align:left">Importar lista de passageiros</button>
+<button onClick="{{ toastExport }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 12px;border:0;border-radius:14px;background:var(--muted);color:var(--text);font:500 15px Geist;cursor:pointer;text-align:left">Exportar passageiros filtrados</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.list }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:18px">
+<span style="display:flex;flex-direction:column;gap:3px"><span style="font:600 20px Geist;letter-spacing:-0.01em">{{ sl.label }}</span><span style="font:400 13px Geist;color:var(--text2)">{{ sl.desc }}</span></span>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Dia</span>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:var(--muted)"><sc-for list="{{ daySeg }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.onClick }}" style="height:38px;border:0;border-radius:10px;background:{{ d.bg }};box-shadow:{{ d.sh }};color:var(--text);font:500 14px Geist;cursor:pointer">{{ d.name }} {{ d.date }}</button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Formato</span>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><sc-for list="{{ fmts }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;border:1.5px solid {{ f.bd }};border-radius:14px;background:{{ f.bg }};color:var(--text);cursor:pointer"><span style="font:600 14px Geist">{{ f.label }}</span><span style="font:400 11px Geist;color:var(--text2)">{{ f.sub }}</span></button></sc-for></div></div>
+<button onClick="{{ genList }}" style="height:52px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 15px Geist;cursor:pointer">{{ genLabel }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.pay }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px">
+<span style="display:flex;flex-direction:column;gap:3px"><span style="font:600 20px Geist;letter-spacing:-0.01em">Registrar pagamento</span><span style="font:400 13px Geist;color:var(--text2)">{{ payWho }}</span></span>
+<label style="display:flex;align-items:center;gap:8px;height:64px;padding:0 16px;border:1.5px solid var(--primary);border-radius:16px;background:var(--bg)"><span style="font:600 22px Geist;color:var(--text2)">R$</span><input value="{{ payV }}" onChange="{{ onPayV }}" inputMode="numeric" style="flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:600 30px Geist;outline:none;font-variant-numeric:tabular-nums"></label>
+<div style="display:flex;gap:8px"><sc-for list="{{ payQuick }}" as="q" hint-placeholder-count="3"><button onClick="{{ q.onClick }}" style="flex:1;height:40px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:500 14px Geist;cursor:pointer">{{ q.label }}</button></sc-for></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:var(--muted)"><sc-for list="{{ payMethods }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.onClick }}" style="height:38px;border:0;border-radius:10px;background:{{ m.bg }};box-shadow:{{ m.sh }};color:var(--text);font:500 14px Geist;cursor:pointer">{{ m.label }}</button></sc-for></div>
+<button onClick="{{ savePay }}" style="height:52px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 15px Geist;cursor:pointer">Confirmar R$ {{ payV }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sh.confirm }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;padding-top:4px">
+<span style="width:48px;height:48px;border-radius:14px;background:var(--attn-s);color:var(--attn-t);display:grid;place-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+<span style="display:flex;flex-direction:column;gap:6px"><span style="font:600 20px Geist">Encerrar inscrições agora?</span><span style="font:400 14px/1.5 Geist;color:var(--text2)">As congregações não poderão mais adicionar passageiros. Você pode reabrir depois.</span></span>
+<button onClick="{{ doClose }}" style="height:52px;border:0;border-radius:14px;background:var(--crit);color:#fff;font:600 15px Geist;cursor:pointer">Encerrar inscrições</button>
+<button onClick="{{ closeSheet }}" style="height:46px;border:0;border-radius:14px;background:transparent;color:var(--text);font:500 15px Geist;cursor:pointer">Cancelar</button>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ newOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeNew }}" style="display:{{ T.bdD }};position:fixed;inset:0;z-index:49;background:rgb(10 26 41/.45);animation:fade .2s ease both"></div>
+<div style="position:fixed;left:50%;top:{{ T.ovT }};bottom:{{ T.ovB }};transform:translateX(-50%);width:{{ T.shWd }};max-width:{{ T.ovW }};z-index:50;display:flex;flex-direction:column;background:var(--bg);color:var(--text);border-radius:{{ T.ovR }};overflow:hidden;box-shadow:{{ T.ovSh }};animation:{{ T.ovAnim }}">
+<div style="display:flex;align-items:center;gap:8px;padding:10px 8px 10px 16px;border-bottom:1px solid var(--border);background:var(--surface)">
+<span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:600 18px Geist">Cadastrar passageiro</span><span style="font:400 12px Geist;color:var(--text2)">Assembleia de Circuito · 23 a 25/10</span></span>
+<button onClick="{{ closeNew }}" aria-label="Fechar" style="width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:var(--text2);display:grid;place-items:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+</div>
+<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:18px;padding:16px 16px 24px">
+<sc-if value="{{ nf.searching }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<label style="display:flex;align-items:center;gap:8px;height:52px;padding:0 14px;border:1.5px solid var(--primary);border-radius:14px;background:var(--surface)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input value="{{ nf.q }}" onChange="{{ nf.onQ }}" placeholder="Nome ou RG de quem já viajou" style="flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none"></label>
+<span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;padding:4px 2px 0">{{ nf.histLabel }}</span>
+<div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden">
+<sc-for list="{{ nf.hist }}" as="h" hint-placeholder-count="4"><button onClick="{{ h.pick }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;border-top:{{ h.bt }};background:transparent;color:var(--text);text-align:left;cursor:pointer"><span style="width:38px;height:38px;border-radius:50%;background:var(--primary-s);color:var(--primary);display:grid;place-items:center;font:600 13px Geist;flex-shrink:0">{{ h.ini }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 15px Geist">{{ h.name }}</span><span style="font:400 12px Geist;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.sub }}</span></span><span style="font:500 13px Geist;color:var(--primary)">Usar</span></button></sc-for>
+</div>
+<button onClick="{{ nf.startNew }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border:1.5px dashed var(--border2);border-radius:14px;background:transparent;color:var(--text);font:500 15px Geist;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg>{{ nf.newLabel }}</button>
+</div>
+</sc-if>
+<sc-if value="{{ nf.form }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;animation:rise .25s ease both">
+<sc-if value="{{ nf.fromHist }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--primary-s);color:var(--primary);font:500 13px Geist"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Dados preenchidos do histórico</div></sc-if>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Nome completo</span><input value="{{ nf.name }}" onChange="{{ nf.onName }}" style="height:50px;padding:0 14px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:400 16px Geist;outline:none"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">RG</span><input value="{{ nf.rg }}" onChange="{{ nf.onRg }}" inputMode="numeric" style="height:50px;padding:0 14px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:400 16px Geist;outline:none"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Congregação</span><select value="{{ nf.cong }}" onChange="{{ nf.onCong }}" style="height:50px;padding:0 12px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font:400 16px Geist;outline:none"><sc-for list="{{ congNames }}" as="c" hint-placeholder-count="5"><option value="{{ c }}">{{ c }}</option></sc-for></select></label>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Dias de viagem</span>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><sc-for list="{{ nf.days }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0;border:1.5px solid {{ d.bd }};border-radius:14px;background:{{ d.bg }};color:{{ d.fg }};cursor:pointer"><span style="font:600 15px Geist">{{ d.name }}</span><span style="font:400 12px Geist;opacity:.75">{{ d.date }} · {{ d.free }} livres</span></button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 13px Geist;color:var(--text2)">Pagamento</span>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:var(--muted)"><sc-for list="{{ nf.pays }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.onClick }}" style="height:40px;border:0;border-radius:10px;background:{{ p.bg }};box-shadow:{{ p.sh }};color:{{ p.fg }};font:500 14px Geist;cursor:pointer">{{ p.label }}</button></sc-for></div>
+<sc-if value="{{ nf.partial }}" hint-placeholder-val="{{ false }}"><label style="display:flex;align-items:center;gap:8px;height:50px;padding:0 14px;border:1.5px solid var(--attn);border-radius:14px;background:var(--surface);animation:rise .2s ease both"><span style="font:500 15px Geist;color:var(--text2)">R$</span><input value="{{ nf.partV }}" onChange="{{ nf.onPart }}" inputMode="numeric" placeholder="Valor pago" style="flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:500 16px Geist;outline:none"><span style="font:400 13px Geist;color:var(--text2)">de {{ nf.totalStr }}</span></label></sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ nf.form }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 16px 28px;border-top:1px solid var(--border);background:var(--surface)">
+<span style="display:flex;flex-direction:column;gap:1px"><span style="font:400 12px Geist;color:var(--text2)">Total</span><span style="font:600 18px Geist;font-variant-numeric:tabular-nums">{{ nf.totalStr }}</span></span>
+<button onClick="{{ nf.save }}" style="flex:1;height:52px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font:600 15px Geist;cursor:pointer;opacity:{{ nf.okOp }}">Cadastrar</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSearch }}" style="display:{{ T.bdD }};position:fixed;inset:0;z-index:49;background:rgb(10 26 41/.45);animation:fade .2s ease both"></div>
+<div style="position:fixed;left:50%;top:{{ T.ovT }};bottom:{{ T.ovB }};transform:translateX(-50%);width:{{ T.shWd }};max-width:{{ T.ovW }};z-index:50;display:flex;flex-direction:column;background:var(--bg);color:var(--text);border-radius:{{ T.ovR }};overflow:hidden;box-shadow:{{ T.ovSh }};animation:popX .25s cubic-bezier(.2,.8,.2,1) both">
+<div style="display:flex;align-items:center;gap:8px;padding:10px 8px 10px 14px;background:var(--surface);border-bottom:1px solid var(--border)">
+<label style="flex:1;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:12px;background:var(--muted)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input ref="{{ searchRef }}" value="{{ sq }}" onChange="{{ onSq }}" placeholder="Passageiro, congregação ou ônibus" style="flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:400 16px Geist;outline:none"></label>
+<button onClick="{{ closeSearch }}" style="height:44px;padding:0 8px;border:0;background:transparent;color:var(--primary);font:500 15px Geist;cursor:pointer">Cancelar</button>
+</div>
+<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:14px">
+<span style="font:500 12px Geist;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;padding:0 4px 4px">{{ searchLabel }}</span>
+<sc-for list="{{ searchRes }}" as="r" hint-placeholder-count="6"><button onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:14px;background:var(--surface);color:var(--text);text-align:left;cursor:pointer"><span style="width:36px;height:36px;border-radius:{{ r.radius }};background:{{ r.bg }};color:{{ r.fg }};display:grid;place-items:center;font:600 12px Geist;flex-shrink:0">{{ r.ini }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 15px Geist;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="font:400 12px Geist;color:var(--text2)">{{ r.sub }}</span></span></button></sc-for>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: 'home', sub: null, day: 0, bf: 'todos', pPay: 'todos', pCong: null, pq: '', pSort: 'nome', finTab: 'cong', cgF: 'todas', sheet: null, newOpen: false, nf: null, searchOpen: false, sq: '', toast: '', closed: false, read: false, dark: false, fmt: 'PDF', payV: '40', payM: 'Pix', reminded: false };
+  searchRef = React.createRef();
+  componentDidMount() {
+    this._rz = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rz); this._rz();
+    const k = location.hash.slice(1);
+    const M = { inicio: {}, passageiros: { tab: 'pax' }, financeiro: { tab: 'fin' }, mais: { tab: 'more' }, congregacoes: { tab: 'more', sub: 'congs' }, onibus: { tab: 'more', sub: 'buses' }, listas: { tab: 'more', sub: 'lists' },
+      cadastrar: { newOpen: true, nf: this.blankNf() }, 'cadastrar-form': { newOpen: true, nf: { ...this.blankNf(), form: true, fromHist: true, name: 'Lúcia Ferreira', rg: '32.418.990-1', cong: 'Taquaral', pay: 'Parcial', partV: '40' } },
+      'sheet-onibus': { sheet: { t: 'bus', i: 3 } }, 'sheet-passageiro': { tab: 'pax', sheet: { t: 'pax', id: 1 } }, 'sheet-congregacao': { tab: 'more', sub: 'congs', sheet: { t: 'cong', name: 'Jardim Paulista' } } };
+    if (M[k]) this.setState(M[k]);
+  }
+  componentWillUnmount() { clearTimeout(this._t); window.removeEventListener('resize', this._rz); }
+  blankNf() { return { q: '', form: false, fromHist: false, name: '', rg: '', cong: 'Jardim Paulista', days: [true, true, true], pay: 'Pendente', partV: '' }; }
+  toastMsg = m => { clearTimeout(this._t); this.setState({ toast: m }); this._t = setTimeout(() => this.setState({ toast: '' }), 2600); };
+  rnd(seed) { let x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); }
+  data() {
+    if (this._d) return this._d;
+    const CN = ['Jardim Paulista', 'Taquaral', 'Cambuí', 'Barão Geraldo', 'Sousas', 'Castelo', 'Guanabara', 'Nova Campinas', 'Vila Industrial', 'Proença', 'Bonfim', 'Swift', 'Parque Itália', 'Jardim Chapadão', 'Botafogo', 'São Bernardo', 'Vila Georgina', 'Jardim Aurélia', 'Parque Prado', 'Joaquim Egídio'];
+    const PCT = [100, 100, 100, 100, 100, 100, 100, 100, 92, 86, 81, 74, 68, 63, 57, 49, 41, 33, 22, 0];
+    const congs = CN.map((name, i) => ({ name, code: String(31200 + i * 37), pct: PCT[i], n: i === 19 ? 0 : 28 + Math.round(this.rnd(i + 3) * 40), fin: i < 8, resp: ['Antônio Ferreira', 'Cláudio Ramos', 'Edson Pacheco', 'Gilberto Nogueira', 'Hélio Batista'][i % 5], phone: '(19) 9' + (8100 + i * 37) + '-' + (2000 + i * 113) }));
+    const NAMES = ['Ana Beatriz Souza', 'Bruno Carvalho', 'Carla Mendes', 'Daniel Rocha', 'Eliane Duarte', 'Fábio Martins', 'Gabriela Lima', 'Hugo Almeida', 'Isabela Torres', 'João Pedro Nunes', 'Karina Dias', 'Leonardo Prado', 'Mariana Castro', 'Nelson Barbosa', 'Otávio Ribeiro', 'Patrícia Gomes', 'Rafael Moreira', 'Simone Araújo'];
+    const ST = ['Pago', 'Pago', 'Parcial', 'Pendente', 'Pago', 'Parcial', 'Pago', 'Pendente', 'Pago', 'Pago', 'Parcial', 'Pago', 'Pendente', 'Pago', 'Pago', 'Parcial', 'Pago', 'Pendente'];
+    const pax = NAMES.map((name, i) => { const days = [true, i % 4 !== 1, i % 5 !== 2]; const nd = days.filter(Boolean).length, total = nd * 40, st = ST[i];
+      return { id: i, name, ini: name.split(' ').map(x => x[0]).slice(0, 2).join(''), cong: CN[i % 12], rg: (20 + i) + '.' + (300 + i * 17) + '.' + (100 + i * 29) + '-' + (i % 9), days, total, paid: st === 'Pago' ? total : st === 'Parcial' ? 40 : 0, status: st, bus: [1 + (i % 6), 2 + (i % 5), 1 + (i % 7)], seat: [3 + i * 2, 5 + i * 2, 7 + i] }; });
+    const dayDefs = [{ name: 'Sex', date: '23/10', wd: 'Sex', dd: '23', nBus: 19 }, { name: 'Sáb', date: '24/10', wd: 'Sáb', dd: '24', nBus: 19 }, { name: 'Dom', date: '25/10', wd: 'Dom', dd: '25', nBus: 17 }];
+    const days = dayDefs.map((d, di) => { const buses = []; for (let b = 1; b <= d.nBus; b++) { const r = this.rnd(di * 50 + b); buses.push({ i: b, n: r > 0.45 ? 46 : 30 + Math.round(r * 32) }); } const n = buses.reduce((a, b) => a + b.n, 0); return { ...d, buses, n, cap: d.nBus * 46 }; });
+    this._d = { congs, pax, days };
+    return this._d;
+  }
+  busCard(b, di) {
+    const full = b.n >= 46, hi = b.n >= 42; const fg = full ? 'var(--crit)' : hi ? 'var(--attn-t)' : 'var(--succ)';
+    const cell = k => k < b.n ? { bg: 'var(--primary)', bd: 'transparent' } : k < 46 ? { bg: 'var(--surface)', bd: 'var(--border2)' } : { bg: 'transparent', bd: 'transparent' };
+    const top = [], bot = []; for (let k = 0; k < 24; k++) top.push(cell(k)); for (let k = 24; k < 48; k++) bot.push(cell(k));
+    return { i: b.i, n: b.n, fg, top, bot, tag: full ? 'Lotado' : (46 - b.n) + ' lugares livres', open: () => this.setState({ sheet: { t: 'bus', i: b.i, di } }) };
+  }
+  renderVals() {
+    const s = this.state, d = this.data(), brl = v => 'R$ ' + v.toLocaleString('pt-BR');
+    const sel = (on, extra) => ({ bg: on ? 'var(--surface)' : 'transparent', sh: on ? '0 1px 3px rgb(16 24 40/.12)' : 'none', ...extra });
+    const chip = on => ({ bg: on ? 'var(--text)' : 'var(--surface)', fg: on ? 'var(--bg)' : 'var(--text)', bd: on ? 'var(--text)' : 'var(--border2)' });
+    const stC = { Pago: ['var(--succ-s)', 'var(--succ)', 'var(--succ)'], Parcial: ['var(--attn-s)', 'var(--attn-t)', 'var(--attn)'], Pendente: ['var(--crit-s)', 'var(--crit)', 'var(--crit)'] };
+    const pctC = p => p >= 75 ? 'var(--succ)' : p >= 50 ? 'var(--attn-t)' : 'var(--crit)';
+    const go = (tab, sub = null) => () => { this.setState({ tab, sub, sheet: null }); window.scrollTo(0, 0); };
+    const day = d.days[s.day], dpct = Math.round(day.n / day.cap * 100);
+    const filt = day.buses.filter(b => s.bf === 'todos' || (s.bf === 'lotados' ? b.n >= 46 : b.n < 46));
+    const sheet = s.sheet || {};
+    const tb = (s.vw || 390) >= 760;
+    const T = tb ? { maxW: '1180px', hdrPad: '10px 22px 10px 28px', heroPad: '10px 28px 26px', heroCols: 'minmax(0,1fr) 380px', heroAreas: '"date btn" "steps steps"', heroGapX: '32px',
+      homeCols: 'minmax(0,1.3fr) minmax(0,1fr)', homeRows: 'auto auto auto 1fr', homeAreas: '"kpi kpi" "occ att" "occ rank" "occ ."', gap: '18px', mainT: '22px', px: '28px', kpiCols: 'repeat(4,minmax(0,1fr))',
+      paxCols: 'minmax(0,1fr) 360px', paxAreas: '"hdr pane" "srch pane" "cnt pane" "list pane" "more pane"', paxPx: '16px', paneD: 'block',
+      finCols: 'minmax(0,1fr) minmax(0,1.15fr)', finRows: 'auto auto auto 1fr', finAreas: '"ttl seg" "hero list" "ritmo list" ". list"', cols2: 'repeat(2,minmax(0,1fr))', busCols: 'repeat(4,minmax(0,1fr))',
+      navB: '16px', navWd: 'calc(100% - 32px)', navMax: '560px', navPb: '6px', navBw: '1px', navR: '24px', navSh: '0 12px 32px rgb(13 43 69/.16)',
+      shT: '50%', shB: 'auto', shTf: 'translate(-50%,-50%)', shWd: 'calc(100% - 48px)', shW: '540px', shMax: '84vh', shR: '24px', shAnim: 'popM .26s cubic-bezier(.2,.8,.2,1) both', handleD: 'none', shInPad: '24px 24px 24px',
+      bdD: 'block', ovT: '5vh', ovB: '5vh', ovW: '620px', ovR: '24px', ovSh: '0 30px 80px rgb(10 26 41/.35)', ovAnim: 'popX .28s cubic-bezier(.2,.8,.2,1) both' }
+      : { maxW: '440px', hdrPad: '10px 14px 10px 16px', heroPad: '6px 16px 22px', heroCols: 'minmax(0,1fr)', heroAreas: '"date" "steps" "btn"', heroGapX: '0',
+      homeCols: 'minmax(0,1fr)', homeRows: 'none', homeAreas: '"kpi" "occ" "att" "rank"', gap: '14px', mainT: '16px', px: '14px', kpiCols: 'repeat(2,minmax(0,1fr))',
+      paxCols: 'minmax(0,1fr)', paxAreas: '"hdr" "srch" "cnt" "list" "more" "pane"', paxPx: '0', paneD: 'none',
+      finCols: 'minmax(0,1fr)', finRows: 'none', finAreas: '"ttl" "hero" "ritmo" "seg" "list"', cols2: 'minmax(0,1fr)', busCols: 'repeat(2,minmax(0,1fr))',
+      navB: '0', navWd: '100%', navMax: '440px', navPb: '22px', navBw: '1px 0 0 0', navR: '0', navSh: 'none',
+      shT: 'auto', shB: '0', shTf: 'translateX(-50%)', shWd: '100%', shW: '440px', shMax: sheet.t === 'congPick' || sheet.t === 'bus' ? '86vh' : '92vh', shR: '24px 24px 0 0', shAnim: 'sheet .32s cubic-bezier(.2,.8,.2,1) both', handleD: 'flex', shInPad: '4px 18px 28px',
+      bdD: 'none', ovT: '0', ovB: '0', ovW: '440px', ovR: '0', ovSh: 'none', ovAnim: 'sheet .35s cubic-bezier(.2,.8,.2,1) both' };
+    const I = { home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z', pax: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', fin: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM16 12h.01M3 10h18', more: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z' };
+    const tab = (k, label) => { const on = s.tab === k; return { label, icon: I[k], fg: on ? 'var(--primary)' : 'var(--text2)', weight: on ? 600 : 500, sw: on ? 2.2 : 1.8, onClick: go(k) }; };
+    // passengers
+    let rows = d.pax.filter(p => (s.pPay === 'todos' || p.status === s.pPay) && (!s.pCong || p.cong === s.pCong) && (!s.pq || (p.name + p.rg).toLowerCase().includes(s.pq.toLowerCase())));
+    if (s.pSort === 'aberto') rows = rows.slice().sort((a, b) => (b.total - b.paid) - (a.total - a.paid)); else rows = rows.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const spId = sheet.t === 'pax' ? sheet.id : (tb && s.tab === 'pax' ? (s.paxSel ?? (rows[0] || {}).id) : undefined);
+    const sp = d.pax.find(p => p.id === spId) || d.pax[0];
+    const sb = d.days[sheet.di ?? s.day].buses.find(b => b.i === sheet.i) || d.days[0].buses[2];
+    const sbFull = sb.n >= 46;
+    const scg = d.congs.find(c => c.name === sheet.name) || d.congs[0];
+    const congStatus = c => c.fin ? ['Finalizada', 'var(--succ)'] : c.n ? ['Em andamento', 'var(--attn)'] : ['Sem inscritos', 'var(--crit)'];
+    const cgList = d.congs.filter(c => s.cgF === 'todas' || (s.cgF === 'fin' ? c.fin : s.cgF === 'and' ? !c.fin && c.n : !c.n));
+    const nf = s.nf || this.blankNf(), setNf = p => this.setState(st => ({ nf: { ...st.nf, ...p } }));
+    const nd = nf.days.filter(Boolean).length, nTotal = nd * 40;
+    const HIST = [{ name: 'Lúcia Ferreira', rg: '32.418.990-1', cong: 'Taquaral', sub: 'Taquaral · viajou em mai/2026' }, { name: 'Luiz Henrique Costa', rg: '28.115.402-7', cong: 'Cambuí', sub: 'Cambuí · viajou em out/2025' }, { name: 'Luana Martins', rg: '41.220.338-0', cong: 'Sousas', sub: 'Sousas · viajou em mai/2026' }, { name: 'Lauro Vieira', rg: '19.874.551-3', cong: 'Castelo', sub: 'Castelo · viajou em out/2025' }];
+    const hist = HIST.filter(h => !nf.q || (h.name + h.rg).toLowerCase().includes(nf.q.toLowerCase()));
+    const LT = [['Lista de embarque', 'Por ônibus, com poltrona e congregação no cabeçalho', 'var(--primary-s)', 'var(--primary)', 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12h6M9 16h4'], ['Lista por congregação', 'Passageiros e pagamentos de cada congregação', 'var(--info-s)', 'var(--info)', 'M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5'], ['Pagamentos em aberto', 'Quem ainda deve, com valor e contato', 'var(--crit-s)', 'var(--crit)', 'M12 8v4M12 16h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'], ['Relatório financeiro', 'Resumo do arrecadado por dia e congregação', 'var(--succ-s)', 'var(--succ)', 'M3 3v18h18M7 15l4-4 3 3 5-6'], ['Mensagem para WhatsApp', 'Texto pronto com ônibus e horários', 'var(--attn-s)', 'var(--attn-t)', 'M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z']];
+    const lt = LT[sheet.k || 0];
+    const sqv = s.sq.trim().toLowerCase();
+    const sres = !sqv ? d.pax.slice(0, 4).map(p => ({ name: p.name, sub: 'Recente · ' + p.cong, ini: p.ini, bg: 'var(--primary-s)', fg: 'var(--primary)', radius: '50%', onClick: () => this.setState({ searchOpen: false, tab: 'pax', sheet: { t: 'pax', id: p.id } }) }))
+      : [...d.pax.filter(p => p.name.toLowerCase().includes(sqv)).map(p => ({ name: p.name, sub: 'Passageiro · ' + p.cong, ini: p.ini, bg: 'var(--primary-s)', fg: 'var(--primary)', radius: '50%', onClick: () => this.setState({ searchOpen: false, tab: 'pax', sheet: { t: 'pax', id: p.id } }) })),
+        ...d.congs.filter(c => c.name.toLowerCase().includes(sqv)).map(c => ({ name: c.name, sub: 'Congregação · ' + c.n + ' inscritos', ini: c.name.slice(0, 2).toUpperCase(), bg: 'var(--info-s)', fg: 'var(--info)', radius: '10px', onClick: () => this.setState({ searchOpen: false, tab: 'more', sub: 'congs', sheet: { t: 'cong', name: c.name } }) }))].slice(0, 12);
+    const NOT = [['Taquaral finalizou a lista', 'há 12 min', '✓', 'var(--succ-s)', 'var(--succ)'], ['Ônibus 7 de sábado lotou', 'há 1 h', '!', 'var(--attn-s)', 'var(--attn-t)'], ['Cambuí registrou 6 pagamentos', 'há 3 h', 'R$', 'var(--primary-s)', 'var(--primary)'], ['Joaquim Egídio ainda não tem inscritos', 'ontem', '!', 'var(--crit-s)', 'var(--crit)']];
+    return {
+      T,
+      theme: s.dark ? 'dark' : 'light',
+      isHome: s.tab === 'home', isPax: s.tab === 'pax', isFin: s.tab === 'fin', isMore: s.tab === 'more' && !s.sub, isSub: s.tab === 'more' && !!s.sub,
+      isCongs: s.sub === 'congs', isBuses: s.sub === 'buses', isLists: s.sub === 'lists',
+      back: () => this.setState({ sub: null }),
+      subAction: s.sub === 'congs' ? { label: 'Nova', onClick: () => this.toastMsg('Abrir cadastro de congregação') } : s.sub === 'buses' ? { label: 'Ônibus', onClick: () => this.toastMsg('Ônibus adicionado em ' + day.name) } : { label: 'Modelo', onClick: () => this.toastMsg('Modelos de lista em breve') },
+      openEvents: () => this.setState({ sheet: { t: 'events' } }), openNotifs: () => this.setState({ sheet: { t: 'notifs' } }), goMore: go('more'), goPax: go('pax'), goBuses: go('more', 'buses'), goCongs: go('more', 'congs'),
+      openSearch: () => this.setState({ searchOpen: true, sq: '' }, () => setTimeout(() => this.searchRef.current && this.searchRef.current.focus(), 50)), closeSearch: () => this.setState({ searchOpen: false }), searchRef: this.searchRef, sq: s.sq, onSq: e => this.setState({ sq: e.target.value }), searchRes: sres, searchLabel: sqv ? sres.length + ' resultados' : 'Recentes',
+      hasUnread: !s.read,
+      dayTiles: d.days,
+      tlFill: s.closed ? '25%' : '9%',
+      steps: [['Abertas', 'desde 21/09'], ['Encerram', s.closed ? 'encerradas' : '12/10 · 5 dias'], ['Evento', '23 a 25/10'], ['Finalizado', 'após 25/10']].map(([label, sub], i) => { const cur = s.closed ? i === 1 : i === 0, done = s.closed ? i < 1 : false;
+        return { label, sub, ring: cur || done ? '#4fb393' : 'rgb(255 255 255/.28)', dot: cur || done ? '#4fb393' : 'transparent', anim: cur ? 'pulse 2s infinite' : 'none', weight: cur ? 600 : 500, fg: cur ? '#fff' : 'rgb(255 255 255/.7)', subFg: i === 1 && !s.closed ? '#f2c14b' : 'rgb(255 255 255/.5)' }; }),
+      closeLabel: s.closed ? 'Reabrir inscrições' : 'Encerrar inscrições',
+      askClose: () => s.closed ? (this.setState({ closed: false }), this.toastMsg('Inscrições reabertas')) : this.setState({ sheet: { t: 'confirm' } }),
+      doClose: () => { this.setState({ closed: true, sheet: null }); this.toastMsg('Inscrições encerradas'); },
+      kpis: [{ label: 'Inscritos', value: '912', sub: '+38 esta semana', fg: 'var(--text)', onClick: go('pax') }, { label: 'Arrecadado', value: '65%', sub: 'R$ 58.320 de R$ 89.400', fg: 'var(--primary)', onClick: go('fin') }, { label: 'Em aberto', value: '214', sub: 'pessoas devendo', fg: 'var(--crit)', onClick: () => { this.setState({ tab: 'pax', pSort: 'aberto', pPay: 'Pendente' }); window.scrollTo(0, 0); } }, { label: 'Listas finalizadas', value: '8/20', sub: 'congregações', fg: 'var(--text)', onClick: go('more', 'congs') }],
+      daySeg: d.days.map((x, i) => { const p = Math.round(x.n / x.cap * 100); return { ...sel(i === s.day), name: x.name, date: x.date, nBus: x.nBus, pct: p + '%', pFg: p >= 95 ? 'var(--crit)' : p >= 80 ? 'var(--attn-t)' : 'var(--text2)', onClick: () => this.setState({ day: i }) }; }),
+      day: { free: day.cap - day.n, n: day.n, cap: day.cap, nBus: day.nBus, pct: dpct + '%', fill: dpct >= 95 ? 'var(--crit)' : dpct >= 80 ? 'var(--attn)' : 'var(--primary)', freeFg: dpct >= 95 ? 'var(--crit)' : 'var(--text)' },
+      busFilters: [['todos', 'Todos', day.buses.length], ['vagas', 'Com vagas', day.buses.filter(b => b.n < 46).length], ['lotados', 'Lotados', day.buses.filter(b => b.n >= 46).length]].map(([k, label, n]) => ({ label, n, ...chip(s.bf === k), onClick: () => this.setState({ bf: k }) })),
+      homeBuses: filt.slice(0, 8).map(b => this.busCard(b, s.day)), allBuses: filt.map(b => this.busCard(b, s.day)),
+      alerts: [{ title: 'Sábado está com 97% da capacidade', desc: 'Restam 24 lugares em 19 ônibus.', action: 'Adicionar ônibus', bg: 'var(--crit-s)', fg: 'var(--crit)', onClick: () => this.toastMsg('Ônibus 20 adicionado no sábado') }, { title: 'Joaquim Egídio sem inscritos', desc: 'Inscrições encerram em 5 dias.', action: 'Lembrar coordenador', bg: 'var(--attn-s)', fg: 'var(--attn-t)', onClick: () => this.toastMsg('Lembrete enviado a Joaquim Egídio') }, { title: '128 pagamentos pendentes', desc: 'R$ 15.360 sem nenhum pagamento.', action: 'Ver pendentes', bg: 'var(--attn-s)', fg: 'var(--attn-t)', onClick: () => { this.setState({ tab: 'pax', pPay: 'Pendente' }); window.scrollTo(0, 0); } }],
+      rank5: d.congs.slice(8, 13).concat(d.congs.slice(17, 19)).slice(0, 5).map((c, i) => ({ rank: i + 1, name: c.name, pctStr: c.pct + '%', c: pctC(c.pct), open: () => this.setState({ sheet: { t: 'cong', name: c.name } }) })),
+      tabsL: [tab('home', 'Início'), tab('pax', 'Passageiros')], tabsR: [tab('fin', 'Financeiro'), tab('more', 'Mais')],
+      openNew: () => this.setState({ newOpen: true, nf: this.blankNf(), sheet: null }), closeNew: () => this.setState({ newOpen: false }),
+      newOpen: s.newOpen,
+      nf: { ...nf, searching: !nf.form, onQ: e => setNf({ q: e.target.value }), hist: hist.map((h, i) => ({ ...h, ini: h.name.split(' ').map(x => x[0]).slice(0, 2).join(''), bt: i ? '1px solid var(--border)' : '0', pick: () => setNf({ form: true, fromHist: true, name: h.name, rg: h.rg, cong: h.cong }) })),
+        histLabel: nf.q ? hist.length + ' no histórico do circuito' : 'Viajaram em eventos anteriores', newLabel: nf.q ? 'Cadastrar “' + nf.q + '” como novo' : 'Novo passageiro',
+        startNew: () => setNf({ form: true, fromHist: false, name: nf.q }),
+        onName: e => setNf({ name: e.target.value }), onRg: e => setNf({ rg: e.target.value }), onCong: e => setNf({ cong: e.target.value }), onPart: e => setNf({ partV: e.target.value.replace(/\D/g, '') }),
+        days: d.days.map((x, i) => { const on = nf.days[i]; return { name: x.name, date: x.date, free: x.cap - x.n, bd: on ? 'var(--primary)' : 'var(--border2)', bg: on ? 'var(--primary-s)' : 'var(--surface)', fg: on ? 'var(--primary)' : 'var(--text)', onClick: () => setNf({ days: nf.days.map((v, j) => j === i ? !v : v) }) }; }),
+        pays: ['Pendente', 'Parcial', 'Pago'].map(p => ({ label: p, ...sel(nf.pay === p), fg: nf.pay === p ? stC[p][1] : 'var(--text2)', onClick: () => setNf({ pay: p }) })),
+        partial: nf.pay === 'Parcial', totalStr: brl(nTotal), okOp: nf.name.trim() && nd ? 1 : 0.45,
+        save: () => { if (!nf.name.trim() || !nd) return; this.setState({ newOpen: false }); this.toastMsg(nf.name.trim().split(' ')[0] + ' cadastrado(a) · ' + nd + (nd > 1 ? ' dias' : ' dia')); } },
+      congNames: d.congs.map(c => c.name),
+      pq: s.pq, onPq: e => this.setState({ pq: e.target.value }),
+      payChips: [['todos', 'Todos', d.pax.length, 'transparent', 'none'], ['Pendente', 'Pendentes', d.pax.filter(p => p.status === 'Pendente').length, 'var(--crit)', 'inline-block'], ['Parcial', 'Parciais', d.pax.filter(p => p.status === 'Parcial').length, 'var(--attn)', 'inline-block'], ['Pago', 'Pagos', d.pax.filter(p => p.status === 'Pago').length, 'var(--succ)', 'inline-block']].map(([k, label, n, dot, dotD]) => ({ label, n, dot, dotD, ...chip(s.pPay === k), onClick: () => this.setState({ pPay: k }) })),
+      congChip: { label: s.pCong || 'Congregação', ...chip(!!s.pCong) }, openCongPick: () => this.setState({ sheet: { t: 'congPick' } }),
+      congOpts: [{ name: 'Todas as congregações', n: '', bg: !s.pCong ? 'var(--primary-s)' : 'transparent', weight: !s.pCong ? 600 : 400, onClick: () => this.setState({ pCong: null, sheet: null }) }].concat(d.congs.filter(c => c.n).map(c => ({ name: c.name, n: c.n, bg: s.pCong === c.name ? 'var(--primary-s)' : 'transparent', weight: s.pCong === c.name ? 600 : 400, onClick: () => this.setState({ pCong: c.name, sheet: null }) }))),
+      paxCount: rows.length + (rows.length === 1 ? ' passageiro' : ' passageiros'), sortLabel: s.pSort === 'aberto' ? 'Maior valor em aberto' : 'Nome A–Z', toggleSort: () => this.setState({ pSort: s.pSort === 'aberto' ? 'nome' : 'aberto' }),
+      paxRows: rows.map((p, i) => ({ name: p.name, ini: p.ini, cong: p.cong, status: p.status, sBg: stC[p.status][0], sFg: stC[p.status][1], avBg: stC[p.status][0], avFg: stC[p.status][1], payTxt: p.status === 'Pago' ? brl(p.total) : brl(p.total - p.paid) + ' em aberto', bt: i ? '1px solid var(--border)' : '0',
+        days: d.days.map((x, j) => ({ l: x.name, bg: p.days[j] ? 'var(--primary-s)' : 'var(--muted)', fg: p.days[j] ? 'var(--primary)' : 'var(--border2)' })), bg: tb && p.id === sp.id ? 'var(--primary-s)' : 'transparent', open: () => tb ? this.setState({ paxSel: p.id }) : this.setState({ sheet: { t: 'pax', id: p.id } }) })),
+      paxEmpty: !rows.length, openPaxMenu: () => this.setState({ sheet: { t: 'paxMenu' } }), moreToast: () => this.toastMsg('Mais 20 passageiros carregados'),
+      toastImport: () => { this.setState({ sheet: null }); this.toastMsg('Escolha a planilha para importar'); }, toastExport: () => { this.setState({ sheet: null }); this.toastMsg('Lista exportada em Excel'); },
+      finSeg: [['cong', 'Por congregação'], ['feed', 'Últimos pagamentos']].map(([k, label]) => ({ label, ...sel(s.finTab === k), onClick: () => this.setState({ finTab: k }) })),
+      finByCong: s.finTab === 'cong', finFeed: s.finTab === 'feed',
+      finCongs: d.congs.filter(c => c.n).slice().sort((a, b) => a.pct - b.pct).slice(0, 10).map((c, i) => { const e = c.n * 100, r = Math.round(e * c.pct / 100); return { name: c.name, n: c.n, pctStr: c.pct + '%', c: pctC(c.pct), rec: brl(r), open: c.pct < 100 ? brl(e - r) + ' em aberto' : 'Quitado', bt: i ? '1px solid var(--border)' : '0', tap: () => this.setState({ sheet: { t: 'cong', name: c.name } }) }; }),
+      feed: [['Bruno Carvalho', 'Jardim Paulista · Pix · hoje, 14:32', 'R$ 120'], ['Gabriela Lima', 'Guanabara · Dinheiro · hoje, 11:05', 'R$ 80'], ['Hugo Almeida', 'Nova Campinas · Pix · hoje, 08:47', 'R$ 40'], ['Carla Mendes', 'Barão Geraldo · Pix · ontem, 21:10', 'R$ 40'], ['Isabela Torres', 'Vila Industrial · Dinheiro · ontem, 19:42', 'R$ 120'], ['Fábio Martins', 'Castelo · Pix · ontem, 16:20', 'R$ 40'], ['Leonardo Prado', 'Swift · Pix · 05/10, 20:15', 'R$ 80']].map(([name, sub, v], i) => ({ name, sub, v, glyph: sub.includes('Pix') ? 'PIX' : 'R$', bg: 'var(--succ-s)', fg: 'var(--succ)', bt: i ? '1px solid var(--border)' : '0' })),
+      seeOpen: () => { this.setState({ tab: 'pax', pSort: 'aberto', pPay: 'todos' }); window.scrollTo(0, 0); },
+      openPay: () => { const own = sheet.t === 'pax' || (tb && s.tab === 'pax'); this.setState({ sheet: { t: 'pay', id: own ? sp.id : null }, payV: own ? String(sp.total - sp.paid) : '40' }); },
+      payWho: sheet.id != null && sheet.t === 'pay' ? (d.pax.find(p => p.id === sheet.id) || {}).name + ' · em aberto ' + brl(((d.pax.find(p => p.id === sheet.id) || {}).total || 0) - ((d.pax.find(p => p.id === sheet.id) || {}).paid || 0)) : 'Selecione o passageiro depois de informar o valor',
+      payV: s.payV, onPayV: e => this.setState({ payV: e.target.value.replace(/\D/g, '') }),
+      payQuick: ['40', '80', '120'].map(v => ({ label: 'R$ ' + v, onClick: () => this.setState({ payV: v }) })),
+      payMethods: ['Pix', 'Dinheiro', 'Cartão'].map(m => ({ label: m, ...sel(s.payM === m), onClick: () => this.setState({ payM: m }) })),
+      savePay: () => { this.setState({ sheet: null }); this.toastMsg('Pagamento de R$ ' + s.payV + ' registrado'); },
+      toggleBg: s.dark ? 'var(--primary)' : 'var(--border2)', toggleX: s.dark ? '21px' : '3px',
+      moreGroups: [{ title: 'Evento', items: [
+        { label: 'Ônibus', sub: day.nBus + ' por dia · ' + (day.cap - day.n) + ' lugares livres na ' + day.name.toLowerCase(), icon: 'M8 6v6M16 6v6M2 12h20M7 18h.01M17 18h.01M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12H4zM6 18v2M18 18v2', icBg: 'var(--primary-s)', icFg: 'var(--primary)', onClick: go('more', 'buses') },
+        { label: 'Congregações', sub: '20 no circuito · 8 finalizadas', icon: 'M3 21h18M5 21V10l7-5 7 5v11M10 21v-5h4v5', icBg: 'var(--info-s)', icFg: 'var(--info)', onClick: go('more', 'congs') },
+        { label: 'Listas e exportações', sub: 'Embarque, pagamentos, WhatsApp', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5', icBg: 'var(--attn-s)', icFg: 'var(--attn-t)', onClick: go('more', 'lists') }] },
+        { title: 'Conta', items: [
+        { label: 'Tema escuro', sub: '', icon: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z', icBg: 'var(--muted)', icFg: 'var(--text)', tog: true, onClick: () => this.setState({ dark: !s.dark }) },
+        { label: 'Alterar senha', sub: '', icon: 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4', icBg: 'var(--muted)', icFg: 'var(--text)', onClick: () => this.toastMsg('Enviamos um link para seu e-mail') },
+        { label: 'Sair', sub: '', icon: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9', icBg: 'var(--crit-s)', icFg: 'var(--crit)', danger: true, onClick: () => this.toastMsg('Sessão encerrada') }] }]
+        .map(g => ({ ...g, items: g.items.map((it, i) => ({ ...it, bt: i ? '1px solid var(--border)' : '0', fg: it.danger ? 'var(--crit)' : 'var(--text)', subD: it.sub ? 'block' : 'none', chevD: it.tog || it.danger ? 'none' : 'block', togD: it.tog ? 'block' : 'none' })) })),
+      congSegs: d.congs.map(c => ({ c: congStatus(c)[1] })),
+      remindLabel: s.reminded ? 'Lembretes enviados' : 'Lembrar 12 congregações pendentes', remindOp: s.reminded ? 0.5 : 1, remindAll: () => { if (s.reminded) return; this.setState({ reminded: true }); this.toastMsg('Lembrete enviado a 12 coordenadores'); },
+      congChips: [['todas', 'Todas', 20, 'transparent', 'none'], ['fin', 'Finalizadas', 8, 'var(--succ)', 'inline-block'], ['and', 'Em andamento', 11, 'var(--attn)', 'inline-block'], ['sem', 'Sem inscritos', 1, 'var(--crit)', 'inline-block']].map(([k, label, n, dot, dotD]) => ({ label, n, dot, dotD, ...chip(s.cgF === k), onClick: () => this.setState({ cgF: k }) })),
+      congList: cgList.map((c, i) => { const st = congStatus(c); return { name: c.name, code: c.code, n: c.n, pctNum: c.n ? c.pct : 0, pctLabel: c.n ? c.pct + '%' : '—', c: pctC(c.pct), status: st[0], dot: st[1], bt: i >= (tb ? 2 : 1) ? '1px solid var(--border)' : '0', open: () => this.setState({ sheet: { t: 'cong', name: c.name } }) }; }),
+      listTypes: LT.map(([label, desc, bg, fg, icon], k) => ({ label, desc, bg, fg, icon, open: () => this.setState({ sheet: { t: 'list', k } }) })),
+      fmts: [['PDF', 'para imprimir'], ['Excel', 'planilha'], ['WhatsApp', 'texto']].map(([label, sub]) => ({ label, sub, bd: s.fmt === label ? 'var(--primary)' : 'var(--border)', bg: s.fmt === label ? 'var(--primary-s)' : 'var(--surface)', onClick: () => this.setState({ fmt: label }) })),
+      sl: { label: lt[0], desc: lt[1] }, genLabel: s.fmt === 'WhatsApp' ? 'Copiar mensagem' : 'Gerar ' + s.fmt, genList: () => { this.setState({ sheet: null }); this.toastMsg(s.fmt === 'WhatsApp' ? 'Mensagem copiada' : lt[0] + ' gerada em ' + s.fmt); },
+      hasToast: !!s.toast, toast: s.toast,
+      hasSheet: !!s.sheet, closeSheet: () => this.setState({ sheet: null }), sheetMax: sheet.t === 'congPick' || sheet.t === 'bus' ? '86vh' : '92vh',
+      sh: { pax: sheet.t === 'pax', bus: sheet.t === 'bus', cong: sheet.t === 'cong', events: sheet.t === 'events', notifs: sheet.t === 'notifs', congPick: sheet.t === 'congPick', paxMenu: sheet.t === 'paxMenu', list: sheet.t === 'list', pay: sheet.t === 'pay', confirm: sheet.t === 'confirm' },
+      sp: { ...sp, avBg: stC[sp.status][0], avFg: stC[sp.status][1], sFg: stC[sp.status][1], paid: brl(sp.paid), total: brl(sp.total), w: (sp.paid / sp.total * 100) + '%', bar: stC[sp.status][2], canPay: sp.status !== 'Pago',
+        legs: d.days.map((x, j) => sp.days[j] ? { wd: x.wd, dd: x.dd, title: 'Ônibus ' + sp.bus[j] + ' · poltrona ' + sp.seat[j], sub: x.name + ', ' + x.date + ' · saída 06:30', bg: 'var(--primary-s)', fg: 'var(--primary)', op: 1 } : { wd: x.wd, dd: x.dd, title: 'Não vai neste dia', sub: x.name + ', ' + x.date, bg: 'var(--muted)', fg: 'var(--text2)', op: 0.6 }) },
+      toastEdit: () => this.toastMsg('Edição aberta'), toastSeat: () => this.toastMsg('Escolha a nova poltrona no mapa'), toastRemove: () => { this.setState({ sheet: null }); this.toastMsg('Inscrição removida'); },
+      sb: { i: sb.i, n: sb.n, day: d.days[sheet.di ?? s.day].name + ', ' + d.days[sheet.di ?? s.day].date, fg: sbFull ? 'var(--crit)' : 'var(--succ)', tagBg: sbFull ? 'var(--crit-s)' : 'var(--succ-s)', tag: sbFull ? 'Lotado' : (46 - sb.n) + ' livres',
+        cells: (() => { const out = []; let k = 0; for (let r = 0; r < 12; r++) for (let c = 0; c < 5; c++) { if (c === 2) { out.push({ bg: 'transparent', bd: 'transparent' }); continue; } if (r === 11 && c > 2) { out.push({ bg: 'transparent', bd: 'transparent' }); continue; } out.push(k < sb.n ? { bg: 'var(--primary)', bd: 'transparent' } : { bg: 'var(--surface)', bd: 'var(--border2)' }); k++; } return out; })(),
+        pax: d.pax.slice(0, 10).map((p, i) => ({ seat: String(i + 1).padStart(2, '0'), name: p.name })), more: Math.max(0, sb.n - 10) },
+      toastShare: () => this.toastMsg('Lista do ônibus ' + sb.i + ' pronta para compartilhar'), toastBoard: () => { this.setState({ sheet: null }); this.toastMsg('Lista de embarque gerada em PDF'); },
+      sc: { name: scg.name, code: scg.code, pctNum: scg.n ? scg.pct : 0, pctLabel: scg.n ? scg.pct + '%' : '—', c: pctC(scg.pct), status: congStatus(scg)[0], resp: scg.resp, phone: scg.phone,
+        kpis: [{ l: 'Inscritos', v: scg.n, fg: 'var(--text)' }, { l: 'Pago', v: scg.pct + '%', fg: pctC(scg.pct) }, { l: 'Em aberto', v: brl(Math.round(scg.n * 100 * (100 - scg.pct) / 100)), fg: 'var(--crit)' }] },
+      toastRemind: () => this.toastMsg('Lembrete enviado a ' + scg.resp.split(' ')[0]), seeCongPax: () => { this.setState({ sheet: null, tab: 'pax', sub: null, pCong: scg.name, pPay: 'todos' }); window.scrollTo(0, 0); },
+      events: [['Assembleia de Circuito', '23 a 25/10/2026 · inscrições abertas', '#4fb393', 'var(--primary-s)'], ['Congresso Regional', 'jul/2026 · finalizado', 'var(--border2)', 'transparent'], ['Assembleia de Circuito', 'mai/2026 · finalizado', 'var(--border2)', 'transparent']].map(([name, when, dot, bg]) => ({ name, when, dot, bg })),
+      toastNewEvent: () => { this.setState({ sheet: null }); this.toastMsg('Novo evento criado como rascunho'); },
+      notifs: NOT.map(([title, time, glyph, bg, fg], i) => ({ title, time, glyph, bg, fg, weight: s.read ? 400 : 500, dotOp: s.read ? 0 : 1, bt: i ? '1px solid var(--border)' : '0' })),
+      markRead: () => this.setState({ read: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

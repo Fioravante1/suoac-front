@@ -132,6 +132,10 @@
   --suoac-radius-pill: 999px;
   /* 14px: campos e botoes altos do redesign, entre o md e o lg da escala. */
   --suoac-radius-control: 0.875rem;
+  /* 22px: modais do painel no desktop. */
+  --suoac-radius-modal: 1.375rem;
+  /* 24px: sheets e modais do painel no celular e no tablet. */
+  --suoac-radius-sheet: 1.5rem;
 
   /* Shadows */
   --suoac-shadow-xs: 0 1px 2px rgb(16 24 40 / 0.06);
@@ -141,6 +145,10 @@
   --suoac-shadow-dropdown: 0 24px 60px rgb(13 43 69 / 0.28);
   --suoac-shadow-menu: 0 18px 40px rgb(13 43 69 / 0.2);
   --suoac-shadow-modal: 0 40px 100px rgb(10 26 41 / 0.45);
+  /* Projetada para cima: o sheet nasce colado na borda inferior da tela. */
+  --suoac-shadow-sheet: 0 -10px 40px rgb(10 26 41 / 0.25);
+  /* Modal largo do tablet (cadastrar passageiro, busca). */
+  --suoac-shadow-modal-wide: 0 30px 80px rgb(10 26 41 / 0.35);
   --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
   /*
@@ -153,6 +161,8 @@
   /* Scrim & overlay */
   --suoac-color-scrim: rgb(16 24 40 / 0.45);
   --suoac-color-modal-scrim: rgb(10 26 41 / 0.55);
+  /* Mais leve que o do modal do desktop, e sem desfoque: o do painel no celular e no tablet. */
+  --suoac-color-sheet-scrim: rgb(10 26 41 / 0.45);
   --suoac-color-overlay: rgb(247 249 248 / 0.72);
   --suoac-overlay-blur: 4px;
 
@@ -166,6 +176,8 @@
   --suoac-layout-mobile-nav-height: 4.5rem;
   --suoac-layout-sidebar-width: 17rem;
   --suoac-layout-content-max-width: 75rem;
+  /* 440px: largura maxima do painel no celular, centralizado em telas um pouco maiores. */
+  --suoac-layout-compact-max-width: 27.5rem;
 
   /*
    * Larguras de corte do web responsivo (SUC-83), do handoff: celular abaixo de
@@ -173,12 +185,20 @@
    * dividido de desktop e tablet paisagem. Acima de 1200px o espacamento do
    * desktop volta ao tamanho cheio.
    *
+   * O painel (area logada, Fatia 2) corta em outro lugar: usa o layout de tablet
+   * ate 1279px e o de desktop a partir de 1280px. Decisao do usuario em
+   * 28/10/2026 (SUC-6). O README do handoff diz 1100px, mas o desktop do
+   * `SUOAC Dashboard v3.dc.html` aplica `min-width: 1280px`, e cortar antes criaria
+   * rolagem horizontal entre 1100 e 1279px. Consequencia assumida: o tablet em
+   * paisagem (1180px) fica com o layout de tablet.
+   *
    * `@media` nao le `var()`: os CSS Modules escrevem estes mesmos valores, em
    * `min-width`, e `breakpoints.test.ts` falha se algum se afastar daqui.
    */
   --suoac-breakpoint-tablet: 47.5rem;
   --suoac-breakpoint-desktop: 64rem;
   --suoac-breakpoint-desktop-wide: 75rem;
+  --suoac-breakpoint-panel-desktop: 80rem;
 
   /* Motion */
   --suoac-motion-duration-fast: 180ms;
@@ -267,6 +287,35 @@
   }
 }
 
+/*
+ * As tres entradas abaixo sao do painel no celular e no tablet
+ * (`SUOAC Dashboard Mobile.dc.html`). Partem de elementos ja centralizados por
+ * `translate(-50%)`, como o toast, e por isso so servem a quem se posiciona assim.
+ */
+
+/* Sheet: sobe da borda inferior da tela. */
+@keyframes suoac-sheet-in {
+  from {
+    transform: translate(-50%, 100%);
+  }
+}
+
+/* Modal central do tablet, no lugar do sheet: centralizado nos dois eixos. */
+@keyframes suoac-modal-centered-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(0.97);
+  }
+}
+
+/* Modal largo do tablet (cadastrar passageiro, busca): ancorado no topo. */
+@keyframes suoac-modal-wide-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.98);
+  }
+}
+
 /* Toast inferior central — ja centralizado por translate(-50%). */
 @keyframes suoac-pop {
   from {
@@ -346,6 +395,9 @@
   --suoac-animation-swap: suoac-swap;
   --suoac-animation-fade: suoac-fade;
   --suoac-animation-modal-in: suoac-modal-in;
+  --suoac-animation-sheet-in: suoac-sheet-in;
+  --suoac-animation-modal-centered-in: suoac-modal-centered-in;
+  --suoac-animation-modal-wide-in: suoac-modal-wide-in;
   --suoac-animation-pop: suoac-pop;
   --suoac-animation-grow: suoac-grow;
   --suoac-animation-seat: suoac-seat;
@@ -433,6 +485,8 @@ html[data-theme="dark"] {
   --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
   --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
   --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+  --suoac-shadow-sheet: 0 -10px 40px rgb(0 0 0 / 0.45);
+  --suoac-shadow-modal-wide: 0 30px 80px rgb(0 0 0 / 0.55);
   --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
 
@@ -486,6 +540,8 @@ html[data-theme="dark"] {
     --suoac-shadow-dropdown: 0 24px 60px rgb(0 0 0 / 0.5);
     --suoac-shadow-menu: 0 18px 40px rgb(0 0 0 / 0.45);
     --suoac-shadow-modal: 0 40px 100px rgb(0 0 0 / 0.6);
+    --suoac-shadow-sheet: 0 -10px 40px rgb(0 0 0 / 0.45);
+    --suoac-shadow-modal-wide: 0 30px 80px rgb(0 0 0 / 0.55);
     --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
     --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
 
