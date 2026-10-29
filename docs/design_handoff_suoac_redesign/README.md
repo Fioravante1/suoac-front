@@ -17,7 +17,7 @@ Os arquivos `.dc.html` são **referências de design em HTML** — protótipos q
 Nunca usar "coordenador" sozinho: existe também o **coordenador do corpo de anciãos**. Sempre escrever **Coordenador do arranjo de ônibus no circuito** / **na congregação** (forma curta aceitável em espaços estreitos: "Coord. do arranjo").
 
 ## Navegação (sem menu lateral)
-Dashboard: desktop ≥ 1100px, tablet e celular na seção 10. Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
+Dashboard: desktop ≥ 1280px, tablet (760–1279px) e celular (< 760px) na seção 10. Login e Convite são responsivos (ver seção 9). Fonte única: **Geist** (400/500/600/700, Google Fonts).
 
 ### Faixa fixa do evento (topo, fundo `--navy`)
 Altura 68px, padding horizontal 40px, texto branco. Da esquerda para a direita:
@@ -174,7 +174,7 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
 - Ícones: SVG inline estilo Lucide; usar a biblioteca de ícones do codebase (ex.: `lucide-react`).
 
 ## Arquivos
-- `SUOAC Dashboard.dc.html` — faixa do evento, abas e todos os modais (fonte da verdade do painel).
+- `SUOAC Dashboard.dc.html` — versão antiga da navegação (histórico; **não usar** como referência).
 - `SUOAC Login.dc.html` — login, recuperação, nova senha e autocadastro do circuito.
 - `SUOAC Convite.dc.html` — cadastro do coordenador da congregação pelo link de convite.
 - `SUOAC Dashboard Mobile.dc.html` — dashboard para celular e tablet (ver seção 10).
@@ -198,12 +198,12 @@ Fundo da página fora do app: `#e4e9e7`. Links: `#1f6e5a`, hover `#174e40`.
   - Todos os detalhes e ações abrem como **bottom sheets** (alça, fundo escurecido, máx. 86–92vh): passageiro, ônibus (mapa vertical + lista), congregação, registrar pagamento (valor grande, atalhos R$ 40/80/120, Pix/Dinheiro/Cartão), exportar lista (dia + formato PDF/Excel/WhatsApp), confirmar encerramento.
   - **Cadastrar passageiro**: tela cheia; primeiro busca no histórico do circuito ("Usar" preenche), ou "Cadastrar como novo"; formulário com dias (mostrando lugares livres), pagamento Pendente/Parcial/Pago (Parcial abre campo de valor) e rodapé fixo com total + Cadastrar.
   - Inputs 16px (sem zoom no iOS). Estados por hash: `#inicio #passageiros #financeiro #mais #congregacoes #onibus #listas #cadastrar #cadastrar-form #sheet-onibus #sheet-passageiro #sheet-congregacao`.
-- **Tablet (760–1099px)**: `SUOAC Dashboard Mobile.dc.html` (o mesmo app, layout próprio ≥ 760px via objeto `T`): navegação em pílula flutuante (máx. 560px, bottom 16px) com FAB; Início em grade (hero com áreas "date btn" / "steps", KPIs 4 colunas, Ocupação | Atenção + Ranking); **Passageiros em mestre-detalhe** (lista + ficha fixa 360px; toque troca a ficha); Financeiro em 2 colunas; Mais, Listas e Congregações em 2 colunas; Ônibus em 4 colunas; sheets viram **modais centrais** (540px, `popM`); Cadastrar e Busca viram modais grandes (620px, 90vh) com fundo escurecido.
-- Alternativa legada para tablet: `SUOAC Dashboard v3.dc.html` — mesmo dashboard do desktop, responsivo via objeto `R` em `renderVals()` (estado `vw`): colunas laterais descem, KPIs 2×2, abas roláveis, faixa do evento empilhada, palco com 3 ônibus, linhas de passageiros em 2 linhas (grid-template-areas), modais com largura máx. 100%. Acima de 1100px = desktop.
+- **Tablet (760–1279px)**: `SUOAC Dashboard Mobile.dc.html` (o mesmo app, layout próprio ≥ 760px via objeto `T`): navegação em pílula flutuante (máx. 560px, bottom 16px) com FAB; Início em grade (hero com áreas "date btn" / "steps", KPIs 4 colunas, Ocupação | Atenção + Ranking); **Passageiros em mestre-detalhe** (lista + ficha fixa 360px; toque troca a ficha); Financeiro em 2 colunas; Mais, Listas e Congregações em 2 colunas; Ônibus em 4 colunas; sheets viram **modais centrais** (540px, `popM`); Cadastrar e Busca viram modais grandes (620px, 90vh) com fundo escurecido.
+- Alternativa legada para tablet: `SUOAC Dashboard v3.dc.html` — mesmo dashboard do desktop, responsivo via objeto `R` em `renderVals()` (estado `vw`): colunas laterais descem, KPIs 2×2, abas roláveis, faixa do evento empilhada, palco com 3 ônibus, linhas de passageiros em 2 linhas (grid-template-areas), modais com largura máx. 100%. A partir de 1280px = desktop.
 
 
 ### 11. Lacunas: estados e papéis (`SUOAC Lacunas.dc.html`)
-Arquivo único e responsivo (celular < 760, tablet < 1100, desktop ≥ 1100; estado `vw`, objeto `L`). Vitrine com as 10 telas nos 3 tamanhos: `SUOAC Lacunas Vitrine.dc.html`. Hashes entre parênteses.
+Arquivo único e responsivo (celular < 760, tablet 760–1279, desktop ≥ 1280; estado `vw`, objeto `L`). Vitrine com as 10 telas nos 3 tamanhos: `SUOAC Lacunas Vitrine.dc.html`. Hashes entre parênteses.
 - **Circuito sem evento** (`#sem-evento`): card navy com "Nenhum evento em andamento", **Criar evento** e **Duplicar o último**; lista de eventos anteriores com "Duplicar" (copia datas, valor, ônibus e congregações); resumo do circuito (congregações, coordenadores ativos, convites pendentes). Topo mostra "Nenhum evento ativo" com ponto cinza.
 - **Criar / editar evento** (`#criar-evento`, `#editar-evento`): tipo (Assembleia de circuito / Congresso regional / Outro), nome, local; dias de viagem (cada dia com saída/retorno e nº de ônibus; adicionar/remover); valor por dia, prazo de inscrição e de pagamento; stepper de ônibus por dia e lugares por ônibus (padrão 46); toggles "Todas as congregações" e "Avisar coordenadores ao publicar". Coluna lateral (sticky no desktop, abaixo no tablet/celular) com **prévia** de como as congregações veem o evento + checklist "Pronto para publicar". Ações: Salvar rascunho / **Publicar e abrir inscrições** (no celular em barra fixa inferior). Editar adiciona **zona de risco** "Cancelar evento".
 - **Evento em rascunho** (`#rascunho`): pílula "Rascunho" no topo; card tracejado com progresso (3 de 5) e itens pendentes com ação (ex.: Ônibus → Adicionar); "Editar evento" / "Publicar"; nota: é possível publicar sem ônibus. Card "Ao publicar" explica o que acontece.

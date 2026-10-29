@@ -328,7 +328,7 @@ class Component extends DCLogic {
   componentWillUnmount() { window.removeEventListener('resize', this._rz); clearTimeout(this._t); }
   say = m => { clearTimeout(this._t); this.setState({ toast: m }); this._t = setTimeout(() => this.setState({ toast: '' }), 2600); };
   renderVals() {
-    const s = this.state, vw = s.vw, m = vw < 760, t = !m && vw < 1100;
+    const s = this.state, vw = s.vw, m = vw < 760, t = !m && vw < 1280;
     const congRole = s.screen === 'cong' || s.screen === 'team', mobNav = m || t;
     const formLike = s.screen === 'create' || s.screen === 'edit';
     const L = {
