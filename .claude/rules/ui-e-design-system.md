@@ -39,16 +39,17 @@ Principios obrigatorios:
     espacamento volta ao tamanho cheio.
   - **O painel (area logada, Fatia 2) corta o desktop em outro lugar**: layout de tablet ate
     1279px e de desktop a partir de 1280px (`80rem`, `--suoac-breakpoint-panel-desktop`).
-    Decisao do usuario em 28/10/2026 (SUC-6): o README do handoff diz 1100px, mas o desktop do
-    `v3` exige 1280px de largura minima, e cortar antes criaria rolagem horizontal. As telas de
-    acesso continuam cortando em 1024px, e `breakpoints.test.ts` confere cada area com os seus.
+    Decisao do usuario em 28/10/2026 (SUC-6): o README do handoff dizia 1100px, mas o desktop do
+    `v3` exige 1280px de largura minima, e cortar antes criaria rolagem horizontal. A exportacao
+    de 29/10/2026 (SUC-103) levou o handoff para 1280px. As telas de acesso continuam cortando em
+    1024px, e `breakpoints.test.ts` confere cada area com os seus.
   - **Mobile-first no CSS**: o estilo base e o do celular, e `@media (min-width: ...)` acrescenta
     o tablet e o desktop. `@media` nao le `var()`, entao o CSS Module escreve o valor do token;
     `src/app/styles/breakpoints.test.ts` falha se um corte nao for um dos declarados.
   - **O desenho vem do handoff.** Celular e tablet saem de `docs/design_handoff_suoac_redesign/`
-    (secao 9 do README e as vitrines Mobile e Tablet), nao de improviso. O handoff so cobre a
-    Fatia 1; as demais so ficam responsivas quando o desenho existir, e o card da fatia deve
-    pedi-lo antes de comecar.
+    (secoes 9 a 11 do README e as vitrines Mobile e Tablet), nao de improviso. O handoff cobre a
+    Fatia 1 e o painel da Fatia 2; as demais so ficam responsivas quando o desenho existir, e o
+    card da fatia deve pedi-lo antes de comecar.
   - **Nao altere** a responsividade de telas ainda nao redesenhadas.
   - Alvos de toque de 44x44px em tela de toque (`@media (pointer: coarse)`), e campos com fonte
     de 16px, que evita o zoom automatico do iOS.
