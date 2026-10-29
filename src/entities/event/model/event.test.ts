@@ -7,7 +7,9 @@ import {
   canCancelEventStatus,
   canEnrollPassengers,
   canUpdateEventDayTimes,
+  isEventVisibleTo,
   isLastActiveDayInEvent,
+  toEventViewer,
   type EventDayInEvent,
 } from "./event";
 
@@ -115,6 +117,31 @@ describe("canCancelEventStatus", () => {
   });
 });
 
+describe("isEventVisibleTo", () => {
+  const circuitUser = { circuitId: "circuit-1", isCircuitUser: true };
+  const congregationUser = { circuitId: "circuit-1", isCircuitUser: false };
+
+  it("mostra o evento publicado do próprio circuito para qualquer papel", () => {
+    const event = { circuitId: "circuit-1", status: EVENT_STATUSES.OPEN };
+
+    expect(isEventVisibleTo(event, circuitUser)).toBe(true);
+    expect(isEventVisibleTo(event, congregationUser)).toBe(true);
+  });
+
+  it("mostra o rascunho só para os papéis do circuito", () => {
+    const draft = { circuitId: "circuit-1", status: EVENT_STATUSES.DRAFT };
+
+    expect(isEventVisibleTo(draft, circuitUser)).toBe(true);
+    expect(isEventVisibleTo(draft, congregationUser)).toBe(false);
+  });
+
+  it("esconde o evento de outro circuito, mesmo dos papéis do circuito", () => {
+    const event = { circuitId: "circuit-2", status: EVENT_STATUSES.OPEN };
+
+    expect(isEventVisibleTo(event, circuitUser)).toBe(false);
+  });
+});
+
 describe("isLastActiveDayInEvent", () => {
   const baseDay: EventDayInEvent = {
     id: "day-1",
@@ -150,5 +177,21 @@ describe("isLastActiveDayInEvent", () => {
 
   it("retorna false para lista vazia", () => {
     expect(isLastActiveDayInEvent([])).toBe(false);
+  });
+});
+
+describe("toEventViewer", () => {
+  it("marca os papéis do circuito, que enxergam rascunho", () => {
+    expect(toEventViewer({ circuitId: "circuit-1", role: "CIRCUIT_ASSISTANT" })).toEqual({
+      circuitId: "circuit-1",
+      isCircuitUser: true,
+    });
+  });
+
+  it("não marca os papéis da congregação", () => {
+    expect(toEventViewer({ circuitId: "circuit-1", role: "CONGREGATION_COORDINATOR" })).toEqual({
+      circuitId: "circuit-1",
+      isCircuitUser: false,
+    });
   });
 });

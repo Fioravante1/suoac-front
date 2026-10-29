@@ -581,6 +581,7 @@ Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client
 | `cancel-event`                | feature | Cancelamento do evento inteiro            |
 | `enroll-passenger`            | feature | Inscricao em evento                       |
 | `select-event-days`           | feature | Escolha de dias e calculo de valor        |
+| `select-event`                | feature | Evento selecionado no shell novo          |
 | `register-payment`            | feature | Pagamento total/parcial/isento            |
 | `finalize-congregation-list`  | feature | Fechamento da lista da congregacao        |
 | `export-event-passenger-list` | feature | Exportacao futura                         |
@@ -617,6 +618,14 @@ Regra inicial:
 
 Evitar colocar todos os endpoints em `shared/api/endpoints` se eles ja tiverem dono claro no
 dominio. `shared/api` nao deve virar um monolito de requests.
+
+**A API autenticada nao e chamada durante a renderizacao de Server Components.** O proxy nao renova
+o access token; quem renova e o `httpClient`, e renovar grava cookie, o que o Next so permite em
+Server Action e Route Handler. Num Server Component, o token vencido rotacionaria o refresh token no
+backend sem o cookie novo ser gravado, e o usuario cairia da sessao. Por isso todo dado autenticado
+chega por Server Action consumida com TanStack Query. Ler cookie num Server Component continua
+permitido, como o tema faz. Exemplo: o evento selecionado do shell novo (`features/select-event`,
+SUC-104) le o proprio cookie dentro da Server Action que resolve o evento, nao no layout.
 
 ### 7.3 DTOs e mappers
 

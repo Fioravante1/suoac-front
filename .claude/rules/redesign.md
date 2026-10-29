@@ -20,6 +20,12 @@ qualquer coisa do redesign. O que segue e o resumo operacional.
 
 - O ponto de decisao entre versao antiga e nova e **o arquivo de rota em `/app`**, que ja deve ser
   fino. Nenhum `if (flag)` espalhado pelo resto do codigo.
+  - **Excecao: contexto que so o shell novo monta.** Uma tela v1 que precisa se comportar diferente
+    dentro do shell novo (ex.: seguir o evento selecionado na faixa, SUC-104) pode ramificar pela
+    presenca de um contexto que so o shell novo monta. Isso nao e `if (flag)`: quem decide continua
+    sendo o arquivo de rota, que monta ou nao o provider. A ramificacao fica num hook unico da
+    feature dona do contexto (`useWorkingEvent`, em `features/select-event`), nunca repetida pelas
+    telas, e sai junto com o shell antigo no corte. Decisao do usuario em 29/10/2026.
 - O slice novo nasce ao lado do antigo com sufixo `-next` (na Fatia 1 foi `login-next`, promovido a
   `login` no corte, SUC-34).
 - O slice `x` e o `x-next` **nunca** importam um do outro. Se algo for reaproveitavel, copie para o

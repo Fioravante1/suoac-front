@@ -18,11 +18,21 @@ export {
   canEnrollPassengers,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
+  isEventVisibleTo,
   isLastActiveDayInEvent,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
+  toEventViewer,
 } from "./model";
-export { eventDetailOptions, eventListOptions, fetchActiveEvent, activeEventOptions, eventSelectOptions } from "./api";
+export {
+  eventDetailOptions,
+  eventListOptions,
+  fetchActiveEvent,
+  fetchCurrentEvent,
+  fetchEvent,
+  activeEventOptions,
+  eventSelectOptions,
+} from "./api";
 export type {
   Event,
   EventDayInEvent,
@@ -31,4 +41,5 @@ export type {
   EventStatusVariant,
   EventType,
   EventUpdateField,
+  EventViewer,
 } from "./model";

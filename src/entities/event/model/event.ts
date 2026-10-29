@@ -1,3 +1,5 @@
+import { isCircuitRole, type UserRole } from "@/shared/auth";
+
 export const EVENT_TYPES = {
   ASSEMBLY: "ASSEMBLY",
   REGIONAL_CONVENTION: "REGIONAL_CONVENTION",
@@ -140,6 +142,27 @@ export function canEnrollPassengers(status: EventStatus): boolean {
 
 export function canCancelEventStatus(status: EventStatus): boolean {
   return status === EVENT_STATUSES.OPEN;
+}
+
+/** Quem olha um evento: o circuito do usuário e se o papel dele é do circuito. */
+export interface EventViewer {
+  circuitId: string;
+  isCircuitUser: boolean;
+}
+
+export function toEventViewer(user: { circuitId: string; role: UserRole }): EventViewer {
+  return { circuitId: user.circuitId, isCircuitUser: isCircuitRole(user.role) };
+}
+
+/**
+ * Quem enxerga um evento: só usuários do mesmo circuito, e rascunho só para os papéis do circuito
+ * ("Rascunho · só você vê"). O backend é a autoridade; o frontend repete a regra como defesa em
+ * profundidade antes de guardar ou mostrar um evento.
+ */
+export function isEventVisibleTo(event: Pick<Event, "circuitId" | "status">, viewer: EventViewer): boolean {
+  if (event.circuitId !== viewer.circuitId) return false;
+
+  return viewer.isCircuitUser || event.status !== EVENT_STATUSES.DRAFT;
 }
 
 export function isLastActiveDayInEvent(days: readonly EventDayInEvent[]): boolean {

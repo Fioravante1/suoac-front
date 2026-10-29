@@ -2,7 +2,7 @@
 
 import { Calendar } from "lucide-react";
 
-import { activeEventOptions } from "@/entities/event";
+import { useWorkingEvent } from "@/features/select-event";
 import { useQuery } from "@/shared/api";
 import { useAuthPermissions } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
@@ -24,17 +24,17 @@ import styles from "./dashboard-page.module.css";
 export function DashboardPage() {
   const { user, userCircuitId, userCongregationId, isCircuitUser } = useAuthPermissions();
 
-  const activeEventQuery = useQuery(activeEventOptions(userCircuitId));
+  const dashboardEvent = useWorkingEvent(userCircuitId);
 
-  const activeEvent = activeEventQuery.data;
+  const activeEvent = dashboardEvent.event;
   const activeEventId = activeEvent?.id ?? "";
 
   const dashboardQuery = useQuery(
     dashboardOptions(activeEventId, isCircuitUser ? undefined : (userCongregationId ?? undefined)),
   );
 
-  const isLoading = activeEventQuery.isLoading || (activeEventId && dashboardQuery.isLoading);
-  const isError = activeEventQuery.isError || dashboardQuery.isError;
+  const isLoading = dashboardEvent.isLoading || (activeEventId && dashboardQuery.isLoading);
+  const isError = dashboardEvent.isError || dashboardQuery.isError;
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -49,7 +49,7 @@ export function DashboardPage() {
           <Button
             variant="primary"
             onClick={() => {
-              activeEventQuery.refetch();
+              dashboardEvent.refetch();
               dashboardQuery.refetch();
             }}
           >
