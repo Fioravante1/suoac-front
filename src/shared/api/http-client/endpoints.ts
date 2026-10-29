@@ -25,6 +25,7 @@ export const endpoints = {
   },
   events: {
     list: (circuitId: string) => `/circuits/${circuitId}/events` as const,
+    current: (circuitId: string) => `/circuits/${circuitId}/events/current` as const,
     detail: (id: string) => `/events/${id}` as const,
     create: (circuitId: string) => `/circuits/${circuitId}/events` as const,
     update: (id: string) => `/events/${id}` as const,
