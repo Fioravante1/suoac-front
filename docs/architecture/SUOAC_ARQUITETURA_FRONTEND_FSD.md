@@ -581,7 +581,7 @@ Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client
 | `cancel-event`                | feature | Cancelamento do evento inteiro            |
 | `enroll-passenger`            | feature | Inscricao em evento                       |
 | `select-event-days`           | feature | Escolha de dias e calculo de valor        |
-| `select-event`                | feature | Evento selecionado no shell novo          |
+| `select-event`                | feature | Evento selecionado e seletor do shell     |
 | `register-payment`            | feature | Pagamento total/parcial/isento            |
 | `finalize-congregation-list`  | feature | Fechamento da lista da congregacao        |
 | `export-event-passenger-list` | feature | Exportacao futura                         |
