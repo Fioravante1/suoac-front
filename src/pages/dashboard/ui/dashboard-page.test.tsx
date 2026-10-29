@@ -18,7 +18,6 @@ vi.mock("@/entities/event", () => ({
   EVENT_STATUS_LABELS: { OPEN: "Inscricoes abertas" },
   EVENT_STATUS_BADGE_VARIANTS: { OPEN: "success" },
   EVENT_TYPE_LABELS: { ASSEMBLY: "Assembleia" },
-  activeEventOptions: vi.fn(),
 }));
 
 vi.mock("@/entities/event-passenger", async (importOriginal) => ({
@@ -47,6 +46,14 @@ vi.mock("@/shared/config", () => ({
 vi.mock("../api", () => ({
   dashboardOptions: vi.fn(),
 }));
+
+const mockUseWorkingEvent = vi.fn();
+
+vi.mock("@/features/select-event", () => ({
+  useWorkingEvent: (...args: unknown[]) => mockUseWorkingEvent(...args),
+}));
+
+import { dashboardOptions } from "../api";
 
 import { DashboardPage } from "./dashboard-page";
 
@@ -100,16 +107,37 @@ const mockDashboardData: DashboardData = {
   passengersByDay: [],
 };
 
+function mockWorkingEvent(state: { event?: { id: string } | null; isLoading?: boolean; isError?: boolean }) {
+  mockUseWorkingEvent.mockReturnValue({
+    event: undefined,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+    selection: null,
+    ...state,
+  });
+}
+
 describe("DashboardPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuthPermissions.mockReturnValue(circuitUserAuth);
   });
 
+  it("mostra o dashboard do evento em que a tela trabalha", () => {
+    mockWorkingEvent({ event: { id: "evt-selecionado" } });
+    mockUseQuery.mockReturnValue({ data: mockDashboardData, isLoading: false, isError: false, refetch: vi.fn() });
+
+    render(<DashboardPage />);
+
+    expect(mockUseWorkingEvent).toHaveBeenCalledWith("circuit-1");
+    expect(dashboardOptions).toHaveBeenCalledWith("evt-selecionado", undefined);
+    expect(screen.getByText("Assembleia Regional")).toBeInTheDocument();
+  });
+
   it("renderiza skeleton durante carregamento", () => {
-    mockUseQuery
-      .mockReturnValueOnce({ data: undefined, isLoading: true, isError: false, refetch: vi.fn() })
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ isLoading: true });
+    mockUseQuery.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -117,14 +145,8 @@ describe("DashboardPage", () => {
   });
 
   it("renderiza empty state quando nao ha evento ativo", () => {
-    mockUseQuery
-      .mockReturnValueOnce({
-        data: null,
-        isLoading: false,
-        isError: false,
-        refetch: vi.fn(),
-      })
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ event: null });
+    mockUseQuery.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -132,9 +154,8 @@ describe("DashboardPage", () => {
   });
 
   it("renderiza error state em caso de falha", () => {
-    mockUseQuery
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: true, refetch: vi.fn() })
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ isError: true });
+    mockUseQuery.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -142,19 +163,8 @@ describe("DashboardPage", () => {
   });
 
   it("renderiza dashboard completo com dados", () => {
-    mockUseQuery
-      .mockReturnValueOnce({
-        data: { id: "evt-1" },
-        isLoading: false,
-        isError: false,
-        refetch: vi.fn(),
-      })
-      .mockReturnValueOnce({
-        data: mockDashboardData,
-        isLoading: false,
-        isError: false,
-        refetch: vi.fn(),
-      });
+    mockWorkingEvent({ event: { id: "evt-1" } });
+    mockUseQuery.mockReturnValue({ data: mockDashboardData, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -165,19 +175,8 @@ describe("DashboardPage", () => {
   });
 
   it("renderiza saudacao com nome do usuario", () => {
-    mockUseQuery
-      .mockReturnValueOnce({
-        data: { id: "evt-1" },
-        isLoading: false,
-        isError: false,
-        refetch: vi.fn(),
-      })
-      .mockReturnValueOnce({
-        data: mockDashboardData,
-        isLoading: false,
-        isError: false,
-        refetch: vi.fn(),
-      });
+    mockWorkingEvent({ event: { id: "evt-1" } });
+    mockUseQuery.mockReturnValue({ data: mockDashboardData, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -185,9 +184,8 @@ describe("DashboardPage", () => {
   });
 
   it("exibe 'Visao geral do circuito' no empty state para usuario de circuito", () => {
-    mockUseQuery
-      .mockReturnValueOnce({ data: null, isLoading: false, isError: false, refetch: vi.fn() })
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ event: null });
+    mockUseQuery.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -203,9 +201,8 @@ describe("DashboardPage", () => {
       isAuthenticated: true,
     });
 
-    mockUseQuery
-      .mockReturnValueOnce({ data: null, isLoading: false, isError: false, refetch: vi.fn() })
-      .mockReturnValueOnce({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ event: null });
+    mockUseQuery.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
@@ -227,9 +224,8 @@ describe("DashboardPage", () => {
       ],
     };
 
-    mockUseQuery
-      .mockReturnValueOnce({ data: { id: "evt-1" }, isLoading: false, isError: false, refetch: vi.fn() })
-      .mockReturnValueOnce({ data: dataWithSummaries, isLoading: false, isError: false, refetch: vi.fn() });
+    mockWorkingEvent({ event: { id: "evt-1" } });
+    mockUseQuery.mockReturnValue({ data: dataWithSummaries, isLoading: false, isError: false, refetch: vi.fn() });
 
     render(<DashboardPage />);
 
