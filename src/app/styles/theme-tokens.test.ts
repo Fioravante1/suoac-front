@@ -45,10 +45,10 @@ const SHADOWS_BUILT_ON_COLOR_TOKENS = ["--suoac-shadow-focus-ring"];
 
 /**
  * Famílias de cor que são as mesmas nos dois temas por decisão de design, e não
- * por esquecimento. Hoje só o painel de apresentação da tela de entrada: ele é
- * navy com texto branco independentemente do tema escolhido.
+ * por esquecimento: o painel de apresentação da tela de entrada e os controles
+ * sobre o navy do painel. Os dois são navy com branco independentemente do tema.
  */
-const THEME_AGNOSTIC_COLOR_PREFIXES = ["--suoac-color-brand-panel"];
+const THEME_AGNOSTIC_COLOR_PREFIXES = ["--suoac-color-brand-panel", "--suoac-color-on-navy"];
 
 function isSharedByBothThemes(token: string): boolean {
   if (COLORS_SHARED_BY_BOTH_THEMES.includes(token)) return true;

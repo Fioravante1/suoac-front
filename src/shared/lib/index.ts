@@ -4,6 +4,7 @@ export {
   formatDate,
   formatDateRange,
   formatDaysRemaining,
+  formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
@@ -19,7 +20,15 @@ export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
 export { hardNavigate, isRedirectRejection } from "./navigation";
 export { calcPercentage } from "./number";
-export { containTabKey, getFocusedElement, lockDocumentScroll, registerLayer, useIsClient, useModal } from "./overlay";
+export {
+  containTabKey,
+  findMenuItemToFocus,
+  getFocusedElement,
+  lockDocumentScroll,
+  registerLayer,
+  useIsClient,
+  useModal,
+} from "./overlay";
 export type { Layer } from "./overlay";
 export {
   PHONE_MASK_MAX_LENGTH,

@@ -69,6 +69,19 @@
   --suoac-color-brand-panel-critical-ring: rgb(240 114 114 / 0.35);
   --suoac-color-brand-panel-text-secondary: rgb(255 255 255 / 0.6);
 
+  /*
+   * Controles sobre o navy do painel — faixa do evento no desktop e topo do celular
+   * (`SUOAC Dashboard v3.dc.html`). Branco translucido sobre navy nos dois temas, como
+   * o painel de apresentacao acima: o navy do tema escuro so escurece o fundo.
+   */
+  --suoac-color-on-navy-control: rgb(255 255 255 / 0.06);
+  --suoac-color-on-navy-control-hover: rgb(255 255 255 / 0.12);
+  --suoac-color-on-navy-control-active: rgb(255 255 255 / 0.14);
+  --suoac-color-on-navy-border: rgb(255 255 255 / 0.14);
+  --suoac-color-on-navy-text-muted: rgb(255 255 255 / 0.6);
+  /* Ponto de status neutro (rascunho, nenhum evento ativo) sobre o navy. */
+  --suoac-color-on-navy-status-neutral: rgb(255 255 255 / 0.4);
+
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
   --suoac-color-success-soft: #e7f6ee;
@@ -96,6 +109,8 @@
   --suoac-font-size-label: 0.8125rem;
   --suoac-font-size-small: 0.875rem;
   --suoac-font-size-body: 1rem;
+  /* 15px: itens de lista das sheets do painel no celular. */
+  --suoac-font-size-item: 0.9375rem;
   /* 17px: paragrafo de destaque, um degrau acima do corpo. */
   --suoac-font-size-lead: 1.0625rem;
   --suoac-font-size-h3: 1.25rem;
@@ -126,6 +141,8 @@
   /* 6px: caixas de selecao. */
   --suoac-radius-xs: 0.375rem;
   --suoac-radius-sm: 0.5rem;
+  /* 10px: itens dos menus suspensos do painel. */
+  --suoac-radius-item: 0.625rem;
   --suoac-radius-md: 0.75rem;
   --suoac-radius-lg: 1rem;
   --suoac-radius-xl: 1.25rem;
@@ -226,12 +243,20 @@
   /* Component defaults */
   --suoac-button-height: 2.75rem;
   --suoac-button-height-sm: 2.25rem;
+  /* 48px: botoes de acao das sheets do painel. */
+  --suoac-button-height-md: 3rem;
   /* 54px: botao de acao principal das telas de acesso. */
   --suoac-button-height-lg: 3.375rem;
   --suoac-input-height: 3rem;
   /* 50px: campos das telas de acesso. */
   --suoac-input-height-lg: 3.125rem;
   --suoac-card-padding: var(--suoac-space-6);
+  /* 38px: controles da faixa do evento, como o seletor de evento. */
+  --suoac-strip-control-height: 2.375rem;
+  /* 40px: itens de acao dos menus suspensos do painel. */
+  --suoac-menu-item-height: 2.5rem;
+  /* 56px: itens de lista das sheets do painel no celular. */
+  --suoac-sheet-item-height: 3.5rem;
 
   --background: var(--suoac-color-background);
   --foreground: var(--suoac-color-text-primary);

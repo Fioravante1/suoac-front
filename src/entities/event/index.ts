@@ -18,10 +18,12 @@ export {
   canEnrollPassengers,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
+  getEventPeriod,
   isEventVisibleTo,
   isLastActiveDayInEvent,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
+  sortEventsByPeriod,
   toEventViewer,
 } from "./model";
 export {
@@ -33,10 +35,12 @@ export {
   activeEventOptions,
   eventSelectOptions,
 } from "./api";
+export { EventStatusDot } from "./ui";
 export type {
   Event,
   EventDayInEvent,
   EventDayStatus,
+  EventPeriod,
   EventStatus,
   EventStatusVariant,
   EventType,

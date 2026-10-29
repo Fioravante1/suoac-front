@@ -7,11 +7,26 @@ import {
   canCancelEventStatus,
   canEnrollPassengers,
   canUpdateEventDayTimes,
+  getEventPeriod,
   isEventVisibleTo,
   isLastActiveDayInEvent,
+  sortEventsByPeriod,
   toEventViewer,
   type EventDayInEvent,
 } from "./event";
+
+function buildDay(date: string, status: EventDayInEvent["status"] = EVENT_DAY_STATUSES.ACTIVE): EventDayInEvent {
+  return {
+    id: `day-${date}`,
+    dayNumber: 1,
+    date: `${date}T00:00:00.000Z`,
+    label: "Dia 1",
+    departureTime: "06:00",
+    returnTime: "18:00",
+    status,
+    eventId: "event-1",
+  };
+}
 
 describe("canUpdateEventDayTimes", () => {
   it("retorna true para evento DRAFT com dia ACTIVE", () => {
@@ -193,5 +208,71 @@ describe("toEventViewer", () => {
       circuitId: "circuit-1",
       isCircuitUser: false,
     });
+  });
+});
+
+describe("getEventPeriod", () => {
+  it("vai do primeiro ao último dia ativo", () => {
+    const days = [buildDay("2026-10-23"), buildDay("2026-10-24"), buildDay("2026-10-25")];
+
+    expect(getEventPeriod(days)).toEqual({ start: "2026-10-23T00:00:00.000Z", end: "2026-10-25T00:00:00.000Z" });
+  });
+
+  it("deixa de fora os dias cancelados", () => {
+    const days = [buildDay("2026-10-23"), buildDay("2026-10-24"), buildDay("2026-10-25", EVENT_DAY_STATUSES.CANCELLED)];
+
+    expect(getEventPeriod(days)).toEqual({ start: "2026-10-23T00:00:00.000Z", end: "2026-10-24T00:00:00.000Z" });
+  });
+
+  it("sem nenhum dia ativo, como no evento cancelado, conta todos os dias", () => {
+    const days = [
+      buildDay("2026-08-08", EVENT_DAY_STATUSES.CANCELLED),
+      buildDay("2026-08-09", EVENT_DAY_STATUSES.CANCELLED),
+    ];
+
+    expect(getEventPeriod(days)).toEqual({ start: "2026-08-08T00:00:00.000Z", end: "2026-08-09T00:00:00.000Z" });
+  });
+
+  it("não depende da ordem em que os dias chegam", () => {
+    const days = [buildDay("2026-10-25"), buildDay("2026-10-23")];
+
+    expect(getEventPeriod(days)).toEqual({ start: "2026-10-23T00:00:00.000Z", end: "2026-10-25T00:00:00.000Z" });
+  });
+
+  it("evento sem dias não tem período", () => {
+    expect(getEventPeriod([])).toBeNull();
+  });
+});
+
+describe("sortEventsByPeriod", () => {
+  it("ordena do evento mais recente para o mais antigo, pelo primeiro dia", () => {
+    const events = [
+      { id: "marco", days: [buildDay("2026-03-15")] },
+      { id: "novembro", days: [buildDay("2026-11-14")] },
+      { id: "outubro", days: [buildDay("2026-10-23"), buildDay("2026-10-25")] },
+    ];
+
+    expect(sortEventsByPeriod(events).map((event) => event.id)).toEqual(["novembro", "outubro", "marco"]);
+  });
+
+  it("põe no fim os eventos sem dias, na ordem em que vieram", () => {
+    const events = [
+      { id: "sem-dias-1", days: [] },
+      { id: "outubro", days: [buildDay("2026-10-23")] },
+      { id: "sem-dias-2" },
+    ];
+
+    expect(sortEventsByPeriod(events).map((event) => event.id)).toEqual(["outubro", "sem-dias-1", "sem-dias-2"]);
+  });
+
+  it("não altera a lista recebida", () => {
+    const events = [
+      { id: "marco", days: [buildDay("2026-03-15")] },
+      { id: "novembro", days: [buildDay("2026-11-14")] },
+    ];
+
+    sortEventsByPeriod(events);
+
+    expect(events.map((event) => event.id)).toEqual(["marco", "novembro"]);
   });
 });

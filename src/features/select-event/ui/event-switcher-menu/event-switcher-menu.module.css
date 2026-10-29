@@ -1,0 +1,277 @@
+.root {
+  position: relative;
+  min-width: 0;
+}
+
+/* Botao sobre o navy da faixa: 38px, raio 12, borda e fundo em branco translucido. */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  max-width: 100%;
+  height: var(--suoac-strip-control-height);
+  padding: 0 var(--suoac-space-3) 0 0.875rem;
+  border: 1px solid var(--suoac-color-on-navy-border);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-on-navy-control);
+  color: var(--suoac-color-text-inverse);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.trigger:hover {
+  background: var(--suoac-color-on-navy-control-hover);
+}
+
+.trigger[aria-expanded="true"] {
+  background: var(--suoac-color-on-navy-control-active);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+
+.triggerTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.triggerPeriod {
+  color: var(--suoac-color-on-navy-text-muted);
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Troca a caminho: o spinner toma o lugar da seta, nas cores da faixa. */
+.trigger .spinner {
+  flex-shrink: 0;
+  border-color: var(--suoac-color-on-navy-border);
+  border-top-color: var(--suoac-color-text-inverse);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + var(--suoac-space-2));
+  left: 0;
+  z-index: var(--suoac-z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 22.5rem;
+  padding: var(--suoac-space-2);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-lg);
+  background: var(--suoac-color-surface);
+  box-shadow: var(--suoac-shadow-dropdown);
+  color: var(--suoac-color-text-primary);
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-base);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+.heading {
+  padding: var(--suoac-space-2) 0.625rem 0.375rem;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Com muitos eventos, a lista rola dentro do menu, e o menu nunca passa da tela. */
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: min(24rem, calc(100dvh - 14rem));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding: 0.625rem;
+  border: 0;
+  border-radius: var(--suoac-radius-item);
+  background: transparent;
+  color: var(--suoac-color-text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.event[aria-checked="true"],
+.event:hover,
+.event:focus-visible {
+  background: var(--suoac-color-surface-muted);
+}
+
+.eventText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.eventTitle {
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.eventMeta {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-caption);
+}
+
+.check {
+  flex-shrink: 0;
+  color: var(--suoac-color-primary);
+}
+
+.separator {
+  height: 1px;
+  margin: var(--suoac-space-1) 0.375rem;
+  background: var(--suoac-color-border);
+}
+
+.create,
+.edit {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: var(--suoac-menu-item-height);
+  padding: 0 0.625rem;
+  border-radius: var(--suoac-radius-item);
+  font-size: var(--suoac-font-size-small);
+  text-decoration: none;
+  transition: background-color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.create {
+  color: var(--suoac-color-primary);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.create:hover,
+.create:focus-visible {
+  background: var(--suoac-color-primary-light);
+}
+
+.edit {
+  color: var(--suoac-color-text-primary);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.edit:hover,
+.edit:focus-visible {
+  background: var(--suoac-color-surface-muted);
+}
+
+.event:focus-visible,
+.create:focus-visible,
+.edit:focus-visible,
+.retry:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: -2px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loadingRow {
+  height: 3.25rem;
+  border-radius: var(--suoac-radius-item);
+}
+
+.feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-3) 0.625rem;
+}
+
+.feedbackText {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}
+
+.empty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3) 0.625rem;
+}
+
+.emptyIcon {
+  flex-shrink: 0;
+  color: var(--suoac-color-text-secondary);
+}
+
+.emptyText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.retry {
+  height: var(--suoac-button-height-sm);
+  padding: 0 var(--suoac-space-3);
+  border: 1px solid var(--suoac-color-border-strong);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  cursor: pointer;
+}
+
+.retry:hover {
+  background: var(--suoac-color-surface-muted);
+}
+
+/* Desktop com tela de toque: alvos de 44px. */
+@media (pointer: coarse) {
+  .trigger,
+  .event,
+  .create,
+  .edit,
+  .retry {
+    min-height: 44px;
+  }
+}
