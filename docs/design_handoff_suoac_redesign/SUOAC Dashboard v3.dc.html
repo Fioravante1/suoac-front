@@ -1681,7 +1681,7 @@ class Component extends DCLogic {
       const on = s.tabC === label;
       return { label, count, cDisp: count ? 'inline-block' : 'none', onClick: () => this.setState({ tabC: label }), fg: on ? '#fff' : 'rgb(255 255 255/.66)', bar: on ? 1 : 0 };
     });
-    const vw = s.vw || 1400, m = vw < 760, t = !m && vw < 1100, mt = m || t;
+    const vw = s.vw || 1400, m = vw < 760, t = !m && vw < 1280, mt = m || t;
     const R = {
       minW: mt ? '0' : '1280px', hpad: m ? '0 14px' : t ? '0 28px' : '0 40px', hH: m ? '60px' : '68px', hgap: m ? '6px' : '18px', brandD: m ? 'none' : 'flex', evMax: m ? '190px' : 'none', evWhenD: m ? 'none' : 'inline',
       ddP: m ? 'fixed' : 'absolute', ddL: m ? '10px' : 'auto', ddR: m ? '10px' : 'auto', ddT: m ? '62px' : '46px', evW: m ? 'auto' : '360px', nR: m ? '10px' : '-8px', nT: m ? '62px' : '50px', nW: m ? 'auto' : '380px', uR: m ? '10px' : '0', uT: m ? '62px' : '54px', uW: m ? 'auto' : '320px',
