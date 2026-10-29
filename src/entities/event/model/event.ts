@@ -169,6 +169,49 @@ export function isLastActiveDayInEvent(days: readonly EventDayInEvent[]): boolea
   return days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE).length === 1;
 }
 
+/** Primeiro e último dia do evento, como datas ISO. */
+export interface EventPeriod {
+  start: string;
+  end: string;
+}
+
+/**
+ * Período do evento: do primeiro ao último dia ativo. Sem nenhum dia ativo, como no evento
+ * cancelado (o cancelamento cancela os dias), contam todos os dias, para o período não sumir.
+ * Sem dias, não há período.
+ */
+export function getEventPeriod(days: readonly EventDayInEvent[]): EventPeriod | null {
+  const activeDays = days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE);
+  const countedDays = activeDays.length > 0 ? activeDays : days;
+  const dates = countedDays.map((day) => day.date).sort();
+  const start = dates.at(0);
+  const end = dates.at(-1);
+
+  if (!start || !end) return null;
+
+  return { start, end };
+}
+
+/** Datas ISO em ordem decrescente; quem não tem data vai para o fim. */
+function compareStartsDescending(a: string | undefined, b: string | undefined): number {
+  if (a === b) return 0;
+  if (a === undefined) return 1;
+  if (b === undefined) return -1;
+
+  return a < b ? 1 : -1;
+}
+
+/**
+ * Eventos do mais recente para o mais antigo, pelo início do período. Os que não têm dias vão
+ * para o fim, na ordem em que vieram.
+ */
+export function sortEventsByPeriod<T extends Pick<Event, "days">>(events: readonly T[]): T[] {
+  return events
+    .map((event) => ({ event, start: getEventPeriod(event.days ?? [])?.start }))
+    .sort((a, b) => compareStartsDescending(a.start, b.start))
+    .map(({ event }) => event);
+}
+
 export interface EventDayInEvent {
   id: string;
   dayNumber: number;
