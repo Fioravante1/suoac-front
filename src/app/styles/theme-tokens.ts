@@ -32,9 +32,23 @@ const brandPanelColors = {
   brandPanelTextSecondary: "rgb(255 255 255 / 0.6)",
 } as const;
 
+/**
+ * Controles sobre o navy do painel (faixa do evento e topo do celular). Branco
+ * translucido nos dois temas, pelo mesmo motivo de `brandPanelColors`.
+ */
+const onNavyColors = {
+  onNavyControl: "rgb(255 255 255 / 0.06)",
+  onNavyControlHover: "rgb(255 255 255 / 0.12)",
+  onNavyControlActive: "rgb(255 255 255 / 0.14)",
+  onNavyBorder: "rgb(255 255 255 / 0.14)",
+  onNavyTextMuted: "rgb(255 255 255 / 0.6)",
+  onNavyStatusNeutral: "rgb(255 255 255 / 0.4)",
+} as const;
+
 export const themeTokens = {
   color: {
     ...brandPanelColors,
+    ...onNavyColors,
     primary: "#1F6E5A",
     primaryDark: "#174E40",
     primaryLight: "#E6F4EF",
@@ -87,6 +101,7 @@ export const themeTokens = {
       label: "0.8125rem",
       small: "0.875rem",
       body: "1rem",
+      item: "0.9375rem",
       lead: "1.0625rem",
       h3: "1.25rem",
       h2: "1.5rem",
@@ -119,6 +134,7 @@ export const themeTokens = {
   radius: {
     xs: "6px",
     sm: "8px",
+    item: "10px",
     md: "12px",
     lg: "16px",
     xl: "20px",
@@ -181,10 +197,14 @@ export const themeTokens = {
   component: {
     buttonHeight: "2.75rem",
     buttonHeightSm: "2.25rem",
+    buttonHeightMd: "3rem",
     buttonHeightLg: "3.375rem",
     inputHeight: "3rem",
     inputHeightLg: "3.125rem",
     cardPadding: "1.5rem",
+    stripControlHeight: "2.375rem",
+    menuItemHeight: "2.5rem",
+    sheetItemHeight: "3.5rem",
   },
 } as const;
 
@@ -213,8 +233,9 @@ export interface ThemeVariant {
 
 export const darkThemeTokens: ThemeVariant = {
   color: {
-    // Identicas ao tema claro, de proposito — ver `brandPanelColors`.
+    // Identicas ao tema claro, de proposito — ver `brandPanelColors` e `onNavyColors`.
     ...brandPanelColors,
+    ...onNavyColors,
     primary: "#4FB393",
     primaryDark: "#7FCFB4",
     primaryLight: "#183229",
