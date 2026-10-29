@@ -5,6 +5,7 @@ import {
   formatDate,
   formatDateRange,
   formatDaysRemaining,
+  formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
@@ -116,5 +117,36 @@ describe("getTodayDateString", () => {
     expect(getTodayDateString()).toBe("2026-07-15");
 
     vi.useRealTimers();
+  });
+});
+
+describe("formatShortDateRange", () => {
+  const today = new Date("2026-10-29T12:00:00.000Z");
+
+  it("escreve um dia só com dia e mês abreviado, sem ponto", () => {
+    expect(formatShortDateRange("2026-11-14T00:00:00.000Z", "2026-11-14T00:00:00.000Z", today)).toBe("14 nov");
+  });
+
+  it("junta os dias do mesmo mês com travessão, sem espaços", () => {
+    expect(formatShortDateRange("2026-10-23T00:00:00.000Z", "2026-10-25T00:00:00.000Z", today)).toBe("23–25 out");
+  });
+
+  it("separa meses diferentes com travessão entre espaços", () => {
+    expect(formatShortDateRange("2026-10-30T00:00:00.000Z", "2026-11-01T00:00:00.000Z", today)).toBe("30 out – 1 nov");
+  });
+
+  it("mostra o ano quando não é o ano corrente", () => {
+    expect(formatShortDateRange("2025-03-15T00:00:00.000Z", "2025-03-15T00:00:00.000Z", today)).toBe("15 mar 2025");
+    expect(formatShortDateRange("2027-05-07T00:00:00.000Z", "2027-05-09T00:00:00.000Z", today)).toBe("7–9 mai 2027");
+  });
+
+  it("mostra o ano nas duas pontas quando o intervalo atravessa a virada do ano", () => {
+    expect(formatShortDateRange("2026-12-31T00:00:00.000Z", "2027-01-02T00:00:00.000Z", today)).toBe(
+      "31 dez 2026 – 2 jan 2027",
+    );
+  });
+
+  it("lê a data em UTC, como a API grava os dias", () => {
+    expect(formatShortDateRange("2026-11-01T00:00:00.000Z", "2026-11-01T00:00:00.000Z", today)).toBe("1 nov");
   });
 });

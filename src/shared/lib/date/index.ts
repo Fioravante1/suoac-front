@@ -3,6 +3,7 @@ export {
   formatDate,
   formatDateRange,
   formatDaysRemaining,
+  formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
