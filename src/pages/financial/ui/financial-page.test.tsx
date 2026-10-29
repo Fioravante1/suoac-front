@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const mockUseAuthPermissions = vi.fn();
@@ -16,6 +16,12 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 vi.mock("@/shared/lib", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/lib")>()),
   formatCurrency: (value: string | number) => `R$ ${Number(value).toFixed(2)}`,
+}));
+
+const mockUseWorkingEvent = vi.fn();
+
+vi.mock("@/features/select-event", () => ({
+  useWorkingEvent: () => mockUseWorkingEvent(),
 }));
 
 import { FinancialPage } from "./financial-page";
@@ -69,7 +75,7 @@ interface QueryState {
 
 const defaultStates: Record<string, QueryState> = {
   "events-select": { data: { data: [{ id: "evt-1", title: "Assembleia" }] } },
-  "events-active": { data: { id: "evt-1" } },
+  "working-event": { data: { id: "evt-1" } },
   "financial-summary": { data: summary },
   "event-passengers": { data: { data: [passenger], meta: { totalPages: 1 } }, isFetching: false },
   congregations: { data: { data: [{ id: "c-1", name: "Central" }] } },
@@ -78,7 +84,7 @@ const defaultStates: Record<string, QueryState> = {
 let states: Record<string, QueryState>;
 
 function keyFor(queryKey: readonly unknown[]): string {
-  if (queryKey[1] === "events") return queryKey[2] === "active" ? "events-active" : "events-select";
+  if (queryKey[1] === "events") return "events-select";
   if (queryKey[1] === "financial-summary") return "financial-summary";
   if (queryKey[1] === "event-passengers") return "event-passengers";
   return "congregations";
@@ -86,6 +92,15 @@ function keyFor(queryKey: readonly unknown[]): string {
 
 function setup(isCircuitUser = true) {
   mockUseAuthPermissions.mockReturnValue({ userCircuitId: "circuit-1", isCircuitUser });
+
+  // Shell antigo: sem seleção, o evento da tela é o de inscrições abertas.
+  mockUseWorkingEvent.mockImplementation(() => ({
+    event: states["working-event"]?.data,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+    selection: null,
+  }));
 
   mockUseQuery.mockImplementation((options: { queryKey: readonly unknown[] }) => {
     const state = states[keyFor(options.queryKey)] ?? {};
@@ -103,6 +118,87 @@ describe("FinancialPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     states = structuredClone(defaultStates);
+  });
+
+  function mockNewShell(selection: {
+    event: { id: string } | null | undefined;
+    isError?: boolean;
+    isSelecting?: boolean;
+    selectEvent?: unknown;
+    refetch?: () => void;
+  }) {
+    const refetch = selection.refetch ?? vi.fn();
+
+    mockUseWorkingEvent.mockReturnValue({
+      event: selection.event,
+      isLoading: false,
+      isError: selection.isError ?? false,
+      refetch,
+      selection: {
+        event: selection.event,
+        isLoading: false,
+        isError: selection.isError ?? false,
+        refetch,
+        isSelecting: selection.isSelecting ?? false,
+        selectEvent: selection.selectEvent ?? vi.fn().mockResolvedValue({ success: true }),
+      },
+    });
+  }
+
+  it("no shell novo, mostra o financeiro do evento selecionado e troca a seleção pelo seletor da tela", () => {
+    const selectEvent = vi.fn().mockResolvedValue({ success: true, data: { id: "evt-1" } });
+    states["events-select"] = {
+      data: {
+        data: [
+          { id: "evt-1", title: "Assembleia" },
+          { id: "evt-2", title: "Congresso" },
+        ],
+      },
+    };
+    setup();
+    mockNewShell({ event: { id: "evt-2" }, selectEvent });
+    render(<FinancialPage />);
+
+    expect(mockUseQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["suoac", "financial-summary", "byEvent", "evt-2"] }),
+    );
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Selecionar evento" }), { target: { value: "evt-1" } });
+
+    expect(selectEvent).toHaveBeenCalledWith("evt-1");
+  });
+
+  it("no shell novo, mostra erro com nova tentativa quando o evento selecionado não carrega", () => {
+    const refetch = vi.fn();
+    setup();
+    mockNewShell({ event: undefined, isError: true, refetch });
+    render(<FinancialPage />);
+
+    expect(screen.getByText("Não foi possível carregar o evento")).toBeInTheDocument();
+    expect(screen.queryByText("Nenhum evento")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
+
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it("no shell novo, sem evento atual, pede para escolher um evento sem fingir que um está escolhido", () => {
+    setup();
+    mockNewShell({ event: null });
+    render(<FinancialPage />);
+
+    expect(screen.getByText("Nenhum evento selecionado")).toBeInTheDocument();
+    expect(screen.queryByText("Não há eventos no circuito para exibir o financeiro.")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Selecionar evento" })).toHaveValue("");
+    expect(screen.getByRole("option", { name: "Selecione um evento" })).toBeInTheDocument();
+  });
+
+  it("no shell novo, trava o seletor enquanto a troca de evento está a caminho", () => {
+    setup();
+    mockNewShell({ event: { id: "evt-1" }, isSelecting: true });
+    render(<FinancialPage />);
+
+    expect(screen.getByRole("combobox", { name: "Selecionar evento" })).toBeDisabled();
   });
 
   it("renderiza o heading Financeiro", () => {
@@ -133,7 +229,7 @@ describe("FinancialPage", () => {
   it("exibe empty state quando não há eventos", () => {
     setup();
     states["events-select"] = { data: { data: [] } };
-    states["events-active"] = { data: null };
+    states["working-event"] = { data: null };
     render(<FinancialPage />);
 
     expect(screen.getByText("Nenhum evento")).toBeInTheDocument();

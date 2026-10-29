@@ -3,7 +3,6 @@
 import { useState, type ChangeEvent } from "react";
 import { CalendarX } from "lucide-react";
 
-import { activeEventOptions, eventSelectOptions } from "@/entities/event";
 import { congregationSelectOptions } from "@/entities/congregation";
 import { eventPassengersFinancialOptions, financialSummaryOptions } from "@/entities/event-passenger";
 import { useQuery } from "@/shared/api";
@@ -24,21 +23,25 @@ import {
   type PaymentStatusFilterValue,
 } from "@/widgets/financial-passengers";
 
+import { useFinancialEvent } from "../model";
+
 import styles from "./financial-page.module.css";
 
 export function FinancialPage() {
   const { userCircuitId, isCircuitUser } = useAuthPermissions();
   const { page, setPage, reset } = usePagination();
 
-  const [selectedEventId, setSelectedEventId] = useState("");
   const [filter, setFilter] = useState<PaymentStatusFilterValue>("ALL");
 
-  const eventsQuery = useQuery(eventSelectOptions(userCircuitId));
-  const activeEventQuery = useQuery(activeEventOptions(userCircuitId));
-
-  const events = eventsQuery.data?.data ?? [];
-  // Default: evento ativo (OPEN); se não houver, o primeiro da lista. A escolha do usuário prevalece.
-  const resolvedEventId = selectedEventId || activeEventQuery.data?.id || events[0]?.id || "";
+  const {
+    events,
+    eventId: resolvedEventId,
+    isBootstrapping,
+    isError: isEventError,
+    retry: retryEvent,
+    isChangingEvent,
+    changeEvent,
+  } = useFinancialEvent(userCircuitId);
 
   const paymentStatus = filter === "ALL" ? undefined : filter;
 
@@ -52,7 +55,7 @@ export function FinancialPage() {
   }
 
   function handleEventChange(event: ChangeEvent<HTMLSelectElement>) {
-    setSelectedEventId(event.target.value);
+    changeEvent(event.target.value);
     setFilter("ALL");
     reset();
   }
@@ -62,13 +65,19 @@ export function FinancialPage() {
     reset();
   }
 
-  const isBootstrapping = eventsQuery.isLoading || activeEventQuery.isLoading;
+  const hasEvents = events.length > 0;
+  const showsEventError = !isBootstrapping && isEventError;
+  const hasNoEvent = !isBootstrapping && !isEventError && !resolvedEventId;
+  const showsContent = !isBootstrapping && !isEventError && Boolean(resolvedEventId);
 
-  const eventSelector = events.length > 0 && (
+  const eventSelector = hasEvents && (
     <Select
       aria-label="Selecionar evento"
       value={resolvedEventId}
       onChange={handleEventChange}
+      disabled={isChangingEvent}
+      // Sem evento ainda, a opção vazia evita que o navegador mostre o primeiro evento como escolhido.
+      placeholder={resolvedEventId ? undefined : "Selecione um evento"}
       options={events.map((event) => ({ value: event.id, label: event.title }))}
     />
   );
@@ -90,7 +99,19 @@ export function FinancialPage() {
         </>
       )}
 
-      {!isBootstrapping && !resolvedEventId && (
+      {showsEventError && (
+        <ErrorState
+          title="Não foi possível carregar o evento"
+          description="Verifique sua conexão e tente novamente."
+          action={
+            <Button variant="primary" onClick={retryEvent}>
+              Tentar novamente
+            </Button>
+          }
+        />
+      )}
+
+      {hasNoEvent && !hasEvents && (
         <EmptyState
           icon={<CalendarX size={48} />}
           title="Nenhum evento"
@@ -98,7 +119,15 @@ export function FinancialPage() {
         />
       )}
 
-      {!isBootstrapping && resolvedEventId && (
+      {hasNoEvent && hasEvents && (
+        <EmptyState
+          icon={<CalendarX size={48} />}
+          title="Nenhum evento selecionado"
+          description="Escolha um evento para ver o financeiro."
+        />
+      )}
+
+      {showsContent && (
         <>
           {summaryQuery.isLoading && <SkeletonCardGrid count={3} />}
 
