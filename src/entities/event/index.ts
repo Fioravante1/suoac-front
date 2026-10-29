@@ -35,6 +35,7 @@ export {
   activeEventOptions,
   eventSelectOptions,
 } from "./api";
+export { EventStatusDot } from "./ui";
 export type {
   Event,
   EventDayInEvent,

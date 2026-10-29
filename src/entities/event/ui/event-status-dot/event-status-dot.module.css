@@ -1,0 +1,28 @@
+.dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--suoac-color-text-secondary);
+}
+
+.dot[data-variant="success"] {
+  background: var(--suoac-color-success);
+}
+
+.dot[data-variant="attention"] {
+  background: var(--suoac-color-attention);
+}
+
+.dot[data-variant="critical"] {
+  background: var(--suoac-color-critical);
+}
+
+.dot[data-variant="info"] {
+  background: var(--suoac-color-info);
+}
+
+/* O cinza do texto secundario some sobre o navy; o v3 usa branco translucido ali. */
+.dot[data-surface="navy"][data-variant="neutral"] {
+  background: var(--suoac-color-on-navy-status-neutral);
+}
