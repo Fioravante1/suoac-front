@@ -12,6 +12,7 @@ export const queryKeys = {
     select: (circuitId: string) => ["suoac", "events", "select", circuitId] as const,
     detail: (id: string) => ["suoac", "events", "detail", id] as const,
     activeByCircuit: (circuitId: string) => ["suoac", "events", "active", circuitId] as const,
+    selected: (circuitId: string) => ["suoac", "events", "selected", circuitId] as const,
   },
   eventDays: {
     all: ["suoac", "event-days"] as const,
