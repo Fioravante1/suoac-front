@@ -294,18 +294,19 @@ uma:
 
 Decisões do usuário, registradas no épico:
 
-| Decisão                                                                                                                                        | Motivo                                                                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| O desktop do painel começa em **1280px** (`--suoac-breakpoint-panel-desktop`); abaixo disso vale o layout de tablet. O acesso segue em 1024px. | O README do handoff diz 1100px, mas o `v3` aplica `min-width: 1280px`: cortar antes criaria rolagem horizontal entre 1100 e 1279px. O layout de tablet foi feito para toque e vai até 1180px. |
-| O tablet usa o layout do celular, não o do desktop.                                                                                            | É o desenho do handoff (seção 10 do README, objeto `T`). O `v3` responsivo, que o README chama de alternativa legada para tablet, não é usado.                                                |
-| O evento selecionado fica num **cookie lido no servidor**, como o tema (§3.3).                                                                 | As URLs não mudam e o layout consegue ler o cookie, o que não faz com `searchParams`. Custo aceito: duas abas do navegador compartilham o evento. A regra do evento padrão é do SUC-104.      |
-| A aba **Pagamentos** existe nas três larguras para os papéis da congregação.                                                                   | Esses papéis já veem o financeiro hoje, e o critério de corte (§6) exige paridade funcional. O desenho do desktop ainda não tem a aba (SUC-97).                                               |
-| As **devoluções** de evento cancelado são da Fatia 5 (SUC-100), não do shell.                                                                  | Registrar devolução é trabalho financeiro; o shell só mostra o estado de evento cancelado (SUC-111).                                                                                          |
+| Decisão                                                                                                                                        | Motivo                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| O desktop do painel começa em **1280px** (`--suoac-breakpoint-panel-desktop`); abaixo disso vale o layout de tablet. O acesso segue em 1024px. | O README do handoff dizia 1100px, mas o `v3` aplica `min-width: 1280px`: cortar antes criaria rolagem horizontal entre 1100 e 1279px. O layout de tablet foi feito para toque e vai até 1180px. |
+| O tablet usa o layout do celular, não o do desktop.                                                                                            | É o desenho do handoff (seção 10 do README, objeto `T`). O `v3` responsivo, que o README chama de alternativa legada para tablet, não é usado.                                                  |
+| O evento selecionado fica num **cookie lido no servidor**, como o tema (§3.3).                                                                 | As URLs não mudam e o layout consegue ler o cookie, o que não faz com `searchParams`. Custo aceito: duas abas do navegador compartilham o evento. A regra do evento padrão é do SUC-104.        |
+| A aba **Pagamentos** existe nas três larguras para os papéis da congregação.                                                                   | Esses papéis já veem o financeiro hoje, e o critério de corte (§6) exige paridade funcional. O desenho do desktop ainda não tem a aba (SUC-97).                                                 |
+| As **devoluções** de evento cancelado são da Fatia 5 (SUC-100), não do shell.                                                                  | Registrar devolução é trabalho financeiro; o shell só mostra o estado de evento cancelado (SUC-111).                                                                                            |
 
-**Fonte do desenho.** Até a próxima exportação, o README do handoff tem duas fontes da verdade: ele
-ainda chama o `SUOAC Dashboard.dc.html` de fonte do painel, mas esse arquivo é a antiga exploração da
-navegação. Vale o `v3` para o desktop e o `Dashboard Mobile` para celular e tablet. Os `.dc.html` não
-são editados aqui (`.claude/rules/redesign.md`); a correção vem com a reexportação.
+**Fonte do desenho.** Vale o `v3` para o desktop e o `Dashboard Mobile` para celular e tablet. O
+`SUOAC Dashboard.dc.html` é a antiga exploração da navegação e fica no handoff só como histórico. A
+exportação de 28/10/2026 ainda o chamava de fonte do painel e cortava o desktop em 1100px; a de
+29/10/2026 (SUC-103) corrigiu as duas coisas na origem, já que os `.dc.html` não são editados aqui
+(`.claude/rules/redesign.md`).
 
 **Faltas de desenho são impeditivo.** O que o handoff não desenha não é improvisado: cada falta virou
 card e bloqueia os cards que dependem dela.
