@@ -1,0 +1,60 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Lupa e sino do `v3`: 40px, raio 12, sem borda. O icone fica esmaecido porque ainda nao ha destino. */
+.button {
+  display: grid;
+  place-items: center;
+  width: var(--suoac-strip-icon-button-size);
+  height: var(--suoac-strip-icon-button-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--suoac-radius-md);
+  background: transparent;
+  color: var(--suoac-color-on-navy-text-muted);
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+
+/* A dica abre para baixo: a faixa encosta no topo da tela, e acima dela nao ha espaco. */
+.hint {
+  position: absolute;
+  top: calc(100% + var(--suoac-space-2));
+  left: 50%;
+  z-index: var(--suoac-z-dropdown);
+  padding: var(--suoac-space-1) var(--suoac-space-2);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-sm);
+  background: var(--suoac-color-surface);
+  box-shadow: var(--suoac-shadow-xs);
+  color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(var(--suoac-space-1) * -1));
+  transition:
+    opacity var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard),
+    transform var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.button:hover + .hint,
+.button:focus-visible + .hint {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. */
+@media (pointer: coarse) {
+  .button {
+    width: var(--suoac-button-height);
+    height: var(--suoac-button-height);
+  }
+}

@@ -16,6 +16,9 @@ export const endpoints = {
     renewalRequests: (token: string) => `/invitations/${encodeURIComponent(token)}/renewal-requests` as const,
     declines: (token: string) => `/invitations/${encodeURIComponent(token)}/declines` as const,
   },
+  circuits: {
+    own: "/circuits/me",
+  },
   congregations: {
     list: (circuitId: string) => `/circuits/${circuitId}/congregations` as const,
     detail: (id: string) => `/congregations/${id}` as const,

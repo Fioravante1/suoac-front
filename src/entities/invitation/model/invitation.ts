@@ -1,3 +1,5 @@
+import { USER_ROLE_LABELS } from "@/shared/auth";
+
 /**
  * Papel que um convite concede: so o coordenador da congregacao. O assistente
  * nao entra por convite — e promovido pelo proprio coordenador da congregacao
@@ -10,7 +12,7 @@ export const INVITATION_ROLES = {
 export type InvitationRole = (typeof INVITATION_ROLES)[keyof typeof INVITATION_ROLES];
 
 export const INVITATION_ROLE_LABELS: Record<InvitationRole, string> = {
-  CONGREGATION_COORDINATOR: "Coordenador do arranjo de ônibus na congregação",
+  CONGREGATION_COORDINATOR: USER_ROLE_LABELS.CONGREGATION_COORDINATOR,
 };
 
 export function isInvitationRole(value: string): value is InvitationRole {

@@ -1,0 +1,98 @@
+/*
+ * 68px de navy, 40px de respiro nas laterais e 18px entre os itens, como no `v3`.
+ *
+ * So existe a partir de 1280px (`--suoac-breakpoint-panel-desktop`): abaixo disso a faixa
+ * nao cabe, e o painel usa o topo do celular e do tablet (SUC-110).
+ */
+.strip {
+  display: none;
+  align-items: center;
+  gap: 1.125rem;
+  height: var(--suoac-strip-height);
+  padding: 0 var(--suoac-space-10);
+  background: var(--suoac-color-navy);
+  color: var(--suoac-color-text-inverse);
+  transition: background-color var(--suoac-motion-theme) var(--suoac-motion-ease-standard);
+}
+
+.brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 1.125rem;
+}
+
+.brandMark {
+  width: var(--suoac-brand-mark-size);
+  height: var(--suoac-brand-mark-size);
+  border-radius: var(--suoac-radius-brand-mark);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.brandName {
+  font-size: var(--suoac-font-size-lead);
+  font-weight: var(--suoac-font-weight-bold);
+  letter-spacing: 0.05em;
+}
+
+.brandScope {
+  color: var(--suoac-color-on-navy-text-soft);
+  font-size: var(--suoac-font-size-caption);
+}
+
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: var(--suoac-space-6);
+  background: var(--suoac-color-on-navy-divider);
+}
+
+/* Empurra busca, notificacoes, tema e avatar para a direita, no lugar do espacador do `v3`. */
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 1.125rem;
+  margin-left: auto;
+}
+
+/*
+ * O `ThemeToggle` nasceu para fundo claro (tela de entrada). Sobre o navy ele perde a borda e
+ * o fundo e ganha o hover e o foco dos demais botoes de icone da faixa.
+ */
+.strip .themeToggle {
+  width: var(--suoac-strip-icon-button-size);
+  height: var(--suoac-strip-icon-button-size);
+  border: 0;
+  border-radius: var(--suoac-radius-md);
+  background: transparent;
+  color: var(--suoac-color-text-inverse);
+}
+
+.strip .themeToggle:hover {
+  background: var(--suoac-color-on-navy-icon-hover);
+}
+
+.strip .themeToggle:focus-visible {
+  outline-color: var(--suoac-color-text-inverse);
+}
+
+@media (min-width: 80rem) {
+  .strip {
+    display: flex;
+  }
+}
+
+/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. */
+@media (pointer: coarse) {
+  .strip .themeToggle {
+    width: var(--suoac-button-height);
+    height: var(--suoac-button-height);
+  }
+}
