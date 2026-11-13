@@ -495,6 +495,8 @@ Blocos grandes e autocontidos de interface.
 No SUOAC:
 
 - `app-shell`
+- `app-shell-next` — shell novo da Fatia 2 (faixa do evento e menu da conta), ao lado do
+  `app-shell` ate o corte (SUC-114); a fachada no layout privado e o SUC-115
 - `event-overview`
 - `financial-summary`
 - `congregation-status-list`
