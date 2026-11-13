@@ -81,6 +81,15 @@
   --suoac-color-on-navy-text-muted: rgb(255 255 255 / 0.6);
   /* Ponto de status neutro (rascunho, nenhum evento ativo) sobre o navy. */
   --suoac-color-on-navy-status-neutral: rgb(255 255 255 / 0.4);
+  /* Linha de apoio da marca na faixa ("Circuito SP-17"). */
+  --suoac-color-on-navy-text-soft: rgb(255 255 255 / 0.66);
+  /* Divisor vertical entre a marca e o seletor de evento. */
+  --suoac-color-on-navy-divider: rgb(255 255 255 / 0.15);
+  /* Hover dos botoes de icone e do avatar, mais leve que o dos controles com borda. */
+  --suoac-color-on-navy-icon-hover: rgb(255 255 255 / 0.1);
+  /* Avatar do usuario na faixa: verde claro com texto verde escuro, igual nos dois temas. */
+  --suoac-color-on-navy-avatar: #e6f4ef;
+  --suoac-color-on-navy-avatar-text: #174e40;
 
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
@@ -153,6 +162,10 @@
   --suoac-radius-modal: 1.375rem;
   /* 24px: sheets e modais do painel no celular e no tablet. */
   --suoac-radius-sheet: 1.5rem;
+  /* 9px: marca do SUOAC na faixa do evento. */
+  --suoac-radius-brand-mark: 0.5625rem;
+  /* 18px: menu da conta, aberto pelo avatar da faixa do evento. */
+  --suoac-radius-account-menu: 1.125rem;
 
   /* Shadows */
   --suoac-shadow-xs: 0 1px 2px rgb(16 24 40 / 0.06);
@@ -257,6 +270,15 @@
   --suoac-menu-item-height: 2.5rem;
   /* 56px: itens de lista das sheets do painel no celular. */
   --suoac-sheet-item-height: 3.5rem;
+  /* 68px: faixa do evento no desktop. */
+  --suoac-strip-height: 4.25rem;
+  /* 40px: botoes de icone da faixa do evento (busca, notificacoes, tema). */
+  --suoac-strip-icon-button-size: 2.5rem;
+  /* 34px: marca do SUOAC na faixa do evento. */
+  --suoac-brand-mark-size: 2.125rem;
+  /* 36px na faixa do evento; 44px no cabecalho do menu da conta. */
+  --suoac-avatar-size: 2.25rem;
+  --suoac-avatar-size-lg: 2.75rem;
 
   --background: var(--suoac-color-background);
   --foreground: var(--suoac-color-text-primary);

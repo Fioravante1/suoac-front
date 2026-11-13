@@ -43,6 +43,11 @@ const onNavyColors = {
   onNavyBorder: "rgb(255 255 255 / 0.14)",
   onNavyTextMuted: "rgb(255 255 255 / 0.6)",
   onNavyStatusNeutral: "rgb(255 255 255 / 0.4)",
+  onNavyTextSoft: "rgb(255 255 255 / 0.66)",
+  onNavyDivider: "rgb(255 255 255 / 0.15)",
+  onNavyIconHover: "rgb(255 255 255 / 0.1)",
+  onNavyAvatar: "#E6F4EF",
+  onNavyAvatarText: "#174E40",
 } as const;
 
 export const themeTokens = {
@@ -142,6 +147,8 @@ export const themeTokens = {
     control: "14px",
     modal: "22px",
     sheet: "24px",
+    brandMark: "9px",
+    accountMenu: "18px",
   },
   shadow: {
     xs: "0 1px 2px rgb(16 24 40 / 0.06)",
@@ -205,6 +212,11 @@ export const themeTokens = {
     stripControlHeight: "2.375rem",
     menuItemHeight: "2.5rem",
     sheetItemHeight: "3.5rem",
+    stripHeight: "4.25rem",
+    stripIconButtonSize: "2.5rem",
+    brandMarkSize: "2.125rem",
+    avatarSize: "2.25rem",
+    avatarSizeLg: "2.75rem",
   },
 } as const;
 
