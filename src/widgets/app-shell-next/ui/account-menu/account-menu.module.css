@@ -1,0 +1,233 @@
+.root {
+  position: relative;
+  margin-left: 0.375rem;
+}
+
+/* Avatar sobre o navy: pilula de 44px com as iniciais e a seta. */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: var(--suoac-button-height);
+  padding: 0 var(--suoac-space-2) 0 var(--suoac-space-1);
+  border: 0;
+  border-radius: var(--suoac-radius-pill);
+  background: transparent;
+  color: var(--suoac-color-text-inverse);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.trigger:hover {
+  background: var(--suoac-color-on-navy-icon-hover);
+}
+
+.trigger[aria-expanded="true"] {
+  background: var(--suoac-color-on-navy-control-hover);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: var(--suoac-avatar-size);
+  height: var(--suoac-avatar-size);
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-avatar);
+  color: var(--suoac-color-on-navy-avatar-text);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.chevron {
+  opacity: 0.7;
+  transition: transform var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 0.625rem);
+  right: 0;
+  z-index: var(--suoac-z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  width: 20rem;
+  padding: var(--suoac-space-2);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-account-menu);
+  background: var(--suoac-color-surface);
+  box-shadow: var(--suoac-shadow-dropdown);
+  color: var(--suoac-color-text-primary);
+  animation-name: var(--suoac-animation-rise);
+  animation-duration: var(--suoac-motion-duration-base);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  padding: var(--suoac-space-3) var(--suoac-space-3) 0.875rem;
+}
+
+.identityAvatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--suoac-avatar-size-lg);
+  height: var(--suoac-avatar-size-lg);
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+  font-size: var(--suoac-font-size-item);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--suoac-font-size-item);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.email {
+  overflow: hidden;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-label);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+  padding: 0.875rem;
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface-muted);
+}
+
+.privilege {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.detailLabel {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.privilegeBadge {
+  display: inline-flex;
+  align-items: flex-start;
+  align-self: flex-start;
+  gap: var(--suoac-space-2);
+  padding: var(--suoac-space-2) var(--suoac-space-3);
+  border-radius: var(--suoac-radius-item);
+  background: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.privilegeBadge svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.divider,
+.separator {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--suoac-color-border);
+}
+
+.separator {
+  margin: var(--suoac-space-1) var(--suoac-space-2);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--suoac-space-1);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: var(--suoac-menu-item-height);
+  padding: 0 var(--suoac-space-3);
+  border: 0;
+  border-radius: var(--suoac-radius-item);
+  background: transparent;
+  color: var(--suoac-color-text-primary);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.action:hover {
+  background: var(--suoac-color-surface-muted);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: -2px;
+}
+
+/* Meu perfil sem destino ainda: texto apagado e sem reacao ao hover. */
+.action[aria-disabled="true"] {
+  color: var(--suoac-color-text-secondary);
+  cursor: not-allowed;
+}
+
+.action[aria-disabled="true"]:hover {
+  background: transparent;
+}
+
+.soon {
+  margin-left: auto;
+  padding: 2px var(--suoac-space-2);
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-surface-muted);
+  font-size: var(--suoac-font-size-caption);
+}
+
+.signOut {
+  color: var(--suoac-color-critical);
+}
+
+.signOut:hover {
+  background: var(--suoac-color-critical-soft);
+}
+
+.signOut:disabled {
+  cursor: progress;
+}
