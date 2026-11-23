@@ -1,0 +1,74 @@
+/*
+ * Quatro colunas iguais; o trilho vai do centro da primeira ao da ultima (12,5% a 87,5%),
+ * 10px abaixo do topo, por tras dos marcadores.
+ */
+.stepper {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepper::before,
+.stepper::after {
+  position: absolute;
+  top: 0.625rem;
+  left: 12.5%;
+  height: 2px;
+  content: "";
+}
+
+.stepper::before {
+  right: 12.5%;
+  background: var(--suoac-color-on-navy-track);
+}
+
+.stepper::after {
+  width: calc(var(--stepper-progress) * 75%);
+  background: var(--suoac-color-on-navy-status-open);
+  transform-origin: left;
+  animation-name: var(--suoac-animation-grow);
+  animation-duration: calc(var(--suoac-motion-duration-slow) * 2.5);
+  animation-delay: var(--suoac-motion-duration-base);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  text-align: center;
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: var(--suoac-line-height-heading);
+}
+
+.stepLabel {
+  color: var(--suoac-color-on-navy-text-quiet);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.step[data-state="current"] .stepLabel {
+  color: var(--suoac-color-text-inverse);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.stepDetail {
+  color: var(--suoac-color-on-navy-text-faint);
+  font-size: var(--suoac-font-size-overline);
+}
+
+.stepDetail[data-deadline-ahead] {
+  color: var(--suoac-color-on-navy-status-closed);
+}
