@@ -1,11 +1,16 @@
 export {
   daysFromToday,
+  diffInCalendarDays,
   formatDate,
   formatDateRange,
+  formatDayMonth,
+  formatDayMonthRange,
   formatDaysRemaining,
+  formatMonthName,
   formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
+  toDateStringInTimeZone,
   getTodayDateString,
 } from "./date-formatters";

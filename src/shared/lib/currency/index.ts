@@ -1,1 +1,1 @@
-export { formatCurrency, subtractCurrency } from "./currency-formatters";
+export { formatCurrency, formatCurrencyCompact, subtractCurrency } from "./currency-formatters";

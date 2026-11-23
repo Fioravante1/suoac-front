@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatCurrency, subtractCurrency } from "./currency-formatters";
+import { formatCurrency, formatCurrencyCompact, subtractCurrency } from "./currency-formatters";
 
 describe("formatCurrency", () => {
   it("formata valor decimal como moeda brasileira", () => {
@@ -13,6 +13,20 @@ describe("formatCurrency", () => {
 
   it("formata valor numérico com centavos", () => {
     expect(formatCurrency(25.5)).toBe("R$\u00a025,50");
+  });
+});
+
+describe("formatCurrencyCompact", () => {
+  it("omite os centavos quando são zero", () => {
+    expect(formatCurrencyCompact("40.00")).toBe("R$\u00a040");
+  });
+
+  it("mantém os centavos quando existem", () => {
+    expect(formatCurrencyCompact("40.50")).toBe("R$\u00a040,50");
+  });
+
+  it("separa os milhares como a moeda brasileira", () => {
+    expect(formatCurrencyCompact(1200)).toBe("R$\u00a01.200");
   });
 });
 

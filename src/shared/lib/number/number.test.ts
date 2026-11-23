@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calcPercentage } from "./number";
+import { calcPercentage, formatInteger } from "./number";
 
 describe("calcPercentage", () => {
   it("calcula percentual arredondado", () => {
@@ -17,5 +17,15 @@ describe("calcPercentage", () => {
 
   it("retorna 0 quando total e zero", () => {
     expect(calcPercentage(10, 0)).toBe(0);
+  });
+});
+
+describe("formatInteger", () => {
+  it("separa o milhar com ponto, como em pt-BR", () => {
+    expect(formatInteger(1204)).toBe("1.204");
+  });
+
+  it("escreve o zero", () => {
+    expect(formatInteger(0)).toBe("0");
   });
 });
