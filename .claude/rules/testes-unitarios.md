@@ -73,7 +73,8 @@ poucos, pela regra do escoteiro: ao tocar num arquivo de teste existente, se hou
 padrao resolve, migre **aquele arquivo** junto com a mudanca. Nao faca mutirao de migracao, e nao
 migre arquivo que voce nao precisou tocar — refatoracao ampla escondida dentro de um PR de
 funcionalidade torna a revisao impossivel. Se a migracao de um arquivo for grande o bastante para
-competir com o trabalho da vez, ela vira card proprio.
+competir com o trabalho da vez, ela fica no mesmo card, mas em commit proprio, antes do commit
+da mudanca que motivou o toque.
 
 Antes de extrair um helper compartilhado, confirme que ha **pelo menos dois** arquivos que o usam de
 verdade. Duplicacao entre arquivos neste projeto e menor do que parece: o levantamento de 09/10/2026
