@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  daysFromToday,
   diffInCalendarDays,
   formatDate,
   formatDateRange,
@@ -64,34 +63,6 @@ describe("toDateString", () => {
 
   it("adiciona zero a esquerda em mes e dia", () => {
     expect(toDateString(new Date(2026, 0, 5))).toBe("2026-01-05");
-  });
-});
-
-describe("daysFromToday", () => {
-  it("retorna numero positivo para data futura", () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-
-    expect(daysFromToday(toDateString(future))).toBe(5);
-  });
-
-  it("retorna 0 para data de hoje", () => {
-    expect(daysFromToday(toDateString(new Date()))).toBe(0);
-  });
-
-  it("retorna numero negativo para data passada", () => {
-    const past = new Date();
-    past.setDate(past.getDate() - 3);
-
-    expect(daysFromToday(toDateString(past))).toBe(-3);
-  });
-
-  it("funciona com data ISO completa (com horario)", () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-    const isoStr = `${toDateString(future)}T15:00:00.000Z`;
-
-    expect(daysFromToday(isoStr)).toBe(5);
   });
 });
 

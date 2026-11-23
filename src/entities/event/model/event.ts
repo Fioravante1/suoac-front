@@ -1,4 +1,5 @@
 import { isCircuitRole, type UserRole } from "@/shared/auth";
+import { diffInCalendarDays, formatDate, toDateStringInTimeZone } from "@/shared/lib";
 
 export const EVENT_TYPES = {
   ASSEMBLY: "ASSEMBLY",
@@ -106,6 +107,41 @@ export function isEventFieldCoordinatorOnly(status: EventStatus, field: EventUpd
   const restricted = EVENT_COORDINATOR_ONLY_FIELDS_BY_STATUS[status];
 
   return restricted ? restricted.includes(field) : false;
+}
+
+/**
+ * Fuso em que as datas do evento valem: o "hoje" da contagem regressiva e da linha de etapas é
+ * o de São Paulo, como no back (`EVENT_TIMEZONE`), e não o do navegador de quem olha.
+ */
+export const EVENT_TIME_ZONE = "America/Sao_Paulo";
+
+/**
+ * Data de calendário em São Paulo ("2026-10-12") de um instante do evento: um prazo, a abertura
+ * ou o encerramento das inscrições. A API grava "até 12/10" como o último instante do dia 12 lá
+ * (`2026-10-13T02:59:59.999Z`), e lido em UTC o prazo cairia no dia 13.
+ *
+ * Os dias do evento não passam por aqui: são datas puras, gravadas à meia-noite UTC.
+ */
+export function toEventCalendarDate(instant: string): string {
+  return toDateStringInTimeZone(new Date(instant), EVENT_TIME_ZONE);
+}
+
+/** Um prazo do evento por extenso, no dia dele em São Paulo: "12/10/2026" para "até 12/10". */
+export function formatEventDeadline(deadline: string): string {
+  return formatDate(toEventCalendarDate(deadline));
+}
+
+/** O "hoje" do evento: a data de calendário em São Paulo, e não a do navegador de quem olha. */
+export function getEventToday(now: Date = new Date()): string {
+  return toDateStringInTimeZone(now, EVENT_TIME_ZONE);
+}
+
+/**
+ * Dias de calendário do "hoje" do evento até o dia de um prazo: 0 no próprio dia e negativo depois
+ * dele. As duas pontas são lidas em São Paulo, e quem olha de outro fuso vê o mesmo número.
+ */
+export function daysUntilEventDeadline(deadline: string, today: string = getEventToday()): number {
+  return diffInCalendarDays(today, toEventCalendarDate(deadline));
 }
 
 export const EVENT_DAY_STATUSES = {
@@ -229,7 +265,9 @@ export interface Event {
   type: EventType;
   ticketPrice: string;
   status: EventStatus;
+  /** Último instante do dia do prazo em São Paulo; leia a data com `toEventCalendarDate`. */
   registrationDeadline: string;
+  /** Mesma regra de `registrationDeadline`. */
   paymentDeadline: string;
   venue: string;
   address: string;

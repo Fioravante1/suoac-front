@@ -44,6 +44,7 @@ import {
   canUpdateEventDayTimes,
   canUpdateEventStatus,
   isLastActiveDayInEvent,
+  formatEventDeadline,
   type Event,
   type EventDayInEvent,
 } from "@/entities/event";
@@ -290,12 +291,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                       },
                       {
                         label: "Prazo de inscrição",
-                        value: formatDate(event.registrationDeadline),
+                        value: formatEventDeadline(event.registrationDeadline),
                         icon: <CalendarDays size={20} aria-hidden="true" />,
                       },
                       {
                         label: "Prazo de pagamento",
-                        value: formatDate(event.paymentDeadline),
+                        value: formatEventDeadline(event.paymentDeadline),
                         icon: <Clock size={20} aria-hidden="true" />,
                       },
                       event.observations && {

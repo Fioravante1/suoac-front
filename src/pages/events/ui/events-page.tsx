@@ -18,7 +18,7 @@ import {
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import { useAuthPermissions, isCircuitRole } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { formatCurrency, formatDate, useModal, usePagination } from "@/shared/lib";
+import { formatCurrency, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -40,6 +40,7 @@ import {
   canDeleteEventStatus,
   canEnrollPassengers,
   canUpdateEventStatus,
+  formatEventDeadline,
   type Event,
 } from "@/entities/event";
 import { eventDetailOptions, eventListOptions } from "@/entities/event/api";
@@ -132,11 +133,11 @@ function EventCard({
       <div className={styles.eventMeta}>
         <span className={styles.metaItem}>
           <CalendarDays size={16} aria-hidden="true" />
-          Inscrições até {formatDate(event.registrationDeadline)}
+          Inscrições até {formatEventDeadline(event.registrationDeadline)}
         </span>
         <span className={styles.metaItem}>
           <Clock size={16} aria-hidden="true" />
-          Pagamento até {formatDate(event.paymentDeadline)}
+          Pagamento até {formatEventDeadline(event.paymentDeadline)}
         </span>
         <span className={styles.metaItem}>
           <MapPin size={16} aria-hidden="true" />

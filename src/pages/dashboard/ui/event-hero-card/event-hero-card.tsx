@@ -1,12 +1,16 @@
 import { ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 
-import { EVENT_STATUS_BADGE_VARIANTS, EVENT_STATUS_LABELS, EVENT_TYPE_LABELS } from "@/entities/event";
+import {
+  EVENT_STATUS_BADGE_VARIANTS,
+  EVENT_STATUS_LABELS,
+  EVENT_TYPE_LABELS,
+  daysUntilEventDeadline,
+} from "@/entities/event";
 import { Badge } from "@/shared/ui/badge";
 import { Card } from "@/shared/ui/card";
 import { routes } from "@/shared/config";
 import {
-  daysFromToday,
   formatDateRange,
   formatDaysRemaining,
   getDeadlineUrgency,
@@ -23,8 +27,8 @@ interface EventHeroCardProps {
 }
 
 export function EventHeroCard({ event }: EventHeroCardProps) {
-  const registrationDays = daysFromToday(event.registrationDeadline);
-  const paymentDays = daysFromToday(event.paymentDeadline);
+  const registrationDays = daysUntilEventDeadline(event.registrationDeadline);
+  const paymentDays = daysUntilEventDeadline(event.paymentDeadline);
   const registrationUrgency = getDeadlineUrgency(registrationDays);
   const paymentUrgency = getDeadlineUrgency(paymentDays);
 

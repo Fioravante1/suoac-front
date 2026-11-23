@@ -1,6 +1,5 @@
 export { formatCurrency, formatCurrencyCompact, subtractCurrency } from "./currency";
 export {
-  daysFromToday,
   diffInCalendarDays,
   formatDate,
   formatDateRange,

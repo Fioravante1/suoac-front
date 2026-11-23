@@ -7,10 +7,14 @@ import {
   canCancelEventStatus,
   canEnrollPassengers,
   canUpdateEventDayTimes,
+  daysUntilEventDeadline,
+  formatEventDeadline,
   getEventPeriod,
+  getEventToday,
   isEventVisibleTo,
   isLastActiveDayInEvent,
   sortEventsByPeriod,
+  toEventCalendarDate,
   toEventViewer,
   type EventDayInEvent,
 } from "./event";
@@ -274,5 +278,49 @@ describe("sortEventsByPeriod", () => {
     sortEventsByPeriod(events);
 
     expect(events.map((event) => event.id)).toEqual(["marco", "novembro"]);
+  });
+});
+
+describe("toEventCalendarDate", () => {
+  it("lê o prazo gravado pela API como o dia dele em São Paulo, e não o dia seguinte do UTC", () => {
+    expect(toEventCalendarDate("2026-10-13T02:59:59.999Z")).toBe("2026-10-12");
+  });
+
+  it("lê um instante da noite em São Paulo no dia de lá, quando em UTC já é o dia seguinte", () => {
+    expect(toEventCalendarDate("2026-09-22T01:30:00.000Z")).toBe("2026-09-21");
+  });
+
+  it("lê um prazo antigo, gravado à meia-noite UTC, como a véspera, que é quando ele vencia", () => {
+    expect(toEventCalendarDate("2026-10-12T00:00:00.000Z")).toBe("2026-10-11");
+  });
+});
+
+describe("getEventToday", () => {
+  it("devolve o dia de calendário em São Paulo", () => {
+    expect(getEventToday(new Date("2026-10-07T15:00:00.000Z"))).toBe("2026-10-07");
+  });
+
+  it("ainda é o mesmo dia às 22h de São Paulo, quando em UTC já é o seguinte", () => {
+    expect(getEventToday(new Date("2026-10-08T01:00:00.000Z"))).toBe("2026-10-07");
+  });
+});
+
+describe("daysUntilEventDeadline", () => {
+  // "Inscrições até 12/10", como a API grava o prazo.
+  const deadline = "2026-10-13T02:59:59.999Z";
+
+  it("conta os dias de calendário até o prazo, em São Paulo", () => {
+    expect(daysUntilEventDeadline(deadline, "2026-10-07")).toBe(5);
+  });
+
+  it("dá 0 no próprio dia do prazo e negativo depois dele", () => {
+    expect(daysUntilEventDeadline(deadline, "2026-10-12")).toBe(0);
+    expect(daysUntilEventDeadline(deadline, "2026-10-14")).toBe(-2);
+  });
+});
+
+describe("formatEventDeadline", () => {
+  it("escreve o prazo no dia dele em São Paulo, e não no dia seguinte do UTC", () => {
+    expect(formatEventDeadline("2026-10-13T02:59:59.999Z")).toBe("12/10/2026");
   });
 });

@@ -1,5 +1,4 @@
 export {
-  daysFromToday,
   diffInCalendarDays,
   formatDate,
   formatDateRange,

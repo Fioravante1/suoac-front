@@ -14,7 +14,8 @@ vi.mock("@/shared/api", () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
 }));
 
-vi.mock("@/entities/event", () => ({
+vi.mock("@/entities/event", async (importOriginal) => ({
+  ...(await importOriginal()),
   EVENT_STATUS_LABELS: { OPEN: "Inscricoes abertas" },
   EVENT_STATUS_BADGE_VARIANTS: { OPEN: "success" },
   EVENT_TYPE_LABELS: { ASSEMBLY: "Assembleia" },
