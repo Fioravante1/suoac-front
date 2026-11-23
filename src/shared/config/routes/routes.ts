@@ -11,6 +11,9 @@ export const routes = {
   dashboard: "/dashboard",
   events: "/events",
   eventDetail: (id: string) => `/events/${id}`,
+  // Os inscritos do evento, na seção do detalhe. É o destino da aba Passageiros do painel novo até
+  // a Fatia 4 (SUC-8) trazer a tela nova.
+  eventEnrollments: (id: string) => `/events/${id}#inscricoes`,
   congregations: "/congregations",
   passengers: "/passengers",
   financial: "/financial",

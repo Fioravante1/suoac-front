@@ -1,0 +1,101 @@
+import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES, type Event, type EventStatus } from "@/entities/event";
+
+const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), useAuthPermissions: vi.fn(), useEventToday: vi.fn() }));
+
+vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
+vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
+vi.mock("../use-event-today", () => ({ useEventToday: mocks.useEventToday }));
+
+import { useEventOverview } from "./use-event-overview";
+
+function buildEvent(status: EventStatus): Event {
+  return {
+    id: "event-1",
+    title: "Congresso Regional 2026",
+    type: EVENT_TYPES.REGIONAL_CONVENTION,
+    ticketPrice: "40.00",
+    status,
+    registrationDeadline: "2026-10-13T02:59:59.999Z",
+    paymentDeadline: "2026-10-20T02:59:59.999Z",
+    venue: "Salão de Assembleias",
+    address: "Rua A, 1",
+    city: "Campinas",
+    state: "SP",
+    observations: null,
+    circuitId: "circuit-1",
+    createdById: "user-1",
+    createdAt: "2026-09-01T00:00:00.000Z",
+    updatedAt: "2026-09-01T00:00:00.000Z",
+    days: [
+      {
+        id: "day-1",
+        dayNumber: 1,
+        date: "2026-10-23T00:00:00.000Z",
+        label: "Dia 1",
+        departureTime: "06:30",
+        returnTime: "18:30",
+        status: EVENT_DAY_STATUSES.ACTIVE,
+        eventId: "event-1",
+      },
+    ],
+  };
+}
+
+function select(event: Event | null, isLoading = false) {
+  mocks.useSelectedEvent.mockReturnValue({ event, isLoading, isError: false, refetch: vi.fn() });
+}
+
+describe("useEventOverview", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useEventToday.mockReturnValue("2026-10-07");
+  });
+
+  it("fica carregando enquanto o evento selecionado não chega", () => {
+    select(null, true);
+
+    expect(renderHook(() => useEventOverview()).result.current).toEqual({ status: "loading" });
+  });
+
+  it.each([EVENT_STATUSES.DRAFT, EVENT_STATUSES.CANCELLED])(
+    "esconde o resumo do evento %s, que tem outro",
+    (status) => {
+      select(buildEvent(status));
+
+      expect(renderHook(() => useEventOverview()).result.current).toEqual({ status: "hidden" });
+    },
+  );
+
+  it("esconde o resumo sem evento", () => {
+    select(null);
+
+    expect(renderHook(() => useEventOverview()).result.current).toEqual({ status: "hidden" });
+  });
+
+  it("calcula o resumo para o hoje de São Paulo e libera as ações do circuito com inscrições abertas", () => {
+    select(buildEvent(EVENT_STATUSES.OPEN));
+
+    const state = renderHook(() => useEventOverview()).result.current;
+
+    expect(state.status).toBe("ready");
+    expect(state.status === "ready" && state.overview.summary.countdown).toBe("Faltam 16 dias");
+    expect(state.status === "ready" && state.canAct).toBe(true);
+  });
+
+  it("não libera as ações para quem é da congregação nem com inscrições encerradas", () => {
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
+    select(buildEvent(EVENT_STATUSES.OPEN));
+    const congregationView = renderHook(() => useEventOverview()).result.current;
+
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    select(buildEvent(EVENT_STATUSES.CLOSED));
+    const closedView = renderHook(() => useEventOverview()).result.current;
+
+    expect(congregationView.status === "ready" && congregationView.canAct).toBe(false);
+    expect(closedView.status === "ready" && closedView.canAct).toBe(false);
+  });
+});
