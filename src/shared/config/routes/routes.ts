@@ -14,5 +14,8 @@ export const routes = {
   congregations: "/congregations",
   passengers: "/passengers",
   financial: "/financial",
+  // Abas do painel novo que ainda esperam a fatia delas: Ônibus (Fatia 7) e Listas (Fatia 8).
+  buses: "/buses",
+  lists: "/lists",
   settings: "/settings",
 } as const;
