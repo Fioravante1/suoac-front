@@ -495,8 +495,11 @@ Blocos grandes e autocontidos de interface.
 No SUOAC:
 
 - `app-shell`
-- `app-shell-next` — shell novo da Fatia 2 (faixa do evento e menu da conta), ao lado do
-  `app-shell` ate o corte (SUC-114); a fachada no layout privado e o SUC-115
+- `app-shell-next` — shell novo da Fatia 2, ao lado do `app-shell` ate o corte (SUC-114); a
+  fachada no layout privado e o SUC-115. Tem a faixa do evento e o menu da conta (SUC-106) e o
+  resumo do evento (SUC-108): no desktop, `EventSummary`, com a linha de etapas e as abas; no
+  celular e no tablet, `EventHomeHero`, o hero da tela Inicio. A regra das etapas e da contagem
+  regressiva fica no `model` do widget, como funcao pura sobre o evento e o "hoje" de Sao Paulo
 - `event-overview`
 - `financial-summary`
 - `congregation-status-list`
@@ -519,6 +522,8 @@ No SUOAC:
 - `event-detail`
 - `passengers`
 - `financial`
+- `buses` — aba Onibus do painel; estado vazio ate a Fatia 7 (SUC-11)
+- `lists` — aba Listas e exportacoes; a exportacao de inscritos ate a Fatia 8 (SUC-12)
 - `settings`
 
 Pages podem compor widgets, features e entities. Pequenas logicas especificas de uma unica tela
@@ -797,6 +802,7 @@ Componentes genericos:
 - Spinner.
 - Table.
 - TextField.
+- VisuallyHidden (texto so para leitor de tela).
 
 Cada componente deve ter seu proprio diretorio e `index.ts`:
 

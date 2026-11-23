@@ -18,12 +18,17 @@ export {
   canEnrollPassengers,
   canUpdateEventDayTimes,
   canUpdateEventStatus,
+  daysUntilEventDeadline,
+  formatEventDeadline,
+  getActiveEventDays,
   getEventPeriod,
+  getEventToday,
   isEventVisibleTo,
   isLastActiveDayInEvent,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
   sortEventsByPeriod,
+  toEventCalendarDate,
   toEventViewer,
 } from "./event";
 export type {

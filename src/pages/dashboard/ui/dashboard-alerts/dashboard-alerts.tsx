@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 import { AlertTriangle, Clock } from "lucide-react";
 
+import { daysUntilEventDeadline } from "@/entities/event";
 import type { DeadlineUrgency } from "@/shared/lib";
 import {
-  daysFromToday,
   formatCurrency,
   pluralize,
   getDeadlineUrgency,
@@ -76,8 +76,8 @@ function buildPaymentAlert(
 }
 
 export function DashboardAlerts({ event, totalPendingPassengers, totalPending }: DashboardAlertsProps) {
-  const regDays = daysFromToday(event.registrationDeadline);
-  const payDays = daysFromToday(event.paymentDeadline);
+  const regDays = daysUntilEventDeadline(event.registrationDeadline);
+  const payDays = daysUntilEventDeadline(event.paymentDeadline);
 
   const alerts = [
     buildRegistrationAlert(regDays, getDeadlineUrgency(regDays)),

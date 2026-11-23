@@ -1,4 +1,5 @@
 export {
+  createEnrollPassengerSchema,
   enrollPassengerSchema,
   toEnrollPayload,
   type EnrollPassengerFormValues,

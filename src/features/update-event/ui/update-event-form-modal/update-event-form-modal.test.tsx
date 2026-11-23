@@ -12,8 +12,8 @@ const baseEvent: Event = {
   type: EVENT_TYPES.ASSEMBLY,
   ticketPrice: "25.00",
   status: EVENT_STATUSES.DRAFT,
-  registrationDeadline: "2026-06-01T00:00:00.000Z",
-  paymentDeadline: "2026-06-15T00:00:00.000Z",
+  registrationDeadline: "2026-06-02T02:59:59.999Z",
+  paymentDeadline: "2026-06-16T02:59:59.999Z",
   venue: "Salão Central",
   address: "Rua das Flores, 100",
   city: "São Paulo",
@@ -39,6 +39,21 @@ describe("UpdateEventFormModal", () => {
 
     expect(screen.getByDisplayValue("Assembleia SP 2026")).toBeInTheDocument();
     expect(screen.getByDisplayValue("25.00")).toBeInTheDocument();
+  });
+
+  it("preenche os prazos com o dia deles em São Paulo, e não com o dia seguinte do UTC", () => {
+    render(
+      <UpdateEventFormModal
+        open
+        event={baseEvent}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByDisplayValue("2026-06-01")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("2026-06-15")).toBeInTheDocument();
   });
 
   it("libera todos os campos para coordenador em evento aberto sem mensagem de restrição", () => {

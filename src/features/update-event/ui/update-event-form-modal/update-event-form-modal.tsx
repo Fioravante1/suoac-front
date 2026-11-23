@@ -10,6 +10,7 @@ import {
   EVENT_UPDATE_FIELDS,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,
+  toEventCalendarDate,
   type Event,
   type EventUpdateField,
 } from "@/entities/event";
@@ -34,16 +35,12 @@ interface UpdateEventFormModalProps {
   userRole: UserRole | null;
 }
 
-function toDateInputValue(value: string): string {
-  return value.slice(0, 10);
-}
-
 function toFormValues(event: Event | null): UpdateEventFormValues {
   return {
     title: event?.title ?? "",
     ticketPrice: event?.ticketPrice ?? "",
-    registrationDeadline: event ? toDateInputValue(event.registrationDeadline) : "",
-    paymentDeadline: event ? toDateInputValue(event.paymentDeadline) : "",
+    registrationDeadline: event ? toEventCalendarDate(event.registrationDeadline) : "",
+    paymentDeadline: event ? toEventCalendarDate(event.paymentDeadline) : "",
     venue: event?.venue ?? "",
     address: event?.address ?? "",
     city: event?.city ?? "",

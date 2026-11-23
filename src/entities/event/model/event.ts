@@ -1,4 +1,5 @@
 import { isCircuitRole, type UserRole } from "@/shared/auth";
+import { diffInCalendarDays, formatDate, toDateStringInTimeZone } from "@/shared/lib";
 
 export const EVENT_TYPES = {
   ASSEMBLY: "ASSEMBLY",
@@ -108,6 +109,41 @@ export function isEventFieldCoordinatorOnly(status: EventStatus, field: EventUpd
   return restricted ? restricted.includes(field) : false;
 }
 
+/**
+ * Fuso em que as datas do evento valem: o "hoje" da contagem regressiva e da linha de etapas é
+ * o de São Paulo, como no back (`EVENT_TIMEZONE`), e não o do navegador de quem olha.
+ */
+export const EVENT_TIME_ZONE = "America/Sao_Paulo";
+
+/**
+ * Data de calendário em São Paulo ("2026-10-12") de um instante do evento: um prazo, a abertura
+ * ou o encerramento das inscrições. A API grava "até 12/10" como o último instante do dia 12 lá
+ * (`2026-10-13T02:59:59.999Z`), e lido em UTC o prazo cairia no dia 13.
+ *
+ * Os dias do evento não passam por aqui: são datas puras, gravadas à meia-noite UTC.
+ */
+export function toEventCalendarDate(instant: string): string {
+  return toDateStringInTimeZone(new Date(instant), EVENT_TIME_ZONE);
+}
+
+/** Um prazo do evento por extenso, no dia dele em São Paulo: "12/10/2026" para "até 12/10". */
+export function formatEventDeadline(deadline: string): string {
+  return formatDate(toEventCalendarDate(deadline));
+}
+
+/** O "hoje" do evento: a data de calendário em São Paulo, e não a do navegador de quem olha. */
+export function getEventToday(now: Date = new Date()): string {
+  return toDateStringInTimeZone(now, EVENT_TIME_ZONE);
+}
+
+/**
+ * Dias de calendário do "hoje" do evento até o dia de um prazo: 0 no próprio dia e negativo depois
+ * dele. As duas pontas são lidas em São Paulo, e quem olha de outro fuso vê o mesmo número.
+ */
+export function daysUntilEventDeadline(deadline: string, today: string = getEventToday()): number {
+  return diffInCalendarDays(today, toEventCalendarDate(deadline));
+}
+
 export const EVENT_DAY_STATUSES = {
   ACTIVE: "ACTIVE",
   CANCELLED: "CANCELLED",
@@ -175,13 +211,18 @@ export interface EventPeriod {
   end: string;
 }
 
+/** Os dias que acontecem, sem os cancelados, em ordem de data. */
+export function getActiveEventDays(days: readonly EventDayInEvent[]): EventDayInEvent[] {
+  return days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE).sort((a, b) => a.date.localeCompare(b.date));
+}
+
 /**
  * Período do evento: do primeiro ao último dia ativo. Sem nenhum dia ativo, como no evento
  * cancelado (o cancelamento cancela os dias), contam todos os dias, para o período não sumir.
  * Sem dias, não há período.
  */
 export function getEventPeriod(days: readonly EventDayInEvent[]): EventPeriod | null {
-  const activeDays = days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE);
+  const activeDays = getActiveEventDays(days);
   const countedDays = activeDays.length > 0 ? activeDays : days;
   const dates = countedDays.map((day) => day.date).sort();
   const start = dates.at(0);
@@ -229,13 +270,26 @@ export interface Event {
   type: EventType;
   ticketPrice: string;
   status: EventStatus;
+  /** Último instante do dia do prazo em São Paulo; leia a data com `toEventCalendarDate`. */
   registrationDeadline: string;
+  /** Mesma regra de `registrationDeadline`. */
   paymentDeadline: string;
   venue: string;
   address: string;
   city: string;
   state: string;
   observations: string | null;
+  /**
+   * Quando as inscrições abriram: a publicação do rascunho. `null` em rascunho e em evento
+   * publicado antes de a API guardar a data. Opcional porque o front pode chegar a produção antes
+   * da API que o expõe.
+   */
+  publishedAt?: string | null;
+  /**
+   * Quando as inscrições encerraram: o encerramento manual ou, pelo ciclo de vida, o próprio
+   * prazo. `null` enquanto estão abertas e em evento antigo sem registro; opcional como `publishedAt`.
+   */
+  registrationClosedAt?: string | null;
   circuitId: string;
   createdById: string;
   createdAt: string;

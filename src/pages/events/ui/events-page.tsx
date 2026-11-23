@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { useAuthPermissions, isCircuitRole } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
-import { formatCurrency, formatDate, useModal, usePagination } from "@/shared/lib";
+import { formatCurrency, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -40,6 +40,7 @@ import {
   canDeleteEventStatus,
   canEnrollPassengers,
   canUpdateEventStatus,
+  formatEventDeadline,
   type Event,
 } from "@/entities/event";
 import { eventDetailOptions, eventListOptions } from "@/entities/event/api";
@@ -50,7 +51,11 @@ import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
 import { updateEventAction } from "@/features/update-event/api";
-import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
+import {
+  EnrollPassengerModal,
+  useEnrollPassengerMutation,
+  type EnrollPassengerPayload,
+} from "@/features/enroll-passenger";
 
 import styles from "./events-page.module.css";
 
@@ -132,11 +137,11 @@ function EventCard({
       <div className={styles.eventMeta}>
         <span className={styles.metaItem}>
           <CalendarDays size={16} aria-hidden="true" />
-          Inscrições até {formatDate(event.registrationDeadline)}
+          Inscrições até {formatEventDeadline(event.registrationDeadline)}
         </span>
         <span className={styles.metaItem}>
           <Clock size={16} aria-hidden="true" />
-          Pagamento até {formatDate(event.paymentDeadline)}
+          Pagamento até {formatEventDeadline(event.paymentDeadline)}
         </span>
         <span className={styles.metaItem}>
           <MapPin size={16} aria-hidden="true" />
@@ -202,26 +207,14 @@ export function EventsPage() {
     enabled: Boolean(enrollEventId),
   });
 
-  const enrollMutation = useMutation({
-    mutationFn: (payload: EnrollPassengerPayload) => enrollPassengerAction(enrollEventId, payload),
-    onSuccess: (result) => {
-      if (!result.success) return;
-
-      queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(enrollEventId) });
-      // A inscrição altera contagens/valores agregados no Dashboard e na tela Financeira.
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.financialSummary.all });
-      toast.success("Passageiro inscrito com sucesso.");
-    },
-  });
+  const enrollMutation = useEnrollPassengerMutation(enrollEventId);
 
   async function handleEnroll(payload: EnrollPassengerPayload) {
     return enrollMutation.mutateAsync(payload);
   }
 
   const enrollCongregationId = userCongregationId ?? "";
-  const canShowEnrollModal = enrollEventDetail && (userCongregationId || (userRole && isCircuitRole(userRole)));
+  const canShowEnrollModal = enrollEventDetail && (userCongregationId || isCircuitUser);
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
@@ -253,7 +246,7 @@ export function EventsPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ event, values }: { event: Event; values: UpdateEventFormValues }) =>
-      updateEventAction(event.id, event.status, values),
+      updateEventAction(event, values),
     onSuccess: (result) => {
       if (!result.success) return;
 
@@ -435,6 +428,7 @@ export function EventsPage() {
           onClose={enrollModal.close}
           onSubmit={handleEnroll}
           event={enrollEventDetail}
+          isCircuitUser={isCircuitUser}
           congregationId={enrollCongregationId}
         />
       )}

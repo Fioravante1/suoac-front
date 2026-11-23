@@ -1,13 +1,17 @@
-export { formatCurrency, subtractCurrency } from "./currency";
+export { formatCurrency, formatCurrencyCompact, subtractCurrency } from "./currency";
 export {
-  daysFromToday,
+  diffInCalendarDays,
   formatDate,
   formatDateRange,
+  formatDayMonth,
+  formatDayMonthRange,
   formatDaysRemaining,
+  formatMonthName,
   formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
+  toDateStringInTimeZone,
   getTodayDateString,
 } from "./date";
 export {
@@ -19,7 +23,7 @@ export {
 export type { DeadlineUrgency } from "./deadline";
 export { downloadResponseAsFile, parseContentDispositionFilename } from "./download";
 export { hardNavigate, isRedirectRejection } from "./navigation";
-export { calcPercentage } from "./number";
+export { calcPercentage, formatInteger } from "./number";
 export {
   containTabKey,
   findMenuItemToFocus,

@@ -64,7 +64,7 @@ vi.mock("@/entities/event/api/event.queries", () => ({
 vi.mock("@/features/enroll-passenger", () => ({
   EnrollPassengerModal: ({ open }: { open: boolean }) =>
     open ? <div data-testid="enroll-modal">Modal de inscrição</div> : null,
-  enrollPassengerAction: vi.fn(),
+  useEnrollPassengerMutation: () => ({ mutateAsync: vi.fn() }),
 }));
 
 vi.mock("@/features/create-event/api", () => ({
@@ -115,8 +115,8 @@ const draftEvent = {
   type: EVENT_TYPES.ASSEMBLY,
   ticketPrice: "25.00",
   status: EVENT_STATUSES.DRAFT,
-  registrationDeadline: "2026-06-01T00:00:00.000Z",
-  paymentDeadline: "2026-06-15T00:00:00.000Z",
+  registrationDeadline: "2026-06-02T02:59:59.999Z",
+  paymentDeadline: "2026-06-16T02:59:59.999Z",
   venue: "Salão Central",
   address: "Rua das Flores, 100",
   city: "São Paulo",
@@ -157,6 +157,18 @@ describe("EventsPage", () => {
     render(<EventsPage />, { wrapper: createWrapper() });
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Eventos");
+  });
+
+  it("mostra os prazos no dia deles em São Paulo", async () => {
+    fetchEventsMock.mockResolvedValue({
+      data: [draftEvent],
+      meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+    });
+
+    render(<EventsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("Inscrições até 01/06/2026")).toBeInTheDocument();
+    expect(screen.getByText("Pagamento até 15/06/2026")).toBeInTheDocument();
   });
 
   it("renderiza o botão de novo evento para papel de circuito", () => {
@@ -226,8 +238,7 @@ describe("EventsPage", () => {
 
     await waitFor(() => {
       expect(updateEventActionMock).toHaveBeenCalledWith(
-        "event-1",
-        EVENT_STATUSES.DRAFT,
+        expect.objectContaining({ id: "event-1", status: EVENT_STATUSES.DRAFT }),
         expect.objectContaining({ title: "Novo título" }),
       );
     });

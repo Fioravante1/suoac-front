@@ -1,0 +1,33 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+.export {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--suoac-space-4);
+}
+
+.exportText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-1);
+  min-width: 0;
+}
+
+.exportTitle {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.exportDescription {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+}

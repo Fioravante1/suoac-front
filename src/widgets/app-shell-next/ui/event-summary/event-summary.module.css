@@ -1,0 +1,125 @@
+/*
+ * Continua o navy da faixa, com os mesmos 40px nas laterais. So existe a partir de 1280px
+ * (`--suoac-breakpoint-panel-desktop`): abaixo disso, o resumo e o hero do Inicio (`EventHomeHero`).
+ */
+.summary {
+  display: none;
+  padding: 0 var(--suoac-space-10);
+  background: var(--suoac-color-navy);
+  color: var(--suoac-color-text-inverse);
+  transition: background-color var(--suoac-motion-theme) var(--suoac-motion-ease-standard);
+}
+
+@media (min-width: 80rem) {
+  .summary {
+    display: block;
+  }
+}
+
+/* Identidade do evento a esquerda e acoes a direita, alinhadas pela base, como no `v3`. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--suoac-space-8);
+  padding: 1.625rem 0 1.375rem;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+  min-width: 0;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.type {
+  color: var(--suoac-color-on-navy-text-muted);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--suoac-font-size-event-title);
+  font-weight: var(--suoac-font-weight-semibold);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suoac-space-2);
+  margin: 0;
+  padding: 2px 0 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  height: var(--suoac-event-chip-height);
+  padding: 0 var(--suoac-space-3);
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-chip);
+  color: var(--suoac-color-on-navy-text-emphasis);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-medium);
+  white-space: nowrap;
+}
+
+.chip svg {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.625rem;
+}
+
+/* Esqueleto no lugar do resumo, com a altura dele, para a tela nao pular quando o evento chega. */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-3);
+  padding: 1.625rem 0 4.625rem;
+}
+
+.loading .bone {
+  display: block;
+  max-width: 100%;
+  background: var(--suoac-color-on-navy-tile);
+}
+
+.loading .bonePill {
+  width: 9rem;
+  height: var(--suoac-event-pill-height);
+  border-radius: var(--suoac-radius-pill);
+}
+
+.loading .boneTitle {
+  width: 26rem;
+  height: 2.5rem;
+}
+
+.loading .boneChips {
+  width: 34rem;
+  height: var(--suoac-event-chip-height);
+  border-radius: var(--suoac-radius-pill);
+}
+
+.loading .boneTimeline {
+  width: 100%;
+  height: 5.5rem;
+  border-radius: var(--suoac-radius-lg);
+}

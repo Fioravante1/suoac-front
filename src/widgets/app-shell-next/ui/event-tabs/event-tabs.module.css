@@ -1,0 +1,61 @@
+/* Abas de 52px com um fio por cima; rolam na horizontal se um dia nao couberem. */
+.tabs {
+  display: flex;
+  gap: var(--suoac-space-1);
+  overflow-x: auto;
+  border-top: 1px solid var(--suoac-color-on-navy-rule);
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  height: var(--suoac-event-tab-height);
+  padding: 0 var(--suoac-space-4);
+  color: var(--suoac-color-on-navy-text-soft);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  white-space: nowrap;
+  transition: color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+/* Sublinhado verde da aba ativa: cresce do centro, recolhido nas demais. */
+.tab::after {
+  position: absolute;
+  right: var(--suoac-space-3);
+  bottom: 0;
+  left: var(--suoac-space-3);
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--suoac-color-on-navy-status-open);
+  content: "";
+  transform: scaleX(0);
+  transition: transform var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.tab:hover,
+.tab[aria-current="page"] {
+  color: var(--suoac-color-text-inverse);
+}
+
+.tab[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: -2px;
+  border-radius: var(--suoac-radius-sm);
+}
+
+.count {
+  padding: 1px 0.4375rem;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-tint);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}

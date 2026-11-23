@@ -1,0 +1,67 @@
+/*
+ * Aro de 22px com o ponto de 8px. O fundo navy cobre o trilho do stepper do celular, que passa
+ * por tras dos marcadores.
+ */
+.marker {
+  --pulse-spread: 0.75rem;
+
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--suoac-stage-marker-size);
+  height: var(--suoac-stage-marker-size);
+  border: 2px solid var(--suoac-color-on-navy-marker);
+  border-radius: 50%;
+  background: var(--suoac-color-navy);
+  transition: border-color var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.marker[data-compact] {
+  --pulse-spread: 0.625rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.marker[data-state="done"],
+.marker[data-state="current"] {
+  border-color: var(--suoac-color-on-navy-status-open);
+}
+
+.marker[data-state="done"] .dot,
+.marker[data-state="current"] .dot {
+  background: var(--suoac-color-on-navy-status-open);
+}
+
+.marker[data-pulsing] {
+  animation-name: stage-pulse;
+  animation-duration: calc(var(--suoac-motion-duration-slow) * 5);
+  /* `ease`, o padrao do CSS: o `v3` declara o pulso sem curva (`pulse 2s infinite`). */
+  animation-timing-function: ease;
+  animation-iteration-count: infinite;
+}
+
+@keyframes stage-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--suoac-color-on-navy-status-open-pulse);
+  }
+  70% {
+    box-shadow: 0 0 0 var(--pulse-spread) transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Um pulso sem fim nao e entrada: com menos movimento, o aro fica parado. */
+@media (prefers-reduced-motion: reduce) {
+  .marker[data-pulsing] {
+    animation-name: none;
+  }
+}

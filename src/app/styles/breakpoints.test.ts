@@ -39,6 +39,7 @@ const RESPONSIVE_DIRECTORIES: ReadonlyArray<[string, readonly string[]]> = [
   ["src/shared/ui/checkbox", ACCESS_BREAKPOINTS],
   ["src/shared/ui/theme-toggle", ACCESS_BREAKPOINTS],
   ["src/shared/ui/modal-next", PANEL_BREAKPOINTS],
+  ["src/widgets/app-shell-next", PANEL_BREAKPOINTS],
 ];
 
 function cssModulesUnder(directory: string): string[] {

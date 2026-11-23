@@ -1,1 +1,1 @@
-export { calcPercentage } from "./number";
+export { calcPercentage, formatInteger } from "./number";

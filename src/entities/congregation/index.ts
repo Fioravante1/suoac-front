@@ -1,2 +1,2 @@
 export type { Congregation } from "./model/congregation";
-export { congregationSelectOptions } from "./api";
+export { congregationListOptions, congregationSelectOptions } from "./api";

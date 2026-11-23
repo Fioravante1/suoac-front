@@ -20,8 +20,8 @@ const event: Event = {
   type: EVENT_TYPES.ASSEMBLY,
   ticketPrice: "25.00",
   status: EVENT_STATUSES.DRAFT,
-  registrationDeadline: "2026-06-01T00:00:00.000Z",
-  paymentDeadline: "2026-06-15T00:00:00.000Z",
+  registrationDeadline: "2026-06-02T02:59:59.999Z",
+  paymentDeadline: "2026-06-16T02:59:59.999Z",
   venue: "Salão Central",
   address: "Rua das Flores, 100",
   city: "São Paulo",
@@ -51,7 +51,7 @@ describe("updateEventAction", () => {
   });
 
   it("chama o endpoint de atualização do evento", async () => {
-    const result = await updateEventAction("event-1", EVENT_STATUSES.DRAFT, values);
+    const result = await updateEventAction(event, values);
 
     expect(result.success).toBe(true);
     expect(httpClientMock).toHaveBeenCalledWith("/events/event-1", {
@@ -61,7 +61,7 @@ describe("updateEventAction", () => {
   });
 
   it("bloqueia edição para evento finalizado", async () => {
-    const result = await updateEventAction("event-1", EVENT_STATUSES.FINISHED, values);
+    const result = await updateEventAction({ ...event, status: EVENT_STATUSES.FINISHED }, values);
 
     expect(result).toEqual({ success: false, error: "Este evento não pode mais ser editado." });
   });

@@ -1,0 +1,15 @@
+/*
+ * Fora da tela, mas no leitor de tela: o texto ocupa 1px recortado em vez de sumir com
+ * `display: none`, que o tiraria da arvore de acessibilidade.
+ */
+.root {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

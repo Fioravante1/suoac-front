@@ -1,3 +1,5 @@
+"use client";
+
 import { type ClipboardEvent, useCallback, useState } from "react";
 
 import { PASSWORD_MAX_LENGTH, PASSWORD_TRUNCATED_MESSAGE } from "../password-policy";

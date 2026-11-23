@@ -1,14 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  daysFromToday,
+  diffInCalendarDays,
   formatDate,
   formatDateRange,
+  formatDayMonth,
+  formatDayMonthRange,
   formatDaysRemaining,
+  formatMonthName,
   formatShortDateRange,
   formatWeekday,
   formatWeekdayShort,
   toDateString,
+  toDateStringInTimeZone,
   getTodayDateString,
 } from "./date-formatters";
 
@@ -59,34 +63,6 @@ describe("toDateString", () => {
 
   it("adiciona zero a esquerda em mes e dia", () => {
     expect(toDateString(new Date(2026, 0, 5))).toBe("2026-01-05");
-  });
-});
-
-describe("daysFromToday", () => {
-  it("retorna numero positivo para data futura", () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-
-    expect(daysFromToday(toDateString(future))).toBe(5);
-  });
-
-  it("retorna 0 para data de hoje", () => {
-    expect(daysFromToday(toDateString(new Date()))).toBe(0);
-  });
-
-  it("retorna numero negativo para data passada", () => {
-    const past = new Date();
-    past.setDate(past.getDate() - 3);
-
-    expect(daysFromToday(toDateString(past))).toBe(-3);
-  });
-
-  it("funciona com data ISO completa (com horario)", () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-    const isoStr = `${toDateString(future)}T15:00:00.000Z`;
-
-    expect(daysFromToday(isoStr)).toBe(5);
   });
 });
 
@@ -148,5 +124,80 @@ describe("formatShortDateRange", () => {
 
   it("lê a data em UTC, como a API grava os dias", () => {
     expect(formatShortDateRange("2026-11-01T00:00:00.000Z", "2026-11-01T00:00:00.000Z", today)).toBe("1 nov");
+  });
+});
+
+describe("formatDayMonth", () => {
+  it("escreve dia e mês com dois dígitos, sem o ano", () => {
+    expect(formatDayMonth("2026-10-12T00:00:00.000Z")).toBe("12/10");
+    expect(formatDayMonth("2026-09-05T00:00:00.000Z")).toBe("05/09");
+  });
+
+  it("lê a data em UTC, como a API grava os dias", () => {
+    expect(formatDayMonth("2026-11-01T00:00:00.000Z")).toBe("01/11");
+  });
+});
+
+describe("formatDayMonthRange", () => {
+  it("escreve um dia só quando o intervalo começa e termina no mesmo dia", () => {
+    expect(formatDayMonthRange("2026-11-14T00:00:00.000Z", "2026-11-14T00:00:00.000Z")).toBe("14/11");
+  });
+
+  it("junta os dias do mesmo mês, com o mês só no fim", () => {
+    expect(formatDayMonthRange("2026-10-23T00:00:00.000Z", "2026-10-25T00:00:00.000Z")).toBe("23 a 25/10");
+    expect(formatDayMonthRange("2026-10-02T00:00:00.000Z", "2026-10-04T00:00:00.000Z")).toBe("02 a 04/10");
+  });
+
+  it("repete o mês quando o intervalo atravessa a virada do mês", () => {
+    expect(formatDayMonthRange("2026-10-30T00:00:00.000Z", "2026-11-01T00:00:00.000Z")).toBe("30/10 a 01/11");
+  });
+
+  it("não confunde o mesmo mês de anos diferentes", () => {
+    expect(formatDayMonthRange("2026-01-30T00:00:00.000Z", "2027-01-01T00:00:00.000Z")).toBe("30/01 a 01/01");
+  });
+});
+
+describe("formatMonthName", () => {
+  it("escreve só o mês por extenso, lido em UTC", () => {
+    expect(formatMonthName("2026-10-01T00:00:00.000Z")).toBe("outubro");
+  });
+});
+
+describe("toDateStringInTimeZone", () => {
+  it("devolve a data de calendário no fuso pedido", () => {
+    expect(toDateStringInTimeZone(new Date("2026-10-12T15:00:00.000Z"), "America/Sao_Paulo")).toBe("2026-10-12");
+  });
+
+  it("ainda é o mesmo dia em São Paulo às 22h, quando em UTC já é o seguinte", () => {
+    expect(toDateStringInTimeZone(new Date("2026-10-13T01:00:00.000Z"), "America/Sao_Paulo")).toBe("2026-10-12");
+  });
+
+  it("vira o dia em São Paulo à meia-noite de lá", () => {
+    expect(toDateStringInTimeZone(new Date("2026-10-13T03:00:00.000Z"), "America/Sao_Paulo")).toBe("2026-10-13");
+  });
+
+  it("escreve sempre ano, mês e dia com zeros, em qualquer fuso", () => {
+    expect(toDateStringInTimeZone(new Date("2026-01-05T12:00:00.000Z"), "UTC")).toBe("2026-01-05");
+    expect(toDateStringInTimeZone(new Date("2026-01-05T12:00:00.000Z"), "Asia/Tokyo")).toBe("2026-01-05");
+  });
+});
+
+describe("diffInCalendarDays", () => {
+  it("conta os dias de calendário entre duas datas", () => {
+    expect(diffInCalendarDays("2026-10-07", "2026-10-12")).toBe(5);
+  });
+
+  it("é zero no mesmo dia e negativo quando o destino já passou", () => {
+    expect(diffInCalendarDays("2026-10-12", "2026-10-12")).toBe(0);
+    expect(diffInCalendarDays("2026-10-12", "2026-10-09")).toBe(-3);
+  });
+
+  it("aceita o ISO completo da API e considera só a data", () => {
+    expect(diffInCalendarDays("2026-10-07", "2026-10-23T00:00:00.000Z")).toBe(16);
+    expect(diffInCalendarDays("2026-09-21T23:30:00.000Z", "2026-10-12T00:00:00.000Z")).toBe(21);
+  });
+
+  it("atravessa a virada do mês e do ano", () => {
+    expect(diffInCalendarDays("2026-12-30", "2027-01-02")).toBe(3);
   });
 });

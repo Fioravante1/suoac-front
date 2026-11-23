@@ -44,6 +44,7 @@ import {
   canUpdateEventDayTimes,
   canUpdateEventStatus,
   isLastActiveDayInEvent,
+  formatEventDeadline,
   type Event,
   type EventDayInEvent,
 } from "@/entities/event";
@@ -97,8 +98,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ ev, values }: { ev: Event; values: UpdateEventFormValues }) =>
-      updateEventAction(ev.id, ev.status, values),
+    mutationFn: ({ ev, values }: { ev: Event; values: UpdateEventFormValues }) => updateEventAction(ev, values),
     onSuccess: (result) => {
       if (!result.success) return;
 
@@ -290,12 +290,12 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
                       },
                       {
                         label: "Prazo de inscrição",
-                        value: formatDate(event.registrationDeadline),
+                        value: formatEventDeadline(event.registrationDeadline),
                         icon: <CalendarDays size={20} aria-hidden="true" />,
                       },
                       {
                         label: "Prazo de pagamento",
-                        value: formatDate(event.paymentDeadline),
+                        value: formatEventDeadline(event.paymentDeadline),
                         icon: <Clock size={20} aria-hidden="true" />,
                       },
                       event.observations && {

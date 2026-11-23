@@ -3,6 +3,7 @@
 import { Check } from "lucide-react";
 
 import { PASSWORD_REQUIREMENTS, countMetRequirements } from "@/shared/lib";
+import { VisuallyHidden } from "@/shared/ui/visually-hidden";
 
 import styles from "./password-strength-meter.module.css";
 
@@ -85,7 +86,7 @@ export function PasswordStrengthMeter({ value, barsOnly = false, className }: Pa
                 </span>
                 <span>
                   {requirement.label}
-                  <span className={styles.srOnly}>{satisfied ? " — cumprido" : " — pendente"}</span>
+                  <VisuallyHidden>{satisfied ? " — cumprido" : " — pendente"}</VisuallyHidden>
                 </span>
               </li>
             );
@@ -93,9 +94,9 @@ export function PasswordStrengthMeter({ value, barsOnly = false, className }: Pa
         </ul>
       )}
 
-      <span className={styles.srOnly}>
+      <VisuallyHidden>
         {met} de {total} requisitos cumpridos.
-      </span>
+      </VisuallyHidden>
     </div>
   );
 }

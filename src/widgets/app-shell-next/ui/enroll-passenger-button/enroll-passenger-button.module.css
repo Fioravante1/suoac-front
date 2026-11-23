@@ -1,0 +1,39 @@
+/* Acao principal sobre o navy: verde claro, 42px, e branco subindo 1px no hover, como no `v3`. */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--suoac-space-2);
+  width: 100%;
+  height: var(--suoac-event-action-height);
+  padding: 0 1.125rem;
+  border: 0;
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-on-navy-action);
+  color: var(--suoac-color-on-navy-action-text);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard),
+    transform var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.button:hover {
+  background: var(--suoac-color-on-navy-action-hover);
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+
+/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. */
+@media (pointer: coarse) {
+  .button {
+    height: var(--suoac-button-height);
+  }
+}

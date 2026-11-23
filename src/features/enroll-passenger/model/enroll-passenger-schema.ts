@@ -8,6 +8,8 @@ const enrollPassengerBaseSchema = z.object({
   name: z.string().optional(),
   rg: z.string().optional(),
   phone: z.string().optional(),
+  /** Congregação do passageiro novo, escolhida pelos papéis do circuito. */
+  congregationId: z.string().optional(),
   dayIds: z.array(z.string()).optional(),
   observations: z.string().max(500).optional(),
   exemptionReason: z.string().max(300).optional(),
@@ -35,7 +37,15 @@ function validateExistingPassenger(values: EnrollPassengerBaseValues, ctx: Enrol
   ctx.addIssue({ code: "custom", message: "Selecione um passageiro.", path: ["passengerId"] });
 }
 
-function validateInlinePassenger(values: EnrollPassengerBaseValues, ctx: EnrollPassengerRefinementContext) {
+function validateInlinePassenger(
+  values: EnrollPassengerBaseValues,
+  ctx: EnrollPassengerRefinementContext,
+  requiresCongregation: boolean,
+) {
+  if (requiresCongregation && !values.congregationId) {
+    ctx.addIssue({ code: "custom", message: "Selecione a congregação do passageiro.", path: ["congregationId"] });
+  }
+
   if (!values.name || values.name.length < 2) {
     ctx.addIssue({ code: "custom", message: "Nome deve ter pelo menos 2 caracteres.", path: ["name"] });
   }
@@ -81,16 +91,28 @@ function validatePayment(values: EnrollPassengerBaseValues, ctx: EnrollPassenger
   }
 }
 
-export const enrollPassengerSchema = enrollPassengerBaseSchema.superRefine((data, ctx) => {
-  if (data.mode === "existing") {
-    validateExistingPassenger(data, ctx);
-  } else {
-    validateInlinePassenger(data, ctx);
-  }
+interface EnrollPassengerSchemaOptions {
+  /**
+   * Os papéis do circuito não têm congregação e escolhem a do passageiro novo; os da congregação
+   * cadastram na própria, e o campo não aparece.
+   */
+  requiresCongregation: boolean;
+}
 
-  validateExemption(data, ctx);
-  validatePayment(data, ctx);
-});
+export function createEnrollPassengerSchema({ requiresCongregation }: EnrollPassengerSchemaOptions) {
+  return enrollPassengerBaseSchema.superRefine((data, ctx) => {
+    if (data.mode === "existing") {
+      validateExistingPassenger(data, ctx);
+    } else {
+      validateInlinePassenger(data, ctx, requiresCongregation);
+    }
+
+    validateExemption(data, ctx);
+    validatePayment(data, ctx);
+  });
+}
+
+export const enrollPassengerSchema = createEnrollPassengerSchema({ requiresCongregation: false });
 
 export type EnrollPassengerFormValues = z.infer<typeof enrollPassengerSchema>;
 
@@ -99,6 +121,8 @@ export interface EnrollPassengerPayload {
   name?: string;
   rg?: string;
   phone?: string;
+  /** Só no passageiro novo, e só quando quem inscreve é do circuito. */
+  congregationId?: string;
   dayIds?: string[];
   observations?: string;
   exemptionReason?: string;
@@ -120,6 +144,10 @@ function fillPassengerPayload(payload: EnrollPassengerPayload, values: EnrollPas
 
   if (values.phone) {
     payload.phone = values.phone;
+  }
+
+  if (values.congregationId) {
+    payload.congregationId = values.congregationId;
   }
 }
 

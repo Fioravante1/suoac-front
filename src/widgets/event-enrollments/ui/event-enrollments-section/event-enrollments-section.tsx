@@ -29,7 +29,11 @@ import { SkeletonTableRows } from "@/shared/ui/skeleton";
 import { Tooltip } from "@/shared/ui/tooltip";
 import { useToast } from "@/shared/ui/toast";
 
-import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
+import {
+  EnrollPassengerModal,
+  useEnrollPassengerMutation,
+  type EnrollPassengerPayload,
+} from "@/features/enroll-passenger";
 import { ExportPassengersButton } from "@/features/export-event-passengers";
 import { UpdateDaysModal, updateEventPassengerDaysAction } from "@/features/update-event-passenger-days";
 import { removeEventPassengerAction } from "@/features/remove-event-passenger";
@@ -60,6 +64,9 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const queryClient = useQueryClient();
 
   const canManage = canManageEventPassengers(event.status);
+  const isCircuitUser = isCircuitRole(userRole);
+  // Os papéis do circuito inscrevem com ou sem congregação; os da congregação precisam da deles.
+  const canEnroll = isCircuitUser || Boolean(userCongregationId);
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
   const { data: passengersData, isFetching, isError } = useQuery(eventPassengerListOptions(event.id, page));
@@ -83,15 +90,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     queryClient.invalidateQueries({ queryKey: queryKeys.financialSummary.all });
   }
 
-  const enrollMutation = useMutation({
-    mutationFn: (payload: EnrollPassengerPayload) => enrollPassengerAction(event.id, payload),
-    onSuccess: (result) => {
-      if (result.success) {
-        invalidateQueries();
-        toast.success("Passageiro inscrito com sucesso.");
-      }
-    },
-  });
+  const enrollMutation = useEnrollPassengerMutation(event.id);
 
   const updateDaysMutation = useMutation({
     mutationFn: ({ epId, dayIds }: { epId: string; dayIds: string[] }) => updateEventPassengerDaysAction(epId, dayIds),
@@ -281,23 +280,14 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         </>
       )}
 
-      {userCongregationId && (
+      {canEnroll && (
         <EnrollPassengerModal
           open={enrollModal.isOpen}
           onClose={enrollModal.close}
           onSubmit={handleEnroll}
           event={event}
-          congregationId={userCongregationId}
-        />
-      )}
-
-      {!userCongregationId && isCircuitRole(userRole) && (
-        <EnrollPassengerModal
-          open={enrollModal.isOpen}
-          onClose={enrollModal.close}
-          onSubmit={handleEnroll}
-          event={event}
-          congregationId=""
+          isCircuitUser={isCircuitUser}
+          congregationId={userCongregationId ?? ""}
         />
       )}
 
