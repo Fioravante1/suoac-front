@@ -1,0 +1,112 @@
+/*
+ * Cartao translucido do `v3` sob o titulo: datas a esquerda, separadas por um fio, e a linha
+ * de etapas ocupando o resto.
+ */
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: var(--suoac-space-6);
+  margin-bottom: 1.375rem;
+  padding: 0.875rem var(--suoac-space-5) 0.875rem 0.875rem;
+  border: 1px solid var(--suoac-color-on-navy-panel-border);
+  border-radius: var(--suoac-radius-lg);
+  background: var(--suoac-color-on-navy-panel);
+}
+
+.when {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.875rem;
+  padding-right: var(--suoac-space-6);
+  border-right: 1px solid var(--suoac-color-on-navy-rule);
+}
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  line-height: var(--suoac-line-height-heading);
+}
+
+.countdownHeading {
+  font-size: var(--suoac-font-size-h3);
+  font-weight: var(--suoac-font-weight-semibold);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.countdownMonths {
+  color: var(--suoac-color-on-navy-text-muted);
+  font-size: var(--suoac-font-size-label);
+}
+
+.stages {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--suoac-space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.stageText {
+  display: flex;
+  flex-direction: column;
+  line-height: var(--suoac-line-height-heading);
+  white-space: nowrap;
+}
+
+.stageLabel {
+  color: var(--suoac-color-on-navy-text-quiet);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.stage[data-state="current"] .stageLabel {
+  color: var(--suoac-color-text-inverse);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.stageDetail {
+  color: var(--suoac-color-on-navy-text-faint);
+  font-size: var(--suoac-font-size-caption);
+}
+
+/* O encerramento ainda por vir aparece em ambar, como prazo a vigiar. */
+.stageDetail[data-deadline-ahead] {
+  color: var(--suoac-color-on-navy-status-closed);
+}
+
+/* Trilho de 3px entre duas etapas; encolhe ate 20px antes de apertar os rotulos. */
+.segment {
+  flex: 1;
+  min-width: var(--suoac-space-5);
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-track);
+}
+
+.segmentFill {
+  display: block;
+  width: calc(var(--segment-fill) * 100%);
+  height: 100%;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-status-open);
+  transform-origin: left;
+  animation-name: var(--suoac-animation-grow);
+  animation-duration: calc(var(--suoac-motion-duration-slow) * 3);
+  animation-delay: var(--suoac-motion-duration-base);
+  animation-timing-function: var(--suoac-motion-ease-standard);
+  animation-fill-mode: both;
+}

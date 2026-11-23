@@ -1,0 +1,73 @@
+/* Pilula de 26px do `v3`: 7px entre o ponto e o texto, 10px nas laterais. */
+.pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.4375rem;
+  height: var(--suoac-event-pill-height);
+  padding: 0 0.625rem;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-on-navy-tint);
+  color: var(--suoac-color-on-navy-text-emphasis);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-semibold);
+  white-space: nowrap;
+  transition:
+    background-color var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard),
+    color var(--suoac-motion-duration-medium) var(--suoac-motion-ease-standard);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: var(--suoac-color-on-navy-status-neutral);
+}
+
+.pill[data-tone="open"] {
+  background: var(--suoac-color-on-navy-status-open-soft);
+  color: var(--suoac-color-on-navy-status-open-text);
+}
+
+/* O ponto pulsa enquanto as inscricoes estao abertas: o evento esta "ao vivo". */
+.pill[data-tone="open"] .dot {
+  background: var(--suoac-color-on-navy-status-open);
+  animation-name: status-pulse;
+  animation-duration: calc(var(--suoac-motion-duration-slow) * 5);
+  /* `ease`, o padrao do CSS: o `v3` declara o pulso sem curva (`pulse 2s infinite`). */
+  animation-timing-function: ease;
+  animation-iteration-count: infinite;
+}
+
+.pill[data-tone="closed"] {
+  background: var(--suoac-color-on-navy-status-closed-soft);
+  color: var(--suoac-color-on-navy-status-closed);
+}
+
+.pill[data-tone="closed"] .dot {
+  background: var(--suoac-color-on-navy-status-closed);
+}
+
+.pill[data-tone="finished"] .dot {
+  background: var(--suoac-color-on-navy-status-finished);
+}
+
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--suoac-color-on-navy-status-open-pulse);
+  }
+  70% {
+    box-shadow: 0 0 0 0.75rem transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Um pulso sem fim nao e entrada: com menos movimento, o ponto fica parado. */
+@media (prefers-reduced-motion: reduce) {
+  .pill[data-tone="open"] .dot {
+    animation-name: none;
+  }
+}
