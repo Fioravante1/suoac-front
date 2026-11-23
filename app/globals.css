@@ -90,6 +90,38 @@
   /* Avatar do usuario na faixa: verde claro com texto verde escuro, igual nos dois temas. */
   --suoac-color-on-navy-avatar: #e6f4ef;
   --suoac-color-on-navy-avatar-text: #174e40;
+  /*
+   * Resumo do evento sobre o navy (SUC-108): pilula de status, chips, blocos de data, linha
+   * de etapas e abas. Os tons de status sao os do `v3` sobre navy, iguais nos dois temas, e
+   * nao os de `--suoac-color-event-*`, feitos para fundo claro.
+   */
+  --suoac-color-on-navy-chip: rgb(255 255 255 / 0.07);
+  --suoac-color-on-navy-tile: rgb(255 255 255 / 0.08);
+  /* Contador das abas, botao "Ver inscritos" e pilula de status neutra. */
+  --suoac-color-on-navy-tint: rgb(255 255 255 / 0.1);
+  /* Divisoria das abas e do bloco de datas, mais leve que `on-navy-divider`. */
+  --suoac-color-on-navy-rule: rgb(255 255 255 / 0.1);
+  --suoac-color-on-navy-panel: rgb(255 255 255 / 0.05);
+  --suoac-color-on-navy-panel-border: rgb(255 255 255 / 0.08);
+  /* Trilho da linha de etapas e aro das etapas por vir. */
+  --suoac-color-on-navy-track: rgb(255 255 255 / 0.14);
+  --suoac-color-on-navy-marker: rgb(255 255 255 / 0.28);
+  /* Contorno dos botoes secundarios do resumo, como Encerrar inscricoes. */
+  --suoac-color-on-navy-outline: rgb(255 255 255 / 0.22);
+  --suoac-color-on-navy-text-emphasis: rgb(255 255 255 / 0.88);
+  --suoac-color-on-navy-text-quiet: rgb(255 255 255 / 0.75);
+  --suoac-color-on-navy-text-faint: rgb(255 255 255 / 0.55);
+  --suoac-color-on-navy-status-open: #4fb393;
+  --suoac-color-on-navy-status-open-text: #7fcfb4;
+  --suoac-color-on-navy-status-open-soft: rgb(79 179 147 / 0.16);
+  --suoac-color-on-navy-status-open-pulse: rgb(79 179 147 / 0.55);
+  --suoac-color-on-navy-status-closed: #f2c14b;
+  --suoac-color-on-navy-status-closed-soft: rgb(242 193 75 / 0.16);
+  --suoac-color-on-navy-status-finished: #82a9ff;
+  /* Acao principal sobre o navy, como Cadastrar passageiro: verde claro, branco no hover. */
+  --suoac-color-on-navy-action: #e6f4ef;
+  --suoac-color-on-navy-action-text: #174e40;
+  --suoac-color-on-navy-action-hover: #ffffff;
 
   /* Semantic backgrounds */
   --suoac-color-info-soft: #e8f0ff;
@@ -127,6 +159,14 @@
   --suoac-font-size-h1: 2rem;
   /* 40px: titulos de abertura, maiores que o H1 de dentro do app. */
   --suoac-font-size-display: 2.5rem;
+  /* 10px e 11px: dia da semana nos blocos de data do resumo do evento (celular e desktop). */
+  --suoac-font-size-overline-sm: 0.625rem;
+  --suoac-font-size-overline: 0.6875rem;
+  /* 19px e 22px: numero do dia nos blocos de data do resumo do evento (celular e desktop). */
+  --suoac-font-size-day-tile-sm: 1.1875rem;
+  --suoac-font-size-day-tile: 1.375rem;
+  /* 36px: titulo do resumo do evento no desktop. */
+  --suoac-font-size-event-title: 2.25rem;
   --suoac-line-height-tight: 1.2;
   --suoac-line-height-heading: 1.25;
   --suoac-line-height-body: 1.5;
@@ -276,6 +316,16 @@
   --suoac-strip-icon-button-size: 2.5rem;
   /* 34px: marca do SUOAC na faixa do evento. */
   --suoac-brand-mark-size: 2.125rem;
+  /* 26px: pilula de status do resumo do evento. */
+  --suoac-event-pill-height: 1.625rem;
+  /* 30px: chips de local, horario e valor do resumo do evento. */
+  --suoac-event-chip-height: 1.875rem;
+  /* 42px: botoes de acao do resumo do evento no desktop. */
+  --suoac-event-action-height: 2.625rem;
+  /* 52px: abas do painel no desktop. */
+  --suoac-event-tab-height: 3.25rem;
+  /* 22px: marcador de cada etapa da linha de etapas do evento. */
+  --suoac-stage-marker-size: 1.375rem;
   /* 36px na faixa do evento; 44px no cabecalho do menu da conta. */
   --suoac-avatar-size: 2.25rem;
   --suoac-avatar-size-lg: 2.75rem;
