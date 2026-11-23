@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { enrollPassengerSchema, toEnrollPayload, type EnrollPassengerFormValues } from "./enroll-passenger-schema";
+import {
+  createEnrollPassengerSchema,
+  enrollPassengerSchema,
+  toEnrollPayload,
+  type EnrollPassengerFormValues,
+} from "./enroll-passenger-schema";
 
 describe("enrollPassengerSchema", () => {
   it("aceita modo existente com passengerId válido", () => {
@@ -159,6 +164,28 @@ describe("enrollPassengerSchema", () => {
   });
 });
 
+describe("createEnrollPassengerSchema, para os papéis do circuito", () => {
+  const circuitSchema = createEnrollPassengerSchema({ requiresCongregation: true });
+  const newPassenger = { mode: "inline", name: "João Silva", rg: "12.345.678-X" };
+
+  it("exige a congregação do passageiro novo", () => {
+    const result = circuitSchema.safeParse(newPassenger);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues).toContainEqual(
+      expect.objectContaining({ path: ["congregationId"], message: "Selecione a congregação do passageiro." }),
+    );
+  });
+
+  it("aceita o passageiro novo com a congregação escolhida", () => {
+    expect(circuitSchema.safeParse({ ...newPassenger, congregationId: "congregation-2" }).success).toBe(true);
+  });
+
+  it("não pede congregação para o passageiro já cadastrado", () => {
+    expect(circuitSchema.safeParse({ mode: "existing", passengerId: "passenger-1" }).success).toBe(true);
+  });
+});
+
 describe("toEnrollPayload", () => {
   it("retorna passengerId para modo existente", () => {
     const values: EnrollPassengerFormValues = {
@@ -182,6 +209,27 @@ describe("toEnrollPayload", () => {
       rg: "12345678X",
       phone: "11999999999",
     });
+  });
+
+  it("envia a congregação do passageiro novo quando o circuito a escolheu", () => {
+    const values: EnrollPassengerFormValues = {
+      mode: "inline",
+      name: "João",
+      rg: "12345678X",
+      congregationId: "congregation-2",
+    };
+
+    expect(toEnrollPayload(values)).toEqual({ name: "João", rg: "12345678X", congregationId: "congregation-2" });
+  });
+
+  it("não envia congregação na inscrição de passageiro já cadastrado", () => {
+    const values: EnrollPassengerFormValues = {
+      mode: "existing",
+      passengerId: "uuid-123",
+      congregationId: "congregation-2",
+    };
+
+    expect(toEnrollPayload(values)).toEqual({ passengerId: "uuid-123" });
   });
 
   it("inclui dayIds quando presentes", () => {

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign, Search, UserPlus } from "lucide-react";
 
+import { congregationSelectOptions } from "@/entities/congregation";
 import type { EventPassenger } from "@/entities/event-passenger";
 import type { Event } from "@/entities/event";
 import { EVENT_TYPES, getActiveEventDays } from "@/entities/event";
@@ -12,15 +13,16 @@ import type { Passenger } from "@/entities/passenger";
 import { useQuery } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
 import { formatCurrency, getTodayDateString, useServerError } from "@/shared/lib";
-import { passengerListOptions } from "@/entities/passenger";
+import { passengerListByCircuitOptions, passengerListOptions } from "@/entities/passenger";
 import { Button } from "@/shared/ui/button";
 import { Modal } from "@/shared/ui/modal";
+import { Select } from "@/shared/ui/select";
 import { Spinner } from "@/shared/ui/spinner";
 import { TextField } from "@/shared/ui/text-field";
 import { Pagination } from "@/shared/ui/pagination";
 
 import {
-  enrollPassengerSchema,
+  createEnrollPassengerSchema,
   toEnrollPayload,
   type EnrollPassengerFormValues,
   type EnrollPassengerPayload,
@@ -34,8 +36,20 @@ interface EnrollPassengerModalProps {
   onClose: () => void;
   onSubmit: (payload: EnrollPassengerPayload) => Promise<ActionResult<EventPassenger>>;
   event: Event;
+  /**
+   * Os papéis do circuito buscam passageiros no circuito do evento e escolhem a congregação do
+   * passageiro novo. Os da congregação buscam e cadastram na própria.
+   */
+  isCircuitUser: boolean;
+  /**
+   * Congregação de quem inscreve: a da busca e do cadastro, para os papéis da congregação, e a que
+   * vem escolhida no passageiro novo, para os do circuito que têm uma. Vazia quando não há.
+   */
   congregationId: string;
 }
+
+const CONGREGATION_SCHEMA = createEnrollPassengerSchema({ requiresCongregation: false });
+const CIRCUIT_SCHEMA = createEnrollPassengerSchema({ requiresCongregation: true });
 
 const DEFAULT_VALUES: EnrollPassengerFormValues = {
   mode: "existing",
@@ -43,6 +57,7 @@ const DEFAULT_VALUES: EnrollPassengerFormValues = {
   name: "",
   rg: "",
   phone: "",
+  congregationId: "",
   dayIds: [],
   observations: "",
   isExempt: false,
@@ -53,12 +68,22 @@ const DEFAULT_VALUES: EnrollPassengerFormValues = {
   paymentObservations: "",
 };
 
-export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregationId }: EnrollPassengerModalProps) {
+export function EnrollPassengerModal({
+  open,
+  onClose,
+  onSubmit,
+  event,
+  isCircuitUser,
+  congregationId,
+}: EnrollPassengerModalProps) {
   const { searchTerm, searchPage, hasSearch, setSearchPage, updateSearchTerm, resetSearch } = usePassengerSearch();
   const { serverError, clearServerError, showServerError } = useServerError();
 
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(null);
 
+  const initialValues = { ...DEFAULT_VALUES, congregationId: isCircuitUser ? congregationId : "" };
+  const congregationFieldId = useId();
+  const congregationErrorId = useId();
   const activeDays = getActiveEventDays(event.days ?? []);
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
@@ -70,22 +95,42 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
     reset,
     formState: { errors, isSubmitting },
   } = useForm<EnrollPassengerFormValues>({
-    resolver: zodResolver(enrollPassengerSchema),
-    defaultValues: DEFAULT_VALUES,
+    resolver: zodResolver(isCircuitUser ? CIRCUIT_SCHEMA : CONGREGATION_SCHEMA),
+    defaultValues: initialValues,
   });
 
   const activeTab = useWatch({ control, name: "mode" }) ?? DEFAULT_VALUES.mode;
   const isExempt = useWatch({ control, name: "isExempt" });
   const includePayment = useWatch({ control, name: "includePayment" });
   const watchedDayIds = useWatch({ control, name: "dayIds" }) ?? [];
+  const selectedCongregationId = useWatch({ control, name: "congregationId" }) ?? "";
 
   const selectedDaysCount = isRegionalConvention ? watchedDayIds.length : 1;
   const estimatedTotal = Number(event.ticketPrice) * selectedDaysCount;
 
-  const { data: passengersData, isLoading: isLoadingPassengers } = useQuery({
+  const congregationSearch = useQuery({
     ...passengerListOptions(congregationId, searchPage, searchTerm),
-    enabled: hasSearch && Boolean(congregationId),
+    enabled: hasSearch && !isCircuitUser && Boolean(congregationId),
   });
+  const circuitSearch = useQuery({
+    ...passengerListByCircuitOptions(event.circuitId, searchPage, searchTerm, ""),
+    enabled: hasSearch && isCircuitUser && Boolean(event.circuitId),
+  });
+  const { data: passengersData, isLoading: isLoadingPassengers } = isCircuitUser ? circuitSearch : congregationSearch;
+
+  const {
+    data: congregationsData,
+    isLoading: isLoadingCongregations,
+    isError: isCongregationsError,
+    refetch: refetchCongregations,
+  } = useQuery({
+    ...congregationSelectOptions(event.circuitId),
+    enabled: open && isCircuitUser && Boolean(event.circuitId),
+  });
+  const congregationOptions = (congregationsData?.data ?? []).map((congregation) => ({
+    value: congregation.id,
+    label: congregation.name,
+  }));
 
   function handleTabChange(tab: EnrollPassengerFormValues["mode"]) {
     setSelectedPassenger(null);
@@ -131,7 +176,7 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
     clearServerError();
     setSelectedPassenger(null);
     resetSearch();
-    reset(DEFAULT_VALUES);
+    reset(initialValues);
     onClose();
   }
 
@@ -192,7 +237,10 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
               <div className={styles.selectedPassenger}>
                 <span className={styles.selectedLabel}>Selecionado:</span>
                 <strong>{selectedPassenger.name}</strong>
-                <span className={styles.selectedRg}>RG: {selectedPassenger.rg}</span>
+                <span className={styles.selectedRg}>
+                  RG: {selectedPassenger.rg}
+                  {isCircuitUser && selectedPassenger.congregationName && ` · ${selectedPassenger.congregationName}`}
+                </span>
               </div>
             )}
 
@@ -215,7 +263,10 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
                     onClick={() => handleSelectPassenger(passenger)}
                   >
                     <span className={styles.passengerName}>{passenger.name}</span>
-                    <span className={styles.passengerRg}>RG: {passenger.rg}</span>
+                    <span className={styles.passengerRg}>
+                      RG: {passenger.rg}
+                      {isCircuitUser && passenger.congregationName && ` · ${passenger.congregationName}`}
+                    </span>
                   </button>
                 ))}
                 {passengersData && passengersData.data.length === 0 && !isLoadingPassengers && (
@@ -234,6 +285,39 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
 
         {activeTab === "inline" && (
           <div className={styles.section}>
+            {isCircuitUser && (
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor={congregationFieldId}>
+                  Congregação
+                </label>
+                <Select
+                  id={congregationFieldId}
+                  className={errors.congregationId ? styles.hasError : undefined}
+                  placeholder={isLoadingCongregations ? "Carregando congregações..." : "Selecione a congregação"}
+                  options={congregationOptions}
+                  disabled={isLoadingCongregations}
+                  aria-invalid={Boolean(errors.congregationId)}
+                  aria-describedby={errors.congregationId ? congregationErrorId : undefined}
+                  // Controlado: as opções chegam depois do valor, e só assim o React reaplica a
+                  // congregação escolhida quando elas aparecem, em vez de mostrar o "Selecione".
+                  value={selectedCongregationId}
+                  onChange={(event) => setValue("congregationId", event.target.value, { shouldValidate: true })}
+                />
+                {errors.congregationId?.message && (
+                  <span id={congregationErrorId} className={styles.errorMessage}>
+                    {errors.congregationId.message}
+                  </span>
+                )}
+                {isCongregationsError && (
+                  <div className={styles.loadError} role="alert">
+                    <span>Não foi possível carregar as congregações.</span>
+                    <Button variant="ghost" size="small" onClick={() => void refetchCongregations()}>
+                      Tentar de novo
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
             <TextField
               label="Nome completo"
               placeholder="Ex: João da Silva"

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
-import { useAuthPermissions, isCircuitRole } from "@/shared/auth";
+import { useAuthPermissions } from "@/shared/auth";
 import { routes } from "@/shared/config";
 import { formatCurrency, useModal, usePagination } from "@/shared/lib";
 import { ActionMenu, type ActionMenuItem } from "@/shared/ui/action-menu";
@@ -214,7 +214,7 @@ export function EventsPage() {
   }
 
   const enrollCongregationId = userCongregationId ?? "";
-  const canShowEnrollModal = enrollEventDetail && (userCongregationId || (userRole && isCircuitRole(userRole)));
+  const canShowEnrollModal = enrollEventDetail && (userCongregationId || isCircuitUser);
 
   const { data, isError, isLoading, refetch } = useQuery(eventListOptions(circuitId, page));
   const events = data?.data ?? [];
@@ -428,6 +428,7 @@ export function EventsPage() {
           onClose={enrollModal.close}
           onSubmit={handleEnroll}
           event={enrollEventDetail}
+          isCircuitUser={isCircuitUser}
           congregationId={enrollCongregationId}
         />
       )}

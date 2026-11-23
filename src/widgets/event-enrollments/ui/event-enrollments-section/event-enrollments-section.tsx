@@ -64,6 +64,9 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const queryClient = useQueryClient();
 
   const canManage = canManageEventPassengers(event.status);
+  const isCircuitUser = isCircuitRole(userRole);
+  // Os papéis do circuito inscrevem com ou sem congregação; os da congregação precisam da deles.
+  const canEnroll = isCircuitUser || Boolean(userCongregationId);
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
   const { data: passengersData, isFetching, isError } = useQuery(eventPassengerListOptions(event.id, page));
@@ -277,23 +280,14 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         </>
       )}
 
-      {userCongregationId && (
+      {canEnroll && (
         <EnrollPassengerModal
           open={enrollModal.isOpen}
           onClose={enrollModal.close}
           onSubmit={handleEnroll}
           event={event}
-          congregationId={userCongregationId}
-        />
-      )}
-
-      {!userCongregationId && isCircuitRole(userRole) && (
-        <EnrollPassengerModal
-          open={enrollModal.isOpen}
-          onClose={enrollModal.close}
-          onSubmit={handleEnroll}
-          event={event}
-          congregationId=""
+          isCircuitUser={isCircuitUser}
+          congregationId={userCongregationId ?? ""}
         />
       )}
 

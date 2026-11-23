@@ -245,3 +245,13 @@
   font-size: var(--suoac-font-size-small);
   color: var(--suoac-color-text-secondary);
 }
+
+/* Falha ao carregar as congregações do circuito: a mensagem e o caminho de volta, lado a lado. */
+.loadError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--suoac-space-2);
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-critical);
+}
