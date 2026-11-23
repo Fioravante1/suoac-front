@@ -3,19 +3,18 @@
 import { endpoints, httpClient } from "@/shared/api/http-client";
 import type { ActionResult } from "@/shared/api";
 
-import { canUpdateEventStatus, type Event, type EventStatus } from "@/entities/event";
+import { canUpdateEventStatus, type Event } from "@/entities/event";
 
 import { updateEventSchema, type UpdateEventFormValues } from "../model";
 
-import { mapUpdateEventFormToDto } from "./update-event.dto";
+import { mapUpdateEventFormToDto, type EventBeingUpdated } from "./update-event.dto";
 
 export async function updateEventAction(
-  eventId: string,
-  status: EventStatus,
+  event: EventBeingUpdated & Pick<Event, "id">,
   values: UpdateEventFormValues,
 ): Promise<ActionResult<Event>> {
-  if (!eventId) return { success: false, error: "Evento inválido." };
-  if (!canUpdateEventStatus(status)) return { success: false, error: "Este evento não pode mais ser editado." };
+  if (!event.id) return { success: false, error: "Evento inválido." };
+  if (!canUpdateEventStatus(event.status)) return { success: false, error: "Este evento não pode mais ser editado." };
 
   const parsed = updateEventSchema.safeParse(values);
 
@@ -24,9 +23,9 @@ export async function updateEventAction(
   }
 
   try {
-    const data = await httpClient<Event>(endpoints.events.update(eventId), {
+    const data = await httpClient<Event>(endpoints.events.update(event.id), {
       method: "PATCH",
-      body: mapUpdateEventFormToDto(parsed.data, status),
+      body: mapUpdateEventFormToDto(parsed.data, event),
     });
 
     return { success: true, data };

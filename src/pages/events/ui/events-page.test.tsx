@@ -238,8 +238,7 @@ describe("EventsPage", () => {
 
     await waitFor(() => {
       expect(updateEventActionMock).toHaveBeenCalledWith(
-        "event-1",
-        EVENT_STATUSES.DRAFT,
+        expect.objectContaining({ id: "event-1", status: EVENT_STATUSES.DRAFT }),
         expect.objectContaining({ title: "Novo título" }),
       );
     });

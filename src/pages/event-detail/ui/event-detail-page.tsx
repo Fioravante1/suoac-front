@@ -98,8 +98,7 @@ export function EventDetailPage({ eventId }: EventDetailPageProps) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ ev, values }: { ev: Event; values: UpdateEventFormValues }) =>
-      updateEventAction(ev.id, ev.status, values),
+    mutationFn: ({ ev, values }: { ev: Event; values: UpdateEventFormValues }) => updateEventAction(ev, values),
     onSuccess: (result) => {
       if (!result.success) return;
 
