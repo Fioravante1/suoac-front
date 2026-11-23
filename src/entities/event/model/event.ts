@@ -279,6 +279,17 @@ export interface Event {
   city: string;
   state: string;
   observations: string | null;
+  /**
+   * Quando as inscrições abriram: a publicação do rascunho. `null` em rascunho e em evento
+   * publicado antes de a API guardar a data. Opcional porque o front pode chegar a produção antes
+   * da API que o expõe.
+   */
+  publishedAt?: string | null;
+  /**
+   * Quando as inscrições encerraram: o encerramento manual ou, pelo ciclo de vida, o próprio
+   * prazo. `null` enquanto estão abertas e em evento antigo sem registro; opcional como `publishedAt`.
+   */
+  registrationClosedAt?: string | null;
   circuitId: string;
   createdById: string;
   createdAt: string;
