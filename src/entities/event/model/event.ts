@@ -211,13 +211,18 @@ export interface EventPeriod {
   end: string;
 }
 
+/** Os dias que acontecem, sem os cancelados, em ordem de data. */
+export function getActiveEventDays(days: readonly EventDayInEvent[]): EventDayInEvent[] {
+  return days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE).sort((a, b) => a.date.localeCompare(b.date));
+}
+
 /**
  * Período do evento: do primeiro ao último dia ativo. Sem nenhum dia ativo, como no evento
  * cancelado (o cancelamento cancela os dias), contam todos os dias, para o período não sumir.
  * Sem dias, não há período.
  */
 export function getEventPeriod(days: readonly EventDayInEvent[]): EventPeriod | null {
-  const activeDays = days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE);
+  const activeDays = getActiveEventDays(days);
   const countedDays = activeDays.length > 0 ? activeDays : days;
   const dates = countedDays.map((day) => day.date).sort();
   const start = dates.at(0);

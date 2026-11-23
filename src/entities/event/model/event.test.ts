@@ -9,6 +9,7 @@ import {
   canUpdateEventDayTimes,
   daysUntilEventDeadline,
   formatEventDeadline,
+  getActiveEventDays,
   getEventPeriod,
   getEventToday,
   isEventVisibleTo,
@@ -316,6 +317,17 @@ describe("daysUntilEventDeadline", () => {
   it("dá 0 no próprio dia do prazo e negativo depois dele", () => {
     expect(daysUntilEventDeadline(deadline, "2026-10-12")).toBe(0);
     expect(daysUntilEventDeadline(deadline, "2026-10-14")).toBe(-2);
+  });
+});
+
+describe("getActiveEventDays", () => {
+  it("deixa de fora os dias cancelados e ordena os ativos por data", () => {
+    const days = [buildDay("2026-10-25"), buildDay("2026-10-24", EVENT_DAY_STATUSES.CANCELLED), buildDay("2026-10-23")];
+
+    expect(getActiveEventDays(days).map((day) => day.date)).toEqual([
+      "2026-10-23T00:00:00.000Z",
+      "2026-10-25T00:00:00.000Z",
+    ]);
   });
 });
 

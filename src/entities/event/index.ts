@@ -20,6 +20,7 @@ export {
   canUpdateEventStatus,
   daysUntilEventDeadline,
   formatEventDeadline,
+  getActiveEventDays,
   getEventPeriod,
   getEventToday,
   isEventVisibleTo,

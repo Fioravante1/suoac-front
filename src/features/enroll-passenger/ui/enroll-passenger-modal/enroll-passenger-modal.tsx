@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign, Search, UserPlus } from "lucide-react";
 
 import type { EventPassenger } from "@/entities/event-passenger";
-import type { Event, EventDayInEvent } from "@/entities/event";
-import { EVENT_DAY_STATUSES, EVENT_TYPES } from "@/entities/event";
+import type { Event } from "@/entities/event";
+import { EVENT_TYPES, getActiveEventDays } from "@/entities/event";
 import type { Passenger } from "@/entities/passenger";
 import { useQuery } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
@@ -37,10 +37,6 @@ interface EnrollPassengerModalProps {
   congregationId: string;
 }
 
-function getActiveDays(event: Event): EventDayInEvent[] {
-  return (event.days ?? []).filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE);
-}
-
 const DEFAULT_VALUES: EnrollPassengerFormValues = {
   mode: "existing",
   passengerId: "",
@@ -63,7 +59,7 @@ export function EnrollPassengerModal({ open, onClose, onSubmit, event, congregat
 
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(null);
 
-  const activeDays = getActiveDays(event);
+  const activeDays = getActiveEventDays(event.days ?? []);
   const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
 
   const {
