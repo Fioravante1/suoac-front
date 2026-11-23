@@ -55,7 +55,7 @@ vi.mock("@/entities/event-passenger", async (importOriginal) => {
 
 vi.mock("@/features/enroll-passenger", () => ({
   EnrollPassengerModal: () => null,
-  enrollPassengerAction: vi.fn(),
+  useEnrollPassengerMutation: () => ({ mutateAsync: vi.fn() }),
 }));
 
 vi.mock("@/features/update-event-passenger-days", () => ({

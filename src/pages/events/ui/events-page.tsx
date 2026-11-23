@@ -51,7 +51,11 @@ import { deleteEventAction } from "@/features/delete-event";
 import { publishEventAction } from "@/features/publish-event";
 import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
 import { updateEventAction } from "@/features/update-event/api";
-import { EnrollPassengerModal, enrollPassengerAction, type EnrollPassengerPayload } from "@/features/enroll-passenger";
+import {
+  EnrollPassengerModal,
+  useEnrollPassengerMutation,
+  type EnrollPassengerPayload,
+} from "@/features/enroll-passenger";
 
 import styles from "./events-page.module.css";
 
@@ -203,19 +207,7 @@ export function EventsPage() {
     enabled: Boolean(enrollEventId),
   });
 
-  const enrollMutation = useMutation({
-    mutationFn: (payload: EnrollPassengerPayload) => enrollPassengerAction(enrollEventId, payload),
-    onSuccess: (result) => {
-      if (!result.success) return;
-
-      queryClient.invalidateQueries({ queryKey: queryKeys.eventPassengers.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(enrollEventId) });
-      // A inscrição altera contagens/valores agregados no Dashboard e na tela Financeira.
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.financialSummary.all });
-      toast.success("Passageiro inscrito com sucesso.");
-    },
-  });
+  const enrollMutation = useEnrollPassengerMutation(enrollEventId);
 
   async function handleEnroll(payload: EnrollPassengerPayload) {
     return enrollMutation.mutateAsync(payload);

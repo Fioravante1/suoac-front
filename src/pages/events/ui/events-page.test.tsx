@@ -64,7 +64,7 @@ vi.mock("@/entities/event/api/event.queries", () => ({
 vi.mock("@/features/enroll-passenger", () => ({
   EnrollPassengerModal: ({ open }: { open: boolean }) =>
     open ? <div data-testid="enroll-modal">Modal de inscrição</div> : null,
-  enrollPassengerAction: vi.fn(),
+  useEnrollPassengerMutation: () => ({ mutateAsync: vi.fn() }),
 }));
 
 vi.mock("@/features/create-event/api", () => ({
