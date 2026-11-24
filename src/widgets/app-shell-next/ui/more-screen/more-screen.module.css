@@ -116,7 +116,11 @@
   border-top: 1px solid var(--suoac-color-border);
 }
 
-/* Interruptor de 44x26px, como o do desenho; ligado, a cor primaria e o botao vai para a direita. */
+/*
+ * Interruptor de 44x26px, como o do desenho; ligado, a cor primaria e o botao vai para a direita.
+ * O estado vem do tema do `<html>`, como no `ThemeToggle`, e nao de JavaScript: o servidor nao sabe
+ * se `system` resolve para escuro, e um estado do React piscaria desligado na primeira pintura.
+ */
 .track {
   position: relative;
   flex-shrink: 0;
@@ -125,10 +129,6 @@
   border-radius: var(--suoac-radius-pill);
   background: var(--suoac-color-border-strong);
   transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
-}
-
-.track[data-on] {
-  background: var(--suoac-color-primary);
 }
 
 .thumb {
@@ -143,8 +143,22 @@
   transition: left var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
 }
 
-.track[data-on] .thumb {
+:global(html[data-theme="dark"]) .track {
+  background: var(--suoac-color-primary);
+}
+
+:global(html[data-theme="dark"]) .thumb {
   left: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html[data-theme="system"]) .track {
+    background: var(--suoac-color-primary);
+  }
+
+  :global(html[data-theme="system"]) .thumb {
+    left: 1.5rem;
+  }
 }
 
 .soon {

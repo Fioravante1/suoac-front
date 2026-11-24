@@ -116,7 +116,7 @@ export function MoreScreen() {
               checked={isDark}
               onClick={toggleTheme}
               trailing={
-                <span className={styles.track} data-on={isDark || undefined} aria-hidden="true">
+                <span className={styles.track} aria-hidden="true">
                   <span className={styles.thumb} />
                 </span>
               }
