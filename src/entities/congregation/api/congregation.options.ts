@@ -1,6 +1,6 @@
 import { queryKeys } from "@/shared/api";
 
-import { fetchCongregations, fetchCongregation } from "./congregation.queries";
+import { fetchCongregationEventStatuses, fetchCongregations, fetchCongregation } from "./congregation.queries";
 
 export function congregationListOptions(circuitId: string, page: number) {
   return {
@@ -25,5 +25,13 @@ export function congregationDetailOptions(id: string) {
     queryKey: queryKeys.congregations.detail(id),
     queryFn: () => fetchCongregation(id),
     enabled: Boolean(id),
+  } as const;
+}
+
+export function congregationEventStatusesOptions(eventId: string) {
+  return {
+    queryKey: queryKeys.congregations.eventStatuses(eventId),
+    queryFn: () => fetchCongregationEventStatuses(eventId),
+    enabled: Boolean(eventId),
   } as const;
 }

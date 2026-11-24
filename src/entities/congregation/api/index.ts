@@ -1,2 +1,7 @@
-export { fetchCongregations, fetchCongregation } from "./congregation.queries";
-export { congregationListOptions, congregationSelectOptions, congregationDetailOptions } from "./congregation.options";
+export { fetchCongregationEventStatuses, fetchCongregations, fetchCongregation } from "./congregation.queries";
+export {
+  congregationDetailOptions,
+  congregationEventStatusesOptions,
+  congregationListOptions,
+  congregationSelectOptions,
+} from "./congregation.options";
