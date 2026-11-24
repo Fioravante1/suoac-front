@@ -11,8 +11,8 @@ interface CongregationTableProps {
   onDelete: (congregation: Congregation) => void;
 }
 
-function normalizeEmail(email: string): string {
-  return email.toLowerCase();
+function normalizeEmail(email: string | null): string | null {
+  return email?.toLowerCase() ?? null;
 }
 
 export function CongregationTable({ congregations, onEdit, onDelete }: CongregationTableProps) {
@@ -36,7 +36,7 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
                 <TableRow key={congregation.id}>
                   <TableCell className={styles.name}>{congregation.name}</TableCell>
                   <TableCell className={styles.code}>{congregation.code}</TableCell>
-                  <TableCell className={styles.email}>{normalizeEmail(congregation.email)}</TableCell>
+                  <TableCell className={styles.email}>{normalizeEmail(congregation.email) ?? "—"}</TableCell>
                   <TableCell className={styles.city}>{congregation.city ?? "—"}</TableCell>
                   <TableCell>
                     <div className={styles.actions}>
@@ -75,7 +75,9 @@ export function CongregationTable({ congregations, onEdit, onDelete }: Congregat
               <span className={styles.mobileCardName}>{congregation.name}</span>
             </div>
             <span className={styles.mobileCardDetail}>Código: {congregation.code}</span>
-            <span className={styles.mobileCardDetail}>{normalizeEmail(congregation.email)}</span>
+            {congregation.email && (
+              <span className={styles.mobileCardDetail}>{normalizeEmail(congregation.email)}</span>
+            )}
             {congregation.city && <span className={styles.mobileCardDetail}>Cidade: {congregation.city}</span>}
             <div className={styles.mobileCardActions}>
               <button

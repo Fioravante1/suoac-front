@@ -34,7 +34,12 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
   } = useForm<CongregationFormValues>({
     resolver: zodResolver(congregationFormSchema),
     values: congregation
-      ? { code: congregation.code, name: congregation.name, email: congregation.email, city: congregation.city ?? "" }
+      ? {
+          code: congregation.code,
+          name: congregation.name,
+          email: congregation.email ?? "",
+          city: congregation.city ?? "",
+        }
       : { code: "", name: "", email: "", city: "" },
   });
 
