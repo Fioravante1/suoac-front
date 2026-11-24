@@ -3,5 +3,6 @@
 export { EventHomeHero } from "./ui/event-home-hero";
 export { EventStrip } from "./ui/event-strip";
 export { EventSummary } from "./ui/event-summary";
+export { PanelBottomNav } from "./ui/panel-bottom-nav";
 export { PanelTopBar } from "./ui/panel-top-bar";
 export { QuickActionsDock } from "./ui/quick-actions-dock";
