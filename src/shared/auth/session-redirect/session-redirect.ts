@@ -105,6 +105,25 @@ export function redirectToPasswordChangeRequired(): void {
   hardNavigate(CHANGE_PASSWORD_PATH);
 }
 
+/**
+ * Leva à tela certa quando o erro é de autenticação: sessão expirada ou troca de senha
+ * obrigatória. Devolve `true` se redirecionou, para quem chama não mostrar o erro também.
+ * Aceita `Error` (queries) ou `string` (`ActionResult.error` de mutations).
+ */
+export function redirectOnAuthError(error: unknown): boolean {
+  if (isSessionExpiredError(error)) {
+    redirectToSessionExpired();
+    return true;
+  }
+
+  if (isPasswordChangeRequiredError(error)) {
+    redirectToPasswordChangeRequired();
+    return true;
+  }
+
+  return false;
+}
+
 /** @internal Exported for testing only */
 export function resetSessionRedirect(): void {
   isRedirecting = false;

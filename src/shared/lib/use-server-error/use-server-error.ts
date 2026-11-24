@@ -2,12 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-import {
-  isSessionExpiredError,
-  redirectToSessionExpired,
-  isPasswordChangeRequiredError,
-  redirectToPasswordChangeRequired,
-} from "@/shared/auth/session-redirect";
+import { redirectOnAuthError } from "@/shared/auth/session-redirect";
 
 const DEFAULT_SERVER_ERROR_MESSAGE = "Ocorreu um erro inesperado.";
 
@@ -25,18 +20,9 @@ export function useServerError(): UseServerErrorReturn {
   }, []);
 
   const showServerError = useCallback((error?: string | null, fallbackMessage = DEFAULT_SERVER_ERROR_MESSAGE) => {
-    // Sessão expirada (vinda de ActionResult.error) não é um erro de formulário:
-    // redireciona para /login em vez de exibir a mensagem inline.
-    if (isSessionExpiredError(error)) {
-      redirectToSessionExpired();
-      return;
-    }
-
-    // Troca de senha obrigatória: redireciona para a tela de definição de senha.
-    if (isPasswordChangeRequiredError(error)) {
-      redirectToPasswordChangeRequired();
-      return;
-    }
+    // Sessão expirada e troca de senha obrigatória (vindas de ActionResult.error) não são erro
+    // de formulário: levam ao login ou à definição de senha, em vez de mostrar a mensagem inline.
+    if (redirectOnAuthError(error)) return;
 
     const normalizedError = error?.trim();
 

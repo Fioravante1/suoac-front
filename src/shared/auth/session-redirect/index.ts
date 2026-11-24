@@ -3,6 +3,7 @@ export {
   redirectToSessionExpired,
   isPasswordChangeRequiredError,
   redirectToPasswordChangeRequired,
+  redirectOnAuthError,
   resetSessionRedirect,
   subscribeToSessionRedirect,
 } from "./session-redirect";
