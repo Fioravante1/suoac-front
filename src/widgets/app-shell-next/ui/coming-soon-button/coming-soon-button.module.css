@@ -17,26 +17,6 @@
   cursor: not-allowed;
 }
 
-/*
- * Encerrar inscricoes do resumo do evento: o botao secundario com contorno sobre o navy, 44px
- * no celular e no tablet (`Dashboard Mobile`) e 42px no desktop (`v3`), com o texto esmaecido
- * enquanto nao ha destino.
- */
-.root[data-kind="text"] {
-  display: flex;
-}
-
-.root[data-kind="text"] .button {
-  width: 100%;
-  height: var(--suoac-button-height);
-  padding: 0 var(--suoac-space-4);
-  border: 1px solid var(--suoac-color-on-navy-outline);
-  font-family: inherit;
-  font-size: var(--suoac-font-size-small);
-  font-weight: var(--suoac-font-weight-medium);
-  white-space: nowrap;
-}
-
 .button:focus-visible {
   outline: 2px solid var(--suoac-color-text-inverse);
   outline-offset: 2px;
@@ -72,23 +52,10 @@
   transform: translate(-50%, 0);
 }
 
-@media (min-width: 80rem) {
-  .root[data-kind="text"] .button {
-    height: var(--suoac-event-action-height);
-  }
-}
-
-/*
- * Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. Vem depois do corte do
- * desktop e com a mesma especificidade, para vencer os 42px do botao de texto.
- */
+/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. */
 @media (pointer: coarse) {
-  .root[data-kind="icon"] .button {
+  .button {
     width: var(--suoac-button-height);
-  }
-
-  .button,
-  .root[data-kind="text"] .button {
     height: var(--suoac-button-height);
   }
 }
