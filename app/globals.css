@@ -675,17 +675,16 @@ html {
   overflow-x: hidden;
 }
 
-/*
- * `clip`, e nao `hidden`: com `hidden` o body vira um contêiner de rolagem que nao rola, e todo
- * `position: sticky` dentro dele (o topo do painel no celular e no tablet) nunca gruda. O `html`
- * segue com `hidden`, que e o que a pagina usa para rolar.
- */
 body {
   max-width: 100vw;
+  /*
+   * `clip`, e nao so `hidden`: com `hidden` o body vira um contêiner de rolagem que nao rola, e todo
+   * `position: sticky` dentro dele (o topo do painel no celular e no tablet) nunca gruda. O `html`
+   * segue com `hidden`, que e o que a pagina usa para rolar. A linha de `hidden` e para quem nao
+   * conhece `clip` (Safari anterior ao 16), que ignora a segunda e fica como estava.
+   */
+  overflow-x: hidden;
   overflow-x: clip;
-}
-
-body {
   min-height: 100%;
   transition:
     background-color var(--suoac-motion-theme) ease,
