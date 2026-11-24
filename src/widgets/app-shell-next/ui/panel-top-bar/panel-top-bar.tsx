@@ -31,7 +31,11 @@ export function PanelTopBar() {
   const { isCircuitUser } = useAuthPermissions();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const switcher = useEventSwitcher({ isOpen: isSwitcherOpen });
-  const { data: circuit } = useQuery(ownCircuitOptions(user?.circuitId ?? ""));
+  // O topo é do circuito: para os outros papéis ele não aparece, e a consulta do circuito não sai.
+  const { data: circuit } = useQuery({
+    ...ownCircuitOptions(user?.circuitId ?? ""),
+    enabled: isCircuitUser && Boolean(user),
+  });
 
   if (!user || !isCircuitUser) return null;
 

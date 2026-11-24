@@ -127,11 +127,18 @@ describe("PanelTopBar", () => {
     expect(screen.queryByText(/^Circuito /)).not.toBeInTheDocument();
   });
 
-  it("fica de fora para os papéis da congregação, que têm a navegação do SUC-113", () => {
+  it("fica de fora para os papéis da congregação, que têm a navegação do SUC-113, sem buscar o circuito", () => {
     mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
 
     const { container } = render(<PanelTopBar />);
 
     expect(container).toBeEmptyDOMElement();
+    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }));
+  });
+
+  it("busca o circuito para o circuito", () => {
+    render(<PanelTopBar />);
+
+    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
   });
 });
