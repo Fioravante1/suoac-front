@@ -1,0 +1,40 @@
+/*
+ * 48px de vidro logo abaixo do topo de 64px, que continua colado. Celular e tablet; a partir de
+ * 1280px (`--suoac-breakpoint-panel-desktop`) some.
+ */
+.bar {
+  position: sticky;
+  top: var(--suoac-mobile-header-height);
+  z-index: var(--suoac-z-dropdown);
+  display: flex;
+  align-items: center;
+  height: var(--suoac-stacked-bar-height);
+  padding: 0 0.375rem;
+  border-bottom: 1px solid var(--suoac-color-border);
+  background: var(--suoac-color-glass);
+  backdrop-filter: blur(12px);
+}
+
+@media (min-width: 80rem) {
+  .bar {
+    display: none;
+  }
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--suoac-button-height);
+  padding: 0 var(--suoac-space-2);
+  border-radius: var(--suoac-radius-md);
+  color: var(--suoac-color-primary);
+  font-size: var(--suoac-font-size-item);
+  font-weight: var(--suoac-font-weight-medium);
+  text-decoration: none;
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: 2px;
+}
