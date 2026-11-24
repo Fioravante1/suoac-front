@@ -5,6 +5,7 @@ import { USER_ROLES, type SessionUser } from "@/shared/auth";
 
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
+  useAuthPermissions: vi.fn(),
   useQuery: vi.fn(),
   useSelectedEvent: vi.fn(),
   useIsDarkTheme: vi.fn(),
@@ -16,6 +17,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/shared/auth", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/auth")>()),
   useAuth: mocks.useAuth,
+  useAuthPermissions: mocks.useAuthPermissions,
 }));
 vi.mock("@/shared/api", () => ({ useQuery: mocks.useQuery }));
 vi.mock("@/entities/congregation", async (importOriginal) => ({
@@ -50,6 +52,7 @@ describe("MoreScreen", () => {
     vi.clearAllMocks();
     mocks.isSigningOut = false;
     mocks.useAuth.mockReturnValue({ user: coordinator, isAuthenticated: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
     mocks.useSelectedEvent.mockReturnValue({ event: { id: "event-1" } });
     mocks.useQuery.mockReturnValue({ data: undefined });
     mocks.useIsDarkTheme.mockReturnValue(false);
@@ -78,6 +81,17 @@ describe("MoreScreen", () => {
     expect(within(group).getByRole("link", { name: /Listas e exportações/ })).toHaveTextContent(
       "Embarque, pagamentos, WhatsApp",
     );
+  });
+
+  it("para os papéis da congregação, deixa de fora os atalhos do evento e mantém a conta", () => {
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
+
+    render(<MoreScreen />);
+
+    expect(screen.queryByRole("region", { name: "Evento" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Ônibus/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Tema escuro" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument();
   });
 
   it("resume as congregações do evento: quantas no circuito e quantas finalizaram", () => {

@@ -5,7 +5,7 @@ import { Bus, FileText, Landmark, Lock, LogOut, Moon, ShieldCheck, type LucideIc
 import { congregationEventStatusesOptions, countUnfinalizedCongregations } from "@/entities/congregation";
 import { useSelectedEvent } from "@/features/select-event";
 import { useQuery } from "@/shared/api";
-import { USER_ROLE_LABELS, useAuth } from "@/shared/auth";
+import { USER_ROLE_LABELS, useAuth, useAuthPermissions } from "@/shared/auth";
 import { getInitials } from "@/shared/lib";
 import { useIsDarkTheme, useTheme } from "@/shared/theme";
 import { LoadingOverlay } from "@/shared/ui/loading-overlay";
@@ -39,12 +39,14 @@ const SCREEN_HINTS: Partial<Record<MoreScreenId, string>> = {
  * conta, os atalhos do evento (Ônibus, Congregações, Listas e exportações), o tema escuro, Alterar
  * senha e Sair. No tablet as duas colunas dividem o que no celular é uma fila só.
  *
+ * Os atalhos do evento são do circuito: o papel da congregação vê só a conta, o tema e Sair.
  * O card da conta é informativo: Meu perfil não tem tela (SUC-96, SUC-124). Alterar senha aparece
  * desabilitado, com "Em breve", como no menu da conta do desktop, até a troca voluntária
  * (SUC-125): `/change-password` é só a troca do primeiro acesso.
  */
 export function MoreScreen() {
   const { user } = useAuth();
+  const { isCircuitUser } = useAuthPermissions();
   const { toggle: toggleTheme } = useTheme();
   const isDark = useIsDarkTheme();
   const { signOut, isSigningOut } = useSignOut();
@@ -82,23 +84,25 @@ export function MoreScreen() {
           <AccountCircuit circuitId={user.circuitId} />
         </section>
 
-        <section className={styles.group} aria-labelledby="more-event">
-          <h2 id="more-event" className={styles.groupTitle}>
-            Evento
-          </h2>
-          <div className={styles.rows}>
-            {MORE_SCREENS.map((screen) => (
-              <MoreRow
-                key={screen.id}
-                icon={SCREEN_ICONS[screen.id]}
-                tone={SCREEN_TONES[screen.id]}
-                label={screen.label}
-                hint={screen.id === MORE_SCREEN_IDS.CONGREGATIONS ? congregationsHint : SCREEN_HINTS[screen.id]}
-                href={screen.href}
-              />
-            ))}
-          </div>
-        </section>
+        {isCircuitUser && (
+          <section className={styles.group} aria-labelledby="more-event">
+            <h2 id="more-event" className={styles.groupTitle}>
+              Evento
+            </h2>
+            <div className={styles.rows}>
+              {MORE_SCREENS.map((screen) => (
+                <MoreRow
+                  key={screen.id}
+                  icon={SCREEN_ICONS[screen.id]}
+                  tone={SCREEN_TONES[screen.id]}
+                  label={screen.label}
+                  hint={screen.id === MORE_SCREEN_IDS.CONGREGATIONS ? congregationsHint : SCREEN_HINTS[screen.id]}
+                  href={screen.href}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className={styles.group} aria-labelledby="more-account">
           <h2 id="more-account" className={styles.groupTitle}>
@@ -122,7 +126,6 @@ export function MoreScreen() {
               tone="neutral"
               label="Alterar senha"
               isDisabled
-              onClick={() => undefined}
               trailing={<span className={styles.soon}>Em breve</span>}
             />
             <MoreRow icon={LogOut} tone="critical" label="Sair" isBusy={isSigningOut} onClick={signOut} />

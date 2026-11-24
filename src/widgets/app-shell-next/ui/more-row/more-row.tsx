@@ -18,7 +18,7 @@ type MoreRowLinkProps = MoreRowBaseProps & Readonly<{ href: string }>;
 
 type MoreRowButtonProps = MoreRowBaseProps &
   Readonly<{
-    onClick: () => void;
+    onClick?: () => void;
     /** O que aparece à direita: o interruptor, o "Em breve"; sem nada, é só a ação. */
     trailing?: ReactNode;
     /** Interruptor: o estado fica em `aria-checked`. */
