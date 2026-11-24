@@ -11,7 +11,11 @@ import { TextField } from "@/shared/ui/text-field";
 
 import type { Congregation } from "@/entities/congregation";
 
-import { congregationFormSchema, type CongregationFormValues } from "../../model/congregation-form-schema";
+import {
+  congregationEditWithoutEmailSchema,
+  congregationFormSchema,
+  type CongregationFormValues,
+} from "../../model/congregation-form-schema";
 
 import styles from "./congregation-form-modal.module.css";
 
@@ -24,6 +28,8 @@ interface CongregationFormModalProps {
 
 export function CongregationFormModal({ open, onClose, onSubmit, congregation }: CongregationFormModalProps) {
   const isEditing = Boolean(congregation);
+  // Sem e-mail cadastrado, o campo pode seguir vazio: obrigar a inventar um e-mail travaria a edição.
+  const schema = congregation?.email === null ? congregationEditWithoutEmailSchema : congregationFormSchema;
   const { serverError, clearServerError, showServerError } = useServerError();
 
   const {
@@ -32,7 +38,7 @@ export function CongregationFormModal({ open, onClose, onSubmit, congregation }:
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CongregationFormValues>({
-    resolver: zodResolver(congregationFormSchema),
+    resolver: zodResolver(schema),
     values: congregation
       ? {
           code: congregation.code,

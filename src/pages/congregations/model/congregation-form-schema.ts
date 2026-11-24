@@ -7,4 +7,12 @@ export const congregationFormSchema = z.object({
   city: z.string().min(1, { message: "Cidade é obrigatória." }),
 });
 
+/**
+ * A edição de uma congregação cadastrada sem e-mail (como no autocadastro do circuito) aceita o campo
+ * vazio, e a página não o envia. Preenchido, ele continua tendo de ser um e-mail válido.
+ */
+export const congregationEditWithoutEmailSchema = congregationFormSchema.extend({
+  email: z.union([z.literal(""), z.email({ message: "E-mail inválido." })]),
+});
+
 export type CongregationFormValues = z.infer<typeof congregationFormSchema>;
