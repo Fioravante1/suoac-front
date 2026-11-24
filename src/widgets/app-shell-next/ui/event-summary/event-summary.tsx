@@ -6,11 +6,11 @@ import { Banknote, Clock, MapPin } from "lucide-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import { useEventOverview } from "../../model";
-import { ComingSoonButton } from "../coming-soon-button";
 import { EnrollPassengerButton } from "../enroll-passenger-button";
 import { EventStatusPill } from "../event-status-pill";
 import { EventTabs } from "../event-tabs";
 import { EventTimeline } from "../event-timeline";
+import { RegistrationsToggle } from "../registrations-toggle";
 
 import styles from "./event-summary.module.css";
 
@@ -20,8 +20,9 @@ import styles from "./event-summary.module.css";
  * etapas e as abas do painel.
  *
  * Mostra o evento selecionado na faixa, publicado: inscrições abertas, encerradas ou
- * finalizado. Rascunho e cancelado têm outro resumo (SUC-111). Encerrar inscrições aparece
- * com "Em breve" até o SUC-109 ligar a ação.
+ * finalizado. Rascunho e cancelado têm outro resumo (SUC-111). Com as inscrições abertas, as
+ * ações são Encerrar inscrições e Cadastrar passageiro; encerradas antes do prazo, Reabrir
+ * inscrições.
  *
  * Ações e abas são as do circuito. Os papéis da congregação veem o resumo e as etapas, e as
  * abas e ações deles chegam com o SUC-113.
@@ -47,7 +48,7 @@ export function EventSummary() {
 
   if (state.status === "hidden") return null;
 
-  const { event, overview, isCircuitUser, canAct } = state;
+  const { event, overview, isCircuitUser, canEnroll, registrationAction } = state;
   const { summary, timeline } = overview;
 
   return (
@@ -81,12 +82,13 @@ export function EventSummary() {
           </ul>
         </div>
 
-        {canAct && (
-          <div className={styles.actions}>
-            <ComingSoonButton label="Encerrar inscrições" />
-            <EnrollPassengerButton event={event} />
-          </div>
-        )}
+        {/* Sempre montado, para a confirmação de encerrar seguir aberta mesmo que o evento
+            recarregado já não ofereça ação; sem botões, o CSS some com o bloco. Sem Cadastrar
+            passageiro, o Reabrir fica sozinho. */}
+        <div className={styles.actions} data-single={!canEnroll || undefined}>
+          <RegistrationsToggle event={event} action={registrationAction} />
+          {canEnroll && <EnrollPassengerButton event={event} />}
+        </div>
       </div>
 
       <EventTimeline summary={summary} timeline={timeline} />

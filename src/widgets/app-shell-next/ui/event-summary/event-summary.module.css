@@ -87,6 +87,19 @@
   gap: 0.625rem;
 }
 
+/* Reabrir inscricoes sozinho: uma coluna, sem a vazia de Cadastrar e o vao depois dele. */
+.actions[data-single] {
+  grid-template-columns: auto;
+}
+
+/*
+ * Sem acao para quem ve (congregacao, ou evento sem encerrar nem reabrir), o bloco some. A
+ * confirmacao de encerrar, quando aberta, sai por portal e nao conta como filho.
+ */
+.actions:empty {
+  display: none;
+}
+
 /* Esqueleto no lugar do resumo, com a altura dele, para a tela nao pular quando o evento chega. */
 .loading {
   display: flex;

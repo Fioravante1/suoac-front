@@ -76,7 +76,7 @@
   gap: 0.625rem;
 }
 
-/* Sem Encerrar inscricoes (encerradas ou finalizado), Ver inscritos ocupa a linha toda. */
+/* Sem Encerrar nem Reabrir inscricoes, Ver inscritos ocupa a linha toda. */
 .actions[data-single] {
   grid-template-columns: minmax(0, 1fr);
 }
