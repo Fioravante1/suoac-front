@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvent } from "@/entities/event/api/event.queries";
-import { cancelEventAction } from "@/features/cancel-event";
+import { cancelEventAction } from "@/features/event/cancel-event";
 import { cancelEventDayAction } from "@/features/cancel-event-day";
-import { deleteEventAction } from "@/features/delete-event";
-import { publishEventAction } from "@/features/publish-event";
-import { updateEventAction } from "@/features/update-event/api";
+import { deleteEventAction } from "@/features/event/delete-event";
+import { publishEventAction } from "@/features/event/publish-event";
+import { updateEventAction } from "@/features/event/update-event/api";
 import { updateEventDayAction } from "@/features/update-event-day/api";
 
 import { EventDetailPage } from "./event-detail-page";
@@ -71,15 +71,15 @@ vi.mock("@/entities/event/api/event.queries", () => ({
   fetchEvent: vi.fn(),
 }));
 
-vi.mock("@/features/publish-event", () => ({
+vi.mock("@/features/event/publish-event", () => ({
   publishEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/update-event/api", () => ({
+vi.mock("@/features/event/update-event/api", () => ({
   updateEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/delete-event", () => ({
+vi.mock("@/features/event/delete-event", () => ({
   deleteEventAction: vi.fn(),
 }));
 
@@ -87,7 +87,7 @@ vi.mock("@/features/update-event-day/api", () => ({
   updateEventDayAction: vi.fn(),
 }));
 
-vi.mock("@/features/cancel-event", () => ({
+vi.mock("@/features/event/cancel-event", () => ({
   cancelEventAction: vi.fn(),
 }));
 

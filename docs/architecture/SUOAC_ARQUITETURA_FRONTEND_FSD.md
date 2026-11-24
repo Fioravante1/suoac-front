@@ -265,21 +265,22 @@ src/
       api/
         change-password-action.ts
 
-    create-event/
-      index.ts
-      ui/
-        create-event-form.tsx
-      model/
-        create-event-schema.ts
-      api/
-        create-event.mutation.ts
+    event/                     # grupo dos slices do evento: so a pasta, sem index.ts
+      create-event/
+        index.ts
+        ui/
+          create-event-form.tsx
+        model/
+          create-event-schema.ts
+        api/
+          create-event.mutation.ts
 
-    publish-event/
-      index.ts
-      ui/
-        publish-event-button.tsx
-      api/
-        publish-event.mutation.ts
+      publish-event/
+        index.ts
+        ui/
+          publish-event-button.tsx
+        api/
+          publish-event.mutation.ts
 
     enroll-passenger/
       index.ts
@@ -581,11 +582,12 @@ Error boundaries (`error.tsx` e `global-error.tsx`) ficam em `/app` e sao Client
 | ----------------------------- | ------- | ----------------------------------------- |
 | `sign-in`                     | feature | Login por e-mail/senha e futuro OAuth     |
 | `change-password`             | feature | Troca de senha obrigatoria no 1º acesso   |
-| `create-event`                | feature | Criacao de assembleia/congresso           |
-| `publish-event`               | feature | Mudanca de status para inscricoes abertas |
+| `event/create-event`          | feature | Criacao de assembleia/congresso           |
+| `event/publish-event`         | feature | Mudanca de status para inscricoes abertas |
+| `event/close-registrations`   | feature | Encerrar e reabrir as inscricoes          |
 | `update-event-day`            | feature | Edicao de horarios de saida/retorno       |
 | `cancel-event-day`            | feature | Cancelamento de dia individual do evento  |
-| `cancel-event`                | feature | Cancelamento do evento inteiro            |
+| `event/cancel-event`          | feature | Cancelamento do evento inteiro            |
 | `enroll-passenger`            | feature | Inscricao em evento                       |
 | `select-event-days`           | feature | Escolha de dias e calculo de valor        |
 | `select-event`                | feature | Evento selecionado e seletor do shell     |
@@ -716,7 +718,7 @@ Se a regra depender fortemente de `User`, mover ou expor composicoes via `entiti
 Regras especificas de features ficam na propria feature:
 
 ```txt
-features/publish-event/model/...    # regra especifica para publicar evento
+features/event/publish-event/model/...    # regra especifica para publicar evento
 ```
 
 ---
@@ -737,7 +739,7 @@ O projeto usa **React Hook Form + Zod + `@hookform/resolvers`** como padrao para
 Exemplos:
 
 ```txt
-features/create-event/model/create-event-schema.ts
+features/event/create-event/model/create-event-schema.ts
 features/enroll-passenger/model/enroll-passenger-schema.ts
 features/register-payment/model/payment-schema.ts
 entities/passenger/model/rg-schema.ts
@@ -1146,16 +1148,20 @@ Status atual da fatia de eventos:
 
 - `entities/event` contem model, constantes de status/tipo, labels, variants, helpers de regra de negocio para dias (`canUpdateEventDayTimes`, `canCancelEventDay`) e para o evento (`canCancelEventStatus`, `isLastActiveDayInEvent`), queries e query options para listagem e detalhe. Regra de cancelamento: tanto `canCancelEventStatus` quanto `canCancelEventDay` exigem que o evento esteja em `OPEN`; eventos em `DRAFT` devem ser excluidos via DELETE.
 - `entities/event-day` contem model, queries e query options para listagem e detalhe de dias.
-- `features/create-event` contem schema Zod, mapper de DTO, Server Action e modal de criacao.
+- As features do evento ficam no grupo `features/event/` (create, update, delete, cancel, publish e
+  close-registrations): o Steiger recusa mais de 20 slices soltos numa camada.
+- `features/event/create-event` contem schema Zod, mapper de DTO, Server Action e modal de criacao.
 - `features/update-event-day` contem schema Zod (horarios HH:mm), DTO com deteccao de alteracoes, Server Action (PATCH) e modal de edicao de horarios.
 - `features/cancel-event-day` contem Server Action para cancelamento de dia (PATCH /event-days/:id/cancel).
-- `features/cancel-event` contem Server Action para cancelamento do evento inteiro via endpoint dedicado (PATCH /events/:id/cancel, sem body).
+- `features/event/cancel-event` contem Server Action para cancelamento do evento inteiro via endpoint dedicado (PATCH /events/:id/cancel, sem body).
 - `pages/events` consome eventos por circuito via TanStack Query, exibe cards paginados e abre o modal de criacao. Os cards usam botoes `size="small"` nas acoes, layout com grid auto-fit para distribuicao equilibrada e hierarquia visual clara (tipo + badge no header, titulo linkavel, meta com icones, footer com preco/local e acoes alinhadas a direita).
 - `pages/event-detail` exibe detalhe do evento com acoes de editar, excluir, publicar, cancelar evento, editar horarios de dia e cancelar dia. Cancelar dia so esta disponivel quando o evento esta em `OPEN`. Ao cancelar o ultimo dia ativo, o dialog avisa que o evento tambem sera cancelado.
 - A grade de eventos usa dois cards por linha em telas maiores e um card por linha em telas menores.
-- A publicacao do evento (`DRAFT` -> `OPEN`) foi implementada em `features/publish-event`.
-- A edicao por campos permitidos em cada status foi implementada em `features/update-event`.
-- A exclusao de eventos em rascunho foi implementada em `features/delete-event`.
+- A publicacao do evento (`DRAFT` -> `OPEN`) foi implementada em `features/event/publish-event`.
+- A edicao por campos permitidos em cada status foi implementada em `features/event/update-event`.
+- A exclusao de eventos em rascunho foi implementada em `features/event/delete-event`.
+- Encerrar e reabrir as inscricoes (`OPEN` <-> `CLOSED`, reabrir so antes do prazo) foi implementado em
+  `features/event/close-registrations`, com a confirmacao de encerrar (SUC-109).
 
 Status atual da fatia de passageiros e inscricoes:
 

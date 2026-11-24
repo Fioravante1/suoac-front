@@ -4,7 +4,7 @@ import { httpClient, endpoints } from "@/shared/api/http-client";
 
 import type { PaginatedResponse } from "@/shared/api/http-client";
 
-import type { Congregation } from "../model/congregation";
+import type { Congregation, CongregationEventStatus } from "../model/congregation";
 
 export async function fetchCongregations(
   circuitId: string,
@@ -18,4 +18,9 @@ export async function fetchCongregations(
 
 export async function fetchCongregation(id: string): Promise<Congregation> {
   return httpClient<Congregation>(endpoints.congregations.detail(id));
+}
+
+/** A situação da lista de cada congregação do circuito no evento. Só os papéis do circuito leem. */
+export async function fetchCongregationEventStatuses(eventId: string): Promise<CongregationEventStatus[]> {
+  return httpClient<CongregationEventStatus[]>(endpoints.events.congregationStatuses(eventId));
 }

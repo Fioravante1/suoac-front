@@ -1,0 +1,89 @@
+/* Modal de 460px do `v3`; no celular, o sheet do `Dashboard Mobile`. */
+.modal {
+  --modal-next-width: 28.75rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-4);
+}
+
+/* Cadeado de 44px em fundo de atencao: a acao muda o que as congregacoes podem fazer. */
+.icon {
+  display: grid;
+  place-items: center;
+  width: var(--suoac-button-height);
+  height: var(--suoac-button-height);
+  border-radius: var(--suoac-radius-control);
+  background: var(--suoac-color-attention-soft);
+  color: var(--suoac-color-attention-text);
+}
+
+.description {
+  margin: 0;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-small);
+  line-height: var(--suoac-line-height-body);
+  text-wrap: pretty;
+}
+
+/* O celular tem o texto curto e nenhuma contagem; o desktop, o texto do prazo e as contagens. */
+.full,
+.counts {
+  display: none;
+}
+
+.counts {
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  margin: 0;
+  padding: var(--suoac-space-3);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-surface-muted);
+  font-size: var(--suoac-font-size-small);
+}
+
+.count {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--suoac-space-3);
+}
+
+.count dt {
+  color: var(--suoac-color-text-secondary);
+}
+
+.count dd {
+  margin: 0;
+  color: var(--suoac-color-text-primary);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+/* Do tamanho de uma contagem curta, na altura da linha, enquanto ela carrega. */
+.countBone {
+  display: inline-block;
+  width: 2.5rem;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.error {
+  margin: 0;
+  color: var(--suoac-color-critical);
+  font-size: var(--suoac-font-size-small);
+}
+
+@media (min-width: 80rem) {
+  .full {
+    display: inline;
+  }
+
+  .compact {
+    display: none;
+  }
+
+  .counts {
+    display: flex;
+  }
+}

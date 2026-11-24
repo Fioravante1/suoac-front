@@ -24,6 +24,7 @@ export {
   getEventPeriod,
   getEventToday,
   isEventVisibleTo,
+  isWithinReopenWindow,
   isLastActiveDayInEvent,
   isEventFieldCoordinatorOnly,
   isEventFieldEditable,

@@ -77,6 +77,24 @@ import { createQueryClient } from "@/shared/api/query-client";
 
 Codigo interno do proprio slice deve usar import relativo.
 
+### Grupos de slices
+
+O Steiger (`fsd/excessive-slicing`) recusa mais de 20 slices soltos numa camada. Slices do mesmo
+dominio ficam num grupo: uma pasta sem `index.ts`, que nao e slice nem tem public API.
+
+```text
+features/
+  event/                # grupo
+    create-event/
+    update-event/
+    close-registrations/
+  enroll-passenger/
+```
+
+O import passa pelo grupo (`@/features/event/create-event`), e cada slice do grupo continua
+isolado: nao importa outro slice, nem do mesmo grupo. Feature nova do evento nasce em
+`features/event/`.
+
 ### Organizacao interna de segmentos
 
 Dentro de qualquer segmento (`api`, `auth`, `ui`, `lib`, `model`, `config`), em qualquer camada

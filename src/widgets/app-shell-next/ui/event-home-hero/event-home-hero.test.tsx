@@ -15,6 +15,16 @@ const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), usePathname: vi.fn(
 vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
 vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
 vi.mock("next/navigation", () => ({ usePathname: mocks.usePathname }));
+vi.mock("../registrations-toggle", () => ({
+  RegistrationsToggle: ({ action }: { action: RegistrationAction | null }) => (
+    <>
+      {action === REGISTRATION_ACTIONS.CLOSE && <button type="button">Encerrar inscrições</button>}
+      {action === REGISTRATION_ACTIONS.REOPEN && <button type="button">Reabrir inscrições</button>}
+    </>
+  ),
+}));
+
+import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
 
 import { EventHomeHero } from "./event-home-hero";
 
@@ -100,21 +110,40 @@ describe("EventHomeHero", () => {
     ]);
   });
 
-  it("com as inscrições abertas, oferece Encerrar inscrições em breve e Ver inscritos", () => {
+  it("com as inscrições abertas, oferece Encerrar inscrições e Ver inscritos", () => {
     selectEvent(buildEvent(EVENT_STATUSES.OPEN));
 
     render(<EventHomeHero />);
 
-    expect(screen.getByRole("button", { name: "Encerrar inscrições" })).toHaveAccessibleDescription("Em breve");
+    expect(screen.getByRole("button", { name: "Encerrar inscrições" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Ver inscritos" })).toHaveAttribute("href", "/events/event-1#inscricoes");
   });
 
-  it.each([EVENT_STATUSES.CLOSED, EVENT_STATUSES.FINISHED])("com o evento %s, só oferece Ver inscritos", (status) => {
-    selectEvent(buildEvent(status));
+  it("com as inscrições encerradas antes do prazo, troca Encerrar por Reabrir inscrições", () => {
+    selectEvent(buildEvent(EVENT_STATUSES.CLOSED));
 
     render(<EventHomeHero />);
 
+    expect(screen.getByRole("button", { name: "Reabrir inscrições" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Encerrar inscrições" })).not.toBeInTheDocument();
+  });
+
+  it("com as inscrições encerradas depois do prazo, só oferece Ver inscritos", () => {
+    vi.setSystemTime(new Date("2026-10-14T15:00:00.000Z"));
+    selectEvent(buildEvent(EVENT_STATUSES.CLOSED));
+
+    render(<EventHomeHero />);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ver inscritos" })).toBeInTheDocument();
+  });
+
+  it("com o evento finalizado, só oferece Ver inscritos", () => {
+    selectEvent(buildEvent(EVENT_STATUSES.FINISHED));
+
+    render(<EventHomeHero />);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Ver inscritos" })).toBeInTheDocument();
   });
 
@@ -128,7 +157,7 @@ describe("EventHomeHero", () => {
     expect(within(hero()).getByText("outubro de 2026")).toBeInTheDocument();
   });
 
-  it("para os papéis da congregação, deixa de fora Encerrar inscrições, que é do circuito", () => {
+  it("para os papéis da congregação, deixa de fora Encerrar e Reabrir inscrições, que são do circuito", () => {
     mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
     selectEvent(buildEvent(EVENT_STATUSES.OPEN));
 

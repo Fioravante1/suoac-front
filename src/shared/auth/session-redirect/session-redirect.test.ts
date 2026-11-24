@@ -7,6 +7,7 @@ import {
   redirectToSessionExpired,
   isPasswordChangeRequiredError,
   redirectToPasswordChangeRequired,
+  redirectOnAuthError,
   resetSessionRedirect,
   subscribeToSessionRedirect,
 } from "./session-redirect";
@@ -92,6 +93,29 @@ describe("redirectToPasswordChangeRequired", () => {
     redirectToSessionExpired();
 
     expect(mockLocationHref).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("redirectOnAuthError", () => {
+  it("leva ao login quando a sessão expirou", () => {
+    expect(redirectOnAuthError(SESSION_EXPIRED_MESSAGE)).toBe(true);
+
+    expect(mockLocationHref).toHaveBeenCalledWith(
+      "https://suoac.com/login?sessionExpired=true&returnUrl=%2Fpassengers%3Fpage%3D3",
+    );
+  });
+
+  it("leva à troca de senha quando ela é obrigatória", () => {
+    expect(redirectOnAuthError(new Error(PASSWORD_CHANGE_REQUIRED_MESSAGE))).toBe(true);
+
+    expect(mockLocationHref).toHaveBeenCalledWith("https://suoac.com/change-password");
+  });
+
+  it("deixa os outros erros com quem chama, sem redirecionar", () => {
+    expect(redirectOnAuthError("Transição inválida")).toBe(false);
+    expect(redirectOnAuthError(undefined)).toBe(false);
+
+    expect(mockLocationHref).not.toHaveBeenCalled();
   });
 });
 

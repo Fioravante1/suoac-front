@@ -21,11 +21,21 @@ vi.mock("../event-tabs", () => ({
     </nav>
   ),
 }));
+vi.mock("../registrations-toggle", () => ({
+  RegistrationsToggle: ({ action }: { action: RegistrationAction | null }) => (
+    <>
+      {action === REGISTRATION_ACTIONS.CLOSE && <button type="button">Encerrar inscrições</button>}
+      {action === REGISTRATION_ACTIONS.REOPEN && <button type="button">Reabrir inscrições</button>}
+    </>
+  ),
+}));
 vi.mock("../enroll-passenger-button", () => ({
   EnrollPassengerButton: ({ event }: { event: Event }) => (
     <button type="button">Cadastrar passageiro em {event.title}</button>
   ),
 }));
+
+import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
 
 import { EventSummary } from "./event-summary";
 
@@ -137,30 +147,49 @@ describe("EventSummary", () => {
     );
   });
 
-  it("com as inscrições abertas, oferece Encerrar inscrições em breve e Cadastrar passageiro", () => {
+  it("com as inscrições abertas, oferece Encerrar inscrições e Cadastrar passageiro", () => {
     selectEvent(buildEvent(EVENT_STATUSES.OPEN));
 
     render(<EventSummary />);
 
-    const close = screen.getByRole("button", { name: "Encerrar inscrições" });
+    const closeButton = screen.getByRole("button", { name: "Encerrar inscrições" });
 
-    expect(close).toHaveAttribute("aria-disabled", "true");
-    expect(close).toHaveAccessibleDescription("Em breve");
     expect(screen.getByRole("button", { name: "Cadastrar passageiro em Congresso Regional 2026" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reabrir inscrições" })).not.toBeInTheDocument();
+    expect(closeButton.parentElement).not.toHaveAttribute("data-single");
   });
 
-  it.each([EVENT_STATUSES.CLOSED, EVENT_STATUSES.FINISHED])(
-    "sem ações com o evento %s, que não aceita inscrição",
-    (status) => {
-      selectEvent(buildEvent(status));
+  it("com as inscrições encerradas antes do prazo, oferece só Reabrir inscrições", () => {
+    selectEvent(buildEvent(EVENT_STATUSES.CLOSED));
 
-      render(<EventSummary />);
+    render(<EventSummary />);
 
-      expect(screen.queryByRole("button", { name: /Encerrar inscrições/ })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /Cadastrar passageiro/ })).not.toBeInTheDocument();
-      expect(screen.getByRole("list", { name: "Etapas do evento" })).toBeInTheDocument();
-    },
-  );
+    const reopenButton = screen.getByRole("button", { name: "Reabrir inscrições" });
+
+    expect(screen.queryByRole("button", { name: "Encerrar inscrições" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Cadastrar passageiro/ })).not.toBeInTheDocument();
+    // Sozinho, o botão ocupa o bloco inteiro, sem a coluna vazia de Cadastrar ao lado.
+    expect(reopenButton.parentElement).toHaveAttribute("data-single");
+  });
+
+  it("sem ações com as inscrições encerradas depois do prazo, que não reabrem mais", () => {
+    vi.setSystemTime(new Date("2026-10-14T15:00:00.000Z"));
+    selectEvent(buildEvent(EVENT_STATUSES.CLOSED));
+
+    render(<EventSummary />);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Etapas do evento" })).toBeInTheDocument();
+  });
+
+  it("sem ações com o evento finalizado", () => {
+    selectEvent(buildEvent(EVENT_STATUSES.FINISHED));
+
+    render(<EventSummary />);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Etapas do evento" })).toBeInTheDocument();
+  });
 
   it("para os papéis da congregação, mostra o resumo e as etapas sem as ações e as abas do circuito", () => {
     mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });

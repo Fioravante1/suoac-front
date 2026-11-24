@@ -19,6 +19,7 @@ export {
   canUpdateEventDayTimes,
   canUpdateEventStatus,
   daysUntilEventDeadline,
+  isWithinReopenWindow,
   formatEventDeadline,
   getActiveEventDays,
   getEventPeriod,

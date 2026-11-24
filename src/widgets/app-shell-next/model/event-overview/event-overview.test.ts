@@ -63,4 +63,21 @@ describe("getEventOverview", () => {
     expect(getEventOverview(buildEvent(EVENT_STATUSES.CLOSED), "2026-10-07").isRegistrationOpen).toBe(false);
     expect(getEventOverview(buildEvent(EVENT_STATUSES.FINISHED), "2026-10-26").isRegistrationOpen).toBe(false);
   });
+
+  it("deixa reabrir só as inscrições encerradas antes do prazo, inclusive no próprio dia dele", () => {
+    // Prazo: 12/10 em São Paulo.
+    expect(getEventOverview(buildEvent(EVENT_STATUSES.CLOSED), "2026-10-07").isRegistrationReopenable).toBe(true);
+    expect(getEventOverview(buildEvent(EVENT_STATUSES.CLOSED), "2026-10-12").isRegistrationReopenable).toBe(true);
+    expect(getEventOverview(buildEvent(EVENT_STATUSES.CLOSED), "2026-10-13").isRegistrationReopenable).toBe(false);
+    expect(getEventOverview(buildEvent(EVENT_STATUSES.OPEN), "2026-10-07").isRegistrationReopenable).toBe(false);
+    expect(getEventOverview(buildEvent(EVENT_STATUSES.FINISHED), "2026-10-07").isRegistrationReopenable).toBe(false);
+  });
+
+  it("não deixa reabrir o evento que já terminou, mesmo com o prazo posto depois dele", () => {
+    const lateDeadline = { ...buildEvent(EVENT_STATUSES.CLOSED), registrationDeadline: "2026-10-31T02:59:59.999Z" };
+
+    // O evento é só em 23/10.
+    expect(getEventOverview(lateDeadline, "2026-10-23").isRegistrationReopenable).toBe(true);
+    expect(getEventOverview(lateDeadline, "2026-10-24").isRegistrationReopenable).toBe(false);
+  });
 });

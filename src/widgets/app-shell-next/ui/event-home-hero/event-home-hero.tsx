@@ -8,20 +8,20 @@ import { routes } from "@/shared/config";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import { useEventOverview } from "../../model";
-import { ComingSoonButton } from "../coming-soon-button";
 import { EventDayTiles } from "../event-day-tiles";
 import { EventStepper } from "../event-stepper";
+import { RegistrationsToggle } from "../registrations-toggle";
 
 import styles from "./event-home-hero.module.css";
 
 /**
  * O resumo do evento no celular e no tablet: o hero navy da tela Início
  * (`SUOAC Dashboard Mobile.dc.html`, abaixo de 1280px). Os dias com a contagem e o local, a
- * linha de etapas com rótulo curto, Encerrar inscrições e Ver inscritos.
+ * linha de etapas com rótulo curto, Encerrar ou Reabrir inscrições e Ver inscritos.
  *
  * Só aparece no Início: nas outras telas, o topo (SUC-110) basta. O título fica no seletor de
  * evento do topo, e Cadastrar passageiro é o botão flutuante da barra de baixo (SUC-110).
- * Encerrar inscrições é do circuito e aparece com "Em breve" até o SUC-109 ligar a ação.
+ * Encerrar e reabrir as inscrições são do circuito.
  *
  * Precisa do `SelectedEventProvider`, que o shell novo monta junto (SUC-115).
  */
@@ -43,7 +43,7 @@ export function EventHomeHero() {
 
   if (state.status === "hidden") return null;
 
-  const { event, overview, canAct: canCloseRegistration } = state;
+  const { event, overview, registrationAction } = state;
   const { summary, timeline } = overview;
   const heading = summary.countdown ?? summary.months;
 
@@ -61,8 +61,8 @@ export function EventHomeHero() {
         <EventStepper timeline={timeline} />
       </div>
 
-      <div className={styles.actions} data-single={!canCloseRegistration || undefined}>
-        {canCloseRegistration && <ComingSoonButton label="Encerrar inscrições" />}
+      <div className={styles.actions} data-single={!registrationAction || undefined}>
+        <RegistrationsToggle event={event} action={registrationAction} />
         <Link href={routes.eventEnrollments(event.id)} className={styles.passengersLink}>
           Ver inscritos
           <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />

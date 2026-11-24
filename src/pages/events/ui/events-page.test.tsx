@@ -12,11 +12,11 @@ vi.mock("next/link", () => ({
 
 import { EVENT_STATUSES, EVENT_TYPES } from "@/entities/event";
 import { fetchEvents, fetchEvent } from "@/entities/event/api/event.queries";
-import { createEventAction } from "@/features/create-event/api";
-import { cancelEventAction } from "@/features/cancel-event";
-import { deleteEventAction } from "@/features/delete-event";
-import { publishEventAction } from "@/features/publish-event";
-import { updateEventAction } from "@/features/update-event/api";
+import { createEventAction } from "@/features/event/create-event/api";
+import { cancelEventAction } from "@/features/event/cancel-event";
+import { deleteEventAction } from "@/features/event/delete-event";
+import { publishEventAction } from "@/features/event/publish-event";
+import { updateEventAction } from "@/features/event/update-event/api";
 
 import { EventsPage } from "./events-page";
 
@@ -67,23 +67,23 @@ vi.mock("@/features/enroll-passenger", () => ({
   useEnrollPassengerMutation: () => ({ mutateAsync: vi.fn() }),
 }));
 
-vi.mock("@/features/create-event/api", () => ({
+vi.mock("@/features/event/create-event/api", () => ({
   createEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/publish-event", () => ({
+vi.mock("@/features/event/publish-event", () => ({
   publishEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/update-event/api", () => ({
+vi.mock("@/features/event/update-event/api", () => ({
   updateEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/cancel-event", () => ({
+vi.mock("@/features/event/cancel-event", () => ({
   cancelEventAction: vi.fn(),
 }));
 
-vi.mock("@/features/delete-event", () => ({
+vi.mock("@/features/event/delete-event", () => ({
   deleteEventAction: vi.fn(),
 }));
 

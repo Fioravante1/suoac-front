@@ -2,7 +2,7 @@ import type { Event } from "@/entities/event";
 import { useSelectedEvent } from "@/features/select-event";
 import { useAuthPermissions } from "@/shared/auth";
 
-import { getEventOverview, type EventOverview } from "../event-overview";
+import { REGISTRATION_ACTIONS, getEventOverview, type EventOverview, type RegistrationAction } from "../event-overview";
 import { hasEventTimeline } from "../event-summary";
 import { useEventToday } from "../use-event-today";
 
@@ -15,8 +15,10 @@ export type EventOverviewState =
       overview: EventOverview;
       /** Quem vê é do circuito: as abas e as ações do circuito aparecem. */
       isCircuitUser: boolean;
-      /** Encerrar inscrições e Cadastrar passageiro aparecem: circuito e inscrições abertas. */
-      canAct: boolean;
+      /** Cadastrar passageiro aparece: circuito e inscrições abertas. */
+      canEnroll: boolean;
+      /** Encerrar ou Reabrir inscrições, para o circuito; `null` quando nenhum dos dois cabe. */
+      registrationAction: RegistrationAction | null;
     };
 
 /**
@@ -38,5 +40,20 @@ export function useEventOverview(): EventOverviewState {
 
   const overview = getEventOverview(event, today);
 
-  return { status: "ready", event, overview, isCircuitUser, canAct: isCircuitUser && overview.isRegistrationOpen };
+  return {
+    status: "ready",
+    event,
+    overview,
+    isCircuitUser,
+    canEnroll: isCircuitUser && overview.isRegistrationOpen,
+    registrationAction: resolveRegistrationAction(isCircuitUser, overview),
+  };
+}
+
+function resolveRegistrationAction(isCircuitUser: boolean, overview: EventOverview): RegistrationAction | null {
+  if (!isCircuitUser) return null;
+  if (overview.isRegistrationOpen) return REGISTRATION_ACTIONS.CLOSE;
+  if (overview.isRegistrationReopenable) return REGISTRATION_ACTIONS.REOPEN;
+
+  return null;
 }

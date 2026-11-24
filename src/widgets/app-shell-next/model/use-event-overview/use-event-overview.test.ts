@@ -83,7 +83,8 @@ describe("useEventOverview", () => {
 
     expect(state.status).toBe("ready");
     expect(state.status === "ready" && state.overview.summary.countdown).toBe("Faltam 16 dias");
-    expect(state.status === "ready" && state.canAct).toBe(true);
+    expect(state.status === "ready" && state.canEnroll).toBe(true);
+    expect(state.status === "ready" && state.registrationAction).toBe("close");
   });
 
   it("não libera as ações para quem é da congregação nem com inscrições encerradas", () => {
@@ -95,7 +96,29 @@ describe("useEventOverview", () => {
     select(buildEvent(EVENT_STATUSES.CLOSED));
     const closedView = renderHook(() => useEventOverview()).result.current;
 
-    expect(congregationView.status === "ready" && congregationView.canAct).toBe(false);
-    expect(closedView.status === "ready" && closedView.canAct).toBe(false);
+    expect(congregationView.status === "ready" && congregationView.canEnroll).toBe(false);
+    expect(congregationView.status === "ready" && congregationView.registrationAction).toBeNull();
+    expect(closedView.status === "ready" && closedView.canEnroll).toBe(false);
+    expect(closedView.status === "ready" && closedView.registrationAction).not.toBe("close");
+  });
+
+  it("libera reabrir para o circuito com as inscrições encerradas antes do prazo, e não para a congregação", () => {
+    select(buildEvent(EVENT_STATUSES.CLOSED));
+    const circuitView = renderHook(() => useEventOverview()).result.current;
+
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
+    const congregationView = renderHook(() => useEventOverview()).result.current;
+
+    expect(circuitView.status === "ready" && circuitView.registrationAction).toBe("reopen");
+    expect(congregationView.status === "ready" && congregationView.registrationAction).toBeNull();
+  });
+
+  it("não oferece encerrar nem reabrir com as inscrições encerradas depois do prazo", () => {
+    mocks.useEventToday.mockReturnValue("2026-10-14");
+    select(buildEvent(EVENT_STATUSES.CLOSED));
+
+    const state = renderHook(() => useEventOverview()).result.current;
+
+    expect(state.status === "ready" && state.registrationAction).toBeNull();
   });
 });

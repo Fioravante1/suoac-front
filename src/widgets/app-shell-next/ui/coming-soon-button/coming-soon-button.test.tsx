@@ -11,9 +11,9 @@ describe("ComingSoonButton", () => {
 
   it("mostra a dica por um instante quando tocado, porque o toque não tem hover", () => {
     vi.useFakeTimers();
-    render(<ComingSoonButton label="Encerrar inscrições" />);
+    render(<ComingSoonButton icon={Search} label="Buscar" />);
 
-    const button = screen.getByRole("button", { name: "Encerrar inscrições" });
+    const button = screen.getByRole("button", { name: "Buscar" });
     const root = button.parentElement;
 
     expect(root).not.toHaveAttribute("data-hint-shown");
@@ -29,9 +29,9 @@ describe("ComingSoonButton", () => {
 
   it("recomeça a contagem a cada toque", () => {
     vi.useFakeTimers();
-    render(<ComingSoonButton label="Encerrar inscrições" />);
+    render(<ComingSoonButton icon={Search} label="Buscar" />);
 
-    const button = screen.getByRole("button", { name: "Encerrar inscrições" });
+    const button = screen.getByRole("button", { name: "Buscar" });
 
     fireEvent.click(button);
     act(() => {
@@ -46,9 +46,9 @@ describe("ComingSoonButton", () => {
   });
 
   it("esconde a dica quando o foco sai do botão", () => {
-    render(<ComingSoonButton label="Encerrar inscrições" />);
+    render(<ComingSoonButton icon={Search} label="Buscar" />);
 
-    const button = screen.getByRole("button", { name: "Encerrar inscrições" });
+    const button = screen.getByRole("button", { name: "Buscar" });
 
     fireEvent.click(button);
     fireEvent.blur(button);
@@ -91,16 +91,5 @@ describe("ComingSoonButton", () => {
     fireEvent.click(screen.getByRole("button", { name: "Buscar" }));
 
     expect(submitted).toBe(false);
-  });
-
-  it("sem ícone, escreve o nome no botão, desabilitado e com a mesma dica", () => {
-    render(<ComingSoonButton label="Encerrar inscrições" />);
-
-    const button = screen.getByRole("button", { name: "Encerrar inscrições" });
-
-    expect(button).toHaveTextContent("Encerrar inscrições");
-    expect(button).not.toHaveAttribute("aria-label");
-    expect(button).toHaveAttribute("aria-disabled", "true");
-    expect(button).toHaveAccessibleDescription("Em breve");
   });
 });
