@@ -100,6 +100,21 @@ describe("PanelBottomNav", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("mantém o cadastro aberto, com o evento de quando abriu, se a tela recarrega por baixo", () => {
+    const { rerender } = render(<PanelBottomNav />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cadastrar passageiro" }));
+    mocks.useEventOverview.mockReturnValue({ status: "loading" });
+    rerender(<PanelBottomNav />);
+
+    expect(screen.getByRole("dialog", { name: "Inscrever em event-1" })).toBeInTheDocument();
+
+    mocks.useEventOverview.mockReturnValue({ status: "ready", event: { id: "event-2" }, canEnroll: false });
+    rerender(<PanelBottomNav />);
+
+    expect(screen.getByRole("dialog", { name: "Inscrever em event-1" })).toBeInTheDocument();
+  });
+
   it("sem inscrições abertas, deixa o + desabilitado, com o motivo, e não abre o cadastro", () => {
     overview(false);
 

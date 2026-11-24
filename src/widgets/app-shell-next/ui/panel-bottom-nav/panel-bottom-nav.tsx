@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Fragment, useId } from "react";
 import { House, LayoutGrid, Plus, Users, Wallet, type LucideIcon } from "lucide-react";
 
+import type { Event } from "@/entities/event";
 import { useSelectedEvent } from "@/features/select-event";
 import { useAuthPermissions } from "@/shared/auth";
 import { useModal } from "@/shared/lib";
@@ -44,7 +45,7 @@ export function PanelBottomNav() {
   const { isCircuitUser } = useAuthPermissions();
   const selection = useSelectedEvent();
   const overview = useEventOverview();
-  const enrollModal = useModal();
+  const enrollModal = useModal<Event>();
   const reasonId = useId();
 
   if (!isCircuitUser) return null;
@@ -54,9 +55,11 @@ export function PanelBottomNav() {
   const isEnrollDisabled = enrollableEvent === null;
 
   function handleEnrollClick() {
-    if (isEnrollDisabled) return;
+    if (!enrollableEvent) return;
 
-    enrollModal.open();
+    // O evento fica guardado ao abrir: uma atualização em segundo plano, que fecha as inscrições ou troca
+    // o evento, não pode desmontar o cadastro com o formulário a meio.
+    enrollModal.open(enrollableEvent);
   }
 
   return (
@@ -100,8 +103,8 @@ export function PanelBottomNav() {
 
       <div className={styles.spacer} aria-hidden="true" />
 
-      {enrollModal.isOpen && enrollableEvent && (
-        <EnrollPassengerDialog event={enrollableEvent} onClose={enrollModal.close} />
+      {enrollModal.isOpen && enrollModal.item && (
+        <EnrollPassengerDialog event={enrollModal.item} onClose={enrollModal.close} />
       )}
     </>
   );
