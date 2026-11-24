@@ -144,6 +144,21 @@ export function daysUntilEventDeadline(deadline: string, today: string = getEven
   return diffInCalendarDays(today, toEventCalendarDate(deadline));
 }
 
+/**
+ * As inscrições, encerradas, ainda podem reabrir: o prazo não passou e o evento não terminou
+ * (tem algum dia hoje ou depois, de qualquer status), como a API confere. Depois do prazo, o
+ * ciclo de vida encerraria de novo na hora seguinte; com o evento terminado, não há mais o que
+ * inscrever. `today` é o dia de calendário em São Paulo.
+ */
+export function isWithinReopenWindow(
+  event: Pick<Event, "registrationDeadline" | "days">,
+  today: string = getEventToday(),
+): boolean {
+  if (daysUntilEventDeadline(event.registrationDeadline, today) < 0) return false;
+
+  return (event.days ?? []).some((day) => diffInCalendarDays(today, day.date) >= 0);
+}
+
 export const EVENT_DAY_STATUSES = {
   ACTIVE: "ACTIVE",
   CANCELLED: "CANCELLED",

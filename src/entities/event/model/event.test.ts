@@ -8,6 +8,7 @@ import {
   canEnrollPassengers,
   canUpdateEventDayTimes,
   daysUntilEventDeadline,
+  isWithinReopenWindow,
   formatEventDeadline,
   getActiveEventDays,
   getEventPeriod,
@@ -317,6 +318,41 @@ describe("daysUntilEventDeadline", () => {
   it("dá 0 no próprio dia do prazo e negativo depois dele", () => {
     expect(daysUntilEventDeadline(deadline, "2026-10-12")).toBe(0);
     expect(daysUntilEventDeadline(deadline, "2026-10-14")).toBe(-2);
+  });
+});
+
+describe("isWithinReopenWindow", () => {
+  // "Inscrições até 12/10" e o evento de 23 a 25/10.
+  const event = {
+    registrationDeadline: "2026-10-13T02:59:59.999Z",
+    days: [buildDay("2026-10-23"), buildDay("2026-10-24"), buildDay("2026-10-25")],
+  };
+
+  it("deixa reabrir antes do prazo, inclusive no próprio dia dele", () => {
+    expect(isWithinReopenWindow(event, "2026-10-07")).toBe(true);
+    expect(isWithinReopenWindow(event, "2026-10-12")).toBe(true);
+  });
+
+  it("não deixa reabrir depois do prazo", () => {
+    expect(isWithinReopenWindow(event, "2026-10-13")).toBe(false);
+  });
+
+  it("não deixa reabrir o evento que já terminou, mesmo com o prazo posto depois dele", () => {
+    const lateDeadline = { ...event, registrationDeadline: "2026-10-31T02:59:59.999Z" };
+
+    expect(isWithinReopenWindow(lateDeadline, "2026-10-25")).toBe(true);
+    expect(isWithinReopenWindow(lateDeadline, "2026-10-26")).toBe(false);
+  });
+
+  it("conta o dia cancelado, como a API, e não deixa reabrir sem dias", () => {
+    const lastDayCancelled = {
+      ...event,
+      registrationDeadline: "2026-10-31T02:59:59.999Z",
+      days: [buildDay("2026-10-23"), buildDay("2026-10-25", EVENT_DAY_STATUSES.CANCELLED)],
+    };
+
+    expect(isWithinReopenWindow(lastDayCancelled, "2026-10-25")).toBe(true);
+    expect(isWithinReopenWindow({ ...event, days: [] }, "2026-10-07")).toBe(false);
   });
 });
 
