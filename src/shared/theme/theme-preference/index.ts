@@ -3,6 +3,7 @@ export {
   THEME_COOKIE_NAME,
   THEME_COOKIE_MAX_AGE,
   DARK_COLOR_SCHEME_QUERY,
+  getAppliedTheme,
   parseThemePreference,
 } from "./theme-preference";
 export type { ThemePreference, ResolvedTheme } from "./theme-preference";
