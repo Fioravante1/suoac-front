@@ -652,10 +652,19 @@ html {
   height: 100%;
 }
 
-html,
-body {
+html {
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+/*
+ * `clip`, e nao `hidden`: com `hidden` o body vira um contêiner de rolagem que nao rola, e todo
+ * `position: sticky` dentro dele (o topo do painel no celular e no tablet) nunca gruda. O `html`
+ * segue com `hidden`, que e o que a pagina usa para rolar.
+ */
+body {
+  max-width: 100vw;
+  overflow-x: clip;
 }
 
 body {
