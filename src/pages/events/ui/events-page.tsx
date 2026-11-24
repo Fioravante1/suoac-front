@@ -44,13 +44,13 @@ import {
   type Event,
 } from "@/entities/event";
 import { eventDetailOptions, eventListOptions } from "@/entities/event/api";
-import { CreateEventFormModal, type CreateEventFormValues } from "@/features/create-event";
-import { createEventAction } from "@/features/create-event/api";
-import { cancelEventAction } from "@/features/cancel-event";
-import { deleteEventAction } from "@/features/delete-event";
-import { publishEventAction } from "@/features/publish-event";
-import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
-import { updateEventAction } from "@/features/update-event/api";
+import { CreateEventFormModal, type CreateEventFormValues } from "@/features/event/create-event";
+import { createEventAction } from "@/features/event/create-event/api";
+import { cancelEventAction } from "@/features/event/cancel-event";
+import { deleteEventAction } from "@/features/event/delete-event";
+import { publishEventAction } from "@/features/event/publish-event";
+import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/event/update-event";
+import { updateEventAction } from "@/features/event/update-event/api";
 import {
   EnrollPassengerModal,
   useEnrollPassengerMutation,

@@ -49,12 +49,12 @@ import {
   type EventDayInEvent,
 } from "@/entities/event";
 import { eventDetailOptions } from "@/entities/event/api";
-import { cancelEventAction } from "@/features/cancel-event";
+import { cancelEventAction } from "@/features/event/cancel-event";
 import { cancelEventDayAction } from "@/features/cancel-event-day";
-import { deleteEventAction } from "@/features/delete-event";
-import { publishEventAction } from "@/features/publish-event";
-import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/update-event";
-import { updateEventAction } from "@/features/update-event/api";
+import { deleteEventAction } from "@/features/event/delete-event";
+import { publishEventAction } from "@/features/event/publish-event";
+import { UpdateEventFormModal, type UpdateEventFormValues } from "@/features/event/update-event";
+import { updateEventAction } from "@/features/event/update-event/api";
 import { UpdateEventDayFormModal, type UpdateEventDayFormValues } from "@/features/update-event-day";
 import { updateEventDayAction } from "@/features/update-event-day/api";
 import { EventEnrollmentsSection } from "@/widgets/event-enrollments";
