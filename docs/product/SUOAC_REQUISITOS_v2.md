@@ -554,7 +554,7 @@ O MVP deve cobrir o fluxo essencial: criar evento (com suporte a multi-dia), cad
 
 Status no frontend em 21/05/2026:
 
-- Criação de evento: parcialmente implementada no frontend com `features/create-event`, incluindo assembleia de um dia e congresso regional multi-dia conforme contrato do backend.
+- Criação de evento: parcialmente implementada no frontend com `features/event/create-event`, incluindo assembleia de um dia e congresso regional multi-dia conforme contrato do backend.
 - Listagem de eventos: implementada em `pages/events` com paginação, cards responsivos, empty state, skeleton e retry em erro.
 - Publicação/abertura de inscrições: implementada na listagem de eventos para registros em `DRAFT`, usando a transição de status `DRAFT` -> `OPEN`.
 - Edição e exclusão de eventos: implementadas no frontend respeitando as restrições por status descritas no contrato do backend.
