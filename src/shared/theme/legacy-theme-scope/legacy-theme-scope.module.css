@@ -72,6 +72,8 @@
   --suoac-shadow-modal-wide: 0 30px 80px rgb(10 26 41 / 0.35);
   --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
+  --suoac-shadow-floating-nav: 0 12px 32px rgb(13 43 69 / 0.16);
+  --suoac-shadow-fab: 0 10px 24px rgb(31 110 90 / 0.35);
   --suoac-color-scrim: rgb(16 24 40 / 0.45);
   --suoac-color-overlay: rgb(247 249 248 / 0.72);
 }
