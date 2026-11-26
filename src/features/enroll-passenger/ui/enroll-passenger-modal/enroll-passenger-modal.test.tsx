@@ -149,7 +149,7 @@ describe("EnrollPassengerModal", () => {
   });
 
   it("não mostra checkboxes de dias para assembleia", () => {
-    const assemblyEvent: Event = { ...baseEvent, type: EVENT_TYPES.ASSEMBLY };
+    const assemblyEvent: Event = { ...baseEvent, type: EVENT_TYPES.ASSEMBLY, days: baseEvent.days?.slice(0, 1) };
 
     render(
       <EnrollPassengerModal
@@ -164,6 +164,39 @@ describe("EnrollPassengerModal", () => {
 
     expect(screen.queryByText("Dias do evento")).not.toBeInTheDocument();
   });
+
+  it("mostra checkboxes de dias para o tipo Outro com mais de um dia", () => {
+    render(
+      <EnrollPassengerModal
+        open
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+        event={{ ...baseEvent, type: EVENT_TYPES.OTHER }}
+        isCircuitUser={false}
+        congregationId="cong-1"
+      />,
+    );
+
+    expect(screen.getByText("Dias do evento")).toBeInTheDocument();
+  });
+
+  it.each([EVENT_TYPES.OTHER, EVENT_TYPES.REGIONAL_CONVENTION])(
+    "não mostra checkboxes de dias quando o evento do tipo %s tem um só dia ativo",
+    (type) => {
+      render(
+        <EnrollPassengerModal
+          open
+          onClose={vi.fn()}
+          onSubmit={vi.fn()}
+          event={{ ...baseEvent, type, days: baseEvent.days?.slice(0, 1) }}
+          isCircuitUser={false}
+          congregationId="cong-1"
+        />,
+      );
+
+      expect(screen.queryByText("Dias do evento")).not.toBeInTheDocument();
+    },
+  );
 
   it("exibe dica de busca quando campo de pesquisa está vazio", () => {
     render(

@@ -8,7 +8,7 @@ import { DollarSign, Search, UserPlus } from "lucide-react";
 import { congregationSelectOptions } from "@/entities/congregation";
 import type { EventPassenger } from "@/entities/event-passenger";
 import type { Event } from "@/entities/event";
-import { EVENT_TYPES, getActiveEventDays } from "@/entities/event";
+import { getActiveEventDays, hasSelectableEventDays } from "@/entities/event";
 import type { Passenger } from "@/entities/passenger";
 import { useQuery } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
@@ -85,7 +85,7 @@ export function EnrollPassengerModal({
   const congregationFieldId = useId();
   const congregationErrorId = useId();
   const activeDays = getActiveEventDays(event.days ?? []);
-  const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
+  const hasDayChoice = hasSelectableEventDays(event.days ?? []);
 
   const {
     register,
@@ -105,7 +105,7 @@ export function EnrollPassengerModal({
   const watchedDayIds = useWatch({ control, name: "dayIds" }) ?? [];
   const selectedCongregationId = useWatch({ control, name: "congregationId" }) ?? "";
 
-  const selectedDaysCount = isRegionalConvention ? watchedDayIds.length : 1;
+  const selectedDaysCount = hasDayChoice ? watchedDayIds.length : 1;
   const estimatedTotal = Number(event.ticketPrice) * selectedDaysCount;
 
   const congregationSearch = useQuery({
@@ -334,7 +334,7 @@ export function EnrollPassengerModal({
           </div>
         )}
 
-        {isRegionalConvention && activeDays.length > 0 && (
+        {hasDayChoice && (
           <div className={styles.section}>
             <span className={styles.sectionTitle}>Dias do evento</span>
             <div className={styles.daysGrid}>

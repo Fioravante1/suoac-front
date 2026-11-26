@@ -11,7 +11,7 @@ import {
   type PaymentStatus,
 } from "@/entities/event-passenger";
 import { eventPassengerListOptions } from "@/entities/event-passenger";
-import { EVENT_TYPES, type Event } from "@/entities/event";
+import { hasSelectableEventDays, type Event } from "@/entities/event";
 import { useMutation, useQuery, useQueryClient, queryKeys } from "@/shared/api";
 import type { ActionResult } from "@/shared/api";
 import { isCircuitRole } from "@/shared/auth";
@@ -67,7 +67,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
   const isCircuitUser = isCircuitRole(userRole);
   // Os papéis do circuito inscrevem com ou sem congregação; os da congregação precisam da deles.
   const canEnroll = isCircuitUser || Boolean(userCongregationId);
-  const isRegionalConvention = event.type === EVENT_TYPES.REGIONAL_CONVENTION;
+  const hasDayChoice = hasSelectableEventDays(event.days ?? []);
 
   const { data: passengersData, isFetching, isError } = useQuery(eventPassengerListOptions(event.id, page));
 
@@ -142,7 +142,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
         onSelect: () => paymentsModal.open(ep),
       },
       canManage &&
-        isRegionalConvention && {
+        hasDayChoice && {
           id: "days",
           label: "Editar dias",
           icon: <CalendarCheck size={16} aria-hidden="true" />,
@@ -167,7 +167,7 @@ export function EventEnrollmentsSection({ event, userRole, userCongregationId }:
     {
       id: "days",
       header: "Dias",
-      visible: isRegionalConvention,
+      visible: hasDayChoice,
       cell: (ep) => (
         <div className={styles.dayBadges}>
           {sortDaysByDate(ep.days).map((day) => (
