@@ -60,4 +60,28 @@ describe("mapCreateEventFormToDto", () => {
 
     expect(dto.endDate).toBe("2026-07-12");
   });
+
+  it.each([
+    ["inclui", "2026-07-11", "2026-07-11"],
+    ["omite, quando vazio,", "", undefined],
+  ])("%s endDate no tipo Outro", (_case, endDate, expected) => {
+    const dto = mapCreateEventFormToDto({
+      title: "Retiro de Jovens",
+      type: EVENT_TYPES.OTHER,
+      ticketPrice: "30.00",
+      registrationDeadline: "2026-06-01",
+      paymentDeadline: "2026-06-15",
+      venue: "Salão Central",
+      address: "Rua das Flores, 100",
+      city: "São Paulo",
+      state: "SP",
+      date: "2026-07-10",
+      endDate,
+      departureTime: "06:00",
+      returnTime: "18:00",
+      observations: "",
+    });
+
+    expect(dto.endDate).toBe(expected);
+  });
 });

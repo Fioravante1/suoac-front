@@ -34,6 +34,31 @@ describe("createEventSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("aceita o tipo Outro sem data final", () => {
+    const result = createEventSchema.safeParse({ ...baseValues, type: EVENT_TYPES.OTHER });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("aceita o tipo Outro de 7 dias e recusa o de 8", () => {
+    const sevenDays = createEventSchema.safeParse({ ...baseValues, type: EVENT_TYPES.OTHER, endDate: "2026-07-16" });
+    const eightDays = createEventSchema.safeParse({ ...baseValues, type: EVENT_TYPES.OTHER, endDate: "2026-07-17" });
+
+    expect(sevenDays.success).toBe(true);
+    expect(eightDays.success).toBe(false);
+    expect(eightDays.error?.issues[0]?.message).toBe("Um evento deste tipo tem no máximo 7 dias.");
+  });
+
+  it("não limita os dias do congresso regional", () => {
+    const result = createEventSchema.safeParse({
+      ...baseValues,
+      type: EVENT_TYPES.REGIONAL_CONVENTION,
+      endDate: "2026-07-20",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("rejeita data final anterior à data inicial", () => {
     const result = createEventSchema.safeParse({
       ...baseValues,

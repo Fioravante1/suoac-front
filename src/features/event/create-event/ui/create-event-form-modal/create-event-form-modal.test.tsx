@@ -23,6 +23,21 @@ describe("CreateEventFormModal", () => {
     expect(screen.getByLabelText("Data final do evento")).toBeInTheDocument();
   });
 
+  it("oferece o tipo Outro, com data final opcional", () => {
+    render(<CreateEventFormModal open onClose={vi.fn()} onSubmit={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("Tipo"), { target: { value: EVENT_TYPES.OTHER } });
+
+    expect(screen.getByRole("option", { name: "Outro" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Data final do evento (opcional)")).toBeInTheDocument();
+  });
+
+  it("não exibe data final na assembleia", () => {
+    render(<CreateEventFormModal open onClose={vi.fn()} onSubmit={vi.fn()} />);
+
+    expect(screen.queryByLabelText(/Data final do evento/)).not.toBeInTheDocument();
+  });
+
   it("envia valores válidos", async () => {
     const onSubmit = vi.fn().mockResolvedValue({ success: true });
     const onClose = vi.fn();
