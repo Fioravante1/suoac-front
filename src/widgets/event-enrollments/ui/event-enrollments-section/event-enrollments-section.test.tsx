@@ -132,6 +132,16 @@ const baseEvent: Event = {
       status: EVENT_DAY_STATUSES.ACTIVE,
       eventId: "event-1",
     },
+    {
+      id: "day-2",
+      dayNumber: 2,
+      date: "2026-07-11T00:00:00.000Z",
+      label: "Dia 2",
+      departureTime: "06:00",
+      returnTime: "18:00",
+      status: EVENT_DAY_STATUSES.ACTIVE,
+      eventId: "event-1",
+    },
   ],
 };
 
@@ -223,6 +233,50 @@ describe("EventEnrollmentsSection", () => {
 
     expect(screen.getByRole("status", { name: "Carregando" })).toBeInTheDocument();
     expect(screen.queryByText("Maria Silva")).not.toBeInTheDocument();
+  });
+
+  it("não oferece editar dias quando o evento tem um só dia ativo", async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [basePassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    render(
+      <EventEnrollmentsSection
+        event={{ ...baseEvent, type: EVENT_TYPES.OTHER, days: baseEvent.days?.slice(0, 1) }}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        userCongregationId={null}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Ações" })[0]);
+
+    expect(screen.queryByRole("menuitem", { name: "Editar dias" })).not.toBeInTheDocument();
+  });
+
+  it("oferece editar dias no tipo Outro com mais de um dia ativo", async () => {
+    const { useQuery: useQueryMock } = await import("@/shared/api");
+
+    vi.mocked(useQueryMock).mockReturnValue({
+      data: { data: [basePassenger], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useQueryMock>);
+
+    render(
+      <EventEnrollmentsSection
+        event={{ ...baseEvent, type: EVENT_TYPES.OTHER }}
+        userRole={USER_ROLES.CIRCUIT_COORDINATOR}
+        userCongregationId={null}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Ações" })[0]);
+
+    expect(screen.getByRole("menuitem", { name: "Editar dias" })).toBeInTheDocument();
   });
 
   it("organiza ações da tabela em um menu compacto por inscrição", async () => {

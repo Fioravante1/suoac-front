@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { EVENT_TYPES, EVENT_TYPE_VALUES } from "@/entities/event";
+import { EVENT_TYPES, EVENT_TYPE_VALUES, MAX_OTHER_EVENT_DAYS, usesEventEndDate } from "@/entities/event";
+import { diffInCalendarDays } from "@/shared/lib";
 
 const dateMessage = "Informe uma data válida.";
 const timeMessage = "Informe um horário no formato HH:mm.";
@@ -41,13 +42,16 @@ export const createEventSchema = z
     observations: z.string().trim().optional(),
   })
   .superRefine((values, context) => {
-    if (values.type !== EVENT_TYPES.REGIONAL_CONVENTION) return;
+    if (!usesEventEndDate(values.type)) return;
+
+    // Só o congresso regional exige a data final; em Outro, sem ela o evento tem 1 dia.
+    if (!values.endDate && values.type === EVENT_TYPES.OTHER) return;
 
     if (!values.endDate || !isValidDate(values.endDate)) {
       context.addIssue({
         code: "custom",
         path: ["endDate"],
-        message: "Informe a data final do congresso.",
+        message: values.type === EVENT_TYPES.OTHER ? dateMessage : "Informe a data final do congresso.",
       });
       return;
     }
@@ -57,6 +61,17 @@ export const createEventSchema = z
         code: "custom",
         path: ["endDate"],
         message: "A data final deve ser igual ou posterior à data inicial.",
+      });
+      return;
+    }
+
+    const totalDays = diffInCalendarDays(values.date, values.endDate) + 1;
+
+    if (values.type === EVENT_TYPES.OTHER && totalDays > MAX_OTHER_EVENT_DAYS) {
+      context.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: `Um evento deste tipo tem no máximo ${MAX_OTHER_EVENT_DAYS} dias.`,
       });
     }
   });
