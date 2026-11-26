@@ -4,5 +4,6 @@
 // `@/shared/auth` e `@/shared/auth/session`.
 export { ThemeProvider, useTheme } from "./theme-context";
 export { LegacyThemeScope } from "./legacy-theme-scope";
+export { useIsDarkTheme } from "./use-is-dark-theme";
 export { THEME_PREFERENCES, THEME_COOKIE_NAME, parseThemePreference } from "./theme-preference";
 export type { ThemePreference, ResolvedTheme } from "./theme-preference";

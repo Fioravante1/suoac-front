@@ -50,7 +50,8 @@ export function CongregationsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: CongregationFormValues }) => updateCongregationAction(id, dto),
+    mutationFn: ({ id, dto }: { id: string; dto: CongregationFormValues }) =>
+      updateCongregationAction(id, { ...dto, email: dto.email || undefined }),
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.congregations.all });

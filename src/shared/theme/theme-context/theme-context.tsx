@@ -2,13 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-import {
-  DARK_COLOR_SCHEME_QUERY,
-  THEME_COOKIE_MAX_AGE,
-  THEME_COOKIE_NAME,
-  type ResolvedTheme,
-  type ThemePreference,
-} from "../theme-preference";
+import { THEME_COOKIE_MAX_AGE, THEME_COOKIE_NAME, getAppliedTheme, type ThemePreference } from "../theme-preference";
 
 interface ThemeContextValue {
   /** `null` enquanto o usuario nunca escolheu um tema. */
@@ -31,27 +25,6 @@ function persistPreference(preference: ThemePreference): void {
   const secureFlag = window.location.protocol === "https:" ? "; secure" : "";
 
   document.cookie = `${THEME_COOKIE_NAME}=${preference}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; samesite=lax${secureFlag}`;
-}
-
-/**
- * Descobre o tema que esta pintado agora lendo o DOM, nao o estado do React.
- *
- * Resolver `system` durante a renderizacao causaria divergencia de hidratacao: o
- * servidor nao tem como saber a preferencia do sistema operacional do usuario.
- * Lendo no momento do clique, o problema simplesmente nao existe.
- */
-function getAppliedTheme(): ResolvedTheme {
-  const appliedPreference = document.documentElement.dataset.theme;
-
-  if (appliedPreference === "dark") return "dark";
-  if (appliedPreference === "light") return "light";
-
-  if (appliedPreference === "system" && window.matchMedia(DARK_COLOR_SCHEME_QUERY).matches) {
-    return "dark";
-  }
-
-  // Sem atributo a pagina fica clara, mesmo com o sistema operacional em escuro.
-  return "light";
 }
 
 interface ThemeProviderProps {

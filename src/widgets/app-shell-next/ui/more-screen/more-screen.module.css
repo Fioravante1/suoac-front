@@ -1,0 +1,172 @@
+/*
+ * Celular: uma fila so. Tablet (760px a 1279px): duas colunas, com o card da conta na primeira.
+ * O espaco de baixo vem do espacador da barra de navegacao, que fica logo depois do conteudo.
+ */
+.screen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--suoac-space-4) 0.875rem;
+  align-items: start;
+  padding: 1.125rem 0.875rem 0;
+}
+
+@media (min-width: 47.5rem) {
+  .screen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.125rem;
+    padding: 1.125rem 1.75rem 0;
+  }
+}
+
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.125rem var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-xl);
+  background: var(--suoac-color-surface);
+  box-shadow: var(--suoac-shadow-xs);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+  font-size: var(--suoac-font-size-lead);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--suoac-font-size-lead);
+  font-weight: var(--suoac-font-weight-semibold);
+}
+
+.email {
+  overflow: hidden;
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-label);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.privilege {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--suoac-space-2);
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+  font-size: var(--suoac-font-size-label);
+  font-weight: var(--suoac-font-weight-semibold);
+  line-height: 1.4;
+}
+
+.privilege svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+
+.groupTitle {
+  margin: 0;
+  padding: 0 var(--suoac-space-1);
+  color: var(--suoac-color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--suoac-font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* O filete entre as linhas, e o arredondamento que recorta o fundo ao passar o mouse. */
+.rows {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--suoac-color-border);
+  border-radius: var(--suoac-radius-xl);
+  background: var(--suoac-color-surface);
+}
+
+.rows > * + * {
+  border-top: 1px solid var(--suoac-color-border);
+}
+
+/*
+ * Interruptor de 44x26px, como o do desenho; ligado, a cor primaria e o botao vai para a direita.
+ * O estado vem do tema do `<html>`, como no `ThemeToggle`, e nao de JavaScript: o servidor nao sabe
+ * se `system` resolve para escuro, e um estado do React piscaria desligado na primeira pintura.
+ */
+.track {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 1.625rem;
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-border-strong);
+  transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--suoac-color-text-inverse);
+  box-shadow: var(--suoac-shadow-xs);
+  transition: left var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+:global(html[data-theme="dark"]) .track {
+  background: var(--suoac-color-primary);
+}
+
+:global(html[data-theme="dark"]) .thumb {
+  left: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html[data-theme="system"]) .track {
+    background: var(--suoac-color-primary);
+  }
+
+  :global(html[data-theme="system"]) .thumb {
+    left: 1.5rem;
+  }
+}
+
+.soon {
+  flex-shrink: 0;
+  padding: 2px var(--suoac-space-2);
+  border-radius: var(--suoac-radius-pill);
+  background: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-caption);
+  font-weight: var(--suoac-font-weight-medium);
+}

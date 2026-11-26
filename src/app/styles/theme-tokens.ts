@@ -189,6 +189,8 @@ export const themeTokens = {
     modalWide: "0 30px 80px rgb(10 26 41 / 0.35)",
     buttonPrimary: "0 6px 16px rgb(31 110 90 / 0.25)",
     buttonPrimaryStrong: "0 10px 24px rgb(31 110 90 / 0.28)",
+    floatingNav: "0 12px 32px rgb(13 43 69 / 0.16)",
+    fab: "0 10px 24px rgb(31 110 90 / 0.35)",
     focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
   },
   overlay: {
@@ -249,6 +251,11 @@ export const themeTokens = {
     stageMarkerSize: "1.375rem",
     avatarSize: "2.25rem",
     avatarSizeLg: "2.75rem",
+    mobileHeaderHeight: "4rem",
+    stackedBarHeight: "3rem",
+    bottomNavItemHeight: "3.25rem",
+    fabSize: "3.625rem",
+    floatingNavMaxWidth: "35rem",
   },
 } as const;
 
@@ -339,6 +346,8 @@ export const darkThemeTokens: ThemeVariant = {
     modalWide: "0 30px 80px rgb(0 0 0 / 0.55)",
     buttonPrimary: "0 6px 16px rgb(0 0 0 / 0.35)",
     buttonPrimaryStrong: "0 10px 24px rgb(0 0 0 / 0.4)",
+    floatingNav: "0 12px 32px rgb(0 0 0 / 0.45)",
+    fab: "0 10px 24px rgb(0 0 0 / 0.45)",
     // Mesma declaracao do tema claro: a cor vem de um token que ja muda.
     focusRing: "0 0 0 4px var(--suoac-color-primary-light)",
   },

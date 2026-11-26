@@ -221,6 +221,10 @@
   --suoac-shadow-modal-wide: 0 30px 80px rgb(10 26 41 / 0.35);
   --suoac-shadow-button-primary: 0 6px 16px rgb(31 110 90 / 0.25);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(31 110 90 / 0.28);
+  /* Pilula de navegacao flutuante do tablet. */
+  --suoac-shadow-floating-nav: 0 12px 32px rgb(13 43 69 / 0.16);
+  /* Botao "+" central da navegacao do celular e do tablet. */
+  --suoac-shadow-fab: 0 10px 24px rgb(31 110 90 / 0.35);
   /*
    * Anel de foco dos campos. Nao tem par escuro porque nao precisa: a cor sai de
    * `--suoac-color-primary-light`, que ja muda de tema. Esta e a unica sombra
@@ -329,6 +333,16 @@
   /* 36px na faixa do evento; 44px no cabecalho do menu da conta. */
   --suoac-avatar-size: 2.25rem;
   --suoac-avatar-size-lg: 2.75rem;
+  /* 64px: topo do painel no celular e no tablet. */
+  --suoac-mobile-header-height: 4rem;
+  /* 48px: barra "Mais" das telas empilhadas. */
+  --suoac-stacked-bar-height: 3rem;
+  /* 52px: itens da navegacao inferior; o alvo de toque passa dos 44px. */
+  --suoac-bottom-nav-item-height: 3.25rem;
+  /* 58px: botao "+" central da navegacao inferior. */
+  --suoac-fab-size: 3.625rem;
+  /* 560px: largura maxima da pilula de navegacao do tablet. */
+  --suoac-floating-nav-max-width: 35rem;
 
   --background: var(--suoac-color-background);
   --foreground: var(--suoac-color-text-primary);
@@ -586,6 +600,8 @@ html[data-theme="dark"] {
   --suoac-shadow-modal-wide: 0 30px 80px rgb(0 0 0 / 0.55);
   --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
   --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+  --suoac-shadow-floating-nav: 0 12px 32px rgb(0 0 0 / 0.45);
+  --suoac-shadow-fab: 0 10px 24px rgb(0 0 0 / 0.45);
 
   /* Scrim & overlay */
   --suoac-color-scrim: rgb(0 0 0 / 0.6);
@@ -641,6 +657,8 @@ html[data-theme="dark"] {
     --suoac-shadow-modal-wide: 0 30px 80px rgb(0 0 0 / 0.55);
     --suoac-shadow-button-primary: 0 6px 16px rgb(0 0 0 / 0.35);
     --suoac-shadow-button-primary-strong: 0 10px 24px rgb(0 0 0 / 0.4);
+    --suoac-shadow-floating-nav: 0 12px 32px rgb(0 0 0 / 0.45);
+    --suoac-shadow-fab: 0 10px 24px rgb(0 0 0 / 0.45);
 
     /* Scrim & overlay */
     --suoac-color-scrim: rgb(0 0 0 / 0.6);
@@ -652,13 +670,21 @@ html {
   height: 100%;
 }
 
-html,
-body {
+html {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
 body {
+  max-width: 100vw;
+  /*
+   * `clip`, e nao so `hidden`: com `hidden` o body vira um contêiner de rolagem que nao rola, e todo
+   * `position: sticky` dentro dele (o topo do painel no celular e no tablet) nunca gruda. O `html`
+   * segue com `hidden`, que e o que a pagina usa para rolar. A linha de `hidden` e para quem nao
+   * conhece `clip` (Safari anterior ao 16), que ignora a segunda e fica como estava.
+   */
+  overflow-x: hidden;
+  overflow-x: clip;
   min-height: 100%;
   transition:
     background-color var(--suoac-motion-theme) ease,

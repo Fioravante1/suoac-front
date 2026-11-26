@@ -20,5 +20,7 @@ export const routes = {
   // Abas do painel novo que ainda esperam a fatia delas: Ônibus (Fatia 7) e Listas (Fatia 8).
   buses: "/buses",
   lists: "/lists",
+  // A tela Mais da navegacao do celular e do tablet: conta, atalhos do evento, tema e sair (SUC-110).
+  more: "/more",
   settings: "/settings",
 } as const;

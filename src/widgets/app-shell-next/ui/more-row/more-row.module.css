@@ -1,0 +1,96 @@
+/* Linha de 56px, sem borda propria: quem agrupa as linhas desenha o filete entre elas. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: var(--suoac-sheet-item-height);
+  padding: var(--suoac-space-2) 0.875rem;
+  border: 0;
+  background: transparent;
+  color: var(--suoac-color-text-primary);
+  font-family: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-fast) var(--suoac-motion-ease-standard);
+}
+
+.row[data-tone="critical"] {
+  color: var(--suoac-color-critical);
+}
+
+.row:hover:not([aria-disabled="true"]) {
+  background: var(--suoac-color-surface-muted);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--suoac-color-primary);
+  outline-offset: -2px;
+}
+
+.row[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.row[aria-disabled="true"] .icon,
+.row[aria-disabled="true"] .text {
+  opacity: 0.55;
+}
+
+.icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: var(--suoac-radius-item);
+}
+
+.icon[data-tone="primary"] {
+  background: var(--suoac-color-primary-light);
+  color: var(--suoac-color-primary);
+}
+
+.icon[data-tone="info"] {
+  background: var(--suoac-color-info-soft);
+  color: var(--suoac-color-info);
+}
+
+.icon[data-tone="attention"] {
+  background: var(--suoac-color-attention-soft);
+  color: var(--suoac-color-attention-text);
+}
+
+.icon[data-tone="neutral"] {
+  background: var(--suoac-color-surface-muted);
+  color: var(--suoac-color-text-primary);
+}
+
+.icon[data-tone="critical"] {
+  background: var(--suoac-color-critical-soft);
+  color: var(--suoac-color-critical);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--suoac-font-size-item);
+  font-weight: var(--suoac-font-weight-medium);
+}
+
+.hint {
+  color: var(--suoac-color-text-secondary);
+  font-size: var(--suoac-font-size-caption);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--suoac-color-text-secondary);
+}

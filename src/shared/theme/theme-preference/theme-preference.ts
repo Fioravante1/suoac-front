@@ -30,3 +30,24 @@ export function parseThemePreference(value: string | null | undefined): ThemePre
 
 /** Media query usada para resolver `system`, tanto no CSS quanto no JavaScript. */
 export const DARK_COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)";
+
+/**
+ * Descobre o tema que esta pintado agora lendo o DOM, nao o estado do React.
+ *
+ * Resolver `system` durante a renderizacao causaria divergencia de hidratacao: o
+ * servidor nao tem como saber a preferencia do sistema operacional do usuario.
+ * Lendo no momento do clique, o problema simplesmente nao existe.
+ */
+export function getAppliedTheme(): ResolvedTheme {
+  const appliedPreference = document.documentElement.dataset.theme;
+
+  if (appliedPreference === "dark") return "dark";
+  if (appliedPreference === "light") return "light";
+
+  if (appliedPreference === "system" && window.matchMedia(DARK_COLOR_SCHEME_QUERY).matches) {
+    return "dark";
+  }
+
+  // Sem atributo a pagina fica clara, mesmo com o sistema operacional em escuro.
+  return "light";
+}

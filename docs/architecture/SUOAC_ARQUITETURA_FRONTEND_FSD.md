@@ -500,7 +500,13 @@ No SUOAC:
   fachada no layout privado e o SUC-115. Tem a faixa do evento e o menu da conta (SUC-106) e o
   resumo do evento (SUC-108): no desktop, `EventSummary`, com a linha de etapas e as abas; no
   celular e no tablet, `EventHomeHero`, o hero da tela Inicio. A regra das etapas e da contagem
-  regressiva fica no `model` do widget, como funcao pura sobre o evento e o "hoje" de Sao Paulo
+  regressiva fica no `model` do widget, como funcao pura sobre o evento e o "hoje" de Sao Paulo.
+  A navegacao do celular e do tablet (SUC-110) e do circuito: `PanelTopBar` (circuito e evento, que
+  abre a sheet de eventos, busca e notificacoes "Em breve" e o avatar), `PanelBottomNav` (Inicio,
+  Passageiros, o "+" de Cadastrar passageiro, Financeiro e Mais; barra no celular, pilula no
+  tablet), `StackedScreenBar` (o "‹ Mais" de Onibus, Congregacoes e Listas) e `MoreScreen`, a tela
+  Mais, servida pela rota `/more` (`pages/more`). Os itens e o que marca cada um como ativo ficam
+  no `model` (`panel-nav`), e os papeis da congregacao ganham a navegacao deles no SUC-113
 - `event-overview`
 - `financial-summary`
 - `congregation-status-list`

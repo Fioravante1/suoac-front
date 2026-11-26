@@ -2,7 +2,8 @@ export interface Congregation {
   id: string;
   code: string;
   name: string;
-  email: string;
+  /** `null` na congregação cadastrada sem e-mail, como no autocadastro do circuito. */
+  email: string | null;
   city: string | null;
   isActive: boolean;
   circuitId: string;
