@@ -4,16 +4,26 @@ import { diffInCalendarDays, formatDate, toDateStringInTimeZone } from "@/shared
 export const EVENT_TYPES = {
   ASSEMBLY: "ASSEMBLY",
   REGIONAL_CONVENTION: "REGIONAL_CONVENTION",
+  OTHER: "OTHER",
 } as const;
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES];
 
-export const EVENT_TYPE_VALUES = [EVENT_TYPES.ASSEMBLY, EVENT_TYPES.REGIONAL_CONVENTION] as const;
+export const EVENT_TYPE_VALUES = [EVENT_TYPES.ASSEMBLY, EVENT_TYPES.REGIONAL_CONVENTION, EVENT_TYPES.OTHER] as const;
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   [EVENT_TYPES.ASSEMBLY]: "Assembleia",
   [EVENT_TYPES.REGIONAL_CONVENTION]: "Congresso regional",
+  [EVENT_TYPES.OTHER]: "Outro",
 };
+
+/** Teto de dias de um evento do tipo Outro; a API recusa mais que isso. */
+export const MAX_OTHER_EVENT_DAYS = 7;
+
+/** A assembleia é sempre de 1 dia e não tem data final; os outros tipos têm. */
+export function usesEventEndDate(type: EventType): boolean {
+  return type !== EVENT_TYPES.ASSEMBLY;
+}
 
 export const EVENT_STATUSES = {
   DRAFT: "DRAFT",
@@ -229,6 +239,14 @@ export interface EventPeriod {
 /** Os dias que acontecem, sem os cancelados, em ordem de data. */
 export function getActiveEventDays(days: readonly EventDayInEvent[]): EventDayInEvent[] {
   return days.filter((day) => day.status === EVENT_DAY_STATUSES.ACTIVE).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/**
+ * Se há o que escolher ao inscrever: com mais de um dia ativo a inscrição escolhe os dias; com um só,
+ * a API escolhe sozinha. Quem decide é a quantidade de dias, não o tipo do evento.
+ */
+export function hasSelectableEventDays(days: readonly EventDayInEvent[]): boolean {
+  return getActiveEventDays(days).length > 1;
 }
 
 /**
