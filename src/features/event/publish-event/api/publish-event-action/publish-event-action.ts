@@ -2,9 +2,11 @@
 
 import { endpoints, httpClient } from "@/shared/api/http-client";
 import type { ActionResult } from "@/shared/api";
-
 import { EVENT_STATUSES, type Event } from "@/entities/event";
 
+/**
+ * Abre as inscrições do rascunho e preserva a mensagem de erro devolvida pela API.
+ */
 export async function publishEventAction(eventId: string): Promise<ActionResult<Event>> {
   if (!eventId) {
     return { success: false, error: "Evento inválido." };
