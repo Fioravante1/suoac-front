@@ -1,3 +1,5 @@
+import { useAuthPermissions } from "@/shared/auth";
+
 import { congregationListOptions } from "@/entities/congregation";
 import { eventPassengerListOptions } from "@/entities/event-passenger";
 import { useQuery, type PaginatedResponse } from "@/shared/api";
@@ -21,9 +23,11 @@ function selectTotal<T>(response: PaginatedResponse<T>): number {
  * motivo para derrubar a tela, então a falha não sobe para o error boundary.
  */
 export function useEventTabCounts(eventId: string, circuitId: string): EventTabCounts {
+  const { isCircuitUser } = useAuthPermissions();
   const passengers = useQuery({ ...eventPassengerListOptions(eventId, 1), select: selectTotal, throwOnError: false });
   const congregations = useQuery({
     ...congregationListOptions(circuitId, 1),
+    enabled: isCircuitUser && Boolean(circuitId),
     select: selectTotal,
     throwOnError: false,
   });

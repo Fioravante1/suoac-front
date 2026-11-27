@@ -51,7 +51,11 @@ export function MoreScreen() {
   const isDark = useIsDarkTheme();
   const { signOut, isSigningOut } = useSignOut();
   const eventId = useSelectedEvent()?.event?.id ?? "";
-  const statuses = useQuery({ ...congregationEventStatusesOptions(eventId), throwOnError: false });
+  const statuses = useQuery({
+    ...congregationEventStatusesOptions(eventId),
+    enabled: isCircuitUser && Boolean(eventId),
+    throwOnError: false,
+  });
 
   if (!user) return null;
 
