@@ -2,6 +2,8 @@ import { USER_ROLES, isCircuitRole, type UserRole } from "@/shared/auth";
 
 import { routes } from "@/shared/config";
 
+import { isUnderPath } from "../shell-route";
+
 export const PANEL_NAV_IDS = {
   HOME: "home",
   PASSENGERS: "passengers",
@@ -84,10 +86,6 @@ export function getPanelNavItems(eventId: string | null, role: UserRole | null):
     },
     lastItem,
   ];
-}
-
-function isUnderPath(pathname: string, path: string): boolean {
-  return pathname === path || pathname.startsWith(`${path}/`);
 }
 
 /** O item vale para a rota dele e para as subrotas, como `/congregations/123` em "Mais". */

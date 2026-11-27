@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buildRedesignFlagDescription } from "./feature-flags";
+import { buildRedesignFlagDescription, redesignAppShellFlag } from "./feature-flags";
+import { redesignAppShellFlag as exportedFlag } from "./index";
 
 describe("descrição das flags de redesign", () => {
   it("diz a fatia, o propósito e o card que remove a flag", () => {
@@ -24,5 +25,14 @@ describe("descrição das flags de redesign", () => {
 
     expect(description).toContain("Temporária");
     expect(description).toContain("SUC-99");
+  });
+});
+
+describe("flag do shell novo", () => {
+  it("expõe a flag com fallback desligado e card de remoção", () => {
+    expect(exportedFlag).toBe(redesignAppShellFlag);
+    expect(redesignAppShellFlag.key).toBe("REDESIGN_APP_SHELL");
+    expect(redesignAppShellFlag.defaultValue).toBe(false);
+    expect(redesignAppShellFlag.description).toContain("SUC-114");
   });
 });

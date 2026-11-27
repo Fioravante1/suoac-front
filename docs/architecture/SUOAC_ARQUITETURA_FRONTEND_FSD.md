@@ -497,9 +497,16 @@ No SUOAC:
 
 - `app-shell`
 - `app-shell-next` — shell novo da Fatia 2, ao lado do `app-shell` ate o corte (SUC-114); a
-  fachada no layout privado e o SUC-115. Tem a faixa do evento e o menu da conta (SUC-106) e o
-  resumo do evento (SUC-108): no desktop, `EventSummary`, com a linha de etapas e as abas; no
-  celular e no tablet, `EventHomeHero`, o hero da tela Inicio. A regra das etapas e da contagem
+  fachada no layout privado escolhe `AppShellNext` pela flag `REDESIGN_APP_SHELL` (SUC-115),
+  desligada por padrão. O widget é a fronteira cliente que monta `SelectedEventProvider`; o
+  `SessionGuard` fica fora dele, no layout, porque o `PanelEventState` troca o conteúdo do Início
+  pelos estados alternativos. `LegacyThemeScope` envolve apenas o conteúdo v1; `/more` e os estados
+  alternativos do painel permanecem fora da contenção, assim como o shell. O conteúdo v1 e os
+  estados alternativos dividem o mesmo contêiner, com o respiro do `main` do handoff. Os contadores
+  das abas só consultam no desktop (`min-width: 80rem`), sem alternar a árvore renderizada por
+  largura. Tem a faixa do evento e o menu da conta (SUC-106) e o resumo do evento (SUC-108): no
+  desktop, `EventSummary`, com a linha de etapas e as abas; no celular e no tablet,
+  `EventHomeHero`, o hero da tela Inicio. A regra das etapas e da contagem
   regressiva fica no `model` do widget, como funcao pura sobre o evento e o "hoje" de Sao Paulo.
   A navegacao do celular e do tablet (SUC-110) e do circuito: `PanelTopBar` (circuito e evento, que
   abre a sheet de eventos, busca e notificacoes "Em breve" e o avatar), `PanelBottomNav` (Inicio,

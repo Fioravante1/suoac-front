@@ -7,7 +7,12 @@ import { createQueryClient } from "@/shared/api";
 
 import { useEventTabCounts } from "./use-event-tab-counts";
 
-const mocks = vi.hoisted(() => ({ isCircuitUser: true, fetchEventPassengers: vi.fn(), fetchCongregations: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  isPanelDesktop: true,
+  isCircuitUser: true,
+  fetchEventPassengers: vi.fn(),
+  fetchCongregations: vi.fn(),
+}));
 
 vi.mock("@/entities/event-passenger/api/event-passenger.queries", () => ({
   fetchEventPassengers: mocks.fetchEventPassengers,
@@ -20,6 +25,8 @@ vi.mock("@/entities/congregation/api/congregation.queries", () => ({
 }));
 
 vi.mock("@/shared/auth", () => ({ useAuthPermissions: () => ({ isCircuitUser: mocks.isCircuitUser }) }));
+
+vi.mock("../use-is-panel-desktop", () => ({ useIsPanelDesktop: () => mocks.isPanelDesktop }));
 
 function page(total: number) {
   return { data: [], meta: { total, page: 1, limit: 10, totalPages: Math.ceil(total / 10) } };
@@ -43,6 +50,7 @@ describe("useEventTabCounts", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.isCircuitUser = true;
+    mocks.isPanelDesktop = true;
   });
 
   it("conta os inscritos do evento e as congregações do circuito pelo total das listas", async () => {
@@ -102,5 +110,23 @@ describe("useEventTabCounts", () => {
     const { result } = renderHook(() => useEventTabCounts("e1", "c1"), { wrapper });
     await waitFor(() => expect(result.current.passengers).toBe(5));
     expect(mocks.fetchCongregations).not.toHaveBeenCalled();
+  });
+
+  it("não dispara contadores desktop no celular ou tablet e busca ao entrar no desktop", async () => {
+    mocks.isPanelDesktop = false;
+    mocks.fetchEventPassengers.mockResolvedValue(page(912));
+    mocks.fetchCongregations.mockResolvedValue(page(20));
+
+    const { result, rerender } = renderHook(() => useEventTabCounts("e1", "c1"), { wrapper });
+
+    expect(mocks.fetchEventPassengers).not.toHaveBeenCalled();
+    expect(mocks.fetchCongregations).not.toHaveBeenCalled();
+    expect(result.current).toEqual({ passengers: undefined, congregations: undefined });
+
+    mocks.isPanelDesktop = true;
+    rerender();
+
+    await waitFor(() => expect(result.current.passengers).toBe(912));
+    expect(mocks.fetchCongregations).toHaveBeenCalledWith("c1", 1);
   });
 });
