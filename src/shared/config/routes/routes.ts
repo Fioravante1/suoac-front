@@ -8,6 +8,7 @@ export const routes = {
   changePassword: "/change-password",
   resetPassword: "/reset-password",
   acceptInvitation: "/accept-invitation",
+  team: "/team",
   dashboard: "/dashboard",
   events: "/events",
   eventDetail: (id: string) => `/events/${id}`,
