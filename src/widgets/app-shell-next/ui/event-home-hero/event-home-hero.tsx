@@ -10,6 +10,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { useEventOverview } from "../../model";
 import { EventDayTiles } from "../event-day-tiles";
 import { EventStepper } from "../event-stepper";
+import { FinalizeListToggle } from "../finalize-list-toggle";
 import { RegistrationsToggle } from "../registrations-toggle";
 
 import styles from "./event-home-hero.module.css";
@@ -48,7 +49,11 @@ export function EventHomeHero() {
   const heading = summary.countdown ?? summary.months;
 
   return (
-    <section className={styles.hero} aria-label={`Resumo de ${event.title}`}>
+    <section
+      className={styles.hero}
+      data-assistant={state.isCongregationAssistant || undefined}
+      aria-label={`Resumo de ${event.title}`}
+    >
       <div className={styles.when}>
         <EventDayTiles tiles={summary.dayTiles} isCompact />
         <p className={styles.countdown}>
@@ -61,8 +66,22 @@ export function EventHomeHero() {
         <EventStepper timeline={timeline} />
       </div>
 
-      <div className={styles.actions} data-single={!registrationAction || undefined}>
-        <RegistrationsToggle event={event} action={registrationAction} />
+      {state.isCongregationAssistant && (
+        <p className={styles.assistantNote}>
+          Você é assistente: cadastra passageiros e registra pagamentos. Finalizar a lista fica com o coordenador do
+          arranjo de ônibus na congregação.
+        </p>
+      )}
+      <div className={styles.actions} data-single={(!registrationAction && !state.canToggleListStatus) || undefined}>
+        {state.isCircuitUser && <RegistrationsToggle event={event} action={registrationAction} />}
+        {state.canToggleListStatus && (
+          <FinalizeListToggle
+            eventId={event.id}
+            status={state.congregationListStatus}
+            isStatusError={state.isCongregationListError}
+            onRetry={state.retryCongregationList}
+          />
+        )}
         <Link href={routes.eventEnrollments(event.id)} className={styles.passengersLink}>
           Ver inscritos
           <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />

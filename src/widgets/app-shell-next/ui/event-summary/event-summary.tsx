@@ -7,13 +7,14 @@ import { Skeleton } from "@/shared/ui/skeleton";
 
 import { useSelectedEvent } from "@/features/select-event";
 import { useAuthPermissions } from "@/shared/auth";
-import { PANEL_MODES, resolvePanelMode, getEventOverview, REGISTRATION_ACTIONS, useEventToday } from "../../model";
+import { PANEL_MODES, resolvePanelMode, useEventOverview } from "../../model";
 import { ComingSoonButton } from "../coming-soon-button";
 import { PublishEventActions } from "../publish-event-actions";
 import { EnrollPassengerButton } from "../enroll-passenger-button";
 import { EventStatusPill } from "../event-status-pill";
 import { EventTabs } from "../event-tabs";
 import { EventTimeline } from "../event-timeline";
+import { FinalizeListToggle } from "../finalize-list-toggle";
 import { RegistrationsToggle } from "../registrations-toggle";
 
 import styles from "./event-summary.module.css";
@@ -28,15 +29,14 @@ import styles from "./event-summary.module.css";
  * ações são Encerrar inscrições e Cadastrar passageiro; encerradas antes do prazo, Reabrir
  * inscrições.
  *
- * Ações e abas são as do circuito. Os papéis da congregação veem o resumo e as etapas, e as
- * abas e ações deles chegam com o SUC-113.
+ * Ações e abas seguem o papel: circuito gerencia inscrições, congregação gerencia a própria lista.
  *
  * Precisa do `SelectedEventProvider`, que o shell novo monta junto (SUC-115).
  */
 export function EventSummary() {
+  const state = useEventOverview({ includeInactive: true });
   const selection = useSelectedEvent();
   const { isCircuitUser } = useAuthPermissions();
-  const today = useEventToday();
   const event = selection?.event;
   const mode = resolvePanelMode(event, isCircuitUser);
   const titleId = useId();
@@ -54,17 +54,14 @@ export function EventSummary() {
     );
   }
 
-  if (!event || mode === PANEL_MODES.EMPTY) return null;
-  const overview = getEventOverview(event, today);
+  if (!event || mode === PANEL_MODES.EMPTY || state.status !== "ready") return null;
+  const { overview } = state;
   const { summary, timeline } = overview;
   const isLive = mode === PANEL_MODES.LIVE;
   const isDraft = mode === PANEL_MODES.DRAFT;
   const isCancelled = mode === PANEL_MODES.CANCELLED;
-  const canEnroll = isLive && isCircuitUser && overview.isRegistrationOpen;
-  const canClose = isLive && isCircuitUser && overview.isRegistrationOpen;
-  const canReopen = isLive && isCircuitUser && overview.isRegistrationReopenable;
-  const registrationAction = canClose ? REGISTRATION_ACTIONS.CLOSE : null;
-  const action = canReopen ? REGISTRATION_ACTIONS.REOPEN : registrationAction;
+  const canEnroll = isLive && state.canEnroll;
+  const action = state.registrationAction;
 
   return (
     <section className={styles.summary} aria-labelledby={titleId}>
@@ -101,7 +98,15 @@ export function EventSummary() {
             recarregado já não ofereça ação; sem botões, o CSS some com o bloco. Sem Cadastrar
             passageiro, o Reabrir fica sozinho. */}
         <div className={styles.actions} data-single={!canEnroll || undefined}>
-          {isLive && <RegistrationsToggle event={event} action={action} />}
+          {isLive && isCircuitUser && <RegistrationsToggle event={event} action={action} />}
+          {isLive && state.canToggleListStatus && (
+            <FinalizeListToggle
+              eventId={event.id}
+              status={state.congregationListStatus}
+              isStatusError={state.isCongregationListError}
+              onRetry={state.retryCongregationList}
+            />
+          )}
           {isDraft && isCircuitUser && <PublishEventActions key={event.id} eventId={event.id} />}
           {isCancelled && isCircuitUser && <ComingSoonButton label="Duplicar como novo" variant="navy-primary" />}
           {canEnroll && <EnrollPassengerButton event={event} />}
@@ -110,7 +115,7 @@ export function EventSummary() {
 
       {isLive && <EventTimeline summary={summary} timeline={timeline} />}
 
-      {isLive && isCircuitUser && <EventTabs eventId={event.id} circuitId={event.circuitId} />}
+      {isLive && <EventTabs eventId={event.id} circuitId={event.circuitId} />}
     </section>
   );
 }

@@ -105,3 +105,17 @@
   font-size: var(--suoac-font-size-label);
   font-weight: var(--suoac-font-weight-semibold);
 }
+
+.rolePill {
+  display: none;
+}
+@media (min-width: 47.5rem) {
+  .rolePill {
+    display: inline-flex;
+    padding: var(--suoac-space-1) var(--suoac-space-2);
+    border-radius: var(--suoac-radius-md);
+    background: var(--suoac-color-on-navy-tint);
+    color: var(--suoac-color-text-inverse);
+    font-size: var(--suoac-font-size-small);
+  }
+}

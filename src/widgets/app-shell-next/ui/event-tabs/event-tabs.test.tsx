@@ -1,6 +1,15 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { USER_ROLES } from "@/shared/auth";
+
+import { EventTabs } from "./event-tabs";
+
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: () => ({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR }),
+}));
+
 const mocks = vi.hoisted(() => ({ usePathname: vi.fn(), useEventTabCounts: vi.fn() }));
 
 vi.mock("next/navigation", () => ({ usePathname: mocks.usePathname }));
@@ -8,8 +17,6 @@ vi.mock("../../model", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../model")>()),
   useEventTabCounts: mocks.useEventTabCounts,
 }));
-
-import { EventTabs } from "./event-tabs";
 
 function tabs() {
   return within(screen.getByRole("navigation", { name: "Seções do evento" })).getAllByRole("link");

@@ -1,9 +1,12 @@
+import { USER_ROLES, isCircuitRole, type UserRole } from "@/shared/auth";
+
 import { routes } from "@/shared/config";
 
 export const PANEL_NAV_IDS = {
   HOME: "home",
   PASSENGERS: "passengers",
   FINANCIAL: "financial",
+  TEAM: "team",
   MORE: "more",
 } as const;
 
@@ -49,7 +52,7 @@ export const MORE_SCREENS: readonly MoreScreen[] = [
  * (`getEventTabs`): Passageiros leva aos inscritos do evento selecionado, e ao cadastro do circuito
  * enquanto não há evento, para o item não apontar para um evento que não existe.
  */
-export function getPanelNavItems(eventId: string | null): PanelNavItem[] {
+export function getPanelNavItems(eventId: string | null, role: UserRole | null): PanelNavItem[] {
   const passengers: PanelNavItem = eventId
     ? {
         id: PANEL_NAV_IDS.PASSENGERS,
@@ -59,16 +62,27 @@ export function getPanelNavItems(eventId: string | null): PanelNavItem[] {
       }
     : { id: PANEL_NAV_IDS.PASSENGERS, label: "Passageiros", href: routes.passengers, paths: [routes.passengers] };
 
+  if (!role) return [];
+  const isCongregation = !isCircuitRole(role);
+  const lastItem: PanelNavItem =
+    role === USER_ROLES.CONGREGATION_COORDINATOR
+      ? { id: PANEL_NAV_IDS.TEAM, label: "Equipe", href: routes.team, paths: [routes.team] }
+      : {
+          id: PANEL_NAV_IDS.MORE,
+          label: "Mais",
+          href: routes.more,
+          paths: [routes.more, ...MORE_SCREENS.map((screen) => screen.href)],
+        };
   return [
     { id: PANEL_NAV_IDS.HOME, label: "Início", href: routes.dashboard, paths: [routes.dashboard] },
     passengers,
-    { id: PANEL_NAV_IDS.FINANCIAL, label: "Financeiro", href: routes.financial, paths: [routes.financial] },
     {
-      id: PANEL_NAV_IDS.MORE,
-      label: "Mais",
-      href: routes.more,
-      paths: [routes.more, ...MORE_SCREENS.map((screen) => screen.href)],
+      id: PANEL_NAV_IDS.FINANCIAL,
+      label: isCongregation ? "Pagamentos" : "Financeiro",
+      href: routes.financial,
+      paths: [routes.financial],
     },
+    lastItem,
   ];
 }
 

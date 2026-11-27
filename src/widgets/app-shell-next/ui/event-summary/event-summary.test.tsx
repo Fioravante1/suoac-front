@@ -10,11 +10,20 @@ import {
   type EventDayInEvent,
   type EventStatus,
 } from "@/entities/event";
+import { USER_ROLES } from "@/shared/auth";
+
+import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
+import { EventSummary } from "./event-summary";
+
+vi.mock("../finalize-list-toggle", () => ({ FinalizeListToggle: () => <button>Finalizar lista</button> }));
 
 const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), useAuthPermissions: vi.fn() }));
 
 vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
-vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: mocks.useAuthPermissions,
+}));
 vi.mock("../publish-event-actions", () => ({
   PublishEventActions: () => (
     <div>
@@ -44,9 +53,10 @@ vi.mock("../enroll-passenger-button", () => ({
   ),
 }));
 
-import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
-
-import { EventSummary } from "./event-summary";
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: () => ({ data: undefined }),
+}));
 
 function day(date: string): EventDayInEvent {
   return {
@@ -101,7 +111,7 @@ describe("EventSummary", () => {
     // O "hoje" do v3: 16 dias antes do congresso, 5 antes do encerramento.
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-07T15:00:00.000Z"));
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
   });
 
   afterEach(() => {
@@ -200,7 +210,7 @@ describe("EventSummary", () => {
     expect(screen.getByRole("list", { name: "Etapas do evento" })).toBeInTheDocument();
   });
 
-  it("para os papéis da congregação, mostra o resumo e as etapas sem as ações e as abas do circuito", () => {
+  it("para os papéis da congregação, mostra o resumo, as etapas e as abas próprias", () => {
     mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
     selectEvent(buildEvent(EVENT_STATUSES.OPEN));
 
@@ -210,7 +220,7 @@ describe("EventSummary", () => {
     expect(screen.getByRole("list", { name: "Etapas do evento" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Encerrar inscrições/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Cadastrar passageiro/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("navigation", { name: "Seções do evento" })).not.toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Seções do evento" })).toBeInTheDocument();
   });
 
   it("com o prazo depois do primeiro dia, mantém as ações e a abertura como etapa atual durante o evento", () => {

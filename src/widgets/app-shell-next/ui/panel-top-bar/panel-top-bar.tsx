@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Bell, ChevronDown, Search } from "lucide-react";
 
+import { congregationDetailOptions, formatCongregationScope } from "@/entities/congregation";
+
 import { formatCircuitName, ownCircuitOptions } from "@/entities/circuit";
 import { EVENT_STATUSES, EventStatusDot } from "@/entities/event";
 import { EventSwitcherSheet, useEventSwitcher } from "@/features/select-event";
@@ -23,22 +25,26 @@ import styles from "./panel-top-bar.module.css";
  * circuito e o evento selecionado, que abre a sheet de eventos; busca e notificações, que esperam a
  * Fatia 9 (SUC-13); e o avatar, que leva à tela Mais. No desktop quem faz o papel é a faixa do evento.
  *
- * É do circuito: os papéis da congregação ganham a navegação deles no SUC-113.
+ * Navegação e escopo respeitam o papel do usuário autenticado.
  *
  * Precisa do `SelectedEventProvider`, que o shell novo monta junto (SUC-115).
  */
 export function PanelTopBar() {
   const { user } = useAuth();
-  const { isCircuitUser } = useAuthPermissions();
+  const { isCircuitUser, userCongregationId, isCongregationAssistant } = useAuthPermissions();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const switcher = useEventSwitcher({ isOpen: isSwitcherOpen });
-  // O topo é do circuito: para os outros papéis ele não aparece, e a consulta do circuito não sai.
+  // Cada papel consulta apenas o escopo mostrado no topo.
   const { data: circuit } = useQuery({
     ...ownCircuitOptions(user?.circuitId ?? ""),
-    enabled: isCircuitUser && Boolean(user),
+    enabled: isCircuitUser && Boolean(user?.circuitId),
   });
 
-  if (!user || !isCircuitUser) return null;
+  const { data: congregation } = useQuery({
+    ...congregationDetailOptions(userCongregationId ?? ""),
+    enabled: !isCircuitUser && Boolean(userCongregationId),
+  });
+  if (!user) return null;
 
   const { current, isCurrentLoading, isSelecting } = switcher;
   const isCurrentPending = current === undefined && isCurrentLoading;
@@ -56,7 +62,10 @@ export function PanelTopBar() {
         onPointerEnter={switcher.prefetchEvents}
         onFocus={switcher.prefetchEvents}
       >
-        {circuit && <span className={styles.circuit}>{formatCircuitName(circuit)}</span>}
+        {isCircuitUser && circuit && <span className={styles.circuit}>{formatCircuitName(circuit)}</span>}
+        {!isCircuitUser && congregation && (
+          <span className={styles.circuit}>{formatCongregationScope(congregation)}</span>
+        )}
         <span className={styles.title}>
           {current && (
             <>
@@ -79,6 +88,9 @@ export function PanelTopBar() {
         </span>
       </button>
 
+      {!isCircuitUser && (
+        <span className={styles.rolePill}>{isCongregationAssistant ? "Assistente" : "Coord. do arranjo"}</span>
+      )}
       <ComingSoonButton icon={Search} label="Buscar" />
       <ComingSoonButton icon={Bell} label="Notificações" />
 

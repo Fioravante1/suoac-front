@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useId } from "react";
-import { House, LayoutGrid, Plus, Users, Wallet, type LucideIcon } from "lucide-react";
+import { Shield, House, LayoutGrid, Plus, Users, Wallet, type LucideIcon } from "lucide-react";
 
 import type { Event } from "@/entities/event";
 import { useSelectedEvent } from "@/features/select-event";
@@ -17,6 +17,7 @@ import { EnrollPassengerDialog } from "../enroll-passenger-dialog";
 import styles from "./panel-bottom-nav.module.css";
 
 const PANEL_NAV_ICONS: Record<PanelNavId, LucideIcon> = {
+  [PANEL_NAV_IDS.TEAM]: Shield,
   [PANEL_NAV_IDS.HOME]: House,
   [PANEL_NAV_IDS.PASSENGERS]: Users,
   [PANEL_NAV_IDS.FINANCIAL]: Wallet,
@@ -37,22 +38,26 @@ const ITEMS_BEFORE_FAB = 2;
  *
  * Um espaçador do tamanho da barra vem junto, para ela não cobrir o fim do conteúdo das telas.
  *
- * É do circuito: os papéis da congregação ganham a navegação deles no SUC-113. Precisa do
+ * Navegação e escopo respeitam o papel do usuário autenticado. Precisa do
  * `SelectedEventProvider`, que o shell novo monta junto (SUC-115).
  */
 export function PanelBottomNav() {
   const pathname = usePathname() ?? "";
-  const { isCircuitUser } = useAuthPermissions();
+  const { userRole } = useAuthPermissions();
   const selection = useSelectedEvent();
   const overview = useEventOverview();
   const enrollModal = useModal<Event>();
   const reasonId = useId();
 
-  if (!isCircuitUser) return null;
+  if (!userRole) return null;
 
-  const items = getPanelNavItems(selection?.event?.id ?? null);
+  const items = getPanelNavItems(selection?.event?.id ?? null, userRole);
   const enrollableEvent = overview.status === "ready" && overview.canEnroll ? overview.event : null;
   const isEnrollDisabled = enrollableEvent === null;
+  const disabledReason =
+    overview.status === "ready"
+      ? overview.enrollDisabledReason
+      : "Nenhum evento com inscrições abertas está disponível.";
 
   function handleEnrollClick() {
     if (!enrollableEvent) return;
@@ -85,7 +90,7 @@ export function PanelBottomNav() {
                   </button>
                   {isEnrollDisabled && (
                     <span id={reasonId}>
-                      <VisuallyHidden>As inscrições não estão abertas</VisuallyHidden>
+                      <VisuallyHidden>{disabledReason}</VisuallyHidden>
                     </span>
                   )}
                 </div>

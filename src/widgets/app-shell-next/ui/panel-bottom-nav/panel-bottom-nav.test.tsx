@@ -1,6 +1,10 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { USER_ROLES } from "@/shared/auth";
+
+import { PanelBottomNav } from "./panel-bottom-nav";
+
 const mocks = vi.hoisted(() => ({
   usePathname: vi.fn(),
   useAuthPermissions: vi.fn(),
@@ -9,7 +13,10 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: mocks.usePathname }));
-vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: mocks.useAuthPermissions,
+}));
 vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
 vi.mock("../../model", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../model")>()),
@@ -25,19 +32,22 @@ vi.mock("../enroll-passenger-dialog", () => ({
   ),
 }));
 
-import { PanelBottomNav } from "./panel-bottom-nav";
-
 const event = { id: "event-1" };
 
 function overview(canEnroll: boolean) {
-  mocks.useEventOverview.mockReturnValue({ status: "ready", event, canEnroll });
+  mocks.useEventOverview.mockReturnValue({
+    status: "ready",
+    event,
+    canEnroll,
+    enrollDisabledReason: canEnroll ? null : "As inscrições não estão abertas.",
+  });
 }
 
 describe("PanelBottomNav", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.usePathname.mockReturnValue("/dashboard");
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
     mocks.useSelectedEvent.mockReturnValue({ event });
     overview(true);
   });
@@ -124,7 +134,7 @@ describe("PanelBottomNav", () => {
     fireEvent.click(fab);
 
     expect(fab).toHaveAttribute("aria-disabled", "true");
-    expect(fab).toHaveAccessibleDescription("As inscrições não estão abertas");
+    expect(fab).toHaveAccessibleDescription("As inscrições não estão abertas.");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
@@ -138,11 +148,16 @@ describe("PanelBottomNav", () => {
     expect(screen.getByRole("button", { name: "Cadastrar passageiro" })).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("fica de fora para os papéis da congregação, que têm a navegação do SUC-113", () => {
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
-
-    const { container } = render(<PanelBottomNav />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
+  it.each([USER_ROLES.CONGREGATION_COORDINATOR, USER_ROLES.CONGREGATION_ASSISTANT])(
+    "navegação inferior própria para %s",
+    (role) => {
+      mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false, userRole: role });
+      render(<PanelBottomNav />);
+      expect(screen.getByRole("link", { name: "Pagamentos" })).toHaveAttribute("href", "/financial");
+      expect(Boolean(screen.queryByRole("link", { name: "Equipe" }))).toBe(
+        role === USER_ROLES.CONGREGATION_COORDINATOR,
+      );
+      expect(screen.queryByRole("link", { name: "Congregações" })).not.toBeInTheDocument();
+    },
+  );
 });

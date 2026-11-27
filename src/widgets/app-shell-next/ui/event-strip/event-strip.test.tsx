@@ -3,13 +3,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { USER_ROLES, type SessionUser } from "@/shared/auth";
 
-const mocks = vi.hoisted(() => ({ useAuth: vi.fn(), useQuery: vi.fn() }));
+import { EventStrip } from "./event-strip";
+
+const mocks = vi.hoisted(() => ({ useAuth: vi.fn(), useQuery: vi.fn(), isCircuitUser: true }));
 
 vi.mock("@/shared/auth", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/auth")>()),
   useAuth: mocks.useAuth,
+  useAuthPermissions: () => ({ isCircuitUser: mocks.isCircuitUser, userCongregationId: "claim-congregation" }),
 }));
-vi.mock("@/shared/api", () => ({ useQuery: mocks.useQuery }));
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: mocks.useQuery,
+}));
 vi.mock("@/entities/circuit", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/entities/circuit")>();
 
@@ -25,8 +31,6 @@ vi.mock("../account-menu", () => ({
   AccountMenu: () => <button type="button">Conta</button>,
 }));
 
-import { EventStrip } from "./event-strip";
-
 const coordinator: SessionUser = {
   id: "user-1",
   name: "Marcos Oliveira",
@@ -40,6 +44,7 @@ const coordinator: SessionUser = {
 describe("EventStrip", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.isCircuitUser = true;
     mocks.useAuth.mockReturnValue({ user: coordinator, isAuthenticated: true });
   });
 
@@ -48,7 +53,7 @@ describe("EventStrip", () => {
 
     render(<EventStrip />);
 
-    expect(mocks.useQuery).toHaveBeenCalledWith({ queryKey: ["circuit", "circuit-1"] });
+    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ["circuit", "circuit-1"] }));
     expect(screen.getByText("SUOAC")).toBeInTheDocument();
     expect(screen.getByText("Circuito SP-17")).toBeInTheDocument();
   });
@@ -90,5 +95,22 @@ describe("EventStrip", () => {
 
     expect(screen.queryByRole("button", { name: /Encerrar inscrições/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Cadastrar passageiro/ })).not.toBeInTheDocument();
+  });
+
+  it("mostra congregação e código para os papéis da congregação", () => {
+    mocks.isCircuitUser = false;
+    mocks.useQuery.mockReturnValue({ data: { name: "Jardim Paulista", code: "31245" } });
+    render(<EventStrip />);
+    expect(screen.getByText("Jardim Paulista · Cód. 31245")).toBeInTheDocument();
+  });
+
+  it("não dispara consulta de congregação para papel do circuito", () => {
+    render(<EventStrip />);
+    expect(mocks.useQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["congregations"]),
+        enabled: false,
+      }),
+    );
   });
 });
