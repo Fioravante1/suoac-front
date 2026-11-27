@@ -38,6 +38,7 @@ export type { MoreScreen, MoreScreenId, PanelNavId, PanelNavItem } from "./panel
 export { useSignOut } from "./use-sign-out";
 export type { SignOutState } from "./use-sign-out";
 export { PANEL_MODES, resolvePanelMode } from "./panel-state";
+export { isRedesignedRoute } from "./shell-route";
 export { buildDraftChecklist, getDraftEventDescription, ON_PUBLISH_STEPS } from "./draft-checklist";
 export { formatCancellationHeader } from "./cancelled-summary";
 export { selectPastEvents } from "./past-events";

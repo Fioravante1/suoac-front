@@ -1,5 +1,6 @@
-// Shell novo da Fatia 2, ainda sem fachada: o layout privado só passa a usá-lo com a flag
-// REDESIGN_APP_SHELL (SUC-115). Nunca importa nem é importado por `widgets/app-shell`.
+// Shell novo da Fatia 2, escolhido no layout privado pela REDESIGN_APP_SHELL.
+// Nunca importa nem é importado por widgets/app-shell; corte no SUC-114.
+export { AppShellNext } from "./ui/app-shell-next";
 export { EventHomeHero } from "./ui/event-home-hero";
 export { EventStrip } from "./ui/event-strip";
 export { EventSummary } from "./ui/event-summary";

@@ -1,1 +1,1 @@
-export { isUnderPath } from "./shell-route";
+export { isRedesignedRoute, isUnderPath } from "./shell-route";
