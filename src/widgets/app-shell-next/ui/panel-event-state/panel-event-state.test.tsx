@@ -83,6 +83,16 @@ describe("PanelEventState", () => {
     },
   );
 
+  it("põe o estado alternativo no contêiner do shell e deixa o conteúdo da página sem ele", () => {
+    const { container, rerender } = render(<PanelEventState className="content">Visão geral</PanelEventState>);
+    expect(container.querySelector(".content")).toContainElement(screen.getByText("Sem evento"));
+
+    mocks.selection.event = { ...event, status: EVENT_STATUSES.OPEN };
+    rerender(<PanelEventState className="content">Visão geral</PanelEventState>);
+    expect(screen.getByText("Visão geral")).toBeInTheDocument();
+    expect(container.querySelector(".content")).toBeNull();
+  });
+
   it("permite tentar de novo após erro de seleção", () => {
     mocks.selection.isError = true;
     render(<PanelEventState>Visão geral</PanelEventState>);
