@@ -1,0 +1,51 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+}
+.actions {
+  display: flex;
+  gap: var(--suoac-space-3);
+}
+.actions a,
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--suoac-button-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-on-navy-outline);
+  border-radius: var(--suoac-radius-md);
+  background: transparent;
+  color: var(--suoac-color-text-inverse);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+}
+.actions button {
+  background: var(--suoac-color-on-navy-avatar);
+  color: var(--suoac-color-on-navy-avatar-text);
+  font-weight: var(--suoac-font-weight-semibold);
+  border-color: var(--suoac-color-on-navy-avatar);
+}
+.actions a:hover {
+  background: var(--suoac-color-on-navy-control-hover);
+}
+.actions button:hover {
+  background: var(--suoac-color-text-inverse);
+}
+.actions button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.actions a:focus-visible,
+.actions button:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+.root p {
+  margin: 0;
+  color: var(--suoac-color-on-navy-status-cancelled);
+  font-size: var(--suoac-font-size-small);
+}

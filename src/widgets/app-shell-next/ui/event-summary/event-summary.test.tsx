@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -14,6 +15,14 @@ const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), useAuthPermissions:
 
 vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
 vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
+vi.mock("../publish-event-actions", () => ({
+  PublishEventActions: () => (
+    <div>
+      <Link href="/events/event-1">Editar evento</Link>
+      <button>Publicar e abrir inscrições</button>
+    </div>
+  ),
+}));
 vi.mock("../event-tabs", () => ({
   EventTabs: ({ eventId, circuitId }: { eventId: string; circuitId: string }) => (
     <nav aria-label="Seções do evento">
@@ -215,15 +224,22 @@ describe("EventSummary", () => {
   });
 
   it.each([EVENT_STATUSES.DRAFT, EVENT_STATUSES.CANCELLED])(
-    "fica de fora com o evento %s, que tem outro resumo",
+    "mostra hero sem etapas nem abas no evento %s",
     (status) => {
       selectEvent(buildEvent(status));
-
-      const { container } = render(<EventSummary />);
-
-      expect(container).toBeEmptyDOMElement();
+      render(<EventSummary />);
+      expect(screen.getByRole("heading", { name: "Congresso Regional 2026" })).toBeInTheDocument();
+      expect(screen.queryByRole("list", { name: "Etapas do evento" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("navigation", { name: "Seções do evento" })).not.toBeInTheDocument();
     },
   );
+
+  it("oculta rascunho de papel da congregação", () => {
+    selectEvent(buildEvent(EVENT_STATUSES.DRAFT));
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
+    const { container } = render(<EventSummary />);
+    expect(container).toBeEmptyDOMElement();
+  });
 
   it("fica de fora sem evento no circuito", () => {
     selectEvent(null);

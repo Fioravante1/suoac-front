@@ -5,7 +5,11 @@ import { Banknote, Clock, MapPin } from "lucide-react";
 
 import { Skeleton } from "@/shared/ui/skeleton";
 
-import { useEventOverview } from "../../model";
+import { useSelectedEvent } from "@/features/select-event";
+import { useAuthPermissions } from "@/shared/auth";
+import { PANEL_MODES, resolvePanelMode, getEventOverview, REGISTRATION_ACTIONS, useEventToday } from "../../model";
+import { ComingSoonButton } from "../coming-soon-button";
+import { PublishEventActions } from "../publish-event-actions";
 import { EnrollPassengerButton } from "../enroll-passenger-button";
 import { EventStatusPill } from "../event-status-pill";
 import { EventTabs } from "../event-tabs";
@@ -20,7 +24,7 @@ import styles from "./event-summary.module.css";
  * etapas e as abas do painel.
  *
  * Mostra o evento selecionado na faixa, publicado: inscrições abertas, encerradas ou
- * finalizado. Rascunho e cancelado têm outro resumo (SUC-111). Com as inscrições abertas, as
+ * finalizado. Rascunho e cancelado mostram só o hero, sem etapas nem abas. Com as inscrições abertas, as
  * ações são Encerrar inscrições e Cadastrar passageiro; encerradas antes do prazo, Reabrir
  * inscrições.
  *
@@ -30,10 +34,14 @@ import styles from "./event-summary.module.css";
  * Precisa do `SelectedEventProvider`, que o shell novo monta junto (SUC-115).
  */
 export function EventSummary() {
-  const state = useEventOverview();
+  const selection = useSelectedEvent();
+  const { isCircuitUser } = useAuthPermissions();
+  const today = useEventToday();
+  const event = selection?.event;
+  const mode = resolvePanelMode(event, isCircuitUser);
   const titleId = useId();
 
-  if (state.status === "loading") {
+  if (selection?.isLoading) {
     return (
       <div className={styles.summary} role="status" aria-label="Carregando o resumo do evento">
         <div className={styles.loading}>
@@ -46,17 +54,24 @@ export function EventSummary() {
     );
   }
 
-  if (state.status === "hidden") return null;
-
-  const { event, overview, isCircuitUser, canEnroll, registrationAction } = state;
+  if (!event || mode === PANEL_MODES.EMPTY) return null;
+  const overview = getEventOverview(event, today);
   const { summary, timeline } = overview;
+  const isLive = mode === PANEL_MODES.LIVE;
+  const isDraft = mode === PANEL_MODES.DRAFT;
+  const isCancelled = mode === PANEL_MODES.CANCELLED;
+  const canEnroll = isLive && isCircuitUser && overview.isRegistrationOpen;
+  const canClose = isLive && isCircuitUser && overview.isRegistrationOpen;
+  const canReopen = isLive && isCircuitUser && overview.isRegistrationReopenable;
+  const registrationAction = canClose ? REGISTRATION_ACTIONS.CLOSE : null;
+  const action = canReopen ? REGISTRATION_ACTIONS.REOPEN : registrationAction;
 
   return (
     <section className={styles.summary} aria-labelledby={titleId}>
       <div className={styles.hero}>
         <div className={styles.identity}>
           <div className={styles.kicker}>
-            <EventStatusPill status={event.status} />
+            <EventStatusPill status={event.status} label={isDraft ? "Rascunho · só você vê" : undefined} />
             <span className={styles.type}>{summary.typeLabel}</span>
           </div>
 
@@ -86,14 +101,16 @@ export function EventSummary() {
             recarregado já não ofereça ação; sem botões, o CSS some com o bloco. Sem Cadastrar
             passageiro, o Reabrir fica sozinho. */}
         <div className={styles.actions} data-single={!canEnroll || undefined}>
-          <RegistrationsToggle event={event} action={registrationAction} />
+          {isLive && <RegistrationsToggle event={event} action={action} />}
+          {isDraft && isCircuitUser && <PublishEventActions key={event.id} eventId={event.id} />}
+          {isCancelled && isCircuitUser && <ComingSoonButton label="Duplicar como novo" variant="navy-primary" />}
           {canEnroll && <EnrollPassengerButton event={event} />}
         </div>
       </div>
 
-      <EventTimeline summary={summary} timeline={timeline} />
+      {isLive && <EventTimeline summary={summary} timeline={timeline} />}
 
-      {isCircuitUser && <EventTabs eventId={event.id} circuitId={event.circuitId} />}
+      {isLive && isCircuitUser && <EventTabs eventId={event.id} circuitId={event.circuitId} />}
     </section>
   );
 }
