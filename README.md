@@ -101,9 +101,10 @@ expostas via `@/shared/feature-flags` e avaliadas server-side (`await flag()`).
 Por dependerem de APIs server-only (`async_hooks`), são mantidas fora de `@/shared/config`
 (consumido por Client Components) e só devem ser importadas em Server Components.
 
-| Flag                      | Tipo    | Descrição                                                                                    |
-| ------------------------- | ------- | -------------------------------------------------------------------------------------------- |
-| `SHOW_PENDING_MENU_ITEMS` | boolean | Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações). |
+| Flag                      | Tipo    | Descrição                                                                                                                   |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `REDESIGN_APP_SHELL`      | boolean | Shell novo da área autenticada. Desligada por padrão; validação em staging e SUC-116 antes de produção, remoção no SUC-114. |
+| `SHOW_PENDING_MENU_ITEMS` | boolean | Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações).                                |
 
 Os valores das flags são gerenciados no painel do Vercel Flags (ou via `vercel flags`),
 por ambiente (production/preview/development).
