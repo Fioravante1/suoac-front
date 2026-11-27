@@ -17,6 +17,7 @@ export const endpoints = {
     declines: (token: string) => `/invitations/${encodeURIComponent(token)}/declines` as const,
   },
   circuits: {
+    summary: (circuitId: string) => `/circuits/${circuitId}/summary` as const,
     own: "/circuits/me",
   },
   congregations: {
