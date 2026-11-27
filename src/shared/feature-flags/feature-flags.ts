@@ -89,3 +89,17 @@ export const showPendingMenuItemsFlag = booleanFlag({
   key: "SHOW_PENDING_MENU_ITEMS",
   description: "Exibe itens de menu cujas páginas ainda não foram implementadas (Financeiro, Configurações).",
 });
+
+/**
+ * Liga o shell novo da área autenticada no lugar do shell legado com sidebar.
+ *
+ * Criada em: 27/11/2026 (Fatia 2 — Shell do evento).
+ * Critério de remoção: ligada em produção por um evento com inscrições abertas sem
+ * rollback e com paridade conferida; removida no SUC-114.
+ */
+export const redesignAppShellFlag = redesignFlag({
+  key: "REDESIGN_APP_SHELL",
+  description: "Serve o shell novo da área autenticada (faixa, resumo, abas e navegação mobile/tablet).",
+  slice: "Fatia 2 — Shell",
+  removalCard: "SUC-114",
+});
