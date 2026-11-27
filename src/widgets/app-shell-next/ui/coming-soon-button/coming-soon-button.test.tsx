@@ -92,4 +92,22 @@ describe("ComingSoonButton", () => {
 
     expect(submitted).toBe(false);
   });
+  it.each(["navy-primary", "navy-outline", "surface-outline", "compact"] as const)(
+    "mostra texto na variante %s com a mesma dica acessível",
+    (variant) => {
+      render(<ComingSoonButton label="Duplicar" variant={variant} />);
+      const button = screen.getByRole("button", { name: "Duplicar" });
+      expect(button).toHaveTextContent("Duplicar");
+      expect(button).not.toHaveAttribute("aria-label");
+      expect(button).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(button);
+      expect(button.parentElement).toHaveAttribute("data-hint-shown", "true");
+      expect(button).toHaveAccessibleDescription("Em breve");
+    },
+  );
+
+  it("combina ícone opcional e rótulo visível nas ações com texto", () => {
+    render(<ComingSoonButton label="Duplicar" icon={Search} variant="surface-outline" />);
+    expect(screen.getByRole("button", { name: "Duplicar" })).toHaveTextContent("Duplicar");
+  });
 });
