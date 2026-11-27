@@ -16,9 +16,17 @@ describe("EventStatusPill", () => {
     expect(screen.getByText(label)).toHaveAttribute("data-tone", tone);
   });
 
-  it("usa o tom neutro para os status que o resumo ainda não desenha", () => {
+  it("usa o tom de rascunho", () => {
     render(<EventStatusPill status={EVENT_STATUSES.DRAFT} />);
 
-    expect(screen.getByText("Rascunho")).toHaveAttribute("data-tone", "neutral");
+    expect(screen.getByText("Rascunho")).toHaveAttribute("data-tone", "draft");
+  });
+  it("permite o rótulo de privacidade do rascunho", () => {
+    render(<EventStatusPill status={EVENT_STATUSES.DRAFT} label="Rascunho · só você vê" />);
+    expect(screen.getByText("Rascunho · só você vê")).toHaveAttribute("data-tone", "draft");
+  });
+  it("identifica o cancelamento com tom próprio", () => {
+    render(<EventStatusPill status={EVENT_STATUSES.CANCELLED} />);
+    expect(screen.getByText("Cancelado")).toHaveAttribute("data-tone", "cancelled");
   });
 });

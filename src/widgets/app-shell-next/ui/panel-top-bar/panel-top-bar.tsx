@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Bell, ChevronDown, Search } from "lucide-react";
 
 import { formatCircuitName, ownCircuitOptions } from "@/entities/circuit";
-import { EventStatusDot } from "@/entities/event";
+import { EVENT_STATUSES, EventStatusDot } from "@/entities/event";
 import { EventSwitcherSheet, useEventSwitcher } from "@/features/select-event";
 import { useQuery } from "@/shared/api";
 import { useAuth, useAuthPermissions } from "@/shared/auth";
@@ -13,6 +13,7 @@ import { routes } from "@/shared/config";
 import { getInitials } from "@/shared/lib";
 import { Spinner } from "@/shared/ui/spinner";
 
+import { EventStatusPill } from "../event-status-pill";
 import { ComingSoonButton } from "../coming-soon-button";
 
 import styles from "./panel-top-bar.module.css";
@@ -61,6 +62,8 @@ export function PanelTopBar() {
             <>
               <EventStatusDot variant={current.statusVariant} surface="navy" />
               <span className={styles.titleText}>{current.title}</span>
+              {current.status === EVENT_STATUSES.DRAFT && <EventStatusPill status={EVENT_STATUSES.DRAFT} />}
+              {current.status === EVENT_STATUSES.CANCELLED && <EventStatusPill status={EVENT_STATUSES.CANCELLED} />}
             </>
           )}
           {hasNoCurrent && (
