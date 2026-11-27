@@ -126,6 +126,11 @@ describe("useEventSwitcher", () => {
 
     const { result } = renderHook(() => useEventSwitcher({ isOpen: true }));
 
+    expect(result.current.events.map(({ status }) => status)).toEqual([
+      EVENT_STATUSES.DRAFT,
+      EVENT_STATUSES.OPEN,
+      EVENT_STATUSES.FINISHED,
+    ]);
     expect(result.current.events.map(({ title, period, statusLabel }) => [title, period, statusLabel])).toEqual([
       ["Assembleia de Circuito", "14 nov", "Rascunho"],
       ["Congresso Regional 2026", "23–25 out", "Inscrições abertas"],
