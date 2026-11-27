@@ -5,6 +5,7 @@ import { eventPassengerListOptions } from "@/entities/event-passenger";
 import { useQuery, type PaginatedResponse } from "@/shared/api";
 
 import { EVENT_TAB_IDS, type EventTabId } from "../event-tabs";
+import { useIsPanelDesktop } from "../use-is-panel-desktop";
 
 export type EventTabCounts = Partial<Record<EventTabId, number>>;
 
@@ -24,10 +25,16 @@ function selectTotal<T>(response: PaginatedResponse<T>): number {
  */
 export function useEventTabCounts(eventId: string, circuitId: string): EventTabCounts {
   const { isCircuitUser } = useAuthPermissions();
-  const passengers = useQuery({ ...eventPassengerListOptions(eventId, 1), select: selectTotal, throwOnError: false });
+  const isPanelDesktop = useIsPanelDesktop();
+  const passengers = useQuery({
+    ...eventPassengerListOptions(eventId, 1),
+    enabled: isPanelDesktop && Boolean(eventId),
+    select: selectTotal,
+    throwOnError: false,
+  });
   const congregations = useQuery({
     ...congregationListOptions(circuitId, 1),
-    enabled: isCircuitUser && Boolean(circuitId),
+    enabled: isPanelDesktop && isCircuitUser && Boolean(circuitId),
     select: selectTotal,
     throwOnError: false,
   });
