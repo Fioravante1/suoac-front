@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EVENT_STATUSES, EVENT_STATUS_LABELS } from "@/entities/event";
 import { USER_ROLES, type SessionUser } from "@/shared/auth";
 
 const mocks = vi.hoisted(() => ({
@@ -140,5 +141,21 @@ describe("PanelTopBar", () => {
     render(<PanelTopBar />);
 
     expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
+  });
+  it.each([EVENT_STATUSES.DRAFT, EVENT_STATUSES.CANCELLED])("mostra a pílula compacta de %s", (status) => {
+    switcher({
+      current: {
+        id: "event-1",
+        title: "Assembleia de Circuito",
+        statusVariant: "neutral",
+        status,
+        statusLabel: "Rótulo independente do status",
+      },
+    });
+    render(<PanelTopBar />);
+    expect(screen.getByText(EVENT_STATUS_LABELS[status])).toHaveAttribute(
+      "data-tone",
+      status === EVENT_STATUSES.DRAFT ? "draft" : "cancelled",
+    );
   });
 });

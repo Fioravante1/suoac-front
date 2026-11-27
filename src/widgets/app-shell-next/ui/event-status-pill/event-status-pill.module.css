@@ -71,3 +71,17 @@
     animation-name: none;
   }
 }
+
+.pill[data-tone="draft"] {
+  color: var(--suoac-color-on-navy-status-draft-text);
+}
+.pill[data-tone="draft"] .dot {
+  background: var(--suoac-color-on-navy-status-draft-dot);
+}
+.pill[data-tone="cancelled"] {
+  background: var(--suoac-color-on-navy-status-cancelled-soft);
+  color: var(--suoac-color-on-navy-status-cancelled);
+}
+.pill[data-tone="cancelled"] .dot {
+  background: var(--suoac-color-on-navy-status-cancelled);
+}

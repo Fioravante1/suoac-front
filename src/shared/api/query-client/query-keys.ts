@@ -1,6 +1,7 @@
 export const queryKeys = {
   all: ["suoac"] as const,
   circuits: {
+    summary: (circuitId: string) => ["suoac", "circuits", "summary", circuitId] as const,
     all: ["suoac", "circuits"] as const,
     // O circuito vem da sessão; o id na chave impede que outra conta, no mesmo navegador, leia o cache da anterior.
     own: (circuitId: string) => ["suoac", "circuits", "own", circuitId] as const,

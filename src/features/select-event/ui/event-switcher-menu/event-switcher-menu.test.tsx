@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EVENT_STATUSES } from "@/entities/event";
+
 import type { EventSwitcherItem, EventSwitcherState } from "../../model";
 
 const mocks = vi.hoisted(() => ({ useEventSwitcher: vi.fn() }));
@@ -13,6 +15,7 @@ const congress: EventSwitcherItem = {
   id: "evt-congresso",
   title: "Congresso Regional 2026",
   period: "23–25 out",
+  status: EVENT_STATUSES.OPEN,
   statusLabel: "Inscrições abertas",
   statusVariant: "success",
   meta: "23–25 out · Inscrições abertas",
@@ -23,6 +26,7 @@ const draft: EventSwitcherItem = {
   id: "evt-rascunho",
   title: "Assembleia de Circuito",
   period: "14 nov",
+  status: EVENT_STATUSES.DRAFT,
   statusLabel: "Rascunho",
   statusVariant: "neutral",
   meta: "14 nov · Rascunho",
@@ -33,6 +37,7 @@ const finished: EventSwitcherItem = {
   id: "evt-finalizado",
   title: "Assembleia com Representante",
   period: "15 mar",
+  status: EVENT_STATUSES.FINISHED,
   statusLabel: "Finalizado",
   statusVariant: "info",
   meta: "15 mar · Finalizado",

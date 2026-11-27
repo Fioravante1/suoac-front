@@ -37,6 +37,10 @@ const brandPanelColors = {
  * translucido nos dois temas, pelo mesmo motivo de `brandPanelColors`.
  */
 const onNavyColors = {
+  onNavyStatusCancelled: "#F07272",
+  onNavyStatusCancelledSoft: "rgb(240 114 114 / 0.18)",
+  onNavyStatusDraftDot: "#9AA8A3",
+  onNavyStatusDraftText: "rgb(255 255 255 / 0.8)",
   onNavyControl: "rgb(255 255 255 / 0.06)",
   onNavyControlHover: "rgb(255 255 255 / 0.12)",
   onNavyControlActive: "rgb(255 255 255 / 0.14)",

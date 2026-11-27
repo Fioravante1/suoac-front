@@ -6,20 +6,25 @@ import type { LucideIcon } from "lucide-react";
 import styles from "./coming-soon-button.module.css";
 
 type ComingSoonButtonProps = Readonly<{
-  /** Nome do botão para leitor de tela, como "Buscar": o botão mostra só o ícone. */
+  /** Texto da ação; nos botões só de ícone, fornece o nome acessível. */
   label: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  variant?: "icon" | "navy-primary" | "navy-outline" | "surface-outline" | "compact";
 }>;
 
 /** Quanto tempo a dica fica à vista depois de um toque, que não tem hover para mantê-la. */
 const TOUCH_HINT_DURATION_MS = 2000;
 
 /**
- * Botão de ícone da faixa cujo destino ainda não existe: busca e notificações (Fatia 9). Fica
- * no lugar do desenho, mas desabilitado: `aria-disabled` o mantém no Tab, para que quem navega
- * por teclado também descubra a dica "Em breve", que aparece abaixo dele.
+ * Ação ainda indisponível no painel, com ícone ou texto visível. Continua no Tab e explica
+ * "Em breve" em hover, foco e toque, sem enviar formulários nem executar a ação futura.
  */
-export function ComingSoonButton({ label, icon: Icon }: ComingSoonButtonProps) {
+export function ComingSoonButton({
+  label,
+  icon: Icon,
+  variant = Icon ? "icon" : "surface-outline",
+}: ComingSoonButtonProps) {
+  const isIconOnly = variant === "icon";
   const hintId = useId();
   // No toque não há hover, e o foco por toque não é `:focus-visible`: o clique mostra a dica.
   // Guarda o momento do toque, e não só "visível", para um novo toque reiniciar a contagem.
@@ -39,13 +44,15 @@ export function ComingSoonButton({ label, icon: Icon }: ComingSoonButtonProps) {
       <button
         type="button"
         className={styles.button}
-        aria-label={label}
+        data-variant={variant}
+        aria-label={isIconOnly ? label : undefined}
         aria-disabled="true"
         aria-describedby={hintId}
         onClick={() => setHintShownAt(Date.now())}
         onBlur={() => setHintShownAt(null)}
       >
-        <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+        {Icon && <Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
+        {!isIconOnly && label}
       </button>
       <span id={hintId} role="tooltip" className={styles.hint}>
         Em breve

@@ -2,11 +2,13 @@ import { EVENT_STATUSES, EVENT_STATUS_LABELS, type EventStatus } from "@/entitie
 
 import styles from "./event-status-pill.module.css";
 
-type EventStatusPillProps = Readonly<{ status: EventStatus }>;
+type EventStatusPillProps = Readonly<{ status: EventStatus; label?: string }>;
 
-type PillTone = "open" | "closed" | "finished" | "neutral";
+type PillTone = "open" | "closed" | "finished" | "draft" | "cancelled" | "neutral";
 
 const PILL_TONES: Partial<Record<EventStatus, PillTone>> = {
+  [EVENT_STATUSES.DRAFT]: "draft",
+  [EVENT_STATUSES.CANCELLED]: "cancelled",
   [EVENT_STATUSES.OPEN]: "open",
   [EVENT_STATUSES.CLOSED]: "closed",
   [EVENT_STATUSES.FINISHED]: "finished",
@@ -17,11 +19,11 @@ const PILL_TONES: Partial<Record<EventStatus, PillTone>> = {
  * pulsando com as inscrições abertas, âmbar quando encerram e neutra com o ponto azul no
  * evento finalizado. O status vem escrito; a cor só reforça.
  */
-export function EventStatusPill({ status }: EventStatusPillProps) {
+export function EventStatusPill({ status, label }: EventStatusPillProps) {
   return (
     <span className={styles.pill} data-tone={PILL_TONES[status] ?? "neutral"}>
       <span className={styles.dot} aria-hidden="true" />
-      {EVENT_STATUS_LABELS[status]}
+      {label ?? EVENT_STATUS_LABELS[status]}
     </span>
   );
 }

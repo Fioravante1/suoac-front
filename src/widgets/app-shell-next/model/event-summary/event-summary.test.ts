@@ -39,6 +39,16 @@ const congress: Pick<Event, "type" | "days" | "venue" | "city" | "state" | "tick
 };
 
 describe("getEventSummary", () => {
+  it("preserva número de dias e horários quando o cancelamento cancela todos os dias", () => {
+    const cancelled = {
+      ...congress,
+      days: congress.days!.map((item) => ({ ...item, status: EVENT_DAY_STATUSES.CANCELLED })),
+    };
+    const summary = getEventSummary(cancelled, "2026-10-07");
+    expect(summary.typeLabel).toBe("Congresso regional · 3 dias");
+    expect(summary.schedule).toBe("Saída 06:30 · retorno 18:30");
+  });
+
   it("mostra os dias ativos em ordem, com o dia da semana abreviado", () => {
     expect(getEventSummary(congress, "2026-10-07").dayTiles).toEqual([
       { id: "day-2026-10-23", weekday: "Sex", day: "23" },

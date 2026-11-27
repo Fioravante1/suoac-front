@@ -9,6 +9,7 @@ import {
   sortEventsByPeriod,
   type Event,
   type EventStatusVariant,
+  type EventStatus,
 } from "@/entities/event";
 import { useQuery, useQueryClient } from "@/shared/api";
 import { useAuthPermissions } from "@/shared/auth";
@@ -23,6 +24,7 @@ export interface EventSwitcherItem {
   title: string;
   /** Período curto, como "23–25 out"; vazio quando o evento não tem dias. */
   period: string;
+  status: EventStatus;
   statusLabel: string;
   statusVariant: EventStatusVariant;
   /** Linha de apoio do item: período e status ("23–25 out · Inscrições abertas"). */
@@ -74,6 +76,7 @@ function toItem(event: Event, selectedId: string | undefined, today: Date): Even
     id: event.id,
     title: event.title,
     period,
+    status: event.status,
     statusLabel,
     statusVariant: EVENT_STATUS_BADGE_VARIANTS[event.status],
     meta: [period, statusLabel].filter(Boolean).join(" · "),

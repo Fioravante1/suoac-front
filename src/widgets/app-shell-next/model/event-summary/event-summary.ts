@@ -113,7 +113,8 @@ export function getEventSummary(
   const days = event.days ?? [];
   const activeDays = getActiveEventDays(days);
   const period = getEventPeriod(days);
-  const dayCount = activeDays.length;
+  const countedDays = activeDays.length > 0 ? activeDays : days;
+  const dayCount = countedDays.length;
 
   return {
     dayTiles: activeDays.map((day) => ({
@@ -126,7 +127,7 @@ export function getEventSummary(
     typeLabel: `${EVENT_TYPE_LABELS[event.type]} · ${dayCount} ${pluralize(dayCount, "dia")}`,
     location: `${event.venue} · ${event.city}, ${event.state}`,
     compactLocation: `${event.venue} · ${event.city}`,
-    schedule: describeSchedule(activeDays),
+    schedule: describeSchedule(countedDays),
     price: `${formatCurrencyCompact(event.ticketPrice)} por dia`,
   };
 }

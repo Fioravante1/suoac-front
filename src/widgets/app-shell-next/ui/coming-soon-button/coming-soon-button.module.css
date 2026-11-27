@@ -3,22 +3,38 @@
   display: inline-flex;
 }
 
-/* Lupa e sino do `v3`: 40px, raio 12, sem borda. O icone fica esmaecido porque ainda nao ha destino. */
+/* Ações com texto e a variante de ícone da faixa compartilham a mesma dica. */
 .button {
-  display: grid;
-  place-items: center;
-  width: var(--suoac-strip-icon-button-size);
-  height: var(--suoac-strip-icon-button-size);
-  padding: 0;
-  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--suoac-button-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-border-strong);
   border-radius: var(--suoac-radius-md);
-  background: transparent;
-  color: var(--suoac-color-on-navy-text-muted);
+  background: var(--suoac-color-surface);
+  color: var(--suoac-color-text-primary);
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
   cursor: not-allowed;
+}
+.button[data-variant="navy-primary"] {
+  background: var(--suoac-color-on-navy-avatar);
+  color: var(--suoac-color-on-navy-avatar-text);
+  border-color: var(--suoac-color-on-navy-avatar);
+}
+.button[data-variant="navy-outline"] {
+  background: transparent;
+  color: var(--suoac-color-text-inverse);
+  border-color: var(--suoac-color-on-navy-outline);
+}
+.button[data-variant="compact"] {
+  padding: 0 var(--suoac-space-3);
+  font-size: var(--suoac-font-size-label);
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--suoac-color-text-inverse);
+  outline: 2px solid var(--suoac-color-primary);
   outline-offset: 2px;
 }
 
@@ -52,9 +68,24 @@
   transform: translate(-50%, 0);
 }
 
-/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px. */
+.button[data-variant="icon"] {
+  display: grid;
+  place-items: center;
+  width: var(--suoac-strip-icon-button-size);
+  height: var(--suoac-strip-icon-button-size);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--suoac-color-on-navy-text-muted);
+}
+.button[data-variant="icon"]:focus-visible,
+.button[data-variant="navy-primary"]:focus-visible,
+.button[data-variant="navy-outline"]:focus-visible {
+  outline-color: var(--suoac-color-text-inverse);
+}
 @media (pointer: coarse) {
-  .button {
+  .button[data-variant="icon"] {
     width: var(--suoac-button-height);
     height: var(--suoac-button-height);
   }

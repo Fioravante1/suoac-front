@@ -3,6 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getFirstName, getInitials, getGreetingByTime, pluralize } from "./string";
 
 describe("pluralize", () => {
+  it("aceita um plural irregular ou uma expressão concordada sem alterar o singular", () => {
+    expect(pluralize(1, "congregação", "congregações")).toBe("congregação");
+    expect(pluralize(0, "congregação", "congregações")).toBe("congregações");
+    expect(pluralize(2, "coordenador ativo", "coordenadores ativos")).toBe("coordenadores ativos");
+  });
   it("retorna singular quando count e 1", () => {
     expect(pluralize(1, "dia")).toBe("dia");
   });

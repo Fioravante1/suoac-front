@@ -1,5 +1,5 @@
-export function pluralize(count: number, singular: string): string {
-  return count !== 1 ? `${singular}s` : singular;
+export function pluralize(count: number, singular: string, plural: string = `${singular}s`): string {
+  return count !== 1 ? plural : singular;
 }
 
 export function getInitials(name: string): string {

@@ -17,3 +17,9 @@ export function formatCircuitName(circuit: Pick<Circuit, "name">): string {
 export function formatCircuitLocation(circuit: Pick<Circuit, "city" | "state">): string {
   return `${circuit.city}, ${circuit.state}`;
 }
+
+export interface CircuitSummary {
+  activeCongregationCount: number;
+  activeCoordinatorCount: number;
+  pendingInvitationCount: number;
+}
