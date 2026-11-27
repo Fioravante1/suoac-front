@@ -74,6 +74,10 @@
    * (`SUOAC Dashboard v3.dc.html`). Branco translucido sobre navy nos dois temas, como
    * o painel de apresentacao acima: o navy do tema escuro so escurece o fundo.
    */
+  --suoac-color-on-navy-status-cancelled: #f07272;
+  --suoac-color-on-navy-status-cancelled-soft: rgb(240 114 114 / 0.18);
+  --suoac-color-on-navy-status-draft-dot: #9aa8a3;
+  --suoac-color-on-navy-status-draft-text: rgb(255 255 255 / 0.8);
   --suoac-color-on-navy-control: rgb(255 255 255 / 0.06);
   --suoac-color-on-navy-control-hover: rgb(255 255 255 / 0.12);
   --suoac-color-on-navy-control-active: rgb(255 255 255 / 0.14);
