@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { Bell, Search } from "lucide-react";
 
+import { congregationDetailOptions, formatCongregationScope } from "@/entities/congregation";
+
 import { formatCircuitName, ownCircuitOptions } from "@/entities/circuit";
 import { EventSwitcherMenu } from "@/features/select-event";
 import { useQuery } from "@/shared/api";
-import { useAuth } from "@/shared/auth";
+import { useAuth, useAuthPermissions } from "@/shared/auth";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 import { AccountMenu } from "../account-menu";
@@ -26,7 +28,15 @@ import styles from "./event-strip.module.css";
  */
 export function EventStrip() {
   const { user } = useAuth();
-  const { data: circuit } = useQuery(ownCircuitOptions(user?.circuitId ?? ""));
+  const { isCircuitUser, userCongregationId } = useAuthPermissions();
+  const { data: congregation } = useQuery({
+    ...congregationDetailOptions(userCongregationId ?? ""),
+    enabled: !isCircuitUser && Boolean(userCongregationId),
+  });
+  const { data: circuit } = useQuery({
+    ...ownCircuitOptions(user?.circuitId ?? ""),
+    enabled: isCircuitUser && Boolean(user?.circuitId),
+  });
 
   return (
     <header className={styles.strip}>
@@ -34,7 +44,10 @@ export function EventStrip() {
         <Image src="/logo-mark-dark.png" alt="" width={34} height={34} className={styles.brandMark} loading="eager" />
         <span className={styles.brandText}>
           <span className={styles.brandName}>SUOAC</span>
-          {circuit && <span className={styles.brandScope}>{formatCircuitName(circuit)}</span>}
+          {isCircuitUser && circuit && <span className={styles.brandScope}>{formatCircuitName(circuit)}</span>}
+          {!isCircuitUser && congregation && (
+            <span className={styles.brandScope}>{formatCongregationScope(congregation)}</span>
+          )}
         </span>
       </div>
 

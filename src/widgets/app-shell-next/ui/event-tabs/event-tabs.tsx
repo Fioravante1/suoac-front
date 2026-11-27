@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useAuthPermissions } from "@/shared/auth";
+
 import { formatInteger } from "@/shared/lib";
 
 import { getEventTabs, isEventTabActive, useEventTabCounts } from "../../model";
@@ -21,12 +23,13 @@ type EventTabsProps = Readonly<{
  * Passageiros leva aos inscritos do evento.
  */
 export function EventTabs({ eventId, circuitId }: EventTabsProps) {
+  const { userRole } = useAuthPermissions();
   const pathname = usePathname();
   const counts = useEventTabCounts(eventId, circuitId);
 
   return (
     <nav className={styles.tabs} aria-label="Seções do evento">
-      {getEventTabs(eventId).map((tab) => {
+      {getEventTabs(eventId, userRole).map((tab) => {
         const isActive = pathname !== null && isEventTabActive(tab, pathname);
         const count = counts[tab.id];
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatCongregationScope,
   CONGREGATION_LIST_STATUSES,
   countUnfinalizedCongregations,
   type CongregationEventStatus,
@@ -32,5 +33,11 @@ describe("countUnfinalizedCongregations", () => {
 
   it("dá zero sem congregações", () => {
     expect(countUnfinalizedCongregations([])).toBe(0);
+  });
+});
+
+describe("formatCongregationScope", () => {
+  it("identifica a congregação por nome e código", () => {
+    expect(formatCongregationScope({ name: "Jardim Paulista", code: "31245" })).toBe("Jardim Paulista · Cód. 31245");
   });
 });

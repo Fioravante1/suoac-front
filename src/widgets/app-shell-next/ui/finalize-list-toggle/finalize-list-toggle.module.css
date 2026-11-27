@@ -1,0 +1,86 @@
+/*
+ * Finalizar ou reabrir a lista da congregacao: o botao secundario com contorno sobre o navy, 44px no
+ * celular e no tablet (`Dashboard Mobile`) e 42px no desktop (`v3`).
+ */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--suoac-button-height);
+  padding: 0 var(--suoac-space-4);
+  border: 1px solid var(--suoac-color-on-navy-outline);
+  border-radius: var(--suoac-radius-md);
+  background: transparent;
+  color: var(--suoac-color-text-inverse);
+  font-family: inherit;
+  font-size: var(--suoac-font-size-small);
+  font-weight: var(--suoac-font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--suoac-motion-duration-base) var(--suoac-motion-ease-standard);
+}
+
+.button:hover:not([aria-disabled="true"]) {
+  background: var(--suoac-color-on-navy-tint);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}
+
+/* Enviando: `aria-disabled`, e nao `disabled`, para o foco ficar no botao. */
+.button[aria-disabled="true"] {
+  cursor: default;
+}
+
+@media (min-width: 80rem) {
+  .button {
+    height: var(--suoac-event-action-height);
+  }
+}
+
+/* Em tela de toque, como um iPad em paisagem, o alvo chega a 44px, depois do corte do desktop. */
+@media (pointer: coarse) {
+  .button {
+    height: var(--suoac-button-height);
+  }
+}
+
+.button[data-assistant="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--suoac-space-2);
+  min-width: 0;
+}
+
+.button[data-busy="true"] {
+  cursor: progress;
+}
+
+.status {
+  font-size: var(--suoac-font-size-small);
+  color: var(--suoac-color-on-navy-text-muted);
+}
+
+.retry {
+  display: block;
+  padding: var(--suoac-space-1) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.retry:focus-visible {
+  outline: 2px solid var(--suoac-color-text-inverse);
+  outline-offset: 2px;
+}

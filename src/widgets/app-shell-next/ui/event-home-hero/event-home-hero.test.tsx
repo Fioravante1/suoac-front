@@ -9,11 +9,25 @@ import {
   type EventDayInEvent,
   type EventStatus,
 } from "@/entities/event";
+import { CONGREGATION_LIST_STATUSES } from "@/entities/congregation";
+import { USER_ROLES } from "@/shared/auth";
+
+import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
+import { EventHomeHero } from "./event-home-hero";
+
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: () => ({ data: { status: CONGREGATION_LIST_STATUSES.PENDING } }),
+}));
+vi.mock("../finalize-list-toggle", () => ({ FinalizeListToggle: () => <button>Finalizar lista</button> }));
 
 const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), usePathname: vi.fn(), useAuthPermissions: vi.fn() }));
 
 vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
-vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: mocks.useAuthPermissions,
+}));
 vi.mock("next/navigation", () => ({ usePathname: mocks.usePathname }));
 vi.mock("../registrations-toggle", () => ({
   RegistrationsToggle: ({ action }: { action: RegistrationAction | null }) => (
@@ -23,10 +37,6 @@ vi.mock("../registrations-toggle", () => ({
     </>
   ),
 }));
-
-import { REGISTRATION_ACTIONS, type RegistrationAction } from "../../model";
-
-import { EventHomeHero } from "./event-home-hero";
 
 function day(date: string): EventDayInEvent {
   return {
@@ -78,7 +88,7 @@ describe("EventHomeHero", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-07T15:00:00.000Z"));
     mocks.usePathname.mockReturnValue("/dashboard");
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
   });
 
   afterEach(() => {
@@ -214,5 +224,17 @@ describe("EventHomeHero", () => {
     rerender(<EventHomeHero />);
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("explica o papel do assistente e mostra a ação da lista", () => {
+    mocks.useAuthPermissions.mockReturnValue({
+      isCircuitUser: false,
+      isCongregationAssistant: true,
+      userCongregationId: "c1",
+    });
+    selectEvent(buildEvent(EVENT_STATUSES.OPEN));
+    render(<EventHomeHero />);
+    expect(screen.getByText(/Você é assistente: cadastra passageiros/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Finalizar lista" })).toBeInTheDocument();
   });
 });

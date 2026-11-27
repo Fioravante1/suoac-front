@@ -1,9 +1,12 @@
+import { USER_ROLES, isCircuitRole, type UserRole } from "@/shared/auth";
+
 import { routes } from "@/shared/config";
 
 export const EVENT_TAB_IDS = {
   OVERVIEW: "overview",
   PASSENGERS: "passengers",
   FINANCIAL: "financial",
+  TEAM: "team",
   CONGREGATIONS: "congregations",
   BUSES: "buses",
   LISTS: "lists",
@@ -27,12 +30,22 @@ function tabTo(id: EventTabId, label: string, path: string, href: string = path)
 /**
  * As abas do painel do circuito no desktop, na ordem do `v3`, para o evento selecionado. Cada aba
  * é uma rota: a aba ativa vem da URL, e voltar no navegador volta de aba. As dos papéis da
- * congregação são o SUC-113.
+ * congregação oferecem Pagamentos e, ao coordenador, Equipe.
  *
  * Passageiros leva aos inscritos do evento, no detalhe dele, até a Fatia 4 (SUC-8) trazer a tela
  * nova: o contador da aba é o de inscritos, e `/passengers` é o cadastro do circuito inteiro.
  */
-export function getEventTabs(eventId: string): EventTab[] {
+export function getEventTabs(eventId: string, role: UserRole | null): EventTab[] {
+  if (!role) return [];
+  if (!isCircuitRole(role)) {
+    const tabs = [
+      tabTo(EVENT_TAB_IDS.OVERVIEW, "Visão geral", routes.dashboard),
+      tabTo(EVENT_TAB_IDS.PASSENGERS, "Passageiros", routes.eventDetail(eventId), routes.eventEnrollments(eventId)),
+      tabTo(EVENT_TAB_IDS.FINANCIAL, "Pagamentos", routes.financial),
+    ];
+    if (role === USER_ROLES.CONGREGATION_COORDINATOR) tabs.push(tabTo(EVENT_TAB_IDS.TEAM, "Equipe", routes.team));
+    return tabs;
+  }
   return [
     tabTo(EVENT_TAB_IDS.OVERVIEW, "Visão geral", routes.dashboard),
     tabTo(EVENT_TAB_IDS.PASSENGERS, "Passageiros", routes.eventDetail(eventId), routes.eventEnrollments(eventId)),

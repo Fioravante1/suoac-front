@@ -506,7 +506,11 @@ No SUOAC:
   Passageiros, o "+" de Cadastrar passageiro, Financeiro e Mais; barra no celular, pilula no
   tablet), `StackedScreenBar` (o "‹ Mais" de Onibus, Congregacoes e Listas) e `MoreScreen`, a tela
   Mais, servida pela rota `/more` (`pages/more`). Os itens e o que marca cada um como ativo ficam
-  no `model` (`panel-nav`), e os papeis da congregacao ganham a navegacao deles no SUC-113
+  no `model` (`panel-nav`). Os papeis da congregacao (SUC-113) tem topo, abas e barra inferior
+  proprios: congregacao e codigo no lugar do circuito, Pagamentos no lugar de Financeiro e, para o
+  coordenador do arranjo de onibus na congregacao, Equipe no lugar de Mais (o avatar segue levando
+  a tela Mais). O `FinalizeListToggle` finaliza ou reabre a propria lista pela feature
+  `finalize-congregation-list`; o assistente o ve desabilitado, com o motivo
 - `event-overview`
 - `financial-summary`
 - `congregation-status-list`
@@ -531,6 +535,8 @@ No SUOAC:
 - `financial`
 - `buses` — aba Onibus do painel; estado vazio ate a Fatia 7 (SUC-11)
 - `lists` — aba Listas e exportacoes; a exportacao de inscritos ate a Fatia 8 (SUC-12)
+- `team` — aba Equipe do coordenador do arranjo de onibus na congregacao; estado vazio ate a Fatia 6
+  (SUC-74)
 - `settings`
 
 Pages podem compor widgets, features e entities. Pequenas logicas especificas de uma unica tela

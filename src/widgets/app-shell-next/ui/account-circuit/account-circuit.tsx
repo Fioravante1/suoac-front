@@ -1,3 +1,6 @@
+import { congregationDetailOptions, formatCongregationScope } from "@/entities/congregation";
+import { useAuthPermissions } from "@/shared/auth";
+
 import { formatCircuitLocation, formatCircuitName, ownCircuitOptions } from "@/entities/circuit";
 import { useQuery } from "@/shared/api";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -18,21 +21,34 @@ export function AccountCircuit({ circuitId }: AccountCircuitProps) {
   // para sempre, e o bloco mostraria o carregamento sem fim.
   const { data: circuit, isLoading, isError, isFetching, refetch } = useQuery(ownCircuitOptions(circuitId));
 
-  const isFailed = isError && !circuit;
+  const { isCircuitUser, userCongregationId } = useAuthPermissions();
+  const congregation = useQuery({
+    ...congregationDetailOptions(userCongregationId ?? ""),
+    enabled: !isCircuitUser && Boolean(userCongregationId),
+  });
+  const isFailed = (isError && !circuit) || (!isCircuitUser && congregation.isError && !congregation.data);
+  const hasScope = Boolean(circuit && (isCircuitUser || congregation.data));
+  const scopeName = isCircuitUser ? "o circuito" : "a congregação";
 
   return (
     <div className={styles.circuit}>
-      <span className={styles.label}>Circuito</span>
+      <span className={styles.label}>{isCircuitUser ? "Circuito" : "Congregação"}</span>
 
-      {circuit && (
+      {hasScope && circuit && (
         <>
-          <span className={styles.name}>{formatCircuitName(circuit)}</span>
-          <span className={styles.location}>{formatCircuitLocation(circuit)}</span>
+          <span className={styles.name}>
+            {!isCircuitUser && congregation.data
+              ? formatCongregationScope(congregation.data)
+              : formatCircuitName(circuit)}
+          </span>
+          <span className={styles.location}>
+            {isCircuitUser ? formatCircuitLocation(circuit) : formatCircuitName(circuit)}
+          </span>
         </>
       )}
 
-      {isLoading && (
-        <span className={styles.loading} role="status" aria-label="Carregando o circuito">
+      {(isLoading || congregation.isLoading) && (
+        <span className={styles.loading} role="status" aria-label={`Carregando ${scopeName}`}>
           <Skeleton className={styles.loadingName} />
           <Skeleton className={styles.loadingLocation} />
         </span>
@@ -40,8 +56,16 @@ export function AccountCircuit({ circuitId }: AccountCircuitProps) {
 
       {isFailed && (
         <span className={styles.failure}>
-          <span className={styles.location}>Não foi possível carregar o circuito.</span>
-          <button type="button" className={styles.retry} onClick={() => refetch()} disabled={isFetching}>
+          <span className={styles.location}>Não foi possível carregar {scopeName}.</span>
+          <button
+            type="button"
+            className={styles.retry}
+            onClick={() => {
+              refetch();
+              if (!isCircuitUser) congregation.refetch();
+            }}
+            disabled={isFetching}
+          >
             Tentar de novo
           </button>
         </span>

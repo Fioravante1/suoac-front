@@ -11,6 +11,8 @@ export const queryKeys = {
     list: (circuitId: string, page: number) => ["suoac", "congregations", "list", circuitId, page] as const,
     select: (circuitId: string) => ["suoac", "congregations", "select", circuitId] as const,
     detail: (id: string) => ["suoac", "congregations", "detail", id] as const,
+    eventStatus: (eventId: string, congregationId: string) =>
+      ["suoac", "congregations", "event-status", eventId, congregationId] as const,
     eventStatuses: (eventId: string) => ["suoac", "congregations", "event-statuses", eventId] as const,
   },
   events: {

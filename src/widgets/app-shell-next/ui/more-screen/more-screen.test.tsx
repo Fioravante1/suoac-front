@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { USER_ROLES, type SessionUser } from "@/shared/auth";
 
+import { MoreScreen } from "./more-screen";
+
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
   useAuthPermissions: vi.fn(),
@@ -19,7 +21,10 @@ vi.mock("@/shared/auth", async (importOriginal) => ({
   useAuth: mocks.useAuth,
   useAuthPermissions: mocks.useAuthPermissions,
 }));
-vi.mock("@/shared/api", () => ({ useQuery: mocks.useQuery }));
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: mocks.useQuery,
+}));
 vi.mock("@/entities/congregation", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/entities/congregation")>()),
   congregationEventStatusesOptions: (eventId: string) => ({ queryKey: ["event-statuses", eventId] }),
@@ -34,8 +39,6 @@ vi.mock("../../model", async (importOriginal) => ({
   useSignOut: () => ({ signOut: mocks.signOut, isSigningOut: mocks.isSigningOut }),
 }));
 vi.mock("../account-circuit", () => ({ AccountCircuit: () => <span>Circuito SP-17</span> }));
-
-import { MoreScreen } from "./more-screen";
 
 const coordinator: SessionUser = {
   id: "user-1",
@@ -52,7 +55,7 @@ describe("MoreScreen", () => {
     vi.clearAllMocks();
     mocks.isSigningOut = false;
     mocks.useAuth.mockReturnValue({ user: coordinator, isAuthenticated: true });
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
     mocks.useSelectedEvent.mockReturnValue({ event: { id: "event-1" } });
     mocks.useQuery.mockReturnValue({ data: undefined });
     mocks.useIsDarkTheme.mockReturnValue(false);
@@ -161,5 +164,11 @@ describe("MoreScreen", () => {
     const { container } = render(<MoreScreen />);
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("desabilita consultas de circuito para a congregação", () => {
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
+    render(<MoreScreen />);
+    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }));
   });
 });

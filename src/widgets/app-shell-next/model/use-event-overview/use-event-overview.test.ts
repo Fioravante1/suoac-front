@@ -2,14 +2,29 @@ import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EVENT_DAY_STATUSES, EVENT_STATUSES, EVENT_TYPES, type Event, type EventStatus } from "@/entities/event";
-
-const mocks = vi.hoisted(() => ({ useSelectedEvent: vi.fn(), useAuthPermissions: vi.fn(), useEventToday: vi.fn() }));
-
-vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
-vi.mock("@/shared/auth", () => ({ useAuthPermissions: mocks.useAuthPermissions }));
-vi.mock("../use-event-today", () => ({ useEventToday: mocks.useEventToday }));
+import { CONGREGATION_LIST_STATUSES } from "@/entities/congregation";
+import { USER_ROLES } from "@/shared/auth";
 
 import { useEventOverview } from "./use-event-overview";
+
+const mocks = vi.hoisted(() => ({
+  useQuery: vi.fn(),
+  useSelectedEvent: vi.fn(),
+  useAuthPermissions: vi.fn(),
+  useEventToday: vi.fn(),
+}));
+
+vi.mock("@/features/select-event", () => ({ useSelectedEvent: mocks.useSelectedEvent }));
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: mocks.useAuthPermissions,
+}));
+vi.mock("../use-event-today", () => ({ useEventToday: mocks.useEventToday }));
+
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: mocks.useQuery,
+}));
 
 function buildEvent(status: EventStatus): Event {
   return {
@@ -51,7 +66,8 @@ function select(event: Event | null, isLoading = false) {
 describe("useEventOverview", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useQuery.mockReturnValue({ data: undefined });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
     mocks.useEventToday.mockReturnValue("2026-10-07");
   });
 
@@ -92,7 +108,7 @@ describe("useEventOverview", () => {
     select(buildEvent(EVENT_STATUSES.OPEN));
     const congregationView = renderHook(() => useEventOverview()).result.current;
 
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
     select(buildEvent(EVENT_STATUSES.CLOSED));
     const closedView = renderHook(() => useEventOverview()).result.current;
 
@@ -120,5 +136,62 @@ describe("useEventOverview", () => {
     const state = renderHook(() => useEventOverview()).result.current;
 
     expect(state.status === "ready" && state.registrationAction).toBeNull();
+  });
+
+  it.each([CONGREGATION_LIST_STATUSES.PENDING, CONGREGATION_LIST_STATUSES.FINALIZED])(
+    "cadastro segue o status %s da própria lista",
+    (status) => {
+      mocks.useAuthPermissions.mockReturnValue({
+        isCircuitUser: false,
+        userCongregationId: "c1",
+        isCongregationCoordinator: true,
+      });
+      mocks.useQuery.mockReturnValue({ data: { status } });
+      select(buildEvent(EVENT_STATUSES.OPEN));
+
+      const state = renderHook(() => useEventOverview()).result.current;
+
+      expect(state.status === "ready" && state.canEnroll).toBe(status === CONGREGATION_LIST_STATUSES.PENDING);
+      expect(state.status === "ready" && state.canToggleListStatus).toBe(true);
+    },
+  );
+
+  it.each([
+    {
+      circuit: true,
+      eventStatus: EVENT_STATUSES.CLOSED,
+      listStatus: null,
+      isListError: false,
+      reason: "As inscrições não estão abertas.",
+    },
+    {
+      circuit: false,
+      eventStatus: EVENT_STATUSES.OPEN,
+      listStatus: CONGREGATION_LIST_STATUSES.FINALIZED,
+      isListError: false,
+      reason: "A lista da congregação já foi finalizada.",
+    },
+    {
+      circuit: false,
+      eventStatus: EVENT_STATUSES.OPEN,
+      listStatus: null,
+      isListError: false,
+      reason: "Carregando o status da lista da congregação.",
+    },
+    {
+      circuit: false,
+      eventStatus: EVENT_STATUSES.OPEN,
+      listStatus: null,
+      isListError: true,
+      reason: "Não foi possível confirmar o status da lista da congregação.",
+    },
+  ])("explica cadastro bloqueado: $reason", ({ circuit, eventStatus, listStatus, isListError, reason }) => {
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: circuit, userCongregationId: "c1" });
+    mocks.useQuery.mockReturnValue({ data: listStatus ? { status: listStatus } : undefined, isError: isListError });
+    select(buildEvent(eventStatus));
+
+    const state = renderHook(() => useEventOverview()).result.current;
+
+    expect(state.status === "ready" && state.enrollDisabledReason).toBe(reason);
   });
 });

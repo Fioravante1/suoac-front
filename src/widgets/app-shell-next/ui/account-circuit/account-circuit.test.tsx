@@ -1,16 +1,30 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ useQuery: vi.fn(), refetch: vi.fn() }));
+import { USER_ROLES } from "@/shared/auth";
 
-vi.mock("@/shared/api", () => ({ useQuery: mocks.useQuery }));
+import { AccountCircuit } from "./account-circuit";
+
+vi.mock("@/shared/auth", async (original) => ({
+  ...(await original<typeof import("@/shared/auth")>()),
+  useAuthPermissions: () => ({
+    isCircuitUser: mocks.isCircuitUser,
+    userCongregationId: "claim-congregation",
+    userRole: USER_ROLES.CIRCUIT_COORDINATOR,
+  }),
+}));
+
+const mocks = vi.hoisted(() => ({ useQuery: vi.fn(), refetch: vi.fn(), isCircuitUser: true }));
+
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: mocks.useQuery,
+}));
 vi.mock("@/entities/circuit", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/entities/circuit")>();
 
   return { ...original, ownCircuitOptions: (circuitId: string) => ({ queryKey: ["circuit", circuitId] }) };
 });
-
-import { AccountCircuit } from "./account-circuit";
 
 const circuit = { id: "circuit-1", name: "SP-17", city: "Campinas", state: "SP" };
 
@@ -28,6 +42,7 @@ function mockQuery(state: Partial<{ data: unknown; isLoading: boolean; isError: 
 describe("AccountCircuit", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.isCircuitUser = true;
   });
 
   it("busca o circuito da sessão", () => {
@@ -35,7 +50,7 @@ describe("AccountCircuit", () => {
 
     render(<AccountCircuit circuitId="circuit-1" />);
 
-    expect(mocks.useQuery).toHaveBeenCalledWith({ queryKey: ["circuit", "circuit-1"] });
+    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ["circuit", "circuit-1"] }));
   });
 
   it("mostra o nome do circuito e, embaixo, a cidade e a UF", () => {
@@ -81,5 +96,42 @@ describe("AccountCircuit", () => {
 
     expect(screen.getByText("Circuito SP-17")).toBeInTheDocument();
     expect(screen.queryByText("Não foi possível carregar o circuito.")).not.toBeInTheDocument();
+  });
+
+  it("identifica a própria congregação no menu", () => {
+    mocks.isCircuitUser = false;
+    mocks.useQuery.mockImplementation((options) => {
+      const data =
+        options.queryKey[0] === "circuit" ? circuit : { id: "congregation-1", name: "Jardim Paulista", code: "31245" };
+      return { data, isLoading: false, isError: false, isFetching: false, refetch: mocks.refetch };
+    });
+    render(<AccountCircuit circuitId="circuit-1" />);
+    expect(screen.getByText("Congregação")).toBeInTheDocument();
+    expect(screen.getByText("Jardim Paulista · Cód. 31245")).toBeInTheDocument();
+    expect(screen.getByText("Circuito SP-17")).toBeInTheDocument();
+  });
+
+  it("para a congregação, fala da congregação ao carregar e ao falhar", () => {
+    mocks.isCircuitUser = false;
+    mockQuery({ isLoading: true });
+    const { rerender } = render(<AccountCircuit circuitId="circuit-1" />);
+
+    expect(screen.getByRole("status", { name: "Carregando a congregação" })).toBeInTheDocument();
+
+    mockQuery({ isError: true });
+    rerender(<AccountCircuit circuitId="circuit-1" />);
+
+    expect(screen.getByText("Não foi possível carregar a congregação.")).toBeInTheDocument();
+  });
+
+  it("não dispara consulta de congregação para papel do circuito", () => {
+    mockQuery({ data: circuit });
+    render(<AccountCircuit circuitId="circuit-1" />);
+    expect(mocks.useQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["congregations"]),
+        enabled: false,
+      }),
+    );
   });
 });

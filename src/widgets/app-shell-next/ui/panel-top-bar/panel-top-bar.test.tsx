@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EVENT_STATUSES, EVENT_STATUS_LABELS } from "@/entities/event";
 import { USER_ROLES, type SessionUser } from "@/shared/auth";
 
+import { PanelTopBar } from "./panel-top-bar";
+
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
   useAuthPermissions: vi.fn(),
@@ -17,7 +19,10 @@ vi.mock("@/shared/auth", async (importOriginal) => ({
   useAuth: mocks.useAuth,
   useAuthPermissions: mocks.useAuthPermissions,
 }));
-vi.mock("@/shared/api", () => ({ useQuery: mocks.useQuery }));
+vi.mock("@/shared/api", async (original) => ({
+  ...(await original<typeof import("@/shared/api")>()),
+  useQuery: mocks.useQuery,
+}));
 vi.mock("@/entities/circuit", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/entities/circuit")>();
 
@@ -27,8 +32,6 @@ vi.mock("@/features/select-event", () => ({
   useEventSwitcher: mocks.useEventSwitcher,
   EventSwitcherSheet: ({ open }: { open: boolean }) => open && <div role="dialog" aria-label="Eventos do circuito" />,
 }));
-
-import { PanelTopBar } from "./panel-top-bar";
 
 const coordinator: SessionUser = {
   id: "user-1",
@@ -54,7 +57,7 @@ describe("PanelTopBar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.useAuth.mockReturnValue({ user: coordinator, isAuthenticated: true });
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true });
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userRole: USER_ROLES.CIRCUIT_COORDINATOR });
     mocks.useQuery.mockReturnValue({ data: { id: "circuit-1", name: "SP-17", city: "Campinas", state: "SP" } });
     switcher();
   });
@@ -128,13 +131,16 @@ describe("PanelTopBar", () => {
     expect(screen.queryByText(/^Circuito /)).not.toBeInTheDocument();
   });
 
-  it("fica de fora para os papéis da congregação, que têm a navegação do SUC-113, sem buscar o circuito", () => {
-    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: false });
-
-    const { container } = render(<PanelTopBar />);
-
-    expect(container).toBeEmptyDOMElement();
-    expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }));
+  it("mostra a congregação e mantém acesso à conta", () => {
+    mocks.useAuthPermissions.mockReturnValue({
+      isCircuitUser: false,
+      userCongregationId: "c1",
+      isCongregationAssistant: true,
+    });
+    mocks.useQuery.mockReturnValue({ data: { id: "c1", name: "Jardim Paulista", code: "31245" } });
+    render(<PanelTopBar />);
+    expect(screen.getByText("Jardim Paulista · Cód. 31245")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Conta de/ })).toHaveAttribute("href", "/more");
   });
 
   it("busca o circuito para o circuito", () => {
@@ -142,6 +148,7 @@ describe("PanelTopBar", () => {
 
     expect(mocks.useQuery).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
   });
+
   it.each([EVENT_STATUSES.DRAFT, EVENT_STATUSES.CANCELLED])("mostra a pílula compacta de %s", (status) => {
     switcher({
       current: {
@@ -156,6 +163,17 @@ describe("PanelTopBar", () => {
     expect(screen.getByText(EVENT_STATUS_LABELS[status])).toHaveAttribute(
       "data-tone",
       status === EVENT_STATUSES.DRAFT ? "draft" : "cancelled",
+    );
+  });
+
+  it("não dispara consulta de congregação para papel do circuito", () => {
+    mocks.useAuthPermissions.mockReturnValue({ isCircuitUser: true, userCongregationId: "claim-congregation" });
+    render(<PanelTopBar />);
+    expect(mocks.useQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["congregations"]),
+        enabled: false,
+      }),
     );
   });
 });

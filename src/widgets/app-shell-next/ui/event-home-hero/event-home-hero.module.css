@@ -17,6 +17,10 @@
   transition: background-color var(--suoac-motion-theme) var(--suoac-motion-ease-standard);
 }
 
+.hero[data-assistant] {
+  grid-template-areas: "when" "steps" "actions" "note";
+}
+
 @media (min-width: 47.5rem) {
   .hero {
     grid-template-areas:
@@ -25,6 +29,12 @@
     grid-template-columns: minmax(0, 1fr) 23.75rem;
     gap: 1.125rem var(--suoac-space-8);
     padding: 0.625rem 1.75rem 1.625rem;
+  }
+}
+
+@media (min-width: 47.5rem) {
+  .hero[data-assistant] {
+    grid-template-areas: "when actions" "steps steps" "note note";
   }
 }
 
@@ -129,4 +139,13 @@
   width: 100%;
   height: var(--suoac-button-height);
   border-radius: var(--suoac-radius-md);
+}
+
+.assistantNote {
+  grid-area: note;
+  margin: 0;
+  padding: var(--suoac-space-3);
+  border-radius: var(--suoac-radius-md);
+  background: var(--suoac-color-on-navy-tint);
+  font-size: var(--suoac-font-size-small);
 }
