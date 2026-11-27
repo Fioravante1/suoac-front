@@ -323,6 +323,8 @@ export interface Event {
    * prazo. `null` enquanto estão abertas e em evento antigo sem registro; opcional como `publishedAt`.
    */
   registrationClosedAt?: string | null;
+  cancelledAt?: string | null;
+  cancelledBy?: { id: string; name: string } | null;
   circuitId: string;
   createdById: string;
   createdAt: string;
