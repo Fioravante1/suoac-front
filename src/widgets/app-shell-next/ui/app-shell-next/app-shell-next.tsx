@@ -14,7 +14,6 @@ import { StackedScreenBar } from "../stacked-screen-bar";
 import { EventHomeHero } from "../event-home-hero";
 import { PanelEventState } from "../panel-event-state";
 import { PanelBottomNav } from "../panel-bottom-nav";
-import { QuickActionsDock } from "../quick-actions-dock";
 
 import styles from "./app-shell-next.module.css";
 
@@ -48,7 +47,6 @@ export function AppShellNext({ children }: Readonly<{ children: ReactNode }>) {
           </PanelEventState>
         </div>
         <PanelBottomNav />
-        <QuickActionsDock />
       </div>
     </SelectedEventProvider>
   );

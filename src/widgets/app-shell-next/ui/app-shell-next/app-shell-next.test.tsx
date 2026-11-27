@@ -18,7 +18,6 @@ vi.mock("../panel-top-bar", () => ({ PanelTopBar: () => <div>Topo compacto</div>
 vi.mock("../stacked-screen-bar", () => ({ StackedScreenBar: () => <div>Voltar para Mais</div> }));
 vi.mock("../event-home-hero", () => ({ EventHomeHero: () => <div>Hero compacto</div> }));
 vi.mock("../panel-bottom-nav", () => ({ PanelBottomNav: () => <div>Navegação inferior</div> }));
-vi.mock("../quick-actions-dock", () => ({ QuickActionsDock: () => <div>Atalhos</div> }));
 vi.mock("../panel-event-state", () => ({
   PanelEventState: ({ children, className }: { children: ReactNode; className?: string }) => (
     <section data-testid="panel-state">
@@ -48,7 +47,6 @@ describe("AppShellNext", () => {
       "Voltar para Mais",
       "Hero compacto",
       "Navegação inferior",
-      "Atalhos",
     ]) {
       expect(provider).toContainElement(screen.getByText(label));
       expect(screen.getByText(label).closest('[data-testid="legacy"]')).toBeNull();
