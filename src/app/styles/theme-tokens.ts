@@ -318,7 +318,8 @@ export const darkThemeTokens: ThemeVariant = {
     attentionSoft: "#342B10",
     criticalSoft: "#3A1D1D",
     neutralSoft: "#1C2623",
-    glass: "rgb(21 29 27 / 0.78)",
+    // 0.92, e nao o 0.78 do handoff: as barras de vidro passam sobre telas v1 claras (SUC-115).
+    glass: "rgb(21 29 27 / 0.92)",
     scrim: "rgb(0 0 0 / 0.6)",
     // O handoff define um unico scrim de modal, igual nos dois temas.
     modalScrim: "rgb(10 26 41 / 0.55)",
