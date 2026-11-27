@@ -1,7 +1,7 @@
 /*
  * Celular: barra de vidro de 440px no maximo, colada na borda de baixo. Tablet (760px a 1279px):
  * pilula flutuante de 560px no maximo, a 16px da borda. A partir de 1280px
- * (`--suoac-breakpoint-panel-desktop`) some, e o desktop usa o dock.
+ * (`--suoac-breakpoint-panel-desktop`) some, e o desktop navega pelas abas do resumo.
  *
  * Cinco colunas: Inicio, Passageiros, o "+", Financeiro e Mais, na ordem do DOM.
  */

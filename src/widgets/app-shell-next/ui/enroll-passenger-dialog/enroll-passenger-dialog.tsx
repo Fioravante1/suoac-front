@@ -11,7 +11,7 @@ type EnrollPassengerDialogProps = Readonly<{ event: Event; onClose: () => void }
 
 /**
  * O modal de inscrição de hoje, o mesmo do detalhe do evento, aberto pelo Cadastrar passageiro
- * do resumo e pelo dock de ações rápidas, até a Fatia 4 (SUC-8) redesenhar o cadastro.
+ * do resumo e pelo "+" da barra de baixo, até a Fatia 4 (SUC-8) redesenhar o cadastro.
  *
  * Sai do shell por um portal: o `Modal` antigo é desenhado no lugar em que é montado, e dentro
  * do resumo herdaria o texto branco do navy e sumiria com ele abaixo de 1280px. No

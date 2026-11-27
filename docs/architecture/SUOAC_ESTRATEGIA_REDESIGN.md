@@ -289,8 +289,10 @@ uma:
 
 - **Celular e tablet** seguem o `SUOAC Dashboard Mobile.dc.html`: topo navy, barra inferior com o
   botão "+" (no tablet, uma pílula flutuante) e a tela "Mais" (SUC-110).
-- **Desktop** segue o `SUOAC Dashboard v3.dc.html`: faixa do evento, resumo, abas e dock de ações
-  (SUC-106 a SUC-109).
+- **Desktop** segue o `SUOAC Dashboard v3.dc.html`: faixa do evento, resumo e abas (SUC-106 a
+  SUC-109). O dock de ações rápidas, que o `v3` não desenha e o SUC-109 trouxe da exploração antiga,
+  saiu em 27/11/2026 por decisão do usuário (SUC-115): fixo no rodapé, cobria o fim das páginas, e
+  as ações dele já estão no resumo e nas abas.
 
 Decisões do usuário, registradas no épico:
 

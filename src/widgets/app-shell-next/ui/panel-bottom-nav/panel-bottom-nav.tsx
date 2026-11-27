@@ -33,7 +33,7 @@ const ITEMS_BEFORE_FAB = 2;
  * colada na borda de baixo; no tablet, uma pílula flutuante. No desktop (a partir de 1280px) some.
  *
  * O item ativo vem da rota (`aria-current="page"`), e Mais fica ativo nas telas empilhadas atrás
- * dele. O "+" abre o cadastro de hoje, o mesmo do resumo e do dock, até a Fatia 4 (SUC-8); sem
+ * dele. O "+" abre o cadastro de hoje, o mesmo do resumo, até a Fatia 4 (SUC-8); sem
  * inscrições abertas ele fica desabilitado, como o Cadastrar passageiro do resumo some.
  *
  * Um espaçador do tamanho da barra vem junto, para ela não cobrir o fim do conteúdo das telas.

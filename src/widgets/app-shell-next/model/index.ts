@@ -24,8 +24,6 @@ export { EVENT_TAB_IDS, getEventTabs, isEventTabActive } from "./event-tabs";
 export type { EventTab, EventTabId } from "./event-tabs";
 export { useEventTabCounts } from "./use-event-tab-counts";
 export type { EventTabCounts } from "./use-event-tab-counts";
-export { QUICK_ACTION_IDS, findShortcutAction, getQuickActions } from "./quick-actions";
-export type { QuickAction, QuickActionId } from "./quick-actions";
 export {
   MORE_SCREENS,
   MORE_SCREEN_IDS,

@@ -590,7 +590,12 @@ html[data-theme="dark"] {
   --suoac-color-attention-soft: #342b10;
   --suoac-color-critical-soft: #3a1d1d;
   --suoac-color-neutral-soft: #1c2623;
-  --suoac-color-glass: rgb(21 29 27 / 0.78);
+  /*
+   * O handoff pede 0.78, mas as barras de vidro do painel passam sobre telas v1, que ficam claras
+   * no `LegacyThemeScope`: com 0.78 o fundo claro vaza e os rotulos caem para 3.3:1. Com 0.92 ficam
+   * acima de 5.3:1 mesmo sobre branco, e sobre fundo escuro nada muda (SUC-115).
+   */
+  --suoac-color-glass: rgb(21 29 27 / 0.92);
 
   /* Shadows */
   --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
@@ -647,7 +652,8 @@ html[data-theme="dark"] {
     --suoac-color-attention-soft: #342b10;
     --suoac-color-critical-soft: #3a1d1d;
     --suoac-color-neutral-soft: #1c2623;
-    --suoac-color-glass: rgb(21 29 27 / 0.78);
+    /* 0.92, e nao o 0.78 do handoff: ver o bloco `html[data-theme="dark"]`. */
+    --suoac-color-glass: rgb(21 29 27 / 0.92);
 
     /* Shadows */
     --suoac-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);

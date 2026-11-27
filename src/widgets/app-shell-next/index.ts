@@ -7,6 +7,5 @@ export { EventSummary } from "./ui/event-summary";
 export { MoreScreen } from "./ui/more-screen";
 export { PanelBottomNav } from "./ui/panel-bottom-nav";
 export { PanelTopBar } from "./ui/panel-top-bar";
-export { QuickActionsDock } from "./ui/quick-actions-dock";
 export { StackedScreenBar } from "./ui/stacked-screen-bar";
 export { PanelEventState } from "./ui/panel-event-state";
