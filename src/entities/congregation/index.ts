@@ -1,3 +1,9 @@
-export { CONGREGATION_LIST_STATUSES, countUnfinalizedCongregations } from "./model";
+export { formatCongregationScope, CONGREGATION_LIST_STATUSES, countUnfinalizedCongregations } from "./model";
 export type { Congregation, CongregationEventStatus, CongregationListStatus } from "./model";
-export { congregationEventStatusesOptions, congregationListOptions, congregationSelectOptions } from "./api";
+export {
+  congregationDetailOptions,
+  congregationEventStatusOptions,
+  congregationEventStatusesOptions,
+  congregationListOptions,
+  congregationSelectOptions,
+} from "./api";

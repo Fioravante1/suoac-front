@@ -38,6 +38,8 @@ export const endpoints = {
     delete: (id: string) => `/events/${id}` as const,
     dashboard: (eventId: string) => `/events/${eventId}/dashboard` as const,
     financialSummary: (eventId: string) => `/events/${eventId}/financial-summary` as const,
+    congregationStatus: (eventId: string, congregationId: string) =>
+      `/events/${eventId}/congregation-statuses/${congregationId}` as const,
     congregationStatuses: (eventId: string) => `/events/${eventId}/congregation-statuses` as const,
   },
   eventDays: {

@@ -35,3 +35,8 @@ export interface CongregationEventStatus {
 export function countUnfinalizedCongregations(statuses: readonly CongregationEventStatus[]): number {
   return statuses.filter((item) => item.status !== CONGREGATION_LIST_STATUSES.FINALIZED).length;
 }
+
+/** Nome e código identificam o escopo da própria congregação no shell. */
+export function formatCongregationScope(congregation: Pick<Congregation, "name" | "code">): string {
+  return `${congregation.name} · Cód. ${congregation.code}`;
+}

@@ -24,3 +24,11 @@ export async function fetchCongregation(id: string): Promise<Congregation> {
 export async function fetchCongregationEventStatuses(eventId: string): Promise<CongregationEventStatus[]> {
   return httpClient<CongregationEventStatus[]>(endpoints.events.congregationStatuses(eventId));
 }
+
+/** A situação individual da lista; a API restringe o escopo de congregação. */
+export async function fetchCongregationEventStatus(
+  eventId: string,
+  congregationId: string,
+): Promise<CongregationEventStatus> {
+  return httpClient<CongregationEventStatus>(endpoints.events.congregationStatus(eventId, congregationId));
+}
